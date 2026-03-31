@@ -10,7 +10,7 @@
 
 // ************************************************
 SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
-                                 const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerInterface() {
+                                     const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerInterface() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerBase object");
@@ -1504,9 +1504,16 @@ std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHist(const int iSample,
   auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
 
   //DB Define the histogram which will be returned
-  std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrX);
-  std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
-  auto _h2DVar = std::make_unique<TH2D>("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  //KS: If we use 2D non uniform binning and wanting to plot fit variables use TH2Poly everything else uses TH2D with binning from config
+  std::unique_ptr<TH2> _h2DVar;
+  if(GetNDim(iSample) == 2 && !Binning->IsUniform(iSample) &&
+     ProjectionVar_StrX == GetKinVarName(iSample, 0) && ProjectionVar_StrY == GetKinVarName(iSample, 1) ) {
+    _h2DVar = std::unique_ptr<TH2>(static_cast<TH2*>(M3::Clone(GetMCHist(iSample)).release()));
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrX);
+    std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
+    _h2DVar = std::make_unique<TH2D>("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  }
   _h2DVar->SetDirectory(nullptr);
   _h2DVar->GetXaxis()->SetTitle(ProjectionVar_StrX.c_str());
   _h2DVar->GetYaxis()->SetTitle(ProjectionVar_StrY.c_str());
@@ -1541,7 +1548,7 @@ std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHist(const int iSample,
 }
 
 // ************************************************
-void SampleHandlerBase::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
+void SampleHandlerBase::Fill2DSubEventHist(const int iSample, TH2* _h2DVar,
                                          const std::string& ProjectionVar_StrX,
                                          const std::string& ProjectionVar_StrY,
                                          const std::vector< KinematicCut >& SubEventSelectionVec,
