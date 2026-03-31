@@ -206,6 +206,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// @brief Function which translates experiment struct into core struct
   virtual void SetupMC() = 0;
+  /// @brief Function responsible for loading data from file or loading from file
+  virtual void InititialiseData() = 0;
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();

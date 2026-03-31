@@ -369,6 +369,16 @@ public:
     }
 
     /* Trampoline (need one for each virtual function) */
+    void InititialiseData() override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,                /* Return type */
+            SampleHandlerBase,   /* Parent class */
+            "inititialis_data",  /*python name*/
+            InititialiseData,    /* Name of function in C++ */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
     void SetupMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,               /* Return type */
