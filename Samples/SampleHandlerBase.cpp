@@ -161,6 +161,7 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
     MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), TempBoundsVec[0], TempBoundsVec[1]);
     StoredSelection[iSample].emplace_back(CutObj);
   }
+  Selection = StoredSelection;
   /// Add new sample
   SampleDetails[iSample] = std::move(SingleSample);
 }
