@@ -237,8 +237,30 @@ std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxe
   return Ratio;
 }
 
+bool IsInvalidHist(const TH1D* hist, double invalid = M3::_BAD_DOUBLE_)
+{
+  if (!hist) return true;
+
+  const int nBins = hist->GetNbinsX();
+
+  for (int i = 1; i <= nBins; i++) {
+    double val = hist->GetBinContent(i);
+
+    // If ANY bin is valid → histogram is usable
+    if (val != invalid) {
+      return false;
+    }
+  }
+
+  // All bins are invalid
+  return true;
+}
+
 void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec,
                TPad *mainPad, TPad *ratioPad, const std::string& OutName) {
+  // KS: If plot is invalid for some reason simply do not plot
+  if(IsInvalidHist(PrefitCopy)) return;
+
   // Draw!
   plotCanv->cd();
   mainPad->Draw();
@@ -466,7 +488,7 @@ void MakeFluxPlots(TCanvas* canv)
 void MakeNDDetPlots()
 {
   MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
-  TCanvas* canv = new TCanvas("canv", "canv", 1024, 1024);
+  auto canv = std::make_unique<TCanvas>("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
   gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
@@ -481,7 +503,7 @@ void MakeNDDetPlots()
 
   TPad* pTop = nullptr;
   TPad* pDown = nullptr;
-  InitializePads(canv, pTop, pDown);
+  InitializePads(canv.get(), pTop, pDown);
 
   int NDbinCounter = NDParametersStartingPos;
   int Start = NDbinCounter;
@@ -525,13 +547,12 @@ void MakeNDDetPlots()
     
     Start += NDSamplesBins[i];
 
-    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown, SaveName);
+    DrawPlots(canv.get(), PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown, SaveName);
     canv->Update();
   }
   delete pTop;
   delete pDown;
   delete Prefit;
-  delete canv;
 }
 
 void MakeRidgePlots()
@@ -733,20 +754,22 @@ void GetPostfitParamPlots()
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   // make a dummy TH1 to set out legend
-  TH1D* Prefit = new TH1D();
-  PlotMan->style().setTH1Style(Prefit, PlotMan->getOption<std::string>("prefitHistStyle"));
-  leg->AddEntry(Prefit, "Prior", "lpf");
+  auto Prefit = std::make_unique<TH1D>();
+  Prefit->SetDirectory(nullptr);
+  PlotMan->style().setTH1Style(Prefit.get(), PlotMan->getOption<std::string>("prefitHistStyle"));
+  leg->AddEntry(Prefit.get(), "Prior", "lpf");
 
+  std::vector<std::unique_ptr<TH1D>> postFitHist_tmp(PlotMan->getNFiles());
   for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
-    TH1D *postFitHist_tmp = new TH1D();
-    postFitHist_tmp->SetBit(kCanDelete);
+    postFitHist_tmp[fileId] = std::make_unique<TH1D>();
+    postFitHist_tmp[fileId]->SetDirectory(nullptr);
     
-    postFitHist_tmp->SetMarkerColor(TColor::GetColorPalette(fileId));
-    postFitHist_tmp->SetLineColor(TColor::GetColorPalette(fileId));
-    postFitHist_tmp->SetMarkerStyle(7);
-    postFitHist_tmp->SetLineStyle(1+fileId);
-    postFitHist_tmp->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
-    leg->AddEntry(postFitHist_tmp, PlotMan->getFileLabel(fileId).c_str(), "lpf");
+    postFitHist_tmp[fileId]->SetMarkerColor(TColor::GetColorPalette(fileId));
+    postFitHist_tmp[fileId]->SetLineColor(TColor::GetColorPalette(fileId));
+    postFitHist_tmp[fileId]->SetMarkerStyle(7);
+    postFitHist_tmp[fileId]->SetLineStyle(1+fileId);
+    postFitHist_tmp[fileId]->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
+    leg->AddEntry(postFitHist_tmp[fileId].get(), PlotMan->getFileLabel(fileId).c_str(), "lpf");
   }
 
   canv->cd();
@@ -764,8 +787,6 @@ void GetPostfitParamPlots()
   canv->Print((SaveName+"]").c_str());
 
   MakeRidgePlots();
-
-  delete Prefit;
 }
 
 std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {})
