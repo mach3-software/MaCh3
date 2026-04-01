@@ -323,13 +323,13 @@ class SampleHandlerFD :  public SampleHandlerBase
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    if (ExptEvents.size() != MCSamples.size()) {
+    if (ExptEvents.size() != MCEvents.size()) {
       MACH3LOG_ERROR("When registering functional shift consuming parameters: "
                      "[ {}], SampleHandler: {} knows about {} MCEvents, but "
                      "passed a vector of experiment events size: "
                      "{}. SampleHandler must have a unique set of event "
                      "indices so this indicates something has gone wrong.",
-                     ss_pars.str(), SampleHandlerName, MCSamples.size(),
+                     ss_pars.str(), SampleHandlerName, MCEvents.size(),
                      ExptEvents.size());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -366,10 +366,9 @@ class SampleHandlerFD :  public SampleHandlerBase
     for (int iEvent = 0; iEvent < NEvents; ++iEvent) {
       int nmatch = 0;
       for (auto const &par : matched_pars) {
-        if (!MatchCondition(par->modes, static_cast<int>(std::round(
-                                            *(MCSamples[iEvent].mode))))) {
+        if (!MatchCondition(par->modes, MCEvents[iEvent].mode)) {
           MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent,
-                         *(MCSamples[iEvent].mode), par->name);
+                         *(MCEvents[iEvent].mode), par->name);
           break;
         }
         if (!PassesSelection((*par), iEvent)) {
@@ -530,7 +529,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //===============================================================================
   /// Stores information about every MC event
-  std::vector<EventInfo> MCSamples;
+  std::vector<EventInfo> MCEvents;
   /// Stores info about currently initialised sample
   std::vector<SampleInfo> SampleDetails;
   //===============================================================================
