@@ -6,9 +6,12 @@ set(OSCILLATOR_OPTIONS
     ProbGPULinear
     Prob3ppLinear
     NuFastLinear
+    NuFastEarth
     NuSQUIDSLinear
     OscProb
+    OscLibLinear
     GLoBESLinear
+    CHICLinear
 )
 
 # KS: Tells whether all oscillators were disabled
@@ -38,14 +41,9 @@ foreach(option IN LISTS OSCILLATOR_OPTIONS)
 endforeach()
 
 #NuOscillator uses 1/0 instead of true/false thus use conversion
-IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
-IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
-IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
-IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
-IsTrue(NuFastLinear_ENABLED USE_NuFastLinear)
-IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLinear)
-IsTrue(OscProb_ENABLED USE_OscProb)
-IsTrue(GLoBESLinear_ENABLED USE_GLoBESLinear)
+foreach(option IN LISTS OSCILLATOR_OPTIONS)
+  IsTrue(${option}_ENABLED USE_${option})
+endforeach()
 
 #Also additional flags
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
@@ -68,7 +66,7 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v1.4.5")
+  set(MaCh3_NuOscillatorBranch "v1.5.0")
 endif()
 
 #Try adding Oscillator Class
@@ -87,9 +85,12 @@ CPMAddPackage(
     "UseProbGPULinear ${USE_ProbGPULinear}"
     "UseProb3ppLinear ${USE_Prob3ppLinear}"
     "UseNuFASTLinear  ${USE_NuFastLinear}"
+    "UseNuFASTEarth  ${USE_NuFastEarth}"
     "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"
     "UseOscProb ${USE_OscProb}"
     "UseGLoBESLinear ${USE_GLoBESLinear}"
+    "UseCHICLinear ${USE_CHICLinear}"
+    "UseOscLibLinear ${USE_OscLibLinear}"
 
     "NuOscillator_Compiler_Flags ${cpu_compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
