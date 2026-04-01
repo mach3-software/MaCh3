@@ -18,6 +18,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include <cmath>
 #include <fstream>
 #include <map>
+#include <omp.h>
 _MaCh3_Safe_Include_End_ //}
 
 /// @file ReweightMCMC.cpp
@@ -62,6 +63,10 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile);
 void ReweightMCMC(const std::string& configFile, const std::string& inputFile, bool reducedChain); // overload to handle temporary fix for reduced chains
 /// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
 
+namespace {
+bool gVerboseLogging = false;
+}
+
 /// @brief Function to interpolate 2D graph for Normal Ordering
 double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32);
 
@@ -82,13 +87,25 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 int main(int argc, char *argv[]) {
     SetMaCh3LoggerFormat();
     
-    if (argc != 3) {
-        MACH3LOG_ERROR("How to use: {} <config.yaml> <input_file.root>", argv[0]);
+    if (argc != 3 && argc != 4) {
+        MACH3LOG_ERROR("How to use: {} <config.yaml> <input_file.root> [verbose]", argv[0]);
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
     std::string configFile = argv[1]; 
     std::string inputFile = argv[2];
+
+    if (argc == 4) {
+        std::string mode = argv[3];
+        if (mode == "verbose") {
+            gVerboseLogging = true;
+            MACH3LOG_INFO("Verbose progress logging enabled (prints every 100000 entries)");
+        } else {
+            MACH3LOG_ERROR("Unknown optional argument: {}. Only 'verbose' is supported.", mode);
+            MACH3LOG_ERROR("How to use: {} <config.yaml> <input_file.root> [verbose]", argv[0]);
+            throw MaCh3Exception(__FILE__, __LINE__);
+        }
+    }
     
     // Check input for posteriors vs osc_posteriors, fail gracefully if osc_posteriors since ProcessMCMC doesn't support reduced chain naming conventions
     auto tempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
@@ -475,6 +492,9 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
         for (Long64_t i = 0; i < nEntries; ++i) {
+            if (gVerboseLogging && (i % 100000 == 0)) {
+                MACH3LOG_INFO("Reweight progress (posteriors): entry {}/{}", i, nEntries);
+            }
             if (i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
             inTree->GetEntry(i);
 
@@ -483,7 +503,6 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                 double weight = 1.0;
 
                 if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
-                    // Match reduced-chain behavior: product of Gaussian priors for requested parameters.
                     for (size_t j = 0; j < rwConfig.paramNames.size(); ++j) {
                         const std::string& paramName = rwConfig.paramNames[j];
                         const double paramValue = paramValues[paramName];
@@ -745,26 +764,86 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     //     }
     // }
 
-    // ProcessMCMC cannot handle the 1D rewighting on a reduced chain so we need to do it ourselves even for the 1D gaussian case, but we can still set the flag to skip the 1D Gaussian reweighting in ProcessMCMC if its present in the config
+    // ProcessMCMC cannot handle the 1D rewighting on a reduced chain so we need to do it ourselves even for the 1D gaussian case.
     bool processMCMCreweighted=false;
 
-    // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
-    // Process all entries
+    // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves.
+    // Stage 1: cache all required parameter values outside multithread block.
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
+    const Long64_t progressStep = (nEntries >= 20) ? (nEntries / 20) : 1;
+
+    // Validate Gaussian priors once before entering the threaded section.
+    for (const auto& rwConfig : reweightConfigs) {
+        if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
+            for (size_t j = 0; j < rwConfig.priorValues.size(); ++j) {
+                const double sigma = rwConfig.priorValues[j][1];
+                if (sigma <= 0.0) {
+                    MACH3LOG_ERROR("Invalid Gaussian sigma={} for parameter {}", sigma, rwConfig.paramNames[j]);
+                    throw MaCh3Exception(__FILE__, __LINE__);
+                }
+            }
+        }
+    }
+
+    std::map<std::string, std::vector<double>> cachedParamValues;
+    for (const auto& kv : paramValues) {
+        cachedParamValues.emplace(kv.first, std::vector<double>(nEntries, 0.0));
+    }
     
 
     /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
     
+    for (Long64_t i = 0; i < nEntries; ++i) {
+        if (gVerboseLogging && (i % 100000 == 0)) {
+            MACH3LOG_INFO("Caching progress (osc_posteriors): entry {}/{}", i, nEntries);
+        }
+        if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+        inTree->GetEntry(i);
+        for (auto& kv : cachedParamValues) {
+            kv.second[i] = paramValues.at(kv.first);
+        }
+    }
+    MaCh3Utils::PrintProgressBar(nEntries, nEntries);
+
+    // Warm up ROOT interpolation internals before entering parallel region.
+    for (const auto& rwConfig : reweightConfigs) {
+        if (rwConfig.dimension == 1 && rwConfig.type == "TGraph") {
+            const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
+            if (mapIt != paramMapping.end()) {
+                const auto cacheIt = cachedParamValues.find(mapIt->second);
+                if (cacheIt != cachedParamValues.end() && !cacheIt->second.empty()) {
+                    (void)Graph_interpolate1D(rwConfig.graph_1D.get(), cacheIt->second[0]);
+                }
+            }
+        } else if (rwConfig.dimension == 2 && rwConfig.type == "TGraph2D") {
+            if (rwConfig.graph_NO) {
+                const double xmid = 0.5 * (rwConfig.graph_NO->GetXmin() + rwConfig.graph_NO->GetXmax());
+                const double ymid = 0.5 * (rwConfig.graph_NO->GetYmin() + rwConfig.graph_NO->GetYmax());
+                (void)Graph_interpolateNO(rwConfig.graph_NO.get(), xmid, ymid);
+            }
+            if (rwConfig.graph_IO) {
+                const double xmid = 0.5 * (rwConfig.graph_IO->GetXmin() + rwConfig.graph_IO->GetXmax());
+                const double ymid = 0.5 * (rwConfig.graph_IO->GetYmin() + rwConfig.graph_IO->GetYmax());
+                (void)Graph_interpolateIO(rwConfig.graph_IO.get(), xmid, -ymid);
+            }
+        }
+    }
+
+    // Stage 2: compute weights in parallel using cached values only.
+    std::vector<std::vector<double>> cachedWeights(reweightConfigs.size(), std::vector<double>(nEntries, 1.0));
+
     if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
+        #pragma omp parallel for schedule(static)
         for (Long64_t i = 0; i < nEntries; ++i) {
-            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-            inTree->GetEntry(i);
-
-            // Calculate weights for all configurations
-            for (const auto& rwConfig : reweightConfigs) {
+            if (gVerboseLogging && (i % 100000 == 0)) {
+                #pragma omp critical
+                MACH3LOG_INFO("Threaded reweight progress (osc_posteriors): entry {}/{}", i, nEntries);
+            }
+            for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
+                const auto& rwConfig = reweightConfigs[cfgIdx];
                 double weight = 1.0;
 
                 if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
@@ -773,17 +852,17 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                         const std::string& mach3ParamName = rwConfig.paramNames[j];
                         const auto mapIt = paramMapping.find(mach3ParamName);
                         if (mapIt == paramMapping.end()) {
-                            MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", mach3ParamName);
-                            throw MaCh3Exception(__FILE__, __LINE__);
+                            weight = 0.0;
+                            break;
                         }
 
                         const std::string& reducedParamName = mapIt->second;
-                        const double paramValue = paramValues[reducedParamName];
+                        const double paramValue = cachedParamValues.at(reducedParamName)[i];
                         const double newCentral = rwConfig.priorValues[j][0];
                         const double newError = rwConfig.priorValues[j][1];
                         if (newError <= 0.0) {
-                            MACH3LOG_ERROR("Invalid Gaussian sigma={} for parameter {}", newError, mach3ParamName);
-                            throw MaCh3Exception(__FILE__, __LINE__);
+                            weight = 0.0;
+                            break;
                         }
 
                         const double newChi = (paramValue - newCentral) / newError;
@@ -794,50 +873,62 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                 } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                     if (rwConfig.type == "TGraph") {
                         const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
-                        if (mapIt == paramMapping.end()) {
-                            MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", rwConfig.paramNames[0]);
-                            throw MaCh3Exception(__FILE__, __LINE__);
+                        if (mapIt != paramMapping.end()) {
+                            const double paramValue = cachedParamValues.at(mapIt->second)[i];
+                            weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
+                        } else {
+                            weight = 0.0;
                         }
-                        double paramValue = paramValues[mapIt->second];
-                        weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
                     } else {
-                        MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
+                        weight = 0.0;
                     }
                 } else if (rwConfig.dimension == 2) {
                     if (rwConfig.type == "TGraph2D") {
                         const auto dmMapIt = paramMapping.find(rwConfig.paramNames[0]);
                         const auto thMapIt = paramMapping.find(rwConfig.paramNames[1]);
                         if (dmMapIt == paramMapping.end() || thMapIt == paramMapping.end()) {
-                            MACH3LOG_ERROR("No reduced-chain mapping found for 2D parameters {} and {}", rwConfig.paramNames[0], rwConfig.paramNames[1]);
-                            throw MaCh3Exception(__FILE__, __LINE__);
-                        }
-                        double dm32 = paramValues[dmMapIt->second];
-                        double theta13 = paramValues[thMapIt->second];
-                        if (dm32 > 0) {
-                            // Normal Ordering
-                            if (rwConfig.graph_NO) {
-                                weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
-                            } else {
-                                MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
-                                weight = 0.0;
-                            }
+                            weight = 0.0;
                         } else {
-                            // Inverted Ordering
-                            if (rwConfig.graph_IO) {
-                                weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                            const double dm32 = cachedParamValues.at(dmMapIt->second)[i];
+                            const double theta13 = cachedParamValues.at(thMapIt->second)[i];
+                            if (dm32 > 0) {
+                                // Normal Ordering
+                                if (rwConfig.graph_NO) {
+                                    weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                                } else {
+                                    weight = 0.0;
+                                }
                             } else {
-                                MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
-                                weight = 0.0;
+                                // Inverted Ordering
+                                if (rwConfig.graph_IO) {
+                                    weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                                } else {
+                                    weight = 0.0;
+                                }
                             }
                         }
                     }
                 }
-                weights[rwConfig.weightBranchName] = weight;
-            }
 
-            outTree->Fill();
+                cachedWeights[cfgIdx][i] = weight;
+            }
         }
     }
+
+    // Stage 3: fill tree serially at the end, using cached weights.
+    for (Long64_t i = 0; i < nEntries; ++i) {
+        if (gVerboseLogging && (i % 100000 == 0)) {
+            MACH3LOG_INFO("Fill progress (osc_posteriors): entry {}/{}", i, nEntries);
+        }
+        if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+        inTree->GetEntry(i);
+        for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
+            const auto& rwConfig = reweightConfigs[cfgIdx];
+            weights[rwConfig.weightBranchName] = cachedWeights[cfgIdx][i];
+        }
+        outTree->Fill();
+    }
+    MaCh3Utils::PrintProgressBar(nEntries, nEntries);
     
     // Write and close
     outFile->cd();
