@@ -105,7 +105,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
                           int WeightStyle=0);
-  void Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+  void Fill2DSubEventHist(const int iSample, TH2* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
 
   std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
