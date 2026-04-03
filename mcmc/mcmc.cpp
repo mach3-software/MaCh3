@@ -99,15 +99,14 @@ void mcmc::runMCMC() {
 
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
+  if(stepStart == 0){
+      ProposeStep(multicanonicalHandler.get());
+      multicanonicalHandler->InitializeMulticanonicalParams(systematics);
 
-  ProposeStep(multicanonicalHandler.get());
-
-  multicanonicalHandler->InitializeMulticanonicalParams(systematics);
-
-  // Set the current logL to the proposed logL for the 0th step
-  // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
-  logLCurr = logLProp;
-
+      // Set the current logL to the proposed logL for the 0th step
+      // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
+      logLCurr = logLProp;
+  }
 
   // Begin MCMC
   for (step = stepStart; step < stepStart+chainLength; ++step)
@@ -186,7 +185,7 @@ void mcmc::ProposeStep(MulticanonicalMCMCHandler* multicanonicalHandler) {
       multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightSeparate(delta_cp_value);
     } else {
       // Get the multicanonical weight from the Gaussian
-      multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightGaussian(delta_cp_value);
+      multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightGaussian(delta_cp_value); // remove, redundant now
     }
 
     llh += multicanonical_penalty;

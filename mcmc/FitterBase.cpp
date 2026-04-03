@@ -280,7 +280,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 
   TFile *infile = new TFile(FitName.c_str(), "READ");
   TTree *posts = infile->Get<TTree>("posteriors");
-  int step_val = 0;
+  unsigned int step_val = 0;
   double log_val = M3::_LARGE_LOGL_;
   posts->SetBranchAddress("step",&step_val);
   posts->SetBranchAddress("LogL",&log_val);
@@ -336,6 +336,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     }
   }
   logLCurr = log_val;
+  logLProp = log_val;
 
   delete posts;
   infile->Close();
