@@ -79,9 +79,6 @@ void mcmc::CheckStep() {
 // Run the Markov chain with all the systematic objects added
 void mcmc::runMCMC() {
 
-  // Initialize the multicanonical handler with a smart pointer
-  std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
-
   // *******************
   // Multicanonical method toggle from spline
   multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"],false);
@@ -100,7 +97,7 @@ void mcmc::runMCMC() {
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   if(stepStart == 0){
-      ProposeStep(multicanonicalHandler.get());
+      ProposeStep();
       multicanonicalHandler->InitializeMulticanonicalParams(systematics);
 
       // Set the current logL to the proposed logL for the 0th step
@@ -122,7 +119,7 @@ void mcmc::runMCMC() {
 
     // Propose current step variation and save the systematic likelihood that results in this step being taken
     // Updates logLProp
-    ProposeStep(multicanonicalHandler.get());
+    ProposeStep();
 
     // Does the MCMC accept this step?
     CheckStep();
@@ -147,7 +144,7 @@ void mcmc::runMCMC() {
 
 // *******************
 // Do the initial reconfigure of the MCMC
-void mcmc::ProposeStep(MulticanonicalMCMCHandler* multicanonicalHandler) {
+void mcmc::ProposeStep() {
 // *******************
   // Initial likelihood
   double llh = 0.0;

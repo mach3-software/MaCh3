@@ -42,13 +42,16 @@ class mcmc : public FitterBase {
   inline std::string GetName()const {return "MCMC";};
  private:
   /// @brief Propose a step
-  inline void ProposeStep(MulticanonicalMCMCHandler* multicanonicalHandler);
+  inline void ProposeStep();
 
   /// @brief Do we accept the step
   inline void CheckStep();
 
   /// @brief Print the progress
   inline void PrintProgress();
+
+  // initialise the multicanonical handler with a smart pointer
+  std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
 
   /// Do we reject based on hitting boundaries in systs
   bool reject;
