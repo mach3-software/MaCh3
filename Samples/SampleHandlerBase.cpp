@@ -3,6 +3,11 @@
 #include "Manager/MaCh3Logger.h"
 #include "Splines/UnbinnedSplineHandler.h"
 
+_MaCh3_Safe_Include_Start_ //{
+#include "THStack.h"
+#include "TLegend.h"
+_MaCh3_Safe_Include_End_ //}
+
 #include <cstddef>
 #include <algorithm>
 #include <memory>

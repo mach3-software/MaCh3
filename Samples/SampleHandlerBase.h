@@ -1,17 +1,17 @@
 #pragma once
 
 //MaCh3 includes
+#include "Samples/SampleInfo.h"
+#include "Samples/EventInfo.h"
+
 #include "Splines/BinnedSplineHandler.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
-#include "Samples/FarDetectorCoreInfoStruct.h"
 #include "Samples/BinningHandler.h"
 
-_MaCh3_Safe_Include_Start_ //{
-#include "THStack.h"
-#include "TLegend.h"
-_MaCh3_Safe_Include_End_ //}
+class THStack;
+class TLegend;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
