@@ -110,6 +110,8 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   SampleInfo SingleSample;
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
   SingleSample.SampleTitle = Get<std::string>(SampleSettings["SampleTitle"], __FILE__ , __LINE__);
+  // Sample name used for defying syst uncertainties, if not specified use SampleHandler name
+  SingleSample.SampleName = GetFromManager<std::string>(SampleSettings["SampleName"], GetName(), __FILE__ , __LINE__);
 
   Binning->SetupSampleBinning(SampleSettings["Binning"], SingleSample);
 
@@ -489,35 +491,42 @@ void SampleHandlerBase::SetupFunctionalParameters() {
 // **************************************************
   funcParsGrid.resize(GetNEvents());
   if(ParHandler == nullptr) return;
-  funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
+  funcParsVec.resize(GetNSamples());
+  for(int iSample = 0; iSample < GetNSamples(); iSample++){
+    funcParsVec[iSample] = ParHandler->GetFunctionalParametersFromSampleName(GetSampleName(iSample));
+  }
   // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (FunctionalParameter& fp : funcParsVec) {
-    auto it = funcParsNamesMap.find(fp.name);
-    // If we don't find a match, we need to throw an error
-    if (it == funcParsNamesMap.end()) {
-      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
-      throw MaCh3Exception(__FILE__, __LINE__);
+  for (auto& funcParsSubVec : funcParsVec) {
+    // For every FunctionalParameter in the sub-vector
+    for (FunctionalParameter& fp : funcParsSubVec) {
+      auto it = funcParsNamesMap.find(fp.name);
+      // If we don't find a match, we need to throw an error
+      if (it == funcParsNamesMap.end()) {
+        MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      const std::size_t key = static_cast<std::size_t>(it->second);
+      MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}",fp.name, key);
+
+      const int ikey = it->second;
+      fp.funcPtr = &funcParsFuncMap[ikey];
+
+      funcParsMap[key].valuePtr = fp.valuePtr;
+      funcParsMap[key].funcPtr  = fp.funcPtr;
     }
-    const std::size_t key = static_cast<std::size_t>(it->second);
-    MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}",fp.name, key);
-
-    const int ikey = it->second;
-    fp.funcPtr = &funcParsFuncMap[ikey];
-
-    funcParsMap[key].valuePtr = fp.valuePtr;
-    funcParsMap[key].funcPtr  = fp.funcPtr;
   }
 
   // Mostly the same as CalcNormsBins
   // For each event, make a vector of pointers to the functional parameters
   for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(GetNEvents()); ++iEvent) {
+    const auto SampleId = MCEvents[iEvent].NominalSample;
     // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
-    for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
+    for (std::vector<FunctionalParameter>::iterator it = funcParsVec[SampleId].begin(); it != funcParsVec[SampleId].end(); ++it) {
       // Check whether the interaction modes match
       const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", static_cast<int>(iEvent))));
       bool ModeMatch = MatchCondition(it->modes, Mode);
@@ -591,7 +600,7 @@ void SampleHandlerBase::SetupOscParameters() {
   // KS: Only make sense to setup osc if you have ParHandler
   if(ParHandler == nullptr ) return;
 
-  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  auto OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
   if (OscParams.size() > 0) {
     MACH3LOG_INFO("Setting up NuOscillator..");
     if (Oscillator != nullptr) {
@@ -630,8 +639,11 @@ void SampleHandlerBase::SetupNormParameters() {
   if(ParHandler == nullptr) return;
   std::vector< std::vector< int > > norms_bins(GetNEvents());
 
-  std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
+  std::vector< std::vector<NormParameter>> norm_parameters(GetNSamples());
 
+  for (int iSample = 0; iSample < GetNSamples(); ++iSample) {
+   norm_parameters[iSample] = ParHandler->GetNormParsFromSampleName(GetSampleName(iSample));
+  }
   if(!ParHandler) {
     MACH3LOG_ERROR("ParHandler is not setup!");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -655,14 +667,13 @@ void SampleHandlerBase::SetupNormParameters() {
 
 // ************************************************
 //A way to check whether a normalisation parameter applies to an event or not
-void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins) {
+void SampleHandlerBase::CalcNormsBins(std::vector <std::vector<NormParameter>>& norm_parameters, std::vector< std::vector< int > >& norms_bins) {
 // ************************************************
-  #ifdef MACH3_DEBUG
-  std::vector<int> VerboseCounter(norm_parameters.size(), 0);
-  #endif
   for(unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent){
     std::vector< int > NormBins = {};
     if (ParHandler) {
+      const auto SampleId = MCEvents[iEvent].NominalSample;
+      auto& NormParam = norm_parameters[SampleId];
       // Skip oscillated NC events
       // Not strictly needed, but these events don't get included in oscillated predictions, so
       // no need to waste our time calculating and storing information about xsec parameters
@@ -671,7 +682,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
-      for (std::vector<NormParameter>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
+      for (std::vector<NormParameter>::iterator it = NormParam.begin(); it != NormParam.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
         const int Target = static_cast<int>(std::round(ReturnKinematicParameter("TargetNucleus", iEvent)));
         bool TargetMatch = MatchCondition(it->targets, Target);
@@ -717,25 +728,10 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
 
         NormBins.push_back(bin);
         MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, it->name);
-        #ifdef MACH3_DEBUG
-        VerboseCounter[std::distance(norm_parameters.begin(), it)]++;
-        #endif
-        //}
       } // end iteration over norm_parameters
     } // end if (ParHandler)
     norms_bins[iEvent] = NormBins;
   }//end loop over events
-  #ifdef MACH3_DEBUG
-  MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
-  for (std::size_t i = 0; i < norm_parameters.size(); ++i) {
-    const auto& norm = norm_parameters[i];
-    double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(GetNEvents());
-
-    MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
-                  ParHandler->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
-  }
-  MACH3LOG_DEBUG("└──────────────────────────────────────────────────────────┘");
-  #endif
 }
 
 // ************************************************
@@ -1049,11 +1045,21 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       EqualBinningPerOscChannel = false;
     }
   }
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  // get osc params for sample 0, later we check all have same number
+  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(0);
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  for(int iSample = 1; iSample < GetNSamples(); iSample++) {
+    auto OscParamsTest = ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
+    if (OscParamsTest.size() != OscParams.size()) {
+      MACH3LOG_ERROR("Sammple {} has {} osc params while sample {} has {}",
+                     GetSampleTitle(iSample), OscParamsTest.size(), 0, GetSampleTitle(0));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
   Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
   // Add samples only if we don't use same binning
@@ -1230,21 +1236,25 @@ void SampleHandlerBase::SetSplinePointers() {
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
-    auto SplineParsVec = ParHandler->GetSplineParsFromSampleName(SampleHandlerName);
+
+    std::vector< std::vector<SplineParameter> > SplineParsVec(GetNSamples());
+    for (int iSample = 0; iSample < GetNSamples(); ++iSample) {
+      SplineParsVec[iSample] = ParHandler->GetSplineParsFromSampleName(GetSampleName(iSample));
+    }
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
       auto EventSplines = GetSplineBins(j, BinnedSpline, ThrowCrititcal);
       const int NSplines = static_cast<int>(EventSplines.size());
       if(NSplines == 0) continue;
       auto& w_pointers = MCEvents[j].total_weight_pointers;
       w_pointers.reserve(w_pointers.size() + NSplines);
-
+      const auto SampleId = MCEvents[j].NominalSample;
       for(int spline = 0; spline < NSplines; spline++) {
         int SystIndex = EventSplines[spline][2];
 
-        bool IsSelected = PassesSelection(SplineParsVec[SystIndex], j);
+        bool IsSelected = PassesSelection(SplineParsVec[SampleId][SystIndex], j);
         // Need to then break the event loop
         if(!IsSelected){
-          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", j, SplineParsVec[SystIndex].name);
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", j, SplineParsVec[SampleId][SystIndex].name);
           continue;
         }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
@@ -1376,7 +1386,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
           SplineVarNames.push_back(GetKinVarName(iSample, 0));
           SplineVarNames.push_back(GetKinVarName(iSample, 1));
         }
-        BinnedSplines->AddSample(SampleHandlerName, GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
+        BinnedSplines->AddSample(GetSampleName(iSample), GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
       }
       BinnedSplines->CountNumberOfLoadedSplines(false, 1);
       BinnedSplines->TransferToMonolith();

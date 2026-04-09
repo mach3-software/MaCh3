@@ -36,7 +36,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::string GetName() const final;
   /// @brief Get fancy title for specified samples
   std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
-
+  /// @brief Sample name tag used only for getting relevant uncertainties
+  std::string GetSampleName(const int Sample) const {return SampleDetails[Sample].SampleName;}
   /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
   /// @param iSample Sample index
   /// @param Dimension Dimension index
@@ -270,7 +271,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// that they are removed as class members but this would be breaking change thus keep it for the time being.
 
   /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<FunctionalParameter> funcParsVec;
+  std::vector<std::vector<FunctionalParameter>> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
   /// funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;
@@ -281,7 +282,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
+  void CalcNormsBins(std::vector<std::vector<NormParameter>>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
   template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
   /// @brief Calculate the total weight weight for a given event
   M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_;

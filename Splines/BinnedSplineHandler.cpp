@@ -64,13 +64,12 @@ void BinnedSplineHandler::cleanUpMemory() {
 }
 
 //****************************************
+//Adds samples to the large array
 void BinnedSplineHandler::AddSample(const std::string& SampleName,
                                     const std::string& SampleTitle,
                                     const std::vector<std::string>& OscChanFileNames,
-                                    const std::vector<std::string>& SplineVarNames)
-//Adds samples to the large array
+                                    const std::vector<std::string>& SplineVarNames) {
 //****************************************
-{
   SampleNames.push_back(SampleName);
   SampleTitles.push_back(SampleTitle);
   Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
