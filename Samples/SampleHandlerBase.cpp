@@ -1046,7 +1046,7 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     }
   }
   // get osc params for sample 0, later we check all have same number
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(0);
+  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
