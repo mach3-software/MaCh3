@@ -10,8 +10,10 @@
 #include "Samples/OscillationHandler.h"
 #include "Samples/BinningHandler.h"
 
-class THStack;
-class TLegend;
+_MaCh3_Safe_Include_Start_ //{
+#include "THStack.h"
+#include "TLegend.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
