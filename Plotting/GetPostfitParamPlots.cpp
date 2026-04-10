@@ -48,7 +48,7 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
-MaCh3Plotting::PlottingManager *PlotMan;
+M3::Plotting::PlottingManager *PlotMan = nullptr;
 
 int NDParameters;
 int NDParametersStartingPos;
@@ -63,7 +63,7 @@ void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* 
                         const std::string& type, const int fileId, const bool setLabels = true){
   // Set the values in the sub-histograms
   MACH3LOG_DEBUG("copying data from at local bin {}: for parameter {}", localBin, paramName);
-  MACH3LOG_DEBUG("  Fitter specific name: {}", PlotMan->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  Fitter specific name: {}", PlotMan->input().translateName(fileId, M3::Plotting::kPostFit, paramName));
   MACH3LOG_DEBUG("  value: {:.4f}", PlotMan->input().getPostFitValue(fileId, paramName, type));
   MACH3LOG_DEBUG("  error: {:.4f}", PlotMan->input().getPostFitError(fileId, paramName, type));
 
@@ -619,7 +619,7 @@ void MakeRidgePlots()
       while (TKey* key = static_cast<TKey*>(next())) {
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
-        std::string name = PlotMan->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
+        std::string name = PlotMan->input().translateName(0, M3::Plotting::kPostFit, paramName);
         uint pos = str.find(name);
         bool foundPar = (pos == str.length() - name.length());
 
@@ -1094,7 +1094,7 @@ int main(int argc, char *argv[])
   // Avoid Info in <TCanvas::Print>
   gErrorIgnoreLevel = kWarning;
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->parseInputs(argc, argv);
   #ifdef MACH3_DEBUG
   PlotMan->input().getFile(0).file->ls();

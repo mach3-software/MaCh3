@@ -12,11 +12,11 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TStyle.h"
 _MaCh3_Safe_Include_End_ //}
 
-
-namespace MaCh3Plotting {
-/// @author Ewan Miller
+namespace M3 {
+namespace Plotting {
 
 /// @brief EW: provides centralized styling utilities for plots, including name prettification and style application
+/// @author Ewan Miller
 /// @ingroup MaCh3Plotting
 class StyleManager {
 public:
@@ -82,5 +82,5 @@ private:
   std::string prettifyName(const std::string &origName, const std::string &nameType) const;
 
 };
-
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

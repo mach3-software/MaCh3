@@ -245,12 +245,9 @@ class ParameterHandlerBase {
   }
 
   /// @brief Print prior value for every parameter
-  void PrintNominal() const;
+  void PrintPreFitValues() const;
   /// @brief Print prior, current and proposed value for each parameter
-  void PrintNominalCurrProp() const;
-  /// @warning only for backward compatibility
-  /// @todo remove it
-  void PrintParameters() const {PrintNominalCurrProp();};
+  void PrintPreFitCurrPropValues() const;
   /// @brief Print step scale for each parameter
   void PrintIndivStepScale() const;
 

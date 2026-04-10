@@ -796,7 +796,7 @@ void ParameterHandlerBase::FlipParameterValue(const int index, const double Flip
 #pragma GCC diagnostic pop
 // ********************************************
 // Function to print the prior values
-void ParameterHandlerBase::PrintNominal() const {
+void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
@@ -806,7 +806,7 @@ void ParameterHandlerBase::PrintNominal() const {
 
 // ********************************************
 // Function to print the prior, current and proposed values
-void ParameterHandlerBase::PrintNominalCurrProp() const {
+void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
 // ********************************************
   MACH3LOG_INFO("Printing parameters for {}", GetName());
   // Dump out the PCA parameters too
@@ -1149,9 +1149,8 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
       _fIndivStepScale[i] = _fIndivStepScaleInitial[i] * _fGlobalStepScaleInitial / _fGlobalStepScale;
     }
   }
-  MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
-  MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
-  PrintIndivStepScale();
+  MACH3LOG_DEBUG("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
+  MACH3LOG_DEBUG("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
 }
 
 // ********************************************
