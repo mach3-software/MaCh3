@@ -134,7 +134,7 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
     }
 
     for (ParameterHandlerBase *cov : systematics) {
-        cov->PrintNominalCurrProp();
+        cov->PrintPreFitCurrPropValues();
     }
 #ifdef MACH3_DEBUG
     if (debug)

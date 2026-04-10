@@ -796,7 +796,7 @@ void ParameterHandlerBase::FlipParameterValue(const int index, const double Flip
 #pragma GCC diagnostic pop
 // ********************************************
 // Function to print the prior values
-void ParameterHandlerBase::PrintNominal() const {
+void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
@@ -806,7 +806,7 @@ void ParameterHandlerBase::PrintNominal() const {
 
 // ********************************************
 // Function to print the prior, current and proposed values
-void ParameterHandlerBase::PrintNominalCurrProp() const {
+void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
 // ********************************************
   MACH3LOG_INFO("Printing parameters for {}", GetName());
   // Dump out the PCA parameters too

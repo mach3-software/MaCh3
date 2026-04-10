@@ -387,7 +387,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     systematics[s]->AcceptStep();
 
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
-    systematics[s]->PrintNominalCurrProp();
+    systematics[s]->PrintPreFitCurrPropValues();
 
     // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
