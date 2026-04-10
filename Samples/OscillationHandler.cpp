@@ -32,7 +32,11 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
       MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    NuOscProbCalcers[0][0]->Setup();
+    LoggerPrint("NuOscillator",
+                [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+                [this]() {
+                  NuOscProbCalcers[0][0]->Setup();
+                });
   } else {
     NuOscProbCalcers[0].resize(SubChannels);
     for (int iChannel = 0; iChannel < SubChannels; iChannel++) {
@@ -130,5 +134,9 @@ void OscillationHandler::SetOscillatorBinning(const int Sample, const int Channe
     NuOscProbCalcers[Sample][Channel]->SetEnergyArrayInCalcer(EnergyArray);
     if(CosineZArray.size() != 0) NuOscProbCalcers[Sample][Channel]->SetCosineZArrayInCalcer(CosineZArray);
   }
-  NuOscProbCalcers[Sample][Channel]->Setup();
+  LoggerPrint("NuOscillator",
+              [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+              [this, Sample, Channel]() {
+                NuOscProbCalcers[Sample][Channel]->Setup();
+              });
 }
