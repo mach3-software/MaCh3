@@ -24,7 +24,7 @@ bool sameAxis;
 double ratioLabelScaling;
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager *PlotMan;
+M3::Plotting::PlottingManager *PlotMan;
 
 /// @brief TPad is SUPER FRAGILE, it is safer to just make raw pointer, while ROOT behave weirdly with smart pointers
 void SetTPads(TPad*& LLHPad, TPad*& ratioPad)
@@ -470,7 +470,7 @@ int main(int argc, char **argv) {
   SetMaCh3LoggerFormat();
   M3::Utils::MaCh3Welcome();
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->parseInputs(argc, argv);
 
   PlotMan->setExec("PlotLLH");

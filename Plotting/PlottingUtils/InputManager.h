@@ -10,8 +10,8 @@
 // Other plotting includes
 #include "PlottingUtils.h"
 
-namespace MaCh3Plotting {
-
+namespace M3 {
+namespace Plotting {
 /// @brief Types of possible file that can be read.
 enum fileTypeEnum {
   kLLH,         //!< Log Likelihood scan
@@ -32,6 +32,7 @@ enum fileTypeEnum {
 /// from very different file structures used by different fitters and provide a common format to
 /// be used for plot making. Intended use of this objects is only via InputManager which contains
 /// the methods to fill and manipulate it.
+/// @author Ewan Miller
 struct InputFile {
   /// @brief Create InputFile instance based on a specified file.
   /// @param fName The name of the file to open.
@@ -670,4 +671,5 @@ private:
   // vector of InputFile objects that this manager is responsible for
   std::vector<InputFile> _fileVec;
 };
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

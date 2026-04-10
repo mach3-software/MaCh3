@@ -18,7 +18,9 @@
 #include "InputManager.h"
 #include "StyleManager.h"
 
-namespace MaCh3Plotting {
+
+namespace M3 {
+namespace Plotting {
 /// @brief The main class to be used in plotting scripts.
 /// @details When it comes to plotting, this guys in charge, the main man, the head honcho, the big
 /// cheese. If it's a plot you need, this is the guy you call. You just call him in your scripts and
@@ -93,10 +95,10 @@ public:
   void addUserOption();
 
   /// @brief Retrieve a command line option you specified using addOption.
-  std::string getUserOption(std::string option);
+  std::string getUserOption(const std::string& option);
 
   /// @brief Print a usage message for the current executable.
-  void usage();
+  void usage() const;
 
   /// @brief Parse string of labels into a vector of strings.
   /// @param labelString string of labels of the form "label1;label2;...".
@@ -189,4 +191,5 @@ private:
   std::unique_ptr<StyleManager> _styleMan;
   std::unique_ptr<InputManager> _inputMan;
 };
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

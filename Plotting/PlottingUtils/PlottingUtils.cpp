@@ -1,7 +1,7 @@
 #include "PlottingUtils.h"
 
-namespace MaCh3Plotting {
-
+namespace M3 {
+namespace Plotting {
 /// It will go through your provided graph and make a histogram binning by taking the midpoints of
 /// all the graph points x values, then fill the histogram with the graphs y values. For the first
 /// and last points it will extend the binning out of the graph bounds using the width between the
@@ -109,4 +109,5 @@ std::vector<std::vector<double>> TGraphToVector(TGraph2D graph) {
   return ret;
 }
 
-} // namespace MaCh3Plotting 
+} // namespace Plotting
+} // namespace M3

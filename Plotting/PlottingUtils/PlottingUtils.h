@@ -33,7 +33,8 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 /// @brief This handy little function lets you interpret a TGraph as a TH1D.
 /// @param graph The graph you want to convert.
 /// @param newName The new name you want to give to the histogram. If not specified, will just use
@@ -53,4 +54,5 @@ std::vector<std::vector<double>> TGraphToVector(TGraph graph);
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis, the 3rd is the z axis
 std::vector<std::vector<double>> TGraphToVector(TGraph2D graph);
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3
