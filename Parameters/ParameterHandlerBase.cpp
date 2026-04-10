@@ -1149,9 +1149,8 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
       _fIndivStepScale[i] = _fIndivStepScaleInitial[i] * _fGlobalStepScaleInitial / _fGlobalStepScale;
     }
   }
-  MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
-  MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
-  PrintIndivStepScale();
+  MACH3LOG_DEBUG("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
+  MACH3LOG_DEBUG("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
 }
 
 // ********************************************
