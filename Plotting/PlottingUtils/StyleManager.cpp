@@ -1,6 +1,7 @@
 #include "StyleManager.h"
 
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 StyleManager::StyleManager(std::string styleConfigName) {
   _styleConfig = M3OpenConfig(styleConfigName);
 }
@@ -72,5 +73,5 @@ void StyleManager::setTH1Style(TH1 *hist, const std::string& styleName) const {
   hist->SetLineColor(GetFromManager<Color_t>(styleDef["LineColor"], kRed, __FILE__, __LINE__));
   hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1, __FILE__, __LINE__));
 }
-
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

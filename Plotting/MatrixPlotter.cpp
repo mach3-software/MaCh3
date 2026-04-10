@@ -14,7 +14,7 @@
 std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
                                    const std::string& Title,
                                    const std::vector<std::string>& Params,
-                                   const std::unique_ptr<MaCh3Plotting::PlottingManager>& man)
+                                   const std::unique_ptr<M3::Plotting::PlottingManager>& man)
 {
   std::vector<int> ParamIndex(Params.size(), M3::_BAD_INT_);
 
@@ -102,7 +102,7 @@ void SetupInfo(const std::string& Config, std::vector<std::string>& Title, std::
   }
 }
 
-void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, const std::string& Config, const std::string& File)
+void PlotMatrix(const std::unique_ptr<M3::Plotting::PlottingManager>& man, const std::string& Config, const std::string& File)
 {
   // Open the ROOT file
   TFile *file = M3::Open(File, "UPDATE", __FILE__, __LINE__);
@@ -171,7 +171,7 @@ void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, cons
   delete file;
 }
 
-void CompareMatrices(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man,
+void CompareMatrices(const std::unique_ptr<M3::Plotting::PlottingManager>& man,
                      const std::string& Config, const std::string& File1, const std::string& Title1,
                      const std::string& File2, const std::string& Title2)
 {
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 {
   SetMaCh3LoggerFormat();
 
-  auto man = std::make_unique<MaCh3Plotting::PlottingManager>();
+  auto man = std::make_unique<M3::Plotting::PlottingManager>();
   man->initialise();
 
   if (argc != 3 && argc != 6)
