@@ -1,11 +1,13 @@
 #pragma once
 
 //MaCh3 includes
+#include "Samples/SampleInfo.h"
+#include "Samples/EventInfo.h"
+
 #include "Splines/BinnedSplineHandler.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
-#include "Samples/FarDetectorCoreInfoStruct.h"
 #include "Samples/BinningHandler.h"
 
 _MaCh3_Safe_Include_Start_ //{
