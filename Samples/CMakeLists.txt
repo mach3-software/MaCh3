@@ -4,7 +4,8 @@ set(HEADERS
     SampleHandlerBase.h
     SampleStructs.h
     HistogramUtils.h
-    FarDetectorCoreInfoStruct.h
+    SampleInfo.h
+    EventInfo.h
     OscillationHandler.h
 )
 
