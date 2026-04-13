@@ -141,7 +141,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   #ifdef MACH3_DEBUG
   //KS: Let's dump all useful matrices to properly validate PCA
   M3::DebugPCA(sum, temp, eigen_vectors, eigen_values, TransferMat, TransferMatT,
-               CovMatrix->GetNrows(), NumParPCA, FirstPCAdpar, LastPCAdpar,
+               CovMatrix->GetNrows(), FirstPCAdpar, LastPCAdpar,
                nKeptPCApars, eigen_threshold);
   #endif
 }
