@@ -213,11 +213,11 @@ void PlottingManager::usage() const {
   MACH3LOG_INFO("Options:");
   MACH3LOG_INFO("  -o <file>                   Output file name");
   MACH3LOG_INFO("  -l <labels>                 Comma/space-separated file labels");
-  //MACH3LOG_INFO("  -c <config>                 Configuration file name");
+  MACH3LOG_INFO("  -c <config>                 Configuration file name");
   //MACH3LOG_INFO("  -d <options>                Extra draw options");
   //MACH3LOG_INFO("  -s                          Split by sample");
   //MACH3LOG_INFO("  -r                          Plot ratios (requires multiple input files)");
-  //MACH3LOG_INFO("  -g                          Draw grid");
+  MACH3LOG_INFO("  -g                          Draw grid");
   MACH3LOG_INFO("  -h                          Show this help message");
 
   MACH3LOG_INFO("");

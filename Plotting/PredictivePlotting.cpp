@@ -12,8 +12,6 @@
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
 M3::Plotting::PlottingManager* PlotMan = nullptr;
-constexpr const double ScalingFactor = 10;
-
 std::vector<std::string> FindSamples(const std::string& File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
@@ -263,9 +261,10 @@ void OverlayPredicitve(const YAML::Node& Settings,
       }
       TH1D* hist = InputFiles[0]->Get<TH1D>((DataLocation).c_str());
 
+      auto BinWidthScale = PlotMan->style().getBinWidthScale(hist->GetXaxis()->GetTitle());
       std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-      M3::ScaleHistogram(DataHist.get(), ScalingFactor);
+      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+      M3::ScaleHistogram(DataHist.get(), BinWidthScale);
       DataHist->SetLineColor(kBlack);
       //KS: +1 for data, we want to get integral before scaling of the histogram
       std::vector<double> Integral(nFiles+1);
@@ -288,8 +287,8 @@ void OverlayPredicitve(const YAML::Node& Settings,
         PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         PredHist[iFile]->SetFillStyle(1001);
-        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-        M3::ScaleHistogram(PredHist[iFile].get(), ScalingFactor);
+        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+        M3::ScaleHistogram(PredHist[iFile].get(), BinWidthScale);
       }
       pad1->cd();
 

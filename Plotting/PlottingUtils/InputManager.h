@@ -321,7 +321,7 @@ public:
   /// @brief Get the parameter value for the current step for a particular parameter from a particular input file.
   /// @param fileNum The index of the file you want the data from.
   /// @param paramName The parameter you want the value of.
-  double getMCMCvalue(int fileNum, std::string paramName) const {
+  double getMCMCvalue(int fileNum, const std::string& paramName) const {
     if (!getEnabledMCMCchain(fileNum, paramName))
     {
       MACH3LOG_WARN("file at index {} does not have an MCMC entry for parameter {}", fileNum, paramName);
@@ -422,7 +422,7 @@ public:
   /// @param LLHType The type of likelihood scan you would like to check for, e.h. total, prior etc.
   /// @return true if scan exists, false if not.
   inline bool getEnabledLLH(const int fileNum, const std::string& paramName,
-                             std::string LLHType = "total") const {
+                            const std::string& LLHType = "total") const {
     return _fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
 
