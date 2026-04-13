@@ -18,8 +18,6 @@ std::vector<double> sigmaArray;
 int PriorKnot = M3::_BAD_INT_;
 
 constexpr const int NVars = 5;
-constexpr const double ScalingFactor = 10;
-
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
@@ -313,8 +311,9 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
     Poly[ik]->SetLineWidth(2.);
     Poly[ik]->SetLineColor(Colours[ik]);
     Poly[ik]->SetLineStyle(Style[ik]);
-    Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-    M3::ScaleHistogram(Poly[ik].get(), ScalingFactor);
+    auto BinWidthScale = PlotMan->style().getBinWidthScale(Poly[ik]->GetXaxis()->GetTitle());
+    Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+    M3::ScaleHistogram(Poly[ik].get(), BinWidthScale);
     max = std::max(max, Poly[ik]->GetMaximum());
   }
   Poly[0]->SetTitle(Title.c_str());
@@ -715,11 +714,13 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
 
   auto PriorHist = Projection[0][PriorKnot].get();
   PriorHist->SetTitle(Title.c_str());
-  PriorHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+
+  auto BinWidthScale = PlotMan->style().getBinWidthScale(PriorHist->GetXaxis()->GetTitle());
+  PriorHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
   PriorHist->Draw("HIST");
   PriorHist->SetLineWidth(2.);
   PriorHist->SetLineColor(kBlack);
-  M3::ScaleHistogram(PriorHist, ScalingFactor);
+  M3::ScaleHistogram(PriorHist, BinWidthScale);
 
   auto PrettyX = PlotMan->style().prettifyKinematicName(PriorHist->GetXaxis()->GetTitle());
   PriorHist->GetXaxis()->SetTitle(PrettyX.c_str());
@@ -732,8 +733,8 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
       Projection[nParam][ik]->SetLineWidth(2.);
       Projection[nParam][ik]->SetLineColor(ParamColour[nParam]);
       Projection[nParam][ik]->SetLineStyle(kDotted);
-      Projection[nParam][ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-      M3::ScaleHistogram(Projection[nParam][ik].get(), ScalingFactor);
+      Projection[nParam][ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+      M3::ScaleHistogram(Projection[nParam][ik].get(), BinWidthScale);
       max = std::max(max, Projection[nParam][ik]->GetMaximum());
     }
     PriorHist->SetMaximum(max*1.2);

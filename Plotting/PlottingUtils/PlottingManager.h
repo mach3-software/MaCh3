@@ -18,7 +18,6 @@
 #include "InputManager.h"
 #include "StyleManager.h"
 
-
 namespace M3 {
 namespace Plotting {
 /// @brief The main class to be used in plotting scripts.
@@ -78,7 +77,7 @@ public:
   /// @brief Parse vector of command line arguments.
   /// @details This mainly just exists for the sake of the python binding.
   /// @param argv The arguments to parse.
-  inline void parseInputsVec(std::vector<std::string> argv) {
+  inline void parseInputsVec(const std::vector<std::string>& argv) {
     std::vector<char *> charVec;
     MACH3LOG_DEBUG("Parsing Inputs :: was given vector:");
     for( const std::string &arg : argv ) 
