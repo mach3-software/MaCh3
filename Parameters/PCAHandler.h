@@ -194,11 +194,6 @@ class PCAHandler{
     else return true;
   }
 
-  #ifdef MACH3_DEBUG
-  /// @brief KS: Let's dump all useful matrices to properly validate PCA
-  void DebugPCA(const double sum, TMatrixD temp, int NumPar);
-  #endif
-
  private:
   /// @brief KS: Make sure decomposed matrix isn't correlated with undecomposed
   void SanitisePCA(TMatrixDSym* CovMatrix);
