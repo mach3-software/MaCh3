@@ -1,7 +1,7 @@
 #include "InputManager.h"
 
-
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 // this is the constructor with user specified translation config file
 InputManager::InputManager(const std::string &translationConfigName) {
   // read the config file
@@ -883,4 +883,5 @@ void InputManager::fillFileData(InputFile &inputFileDef, const bool printThought
     find1dPosterior(inputFileDef, parameter, inputFileDef.fitter, true);
   }
 }
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

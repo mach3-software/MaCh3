@@ -323,6 +323,27 @@ int parameter_counter; //Not par_count
 
 Please note that a lot of this has not been followed in MaCh3 but we are trying to improve the coding style so please bare this in mind when contributing!
 
+## Namespace
+Main MaCh3 namespace is `M3`. If possible, always use it.
+
+If you plan to use another namespace like `blarb`, please follow the rule below:
+
+### ✅ Correct
+```cpp
+M3::blarb
+```
+
+### ❌ Incorrect
+```cpp
+blarb
+```
+
+or
+
+```cpp
+MaCh3blarb
+```
+
 ## ROOT
 MaCh3 uses the CERN ROOT package for plotting and I/O operations. While MaCh3 does not require a specific ROOT version—ensuring compatibility across a wide range of scientific clusters used by different users—be aware that ROOT developers occasionally introduce bugs or breaking changes in new releases.
 To improve stability and portability, it is recommended to prefer standard C++ (STL) counterparts whenever possible.

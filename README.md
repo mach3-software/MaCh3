@@ -236,13 +236,13 @@ The MaCh3 core plotting library code can be found [here](https://github.com/mach
 This is an example how your executable can look like using MaCh3:
 ```cpp
   //Manager is responsible for reading from config
-  std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
+  std::unique_ptr<manager> FitManager = MaCh3ManagerFactory(argc, argv);
 
   std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
   std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
-  MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
+  MakeMaCh3Instance(FitManager.get(), sample, Cov); //Factory like function which initialises everything
 
-  // FitterBase class, can be replaced with other fitting method
+  // FitterBase class has implementation of validation procedures and fitting algorithms
   std::unique_ptr<FitterBase> MarkovChain = MaCh3FitterFactory(FitManager.get());
 
   //Adding samples and covariances to the Fitter class could be in the factory

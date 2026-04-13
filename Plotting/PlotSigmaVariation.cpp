@@ -24,7 +24,7 @@ constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager* PlotMan;
+M3::Plotting::PlottingManager* PlotMan = nullptr;
 
 /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
 void FindKnot(std::vector<double>& SigmaValues,
@@ -841,7 +841,7 @@ int main(int argc, char **argv)
 
   ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->initialise();
 
   CompareSigVar1D(filename, settings);

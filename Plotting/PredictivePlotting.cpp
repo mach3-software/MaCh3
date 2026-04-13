@@ -11,7 +11,7 @@
 /// @author Kamil Skwarczynski
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager* PlotMan;
+M3::Plotting::PlottingManager* PlotMan = nullptr;
 constexpr const double ScalingFactor = 10;
 
 std::vector<std::string> FindSamples(const std::string& File)
@@ -615,7 +615,7 @@ int main(int argc, char **argv)
     FileNames.emplace_back(argv[i]);
   }
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->initialise();
 
   PredictivePlotting(ConfigName, FileNames);
