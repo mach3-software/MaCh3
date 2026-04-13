@@ -51,8 +51,10 @@ struct SampleInfo {
   /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::vector<std::string> VarStr;
 
-  /// @brief the name of this sample e.g."muon-like"
+  /// @brief the name of this sample e.g."muon-like" used for printing
   std::string SampleTitle = "";
+  /// @brief tag for sample used to easily set by which uncertainties should be affected
+  std::string SampleName = "";
 
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
