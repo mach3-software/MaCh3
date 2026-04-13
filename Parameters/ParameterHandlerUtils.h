@@ -676,9 +676,7 @@ inline void DebugPCA(const double sum,
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
 
-  for (int i = 0; i < NumParPCA; ++i) {
-    MACH3LOG_DEBUG("Param {} isDecomposedPCA={}", i, isDecomposedPCA[i]);
-  }
+  TDirectory *ogdir = gDirectory;
 
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");
   PCA_Debug->cd();
@@ -845,6 +843,7 @@ inline void DebugPCA(const double sum,
   PCA_Debug->Close();
   delete PCA_Debug;
   gErrorIgnoreLevel = originalErrorWarning;
+  ogdir->cd();  // go back to original directory
   #pragma GCC diagnostic pop
 }
 
