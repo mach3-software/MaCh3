@@ -282,6 +282,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
+  /// @param norm_parameters indexed [sample][param] describe norm params and associated kinematic cuts etc.
   void CalcNormsBins(std::vector<std::vector<NormParameter>>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
   template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
   /// @brief Calculate the total weight weight for a given event

@@ -71,6 +71,11 @@ void SampleHandlerBase::ReadConfig()
   auto EnabledSasmples = Get<std::vector<std::string>>(SampleManager->raw()["Samples"], __FILE__ , __LINE__);
   // Get number of samples and resize relevant objects
   nSamples = static_cast<M3::int_t>(EnabledSasmples.size());
+  if (nSamples == 0){
+    MACH3LOG_ERROR("No samples for Sample Handler {}, please double check sample config", GetName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   SampleDetails.resize(nSamples);
   StoredSelection.resize(nSamples);
   for (int iSample = 0; iSample < nSamples; iSample++)
@@ -1054,10 +1059,10 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
   }
 
   for(int iSample = 1; iSample < GetNSamples(); iSample++) {
-    auto OscParamsTest = ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
-    if (OscParamsTest.size() != OscParams.size()) {
-      MACH3LOG_ERROR("Sammple {} has {} osc params while sample {} has {}",
-                     GetSampleTitle(iSample), OscParamsTest.size(), 0, GetSampleTitle(0));
+    auto OscParamsCrossCheck = ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
+    if (OscParamsCrossCheck.size() != OscParams.size()) {
+      MACH3LOG_ERROR("Sample {} has {} osc params while sample {} has {}",
+                     GetSampleTitle(iSample), OscParamsCrossCheck.size(), 0, GetSampleTitle(0));
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
