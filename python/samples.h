@@ -122,17 +122,6 @@ public:
     }
 
     /* Trampoline (need one for each virtual function) */
-    M3::int_t GetNSamples(const int iSample) const override
-    {
-        PYBIND11_OVERRIDE_PURE(
-            M3::int_t,              /* Return type */
-            SampleHandlerInterface, /* Parent class */
-            GetNSamples,            /* Name of function in C++ (must match Python name) */
-            iSample                 /* Argument(s) */
-        );
-    }
-
-    /* Trampoline (need one for each virtual function) */
     int GetNOscChannels(const int iSample) const override {
         PYBIND11_OVERRIDE_PURE(
             int,                     /* Return type */
