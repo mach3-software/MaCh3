@@ -157,20 +157,30 @@ void initParametersModule(py::module &m_parameters){
                  >>> handler.set_parameters()
              )pbdoc")
 
-        .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg("index"), "Get the lower bound of parameter at index i. \n\
+             
+        .def("get_par_init", &ParameterHandlerBase::GetParInit, py::arg("index"),
+            "Get initial value of parameter at index i\n\
             :param index: index of the parameter")
 
-        .def("get_upper_bound", &ParameterHandlerBase::GetUpperBound, py::arg("index"), "Get the upper bound of parameter at index i. \n\
+        .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg("index"), 
+            "Get the lower bound of parameter at index i. \n\
+            :param index: index of the parameter")
+             
+        .def("get_upper_bound", &ParameterHandlerBase::GetUpperBound, py::arg("index"), 
+            "Get the upper bound of parameter at index i. \n\
             :param index: index of the parameter")
 
-        .def("get_flat_prior", &ParameterHandlerBase::GetFlatPrior, py::arg("index"), "Is the parameter at index i flat?. \n\
+        .def("get_flat_prior", &ParameterHandlerBase::GetFlatPrior, py::arg("index"), 
+            "Is the parameter at index i flat?. \n\
             :param index: index of the parameter")
 
-        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg("index"), "The prior error on parameter at index i \n\
+        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg("index"), 
+            "The prior error on parameter at index i \n\
             :param index: index of the parameter")
 
-        .def("get_par_fixed", static_cast<bool (ParameterHandlerBase::*)(const int) const>(&ParameterHandlerBase::IsParameterFixed), py::arg("index"), "Is the parameter at index i fixed \n\
-             :param index: index of the parameter")
+        .def("get_par_fixed", static_cast<bool (ParameterHandlerBase::*)(const int) const>(&ParameterHandlerBase::IsParameterFixed), py::arg("index"), 
+            "Is the parameter at index i fixed \n\
+            :param index: index of the parameter")
 
         .def("get_prior_cov", [](ParameterHandlerBase &self)
              {
