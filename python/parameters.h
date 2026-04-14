@@ -157,28 +157,24 @@ void initParametersModule(py::module &m_parameters){
                  >>> handler.set_parameters()
              )pbdoc")
 
-        .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg(index), 
-            "Get the lower bound of parameter at index i. \n\
+        .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg(index), "Get the lower bound of parameter at index i. \n\
             :param index: index of the parameter")
 
-        .def("get_upper_bound", &ParameterHandlerBase::GetUpperBound, py::arg(index), 
-            "Get the upper bound of parameter at index i. \n\
+        .def("get_upper_bound", &ParameterHandlerBase::GetUpperBound, py::arg(index), "Get the upper bound of parameter at index i. \n\
             :param index: index of the parameter")
 
-        .def("get_flat_prior", &ParameterHandlerBase::GetFlatPrior, py::arg(index),
-             "Is the parameter at index i flat?. \n\
+        .def("get_flat_prior", &ParameterHandlerBase::GetFlatPrior, py::arg(index), "Is the parameter at index i flat?. \n\
             :param index: index of the parameter")
 
-        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg(index),
-             "The prior error on parameter at index i \n\
+        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg(index), "The prior error on parameter at index i \n\
             :param index: index of the parameter")
 
-        .def("get_par_fixed", &ParameterHandlerBase::IsParameterFixed, py::arg(index), 
-            "Is the parameter at index i fixed \n\
+        .def("get_par_fixed", &ParameterHandlerBase::IsParameterFixed, py::arg(index), "Is the parameter at index i fixed \n\
              :param index: index of the parameter")
 
         .def("get_prior_cov", [](ParameterHandlerBase &self)
              {
+                 auto mat = self.GetCovMatrix()
                  int n = mat->GetNrows();
                  const double *data = mat->GetMatrixArray();
                  py::array_t<float> result({n, n});
@@ -188,10 +184,9 @@ void initParametersModule(py::module &m_parameters){
                                 [](double v)
                                 { return static_cast<float>(v); });
 
-                 return result;
-             },
+                 return result; },
              "Get the prior covariance")
-             
+
         ; // End of ParameterHandlerBase binding
 
     py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerGeneric")
