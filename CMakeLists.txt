@@ -121,8 +121,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
-  )
+    )
+  # KS: For older gcc it complaints that we should have overide final, while we follow modern apporach and have just final
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 10)
+    target_compile_options(MaCh3Warnings INTERFACE
+      -Wsuggest-override   # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
+    )
+  endif()
 endif()
 
 # KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
