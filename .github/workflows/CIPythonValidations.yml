@@ -38,11 +38,14 @@ jobs:
       run: |
         pip install -v --config-settings="cmake.args=-DMaCh3_Branch=$HEAD_REF" .[testing]
         
+    - name: DEBUG DELETE ME
+      run: pip list
+      
     - name: Validations
       working-directory: /opt/MaCh3Validations
       run: |
         source /opt/root/v6-26-10/bin/thisroot.sh
         export MACH3=$PWD
-        
+
         python3 -m pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
         
