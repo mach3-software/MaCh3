@@ -44,7 +44,8 @@ jobs:
       run: |
         source .venv/bin/activate
         pip install -v --config-settings="cmake.args=-DMaCh3_Branch=$HEAD_REF" .[testing]
-        
+        pip list
+
       
     - name: Validations
       working-directory: /opt/MaCh3Validations
