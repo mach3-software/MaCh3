@@ -22,13 +22,18 @@ jobs:
 
     steps:
 
-    - name: Upgrade pip
-      run: pip install --upgrade pip
-
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+
+    - name: Setup virtual env
+      working-directory: /opt/MaCh3Validations
+      run: |
+        pip install virtualenv
+        virtualenv .venv 
+        source .venv/bin/activate
+        pip install --upgrade pip
 
     - name: Install pytest
       env: 
@@ -36,16 +41,14 @@ jobs:
 
       working-directory: /opt/MaCh3Validations
       run: |
+        source .venv/bin/activate
         pip install -v --config-settings="cmake.args=-DMaCh3_Branch=$HEAD_REF" .[testing]
         
-    - name: DEBUG DELETE ME
-      run: pip list
       
     - name: Validations
       working-directory: /opt/MaCh3Validations
       run: |
-        source /opt/root/v6-26-10/bin/thisroot.sh
+        source .venv/bin/activate
         export MACH3=$PWD
-
-        python3 -m pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
+        pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
         
