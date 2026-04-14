@@ -34,18 +34,16 @@ jobs:
         virtualenv .venv 
         source .venv/bin/activate
         pip install --upgrade pip
-        pip list
 
     - name: Install pytest
       env: 
         HEAD_REF: ${{ github.head_ref }}
+        CMAKE_ARGS: "-DPYTHON_ENABLED=ON -DMaCh3_Branch=$HEAD_REF"
 
       working-directory: /opt/MaCh3Validations
       run: |
         source .venv/bin/activate
-        pip install -v --config-settings="cmake.args=-DMaCh3_Branch=$HEAD_REF" .[testing]
-        pip list
-
+        pip install -v .[testing]
       
     - name: Validations
       working-directory: /opt/MaCh3Validations
