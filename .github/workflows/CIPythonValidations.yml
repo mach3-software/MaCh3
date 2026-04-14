@@ -2,12 +2,12 @@
 
 name: Validations Python CI 
 
-## The events that trigger the workflow
+# The events that trigger the workflow
 on:
   pull_request:
-    branches: [ develop ]
-
-  workflow_dispatch:
+    branches: [ main ]
+    
+  workflow_dispatch: 
 
 permissions:
   contents: read
@@ -23,26 +23,22 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Install pyMaCh3
-      run: |
-        mkdir /python-test-modules
-        pip install .
-        
     - name: Get MaCh3 Validations
+      env:
+        HEAD_REF: ${{ github.head_ref }}
       run: |
         cd /opt/
-        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+        git clone --branch "$HEAD_REF" https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
 
-    - name: Install pytest
+    - name: pip Install
       working-directory: /opt/MaCh3Validations
       run: |
-        pip install -r ./CIValidations/PythonTests/requirements.txt
+        pip install -v .[testing]
         
     - name: Validations
       working-directory: /opt/MaCh3Validations
       run: |
         source /opt/root/v6-26-10/bin/thisroot.sh
-        export PYTHONPATH=$PYTHONPATH:/python-test-modules/
         export MACH3=$PWD
         
         python3 -m pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
