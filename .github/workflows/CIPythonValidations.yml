@@ -37,8 +37,7 @@ jobs:
 
     - name: Install pytest
       env: 
-        HEAD_REF: ${{ github.head_ref }}
-        CMAKE_ARGS: "-DPYTHON_ENABLED=ON -DMaCh3_Branch=$HEAD_REF"
+        CMAKE_ARGS: "-DPYTHON_ENABLED=ON -DMaCh3_Branch=${{ github.head_ref }}"
 
       working-directory: /opt/MaCh3Validations
       run: |
