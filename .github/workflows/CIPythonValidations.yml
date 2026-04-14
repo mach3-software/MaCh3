@@ -23,6 +23,9 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
+    - name: Upgrade pip
+      run: pip install --upgrade pip
+
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
