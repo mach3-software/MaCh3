@@ -169,13 +169,15 @@ void initParametersModule(py::module &m_parameters){
         .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg("index"), "The prior error on parameter at index i \n\
             :param index: index of the parameter")
 
-        .def("get_par_fixed", &ParameterHandlerBase::IsParameterFixed, py::arg("index"), "Is the parameter at index i fixed \n\
+        .def("get_par_fixed", static_cast<bool (ParameterHandlerBase::*)(const int) const>(&ParameterHandlerBase::IsParameterFixed), py::arg("index"), "Is the parameter at index i fixed \n\
              :param index: index of the parameter")
 
         .def("get_prior_cov", [](ParameterHandlerBase &self)
              {
-                 auto mat = self.GetCovMatrix()'
-                 ;'
+                 auto mat = self.GetCovMatrix();
+                 if (!mat){
+                     throw std::runtime_error("TMatrixDSym pointer is null");
+                 }
                  int n = mat->GetNrows();
                  const double *data = mat->GetMatrixArray();
                  py::array_t<float> result({n, n});
