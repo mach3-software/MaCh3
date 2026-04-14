@@ -1,5 +1,5 @@
+---
 # Performs unit and integration testing
-
 name: Validations Python CI 
 
 ## The events that trigger the workflow
@@ -21,7 +21,6 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v6
 
     - name: Upgrade pip
       run: pip install --upgrade pip
@@ -32,6 +31,9 @@ jobs:
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
 
     - name: Install pytest
+      env: 
+        HEAD_REF: ${{ github.head_ref }}
+
       working-directory: /opt/MaCh3Validations
       run: |
         pip install -v --config-settings="cmake.args=-DMaCh3_Branch=$HEAD_REF" .[testing]
