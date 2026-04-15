@@ -43,13 +43,13 @@ jobs:
       working-directory: /opt/MaCh3Validations
       run: |
         source .venv/bin/activate
-        pip install -v .[testing]
+        pip install -v ".[testing]"
       
     - name: Validations
       working-directory: /opt/MaCh3Validations
       run: |
         source .venv/bin/activate
         export MACH3=$PWD
-        source /opt/root/v6-26-10/bin/thisroot.sh
+        source $ROOTSYS/bin/thisroot.sh
         pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
         
