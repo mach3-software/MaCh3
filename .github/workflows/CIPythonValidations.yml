@@ -1,5 +1,5 @@
+---
 # Performs unit and integration testing
-
 name: Validations Python CI 
 
 ## The events that trigger the workflow
@@ -21,29 +21,35 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v6
 
-    - name: Install pyMaCh3
-      run: |
-        mkdir /python-test-modules
-        pip install .
-        
     - name: Get MaCh3 Validations
       run: |
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
 
-    - name: Install pytest
+    - name: Setup virtual env
       working-directory: /opt/MaCh3Validations
       run: |
-        pip install -r ./CIValidations/PythonTests/requirements.txt
-        
+        pip install virtualenv
+        virtualenv .venv 
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install numpy
+
+    - name: Install pytest
+      env: 
+        CMAKE_ARGS: "-DPYTHON_ENABLED=ON -DMaCh3_Branch=${{ github.head_ref }}"
+
+      working-directory: /opt/MaCh3Validations
+      run: |
+        source .venv/bin/activate
+        pip install -v ".[testing]"
+      
     - name: Validations
       working-directory: /opt/MaCh3Validations
       run: |
-        source /opt/root/v6-26-10/bin/thisroot.sh
-        export PYTHONPATH=$PYTHONPATH:/python-test-modules/
+        source .venv/bin/activate
         export MACH3=$PWD
-        
-        python3 -m pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
+        source "$ROOTSYS/bin/thisroot.sh"
+        pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
         
