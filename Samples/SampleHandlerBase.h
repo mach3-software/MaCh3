@@ -20,16 +20,21 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Ed Atkin
 ///
 /// @ingroup SamplesAndParameters
-class SampleHandlerBase :  public SampleHandlerInterface
+template<typename EventDataType=EventInfo>
+class SampleHandlerBase_t : public SampleHandlerInterface
 {
+
+ static_assert(std::is_convertible<EventDataType*, EventInfo*>::value,
+  "SampleHandlerBase_t EventDataType must publicly inherit from EventInfo");
+
  public:
   //######################################### Functions #########################################
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+  SampleHandlerBase_t(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
                   const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
-  virtual ~SampleHandlerBase();
+  virtual ~SampleHandlerBase_t();
 
   /// @brief DB Get what dimensionality binning for given sample has
   /// @param Sample Number of sample
@@ -359,7 +364,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   //===============================================================================
   /// Stores information about every MC event
-  std::vector<EventInfo> MCEvents;
+  std::vector<EventDataType> MCEvents;
   /// Stores info about currently initialised sample
   std::vector<SampleInfo> SampleDetails;
   //===============================================================================
@@ -432,3 +437,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
     kOscChannelPlot = 1
   };
 };
+
+#include "Samples/SampleHandlerBase.tpp"
+
+using SampleHandlerBase = SampleHandlerBase_t<EventInfo>;
