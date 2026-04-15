@@ -50,6 +50,6 @@ jobs:
       run: |
         source .venv/bin/activate
         export MACH3=$PWD
-        source $ROOTSYS/bin/thisroot.sh
+        source "$ROOTSYS/bin/thisroot.sh"
         pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
         
