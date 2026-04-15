@@ -53,10 +53,6 @@ void FindKnot(std::vector<double>& SigmaValues,
   double sigma = 0.0;
   // Find the "_sig_" part in the name
   size_t sig_pos = histname.find("_sig_");
-  if (sig_pos == std::string::npos) {
-    MACH3LOG_ERROR("Missing _sig_ in {}", histname);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
 
   // Extract the part after "_sig_"
   std::string sigma_part = histname.substr(sig_pos + 5);
