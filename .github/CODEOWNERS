@@ -12,8 +12,8 @@
 
 * @kskwarczynski
 
-/cmake/* @kskwarczynski
-**/CMakeLists.txt @kskwarczynski
+/cmake/* @kskwarczynski @luketpickering
+**/CMakeLists.txt @kskwarczynski @luketpickering
 
 /Doc/* @kskwarczynski
 /.github/* @kskwarczynski
@@ -23,13 +23,14 @@
 /Manager/YamlHelper* @kskwarczynski
 /Manager/MaCh3Logger* @kskwarczynski
 
+/Parameters/*  @luketpickering
 /Parameters/AdaptiveMCMCHandler* @henry-wallace-phys
 /Parameters/PCAHandler* @kskwarczynski
 
 /Fitters/* @kskwarczynski
 /Fitters/DelayedMR2T2* @henry-wallace-phys
 
-/Samples/SampleHandlerFD* @dbarrow257
+/Samples/SampleHandler* @dbarrow257  @luketpickering
 /Samples/OscillationHandler* @dbarrow257
 
 /Splines/BinnedSplineHandler* @dbarrow257
