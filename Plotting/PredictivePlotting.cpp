@@ -12,6 +12,7 @@
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
 M3::Plotting::PlottingManager* PlotMan = nullptr;
+
 std::vector<std::string> FindSamples(const std::string& File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
@@ -345,21 +346,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
       RatioPlotData->Divide(DataHist.get());
       PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
 
-      double maxz = -999;
-      double minz = +999;
-      for (int j = 0; j < nFiles; j++) {
-        for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++) {
-          maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
-          minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
-        }
-      }
-      maxz = maxz*1.001;
-      minz = minz*1.001;
-
-      if (std::fabs(1 - maxz) > std::fabs(1-minz))
-        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-      else
-        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+      M3::Plotting::SetSymmetricRatioRange(RatioPlot);
 
       RatioPlot[0]->Draw("p e2");
       for(int ig = 1; ig < nFiles; ig++ ) {

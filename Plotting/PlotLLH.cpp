@@ -293,12 +293,13 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   label->SetTextAlign(11);
   label->SetTextAngle(-55);
   label->SetTextSize(0.012);
+  const auto& SampleTags = PlotMan->getOption<std::vector<std::string>>("sampleTags");
 
   // need to draw the labels after other stuff or they don't show up
-  for (uint i = 0; i < PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags")).size(); i++)
+  for (uint i = 0; i < PlotMan->input().getTaggedSamples(SampleTags).size(); i++)
   {
     MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
-    std::string sampName = PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags"))[i];
+    std::string sampName = PlotMan->input().getTaggedSamples(SampleTags)[i];
     if (!drawLabel[i])
     { 
       MACH3LOG_DEBUG("   - Not drawing label");
