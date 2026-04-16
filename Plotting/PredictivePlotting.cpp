@@ -33,6 +33,7 @@ std::vector<std::string> FindSamples(const std::string& File)
 
     if(dirname == "Total") continue;
     if(dirname == "BetaParameters") continue;
+    if(dirname == "Correlations") continue;
 
     SampleNames.push_back(dirname);
     MACH3LOG_DEBUG("Entering Sample {}", dirname);

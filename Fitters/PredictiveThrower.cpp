@@ -1023,7 +1023,6 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   TempClock.Start();
 
   auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
-  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
@@ -1047,14 +1046,20 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   // Check how number of events changed
   RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
-  // Studying information criterion
-  StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
-
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample]->Close();
     delete SampleDirectories[sample];
   }
+
+  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
+  auto StudyInfoCriterion = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyInformationCriterion"], true, __FILE__, __LINE__);
+  auto StudyCorr = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyCorrelations"], true, __FILE__, __LINE__);
+
+  // Studying information criterion
+  if(StudyInfoCriterion) StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
+  // Study Prior/Posterior correlations between samples etc.
+  if(StudyCorr) StudyCorrelations(PredictiveDir, MC_Hist_Toy, DebugHistograms);
   // Perform beta analysis for mc statical uncertainty
   if(StudyBeta) StudyBetaParameters(PredictiveDir);
 
@@ -1425,6 +1430,109 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   PredictiveDir->cd();
 }
 
+// ****************
+// Study Prior/Posterior correlations between samples etc.
+void PredictiveThrower::StudyCorrelations(TDirectory* PredictiveDir,
+                                          const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                          const bool DebugHistograms) const {
+// ****************
+  MACH3LOG_INFO("Startin {}", __func__);
+
+  // Make a new directory
+  TDirectory *CorrDir = PredictiveDir->mkdir("Correlations");
+  CorrDir->cd();
+
+  std::vector<double> minVals(TotalNumberOfSamples, std::numeric_limits<double>::max());
+  std::vector<double> maxVals(TotalNumberOfSamples, std::numeric_limits<double>::lowest());
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (const auto& toyHist : Toys[i])
+    {
+      const double val = toyHist->Integral();
+      if (val < minVals[i]) minVals[i] = val;
+      if (val > maxVals[i]) maxVals[i] = val;
+    }
+  }
+  auto hSamCorr = std::make_unique<TH2D>("Sample Correlation", "Sample Correlation", TotalNumberOfSamples, 0,
+                                         TotalNumberOfSamples, TotalNumberOfSamples, 0, TotalNumberOfSamples);
+  hSamCorr->SetDirectory(nullptr);
+  hSamCorr->GetZaxis()->SetTitle("Correlation");
+  hSamCorr->SetMinimum(-1);
+  hSamCorr->SetMaximum(1);
+  hSamCorr->GetXaxis()->SetLabelSize(0.015);
+  hSamCorr->GetYaxis()->SetLabelSize(0.015);
+  // Loop over the Covariance matrix entries
+  for (int i = 0; i < TotalNumberOfSamples; ++i) {
+    hSamCorr->SetBinContent(i+1, i+1, 1.0);
+    hSamCorr->GetXaxis()->SetBinLabel(i+1, SampleInfo[i].Name.c_str());
+    for (int j = 0; j < TotalNumberOfSamples; ++j) {
+      hSamCorr->GetYaxis()->SetBinLabel(j+1, SampleInfo[j].Name.c_str());
+    }
+  }
+
+  std::vector<std::vector<std::unique_ptr<TH2D>>> SamCorr(TotalNumberOfSamples);
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    SamCorr[i].resize(TotalNumberOfSamples);
+    const double Min_i = minVals[i];
+    const double Max_i = maxVals[i];
+    for (int j = 0; j < TotalNumberOfSamples; ++j)
+    {
+      const double Min_j = minVals[j];
+      const double Max_j = maxVals[j];
+      // TH2D to hold the Correlation
+      std::string name  = "SamCorr_" + std::to_string(i) + "_" + std::to_string(j);
+      SamCorr[i][j] = std::make_unique<TH2D>(name.c_str(), name.c_str(), 70, Min_i, Max_i, 70, Min_j, Max_j);
+      SamCorr[i][j]->SetDirectory(nullptr);
+      SamCorr[i][j]->SetMinimum(0);
+      SamCorr[i][j]->GetXaxis()->SetTitle(SampleInfo[i].Name.c_str());
+      SamCorr[i][j]->GetYaxis()->SetTitle(SampleInfo[j].Name.c_str());
+      SamCorr[i][j]->GetZaxis()->SetTitle("Events");
+    }
+  }
+
+  // Now we are sure we have the diagonal elements, let's make the off-diagonals
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      // Skip the diagonal elements which we've already done above
+      if (j == i) continue;
+
+      for (int iToy = 0; iToy < Ntoys; ++iToy)
+      {
+        SamCorr[i][j]->Fill(Toys[i][iToy]->Integral(), Toys[j][iToy]->Integral());
+      }
+      SamCorr[i][j]->Smooth();
+
+      // The value of the Covariance
+      const double corr = SamCorr[i][j]->GetCorrelationFactor();
+      hSamCorr->SetBinContent(i+1, j+1, corr);
+      hSamCorr->SetBinContent(j+1, i+1, corr);
+    }// End j loop
+  }// End i loop
+
+  hSamCorr->Draw("colz");
+  hSamCorr->Write("Sample_Corr");
+
+  if(DebugHistograms) {
+    for (int i = 0; i < TotalNumberOfSamples; ++i){
+      for (int j = 0; j <= i; ++j) {
+        // Skip the diagonal elements which we've already done above
+        if (j == i) continue;
+        SamCorr[i][j]->Write();
+      }// End j loop
+    }// End i loop
+  } // end if debugHist
+
+  PredictiveDir->cd();
+}
 
 // ****************
 // Calculate the LLH for TH1, set the LLH to title of MCHist
