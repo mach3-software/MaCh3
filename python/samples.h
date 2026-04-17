@@ -109,7 +109,7 @@ inline py::tuple HistToNumpy(std::unique_ptr<TH1>& hist, int dimension)
 
     if (dimension == 2)
     {
-        auto h2 = std::make_unique<TH2>(hist.release());
+        auto h2 = std::unique_ptr<TH2>(static_cast<TH2*>(hist.release()));
         if (!h2)
             throw std::runtime_error("Expected TH2");
 
@@ -472,6 +472,31 @@ void initSamplesModule(py::module &m_samples){
         )
 
         .def(
+            "get_n_dim",
+            &SampleHandlerInterface::GetNDim,
+            py::arg("sample"),
+            "Get the dimension of a given sample"
+        )
+
+        .def(
+            "get_mc_hist",
+            [](SampleHandlerBase &self, const int sample)
+            {
+                int Dimension = self.GetNDim(sample);
+                auto hist_original = M3::Clone(self.GetMCHist(sample));
+
+                auto edges = HistToNumpy(hist_original, Dimension);
+                return edges;
+            },
+
+            py::return_value_policy::reference_internal,
+            py::arg("sample"),
+            "Get MC histogram as numpy arrays.\n"
+            "For 1D: Returns (contents, edges)\n"
+            "For 2D: Returns (contents, edgesX, edgesY)\n"
+            "where contents is shape (nbinsY, nbinsX) for 2D")
+
+        .def(
             "get_likelihood",
             &SampleHandlerInterface::GetLikelihood,
             "Get the sample likelihood at the current point in your model space. You will need to override this.")
@@ -507,6 +532,14 @@ void initSamplesModule(py::module &m_samples){
             \n ",
             py::arg("mc_version"), py::arg("xsec_cov"))
 
+        .def(
+            "add_data",
+            py::overload_cast<const int, const std::vector<double>&>(&SampleHandlerBase::AddData),
+            py::arg("sample"),
+            py::arg("data_array"),
+            "Set the data for your sample handler (assumes the binning is the same as your MC!)"
+        )
+
         // ================
         // Useful getters
         // ===============
@@ -516,71 +549,33 @@ void initSamplesModule(py::module &m_samples){
             py::arg("sample"),
             "Get the title for a given sample"
         )
-
-        .def(
-            "get_n_dim",
-            &SampleHandlerBase::GetNDim,
-            py::arg("sample"),
-            "Get the dimension of a given sample"
-        )
-
-        .def(
-            "add_data",
-            py::overload_cast<const int, const std::vector<double>&>(&SampleHandlerBase::AddData),
-            py::arg("sample"),
-            py::arg("data_array"),
-            "Set the data for your sample handler (assumes the binning is the same as your MC!)"
-        )
-
-
-        // ================
-        // Histogramming 
-        // ================
         .def(
             "get_data_array", 
-            &SampleHandlerBase::GetDataArray,
+            py::overload_cast<const int>(&SampleHandlerBase::GetDataArray, py::const_),
             py::arg("sample"),
             "Returns the contents of the MC histogram as a flat list"
         )
 
         .def(
             "get_mc_array", 
-            &SampleHandlerBase::GetMCArray,
+            py::overload_cast<const int>(&SampleHandlerBase::GetMCArray, py::const_),
             py::arg("sample"),
             "Returns the contents of the MC histogram as a flat list"
         )
 
         .def(
             "get_w2_array", 
-            &SampleHandlerBase::GetW2Array,
+            py::overload_cast<const int>(&SampleHandlerBase::GetW2Array, py::const_),
             py::arg("sample"),
             "Returns the contents of the W2 histogram as a flat list"
         )
-
-        .def(
-            "get_mc_hist",
-            [](SampleHandlerBase &self, const int sample)
-            {
-                int Dimension = self.GetNDim(sample);
-                auto hist_original = M3::Clone(std::self.GetMCHist(sample));
-
-                auto edges = HistToNumpy(hist_original, Dimension);
-                return edges;
-            },
-
-            py::return_value_policy::reference_internal,
-            py::arg("sample"),
-            "Get MC histogram as numpy arrays.\n"
-            "For 1D: Returns (contents, edges)\n"
-            "For 2D: Returns (contents, edgesX, edgesY)\n"
-            "where contents is shape (nbinsY, nbinsX) for 2D")
 
         .def(
             "get_data_hist",
             [](SampleHandlerBase &self, const int sample)
             {
                 int Dimension = self.GetNDim(sample);
-                auto hist_original = M3::Clone(std::self.GetDataHist(sample));
+                auto hist_original = M3::Clone(self.GetDataHist(sample));
 
                 auto edges = HistToNumpy(hist_original, Dimension);
                 return edges;
@@ -597,7 +592,7 @@ void initSamplesModule(py::module &m_samples){
             [](SampleHandlerBase &self, const int sample)
             {
                 int Dimension = self.GetNDim(sample);
-                auto hist_original = M3::Clone(std::self.GetW2Hist(sample));
+                auto hist_original = M3::Clone(self.GetW2Hist(sample));
 
                 auto edges = HistToNumpy(hist_original, Dimension);
                 return edges;
@@ -608,29 +603,39 @@ void initSamplesModule(py::module &m_samples){
             "Get W2 histogram as numpy arrays.\n"
             "For 1D: Returns (contents, edges)\n"
             "For 2D: Returns (contents, edgesX, edgesY)\n"
-            "where contents is shape (nbinsY, nbinsX) for 2D");
+            "where contents is shape (nbinsY, nbinsX) for 2D")
         
         .def("get_var_hist", 
             [](SampleHandlerBase &self, const int iSample,
                                     const std::string& ProjectionVarX,
                                     const std::string& ProjectionVarY="",
-                                    const std::vector<KinematicCut> &EventSelectionVec = {}
+                                    const std::vector<KinematicCut> &EventSelectionVec = {},
                                     int WeightStyle = 0,
                                     const std::vector< KinematicCut >& SubEventSelectionVec = {})
             {
 
-                py::array_t<M3::float_t> edgesY, edgesX, contents
+                py::array_t<M3::float_t> edgesY, edgesX, contents;
+                std::unique_ptr<TH1> hist;
+                int dim;
                 if(ProjectionVarY==""){
-                    auto hist = std::make_unique<TH1>(self.Get1DVarHistByModeAndChannel(iSample, ProjectionVarX, WeightStyle, SubEventSelectionVec));
-                    const auto[contents, edgesX] = TH1ToNumpy(hist)
-                    const auto edgesY = py::array_t<M3::float_t>();
-                } else{                
-                    auto hist = std::make_unique<TH2>(self.Get2DVarHistByModeAndChannel(iSample, ProjectionVarX, ProjectionVarY, EventSelectionVec, WeightStyle, SubEventSelectionVec));
-                    const auto [contents, edgesX, edgesY] = TH2ToNumpy(hist);
-                }
-                return py::make_tuple(contents, edgesX, edgesY);
+                    hist = self.Get1DVarHist(iSample,
+                                             ProjectionVarX,
+                                             EventSelectionVec,
+                                             WeightStyle,
+                                             SubEventSelectionVec);
+                    dim = 1;
+                } else{
+                    hist = self.Get2DVarHist(iSample, 
+                                     ProjectionVarX,
+                                     ProjectionVarY,
+                                     EventSelectionVec,
+                                     WeightStyle,
+                                     SubEventSelectionVec);
+                    dim = 2;
+                }                    
+                return HistToNumpy(hist, dim);
             }
-        )
+            )
         ; // End of SampleHandler Base
 
 
