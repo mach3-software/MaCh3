@@ -109,7 +109,7 @@ inline py::tuple HistToNumpy(std::unique_ptr<TH1>& hist, int dimension)
 
     if (dimension == 2)
     {
-        const TH2* h2 = std::make_unique<TH2>(hist.release());
+        auto h2 = std::make_unique<TH2>(hist.release());
         if (!h2)
             throw std::runtime_error("Expected TH2");
 
@@ -567,7 +567,7 @@ void initSamplesModule(py::module &m_samples){
                 auto edges = HistToNumpy(hist_original, Dimension);
                 return edges;
             },
-            
+
             py::return_value_policy::reference_internal,
             py::arg("sample"),
             "Get MC histogram as numpy arrays.\n"
@@ -621,12 +621,12 @@ void initSamplesModule(py::module &m_samples){
 
                 py::array_t<M3::float_t> edgesY, edgesX, contents
                 if(ProjectionVarY==""){
-                    auto hist = self.Get1DVarHistByModeAndChannel(iSample, ProjectionVarX, WeightStyle, SubEventSelectionVec;
-                    const auto[contents, edgesX] = TH1ToNumpy(hist.get())
+                    auto hist = std::make_unique<TH1>(self.Get1DVarHistByModeAndChannel(iSample, ProjectionVarX, WeightStyle, SubEventSelectionVec));
+                    const auto[contents, edgesX] = TH1ToNumpy(hist)
                     const auto edgesY = py::array_t<M3::float_t>();
                 } else{                
-                    auto hist = self.Get2DVarHistByModeAndChannel(iSample, ProjectionVarX, ProjectionVarY, EventSelectionVec, WeightStyle, SubEventSelectionVec);
-                    const auto [contents, edgesX, edgesY] = TH2ToNumpy(hist.get());
+                    auto hist = std::make_unique<TH2>(self.Get2DVarHistByModeAndChannel(iSample, ProjectionVarX, ProjectionVarY, EventSelectionVec, WeightStyle, SubEventSelectionVec));
+                    const auto [contents, edgesX, edgesY] = TH2ToNumpy(hist);
                 }
                 return py::make_tuple(contents, edgesX, edgesY);
             }
@@ -634,7 +634,7 @@ void initSamplesModule(py::module &m_samples){
         ; // End of SampleHandler Base
 
 
-    py::class_<KinematicCut>(m, "KinematicCut")
+    py::class_<KinematicCut>(m_samples, "KinematicCut")
         .def(py::init<>(), "Simple wrapper around Kinematic cuts")
         .def_readwrite("param_name", &KinematicCut::ParamToCutOnIt, "Parameter to cut on")
         .def_readwrite("lower_bound", &KinematicCut::LowerBound, "Lower bound")
