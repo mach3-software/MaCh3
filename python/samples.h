@@ -481,26 +481,52 @@ void initSamplesModule(py::module &m_samples){
             \n ",
             py::arg("mc_version"), py::arg("xsec_cov"))
 
-        .def("get_data_array", [](SampleHandlerBase & self, const int sample){
-                // Get the MC bin contents ignoring bin edges 
-                return self.GetDataArray(sample);
-            },    
+        // ================
+        // Useful getters
+        // ===============
+        .def(
+            "get_sample_title",
+            &SampleHandlerBase::GetSampleTitle,
             py::arg("sample"),
-            "Returns the contents of the Data histogram as a flat list"
+            "Get the title for a given sample"
         )
-            
-        .def("get_mc_array", [](SampleHandlerBase & self, const int sample){
-                // Get the MC bin contents ignoring bin edges 
-                return self.GetMCArray(sample);
-            },    
+
+        .def(
+            "get_n_dim",
+            &SampleHandlerBase::GetNDim,
+            py::arg("sample"),
+            "Get the dimension of a given sample"
+        )
+
+        .def(
+            "add_data",
+            py::overload_cast<const int, std::vector<double>&>&SampleHandlerBase::AddData,
+            py::arg("sample"),
+            py::arg("data_array")
+            "Set the data for your sample handler (assumes the binning is the same as your MC!)"
+        )
+
+
+        // ================
+        // Histogramming 
+        // ================
+        .def(
+            "get_data_array", 
+            &SampleHandlerBase::GetDataArray,
             py::arg("sample"),
             "Returns the contents of the MC histogram as a flat list"
         )
 
-        .def("get_w2_array", [](SampleHandlerBase & self, const int sample){
-                // Get the MC bin contents ignoring bin edges
-                return self.GetW2Array(sample);
-            },    
+        .def(
+            "get_mc_array", 
+            &SampleHandlerBase::GetMCArray,
+            py::arg("sample"),
+            "Returns the contents of the MC histogram as a flat list"
+        )
+
+        .def(
+            "get_w2_array", 
+            &SampleHandlerBase::GetW2Array,
             py::arg("sample"),
             "Returns the contents of the W2 histogram as a flat list"
         )
@@ -660,6 +686,8 @@ void initSamplesModule(py::module &m_samples){
             "For 1D: Returns (contents, edges)\n"
             "For 2D: Returns (contents, edgesX, edgesY)\n"
             "where contents is shape (nbinsY, nbinsX) for 2D");
+
+        
 
     /* Not sure if this will be needed in future versions of MaCh3 so leaving commented for now
     py::class_<fdmc_base>(m_samples, "MCstruct")
