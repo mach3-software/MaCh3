@@ -502,7 +502,7 @@ void initSamplesModule(py::module &m_samples){
             "add_data",
             py::overload_cast<const int, std::vector<double>&>&SampleHandlerBase::AddData,
             py::arg("sample"),
-            py::arg("data_array")
+            py::arg("data_array"),
             "Set the data for your sample handler (assumes the binning is the same as your MC!)"
         )
 
