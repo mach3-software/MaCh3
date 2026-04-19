@@ -50,10 +50,9 @@ void initParametersModule(py::module &m_parameters){
             .value("N_Systematic_Types", SystType::kSystTypes);
 
         .def(
-            "calculate_likelihood", 
+            "calculate_likelihood",
             &ParameterHandlerBase::CalcLikelihood,
-            "Calculate penalty term based on inverted covariance matrix."
-        )
+            "Calculate penalty term based on inverted covariance matrix.")
 
         .def(
             "get_internal_par_name",
@@ -66,9 +65,8 @@ void initParametersModule(py::module &m_parameters){
             },
             "Get the internally used name of this parameter. \n\
             :param index: The global index of the parameter",
-            py::arg("index")
-        )
-        
+            py::arg("index"))
+
         .def(
             "get_fancy_par_name",
             [](ParameterHandlerBase &self, int index)
@@ -80,20 +78,17 @@ void initParametersModule(py::module &m_parameters){
             },
             "Get the name of this parameter. \n\
             :param index: The global index of the parameter",
-            py::arg("index")
-        )
+            py::arg("index"))
 
         .def(
             "get_n_pars",
             &ParameterHandlerBase::GetNParameters,
-            "Get the number of parameters that this ParameterHandler object knows about."
-        )
-        
+            "Get the number of parameters that this ParameterHandler object knows about.")
+
         .def(
             "propose_step",
             &ParameterHandlerBase::ProposeStep,
-            "Propose a step based on the covariances. Also feel free to overwrite if you want something more funky."
-        )
+            "Propose a step based on the covariances. Also feel free to overwrite if you want something more funky.")
 
         .def(
             "get_proposal_array",
@@ -118,20 +113,17 @@ void initParametersModule(py::module &m_parameters){
             },
             "Get the parameter proposal values as a numpy array. \n\
             This returns a copy of the current proposal values. \n\
-            :return: A numpy array containing the proposal values for all parameters."
-        )
+            :return: A numpy array containing the proposal values for all parameters.")
 
-        .def("set_parameters", 
-             [](ParameterHandlerBase& self, py::object pars_obj = py::none()) {
+        .def("set_parameters", [](ParameterHandlerBase &self, py::object pars_obj = py::none())
+             {
                  if (pars_obj.is_none()) {
                      self.SetParameters();
                  } else {
                      // This handles both numpy arrays and Python lists
                      std::vector<double> pars_vec = pars_obj.cast<std::vector<double>>();
                      self.SetParameters(pars_vec);
-                 }
-             },
-             py::arg("pars") = py::none(),
+                 } }, py::arg("pars") = py::none(),
              R"pbdoc(
                  Set parameter values using array.
                  
@@ -150,9 +142,51 @@ void initParametersModule(py::module &m_parameters){
                  >>> handler.set_parameters()
              )pbdoc")
 
-    ; // End of ParameterHandlerBase binding
+             
+        .def("get_par_init", &ParameterHandlerBase::GetParInit, py::arg("index"),
+            "Get initial value of parameter at index i\n\
+            :param index: index of the parameter")
 
-    
+        .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg("index"), 
+            "Get the lower bound of parameter at index i. \n\
+            :param index: index of the parameter")
+             
+        .def("get_upper_bound", &ParameterHandlerBase::GetUpperBound, py::arg("index"), 
+            "Get the upper bound of parameter at index i. \n\
+            :param index: index of the parameter")
+
+        .def("get_flat_prior", &ParameterHandlerBase::GetFlatPrior, py::arg("index"), 
+            "Is the parameter at index i flat?. \n\
+            :param index: index of the parameter")
+
+        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg("index"), 
+            "The prior error on parameter at index i \n\
+            :param index: index of the parameter")
+
+        .def("get_par_fixed", static_cast<bool (ParameterHandlerBase::*)(const int) const>(&ParameterHandlerBase::IsParameterFixed), py::arg("index"), 
+            "Is the parameter at index i fixed \n\
+            :param index: index of the parameter")
+
+        .def("get_prior_cov", [](ParameterHandlerBase &self)
+             {
+                 auto mat = self.GetCovMatrix();
+                 if (!mat){
+                     throw std::runtime_error("TMatrixDSym pointer is null");
+                 }
+                 int n = mat->GetNrows();
+                 const double *data = mat->GetMatrixArray();
+                 py::array_t<float> result({n, n});
+                 // Shove matrix into the array
+                 std::transform(data, data + n * n,
+                                result.mutable_data(),
+                                [](double v)
+                                { return static_cast<float>(v); });
+
+                 return result; },
+             "Get the prior covariance")
+
+        ; // End of ParameterHandlerBase binding
+
     py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerGeneric")
         .def(
             py::init<const std::vector<std::string>&, const char *, M3::float_t, int, int>(),
