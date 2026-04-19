@@ -14,21 +14,14 @@
 /// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
-  /// @brief ETA - constructor for a YAML file
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  /// @param name Matrix name
-  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
-  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
-  /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
   ParameterHandlerBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerBase() = default;
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
@@ -146,8 +139,6 @@ class ParameterHandlerBase {
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   std::string GetParFancyName(const int i) const {return _fFancyNames[i];}
-  /// @brief Get name of input file
-  std::string GetInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
@@ -351,13 +342,9 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
                                 const std::vector<std::string>& FancyNames = {});
-
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void Init(const std::string& name, const std::string& file);
-  /// @brief Initialisation of the class using config
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  void Init(const std::vector<std::string>& YAMLFile);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
@@ -374,11 +361,6 @@ protected:
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
-  /// @brief Check if parameter is affecting given sample name
-  /// @param SystIndex number of parameter
-  /// @param SampleName The Sample name used to filter parameters.
-  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
   /// @brief KS: Flip parameter around given value, for example mass ordering around 0
   /// @param index parameter index you want to flip
@@ -400,7 +382,7 @@ protected:
   bool doSpecialStepProposal;
 
   /// The input root file we read in
-  const std::string inputFile;
+  std::string inputFile;
 
   /// Name of cov matrix
   std::string matrixName;
@@ -448,8 +430,6 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
-  /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fSampleNames;
 
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
