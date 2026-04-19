@@ -49,23 +49,6 @@ void initParametersModule(py::module &m_parameters){
             .value("Functional", SystType::kFunc)
             .value("N_Systematic_Types", SystType::kSystTypes);
 
-        
-    py::class_<ParameterHandlerBase, PyParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerBase")
-        .def(
-            py::init<const std::vector<std::string>&, const char *, M3::float_t, int, int>(),
-            "Construct a parameters object from a set of yaml files that define the systematic parameters \n\
-            :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this ParameterHandler object. \n\
-            :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
-            :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
-            :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
-            py::arg("yaml_files"),
-            py::arg("name"),
-            py::arg("threshold") = -1.0,
-            py::arg("firs_PCA_par") = -999,
-            py::arg("last_PCA_par") = -999
-        )
-        
         .def(
             "calculate_likelihood", 
             &ParameterHandlerBase::CalcLikelihood,
