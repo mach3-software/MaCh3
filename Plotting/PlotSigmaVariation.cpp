@@ -53,6 +53,7 @@ void FindKnot(std::vector<double>& SigmaValues,
   double sigma = 0.0;
   // Find the "_sig_" part in the name
   size_t sig_pos = histname.find("_sig_");
+
   // Extract the part after "_sig_"
   std::string sigma_part = histname.substr(sig_pos + 5);
 
@@ -261,27 +262,9 @@ void MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
 
   Ratio[0]->GetYaxis()->SetTitle("Ratio to Prior");
   Ratio[0]->SetBit(TH1D::kNoTitle);
-  Ratio[0]->SetBit(TH1D::kNoTitle);
 
-  double maxz = -999;
-  double minz = +999;
-  for (int j = 0; j < static_cast<int>(sigmaArray.size())-1; j++)
-  {
-    for (int i = 1; i < Ratio[0]->GetXaxis()->GetNbins(); i++)
-    {
-      maxz = std::max(maxz, Ratio[j]->GetBinContent(i));
-      minz = std::min(minz, Ratio[j]->GetBinContent(i));
-    }
-  }
-  maxz = maxz*1.001;
-  minz = minz*1.001;
-
-  if (std::fabs(1 - maxz) > std::fabs(1-minz))
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-  else
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+  M3::Plotting::SetSymmetricRatioRange(Ratio);
 }
-
 
 void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                const std::unique_ptr<TCanvas>& canv,

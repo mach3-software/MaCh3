@@ -59,6 +59,18 @@ std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
   return Hist;
 }
 
+void SetupCanvas(TCanvas* canv) {
+  canv->SetGrid();
+  gStyle->SetOptStat(0);
+  canv->SetTickx();
+  canv->SetTicky();
+  canv->SetBottomMargin(0.2);
+  canv->SetTopMargin(0.1);
+  canv->SetRightMargin(0.15);
+  canv->SetLeftMargin(0.15);
+  gStyle->SetOptTitle(1);
+}
+
 void DynamicLabelSize(TH2D* Hist) {
   if (Hist->GetNbinsX() < 20) {
     Hist->SetMarkerSize(1.0);
@@ -115,16 +127,7 @@ void PlotMatrix(const std::unique_ptr<M3::Plotting::PlottingManager>& man, const
   }
 
   auto MatrixPlot = std::make_unique<TCanvas>("MatrixPlot", "MatrixPlot", 0, 0, 1024, 1024);
-  MatrixPlot->SetGrid();
-  gStyle->SetOptStat(0);
-  gStyle->SetOptTitle(0);
-  MatrixPlot->SetTickx();
-  MatrixPlot->SetTicky();
-  MatrixPlot->SetBottomMargin(0.2);
-  MatrixPlot->SetTopMargin(0.1);
-  MatrixPlot->SetRightMargin(0.15);
-  MatrixPlot->SetLeftMargin(0.15);
-  gStyle->SetOptTitle(1);
+  SetupCanvas(MatrixPlot.get());
   gStyle->SetPaintTextFormat("4.1f");
 
   // Make pretty Correlation colors (red to blue)
@@ -187,16 +190,7 @@ void CompareMatrices(const std::unique_ptr<M3::Plotting::PlottingManager>& man,
     file[i]->GetObject("Correlation_plot", MatrixFull[i]);
   }
   auto MatrixPlot = std::make_unique<TCanvas>("MatrixPlot", "MatrixPlot", 0, 0, 1024, 1024);
-  MatrixPlot->SetGrid();
-  gStyle->SetOptStat(0);
-  gStyle->SetOptTitle(0);
-  MatrixPlot->SetTickx();
-  MatrixPlot->SetTicky();
-  MatrixPlot->SetBottomMargin(0.2);
-  MatrixPlot->SetTopMargin(0.1);
-  MatrixPlot->SetRightMargin(0.15);
-  MatrixPlot->SetLeftMargin(0.15);
-  gStyle->SetOptTitle(1);
+  SetupCanvas(MatrixPlot.get());
 
   //KS: Fancy colors
   constexpr int NRGBs = 10;

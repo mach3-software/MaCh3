@@ -7,7 +7,7 @@ namespace Plotting {
 /// and last points it will extend the binning out of the graph bounds using the width between the
 /// outermost and second outermost points. This can be useful if e.g. you want to draw cumulative
 /// stacks of LLH scans.
-TH1D TGraphToTH1D(TGraph graph, const std::string& newName, const std::string& newTitle) {
+TH1D TGraphToTH1D(const TGraph& graph, const std::string& newName, const std::string& newTitle) {
   std::string name;
   std::string title;
 
@@ -60,7 +60,7 @@ TH1D TGraphToTH1D(TGraph graph, const std::string& newName, const std::string& n
   return retHist;
 }
 
-std::vector<std::vector<double>> TGraphToVector(TGraph graph) {
+std::vector<std::vector<double>> TGraphToVector(const TGraph& graph) {
   int nPoints = graph.GetN();
   std::vector<std::vector<double>> ret(2);
   std::vector<double> pointsX(nPoints);
@@ -83,8 +83,7 @@ std::vector<std::vector<double>> TGraphToVector(TGraph graph) {
 }
 
 
-std::vector<std::vector<double>> TGraphToVector(TGraph2D graph) {
-
+std::vector<std::vector<double>> TGraphToVector(const TGraph2D& graph) {
   int nPoints = graph.GetN();
   std::vector<std::vector<double>> ret(3);
   std::vector<double> pointsX(nPoints);
@@ -107,6 +106,29 @@ std::vector<std::vector<double>> TGraphToVector(TGraph2D graph) {
   ret[2] = pointsZ;
 
   return ret;
+}
+
+void SetSymmetricRatioRange(const std::vector<std::unique_ptr<TH1D>>& RatioPlot)
+{
+  double maxz = -999;
+  double minz = +999;
+
+  for (int j = 0; j < static_cast<int>(RatioPlot.size()); j++) {
+    if (!RatioPlot[j]) continue;
+
+    for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++) {
+      maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
+      minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
+    }
+  }
+
+  maxz = maxz * 1.001;
+  minz = minz * 1.001;
+
+  if (std::fabs(1 - maxz) > std::fabs(1 - minz))
+    RatioPlot[0]->GetYaxis()->SetRangeUser(1 - std::fabs(1 - maxz), 1 + std::fabs(1 - maxz));
+  else
+    RatioPlot[0]->GetYaxis()->SetRangeUser(1 - std::fabs(1 - minz), 1 + std::fabs(1 - minz));
 }
 
 } // namespace Plotting
