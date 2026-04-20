@@ -1,5 +1,4 @@
 #include "Parameters/ParameterHandlerBase.h"
-
 #include "Samples/HistogramUtils.h"
 
 #include <regex>
@@ -74,8 +73,8 @@ void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstP
 
   PCAObj = std::make_unique<PCAHandler>();
   //Check whether first and last pcadpar are set and if not just PCA everything
-  if(FirstPCAdpar == -999 || LastPCAdpar == -999){
-    if(FirstPCAdpar == -999 && LastPCAdpar == -999){
+  if(FirstPCAdpar == -999 || LastPCAdpar == -999) {
+    if(FirstPCAdpar == -999 && LastPCAdpar == -999) {
       FirstPCAdpar = 0;
       LastPCAdpar = covMatrix->GetNrows()-1;
     }
@@ -475,15 +474,16 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
-  _fPreFitValue = std::vector<double>(SizeVec);
-  _fError = std::vector<double>(SizeVec);
-  _fCurrVal = std::vector<double>(SizeVec);
-  _fPropVal = std::vector<M3::float_t>(SizeVec);
-  _fLowBound = std::vector<double>(SizeVec);
-  _fUpBound = std::vector<double>(SizeVec);
-  _fFlatPrior = std::vector<bool>(SizeVec);
-  _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
+
+  _fPreFitValue     = std::vector<double>(SizeVec, 1.0);
+  _fError           = std::vector<double>(SizeVec, 1.0);
+  _fCurrVal         = std::vector<double>(SizeVec, 0.0);
+  _fPropVal         = std::vector<M3::float_t>(SizeVec, 0.0);
+  _fLowBound        = std::vector<double>(SizeVec, -999.99);
+  _fUpBound         = std::vector<double>(SizeVec, 999.99);
+  _fFlatPrior       = std::vector<bool>(SizeVec, false);
+  _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
 
   corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)
@@ -491,14 +491,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 
   // Set the defaults to true
   for(int i = 0; i < SizeVec; i++) {
-    _fPreFitValue.at(i) = 1.;
-    _fError.at(i) = 1.;
-    _fCurrVal.at(i) = 0.;
-    _fPropVal.at(i) = 0.;
-    _fLowBound.at(i) = -999.99;
-    _fUpBound.at(i) = 999.99;
-    _fFlatPrior.at(i) = false;
-    _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
     randParams[i] = 0.0;
   }
@@ -776,14 +768,11 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
 void ParameterHandlerBase::CircularParBounds(const int index, const double LowBound, const double UpBound) {
 // *************************************
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wuseless-cast"
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = static_cast<M3::float_t>(LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound));
   } else if (_fPropVal[index] < LowBound) {
     _fPropVal[index] = static_cast<M3::float_t>(UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound));
   }
-  #pragma GCC diagnostic pop
 }
 
 // *************************************
