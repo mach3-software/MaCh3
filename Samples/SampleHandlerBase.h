@@ -31,37 +31,35 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  /// @brief DB Get what dimensionality binning for given sample has
-  /// @param Sample Number of sample
+  /// @copydoc SampleHandlerInterface::GetNDim
   int GetNDim(const int Sample) const final { return SampleDetails[Sample].nDimensions; }
-  /// @brief Get name for Sample Handler
+  /// @copydoc SampleHandlerInterface::GetName
   std::string GetName() const final;
-  /// @brief Get fancy title for specified samples
+  /// @copydoc SampleHandlerInterface::GetSampleTitle
   std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
   /// @brief Sample name tag used only for getting relevant uncertainties
   std::string GetSampleName(const int Sample) const {return SampleDetails[Sample].SampleName;}
-  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
-  /// @param iSample Sample index
-  /// @param Dimension Dimension index
+  /// @copydoc SampleHandlerInterface::GetKinVarName
   std::string GetKinVarName(const int iSample, const int Dimension) const final;
 
   /// @brief Computes and prints the integral breakdown of all modes and oscillation channels for a given sample.
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
 
-  //===============================================================================
-  // DB Reweighting and Likelihood functions
-
-  //ETA - abstract these to SampleHandlerBase
-  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
+  /// @brief DB: Add data for a given sample from a ROOT histogram.
+  /// @param Sample Index of the sample.
+  /// @param Data Pointer to a TH1 containing the data to be stored.
   void AddData(const int Sample, TH1* Data);
+
+  /// @brief ETA:  Add data for a given sample from a raw array.
+  /// @param Sample Index of the sample.
+  /// @param Data_Array Vector containing the data values.
   void AddData(const int Sample, const std::vector<double>& Data_Array);
 
-  /// @brief Helper function to print rates for the samples with LLH
-  /// @param DataOnly whether to print data only rates
+  /// @copydoc SampleHandlerInterface::PrintRates
   void PrintRates(const bool DataOnly = false) final;
-  /// @brief DB Multi-threaded GetLikelihood
+  /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
-  /// @brief Get likelihood for single sample
+  /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
 
@@ -69,27 +67,32 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @param SampleTitle The title of the sample to search for.
   int GetSampleIndex(const std::string& SampleTitle) const;
 
-  /// @brief Get Data histogram
+  /// @copydoc SampleHandlerInterface::GetDataHist
   const TH1* GetDataHist(const int Sample) final;
+  /// @brief Get Data histogram by sample name
+  /// @param Sample Sample title
   const TH1* GetDataHist(const std::string& Sample);
 
-  /// @brief Get MC histogram
+  /// @copydoc SampleHandlerInterface::GetMCHist
   const TH1* GetMCHist(const int Sample) final;
+  /// @brief Get MC histogram by sample title
+  /// @param Sample Sample name
   const TH1* GetMCHist(const std::string& Sample);
 
-  /// @brief Get W2 histogram
+  /// @copydoc SampleHandlerInterface::GetW2Hist
   const TH1* GetW2Hist(const int Sample) final;
+  /// @brief Get W2 histogram by sample name
+  /// @param Sample Sample title
   const TH1* GetW2Hist(const std::string& Sample);
-  /// @brief main routine modifying MC prediction based on proposed parameter values
+  /// @copydoc SampleHandlerInterface::Reweight
   void Reweight() override;
   /// @brief Computes the total event weight for a given entry.
-  M3::float_t GetEventWeight(const int iEntry);
+  /// @param iEvent Event enumerator
+  M3::float_t GetEventWeight(const int iEvent);
 
-  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
-
-  /// @brief Get number of oscillation channels for a single sample
+  /// @copydoc SampleHandlerInterface::GetNOscChannels
   int GetNOscChannels(const int iSample) const final {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
-
+  /// @copydoc SampleHandlerInterface::GetFlavourName
   std::string GetFlavourName(const int iSample, const int iChannel) const final {
     if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
@@ -97,9 +100,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
     }
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
+  /// @copydoc SampleHandlerInterface::Get1DVarHist
   std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                                     const std::vector<KinematicCut> &SubEventSelectionVec = {}) final;
+  /// @copydoc SampleHandlerInterface::Get2DVarHist
   std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                                     const std::vector< KinematicCut >& EventSelectionVec = {},
                                     int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
@@ -110,10 +115,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
                           int WeightStyle=0);
   void Fill2DSubEventHist(const int iSample, TH2* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
-
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
   std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                                     const int kModeToFill = -1, const int kChannelToFill = -1,
                                                     const int WeightStyle = 0) final;
+  /// @copydoc SampleHandlerInterface::Get2DVarHistByModeAndChannel
   std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
@@ -142,7 +148,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
-  /// @brief Store additional info in a chan
+  /// @copydoc SampleHandlerInterface::SaveAdditionalInfo
   void SaveAdditionalInfo(TDirectory* Dir) final;
 
   /// @brief JM: Convert a kinematic vector name to its corresponding integer ID.
@@ -168,14 +174,17 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetArrayForSample(const int Sample, std::vector<double> const & array) const;
 
   /// @brief Return array storing data entries for every bin
+  /// @param Sample Sample index
   std::vector<double> GetDataArray(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_data);
   }
   /// @brief Return array storing MC entries for every bin
+  /// @param Sample Sample index
   std::vector<double> GetMCArray(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array);
   }
   /// @brief Return array storing W2 entries for single sample
+  /// @param Sample Sample index
   std::vector<double> GetW2Array(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array_w2);
   }
@@ -183,6 +192,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
  protected:
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
+  /// @brief Get pointer to NuOscillator weight for a given event
+  /// @param iEvent Event enumerator
+  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
   /// @brief Initialise pointer to oscillation weight to NuOscillator object
   void SetupNuOscillatorPointers();
   /// @brief Load information about sample handler and corresponding samples from config file
@@ -311,7 +323,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
     return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
-  /// @brief Return the binning used to draw a kinematic parameter
+  /// @copydoc SampleHandlerInterface::ReturnKinematicParameterBinning
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const final;
 
   const double* GetPointerToKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
@@ -344,6 +356,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// @brief Helper function to reset histograms
   void ResetHistograms();
+  /// @brief Setup spline handler (both binned or unbinned)
+  void InitialiseSplineObject();
 
   //===============================================================================
   //DB Variables required for GetLikelihood
@@ -399,14 +413,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// The manager object used to read the sample yaml file
   std::unique_ptr<Manager> SampleManager;
-  void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
 
   //===============================================================================
-  /// DB Miscellaneous Variables
+  /// DB: Legend associated with stacked histograms produced by this class.
   TLegend* THStackLeg = nullptr;
-  //===============================================================================
 
   /// KS:Super hacky to update W2 or not
   bool FirstTimeW2;
@@ -423,8 +435,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
    /// Returns the original Selection so the caller can restore it later.
    std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
                                                                   const std::vector<KinematicCut>& ExtraCuts);
-
+  /// Mapping from input file names to initial neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
+  /// Mapping from input file names to final neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
 
   enum FDPlotType {
