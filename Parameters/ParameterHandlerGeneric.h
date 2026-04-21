@@ -132,6 +132,9 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     std::vector<const M3::float_t*> GetOscParsFromSampleName(const std::string& SampleName);
 
   protected:
+    /// @brief Initialisation of the class using config
+    /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
+    void InitialiseFromConfig(const std::vector<std::string>& YAMLFile);
     /// @brief Print information about the whole object once it is set
     void Print() const;
     /// @brief Prints general information about the ParameterHandler object.
@@ -149,7 +152,12 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// @brief KS: Check if matrix is correctly initialised
     void CheckCorrectInitialisation() const;
-
+    /// @brief Load correlation from yaml config
+    void LoadCorrelationFromConfig(std::vector<std::map<std::string,double>>& Correlations,
+                                   std::map<std::string, int>& CorrNamesMap);
+    /// @brief Initialise single yaml based on several yaml files
+    void LoadAndMergeYAML(const std::vector<std::string>& YAMLFile,
+                          std::map<std::pair<int,int>, std::unique_ptr<TMatrixDSym>>& overrides);
     /// @brief Iterates over parameters and applies a filter and action function.
     ///
     /// This template function provides a way to iterate over parameters associated
@@ -168,7 +176,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
     /// @note This is used internally during the object's initialization process.
-    void InitParams();
+    void InitParameters();
 
     /// @brief Parses the YAML configuration to set up cross-section parameters.
     /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
@@ -177,26 +185,31 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Get Norm params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline NormParameter GetNormParameter(const YAML::Node& param, const int Index);
+    NormParameter GetNormParameter(const YAML::Node& param, const int Index);
 
     /// @brief Get Osc params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline OscillationParameter GetOscillationParameters(const YAML::Node& param, const int Index);
+    OscillationParameter GetOscillationParameters(const YAML::Node& param, const int Index);
 
     /// @brief Get Func params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
+    FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    inline SplineParameter GetSplineParameter(const YAML::Node& param, const int Index);
+    SplineParameter GetSplineParameter(const YAML::Node& param, const int Index);
     /// @brief Fill base parameters
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
     /// @param Parameter Object storing info
-    inline void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
+    void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
+
+    /// @brief Check if parameter is affecting given sample name
+    /// @param SystIndex number of parameter
+    /// @param SampleName The Sample name used to filter parameters.
+    bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
     /// @brief Retrieve parameters that apply to a given sample name.
     /// @tparam ParamT Type of parameter (e.g., FunctionalParameter, NormParameter).
@@ -206,6 +219,9 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @return Vector of parameters of type ParamT that apply to the specified sample.
     template<typename ParamT>
     std::vector<ParamT> GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const;
+
+    /// Tells to which samples object param should be applied
+    std::vector<std::vector<std::string>> _fSampleNames;
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;

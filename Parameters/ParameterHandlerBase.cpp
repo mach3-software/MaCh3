@@ -9,6 +9,8 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   doSpecialStepProposal = false;
+  // Not using adaptive by default
+  use_adaptive = false;
   if (threshold < 0 || threshold >= 1) {
     MACH3LOG_INFO("NOTE: {} {}", name, file);
     MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
@@ -17,32 +19,9 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
     MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
     pca = false;
   }
+
   Init(name, file);
 
-  // Call the innocent helper function
-  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
-}
-// ********************************************
-ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
-                     : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
-// ********************************************
-  MACH3LOG_INFO("Constructing instance of ParameterHandler using");
-  doSpecialStepProposal = false;
-  for(unsigned int i = 0; i < YAMLFile.size(); i++)
-  {
-    MACH3LOG_INFO("{}", YAMLFile[i]);
-  }
-  MACH3LOG_INFO("as an input");
-
-  if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("Please specify a number between 0 and 1");
-    MACH3LOG_INFO("You specified: ");
-    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
-    pca = false;
-  }
-
-  Init(YAMLFile);
   // Call the innocent helper function
   if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
@@ -118,8 +97,6 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
-  // Not using adaptive by default
-  use_adaptive = false;
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
@@ -147,233 +124,6 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
   MACH3LOG_INFO("Created covariance matrix named: {}", GetName());
   MACH3LOG_INFO("from file: {}", file);
   delete infile;
-}
-
-// ********************************************
-// ETA An init function for the YAML constructor
-// All you really need from the YAML file is the number of Systematics
-void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
-// ********************************************
-  std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
-  int running_num_file_pars = 0;
-
-  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < YAMLFile.size(); i++)
-  {
-    YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
-
-    if (YAMLDocTemp["ThrowMatrixOverride"]) { // LP: this allows us to put in
-                                              // proposal matrix overrides per
-                                              // parameter-containing file, add
-                                              // the block diagonal proposal
-                                              // matrix to a list and overwrite
-                                              // the throw matrix after set up.
-      auto filename =
-          YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
-      TFile *submatrix_file = TFile::Open(filename.c_str());
-
-      auto matrixname =
-          YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
-      std::unique_ptr<TMatrixDSym> submatrix{
-          submatrix_file->Get<TMatrixDSym>(matrixname.c_str())};
-      if (!submatrix) {
-        MACH3LOG_CRITICAL("Covariance matrix {} doesn't exist in file: {}",
-                          matrixname, filename);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-      auto numrows = submatrix->GetNrows();
-      // LP: the -1 here is because we specify the last index for consistency
-      // with PCAHandler, not the first index after the end as is more common
-      // throughout computer science...
-      ThrowSubMatrixOverrides[{running_num_file_pars,
-                               running_num_file_pars + (numrows - 1)}] =
-          std::move(submatrix);
-
-      // LP: check names by default, but have option to disable check if you
-      // know what you're doing
-      if (!bool(YAMLDocTemp["ThrowMatrixOverride"]["check_names"]) ||
-          YAMLDocTemp["ThrowMatrixOverride"]["check_names"].as<bool>()) {
-        auto nametree = submatrix_file->Get<TTree>("param_names");
-        if (!nametree) {
-          MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
-                            "ThrowMatrixOverride: {{ check_names: False }} to "
-                            "disable this check.",
-                            filename);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-        std::string *param_name = nullptr;
-        nametree->SetBranchAddress("name", &param_name);
-
-        if (nametree->GetEntries() != int(YAMLDocTemp["Systematics"].size())) {
-          MACH3LOG_CRITICAL("TTree param_names in file: {} has {} entries, but "
-                            "the corresponding yaml file only declares {} "
-                            "parameters. Set ThrowMatrixOverride: {{ "
-                            "check_names: False }} to disable this check.",
-                            filename, nametree->GetEntries(),
-                            YAMLDocTemp["Systematics"].size());
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-
-        int pit = 0;
-        for (const auto &param : YAMLDocTemp["Systematics"]) {
-          nametree->GetEntry(pit++);
-          auto yaml_pname = Get<std::string>(
-              param["Systematic"]["Names"]["FancyName"], __FILE__, __LINE__);
-          if ((*param_name) != yaml_pname) {
-            MACH3LOG_CRITICAL(
-                "TTree param_names in file: {} at entry {} has parameter {}, "
-                "but "
-                "the corresponding yaml parameter is named {}. Set "
-                "ThrowMatrixOverride: {{ "
-                "check_names: False }} to disable this check.",
-                filename, pit, (*param_name), yaml_pname);
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
-        }
-      }
-      submatrix_file->Close();
-    }
-
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      _fYAMLDoc["Systematics"].push_back(item);
-      running_num_file_pars++;
-    }
-  }
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
-  PrintLength = 35;
-
-  // Set the covariance matrix
-  _fNumPar = int(_fYAMLDoc["Systematics"].size());
-
-  use_adaptive = false;
-
-  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  for(int i = 0; i < _fNumPar; i++) {
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++) {
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
-  ReserveMemory(_fNumPar);
-
-  TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
-  int i = 0;
-  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
-  std::map<std::string, int> CorrNamesMap;
-
-  //ETA - read in the systematics. Would be good to add in some checks to make sure
-  //that there are the correct number of entries i.e. are the _fNumPar for Names,
-  //PreFitValues etc etc.
-
-  for (auto const &param : _fYAMLDoc["Systematics"])
-  {
-    _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
-    _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
-    _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
-    _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
-    if(_fError[i] <= 0) {
-      MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-    //ETA - a bit of a fudge but works
-    auto TempBoundsVec = GetBounds(param["Systematic"]["ParameterBounds"]);
-    _fLowBound[i] = TempBoundsVec[0];
-    _fUpBound[i] = TempBoundsVec[1];
-
-    //ETA - now for parameters which are optional and have default values
-    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
-
-    // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
-    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
-      ToggleFixParameter(_fFancyNames[i]);
-    }
-
-    if(param["Systematic"]["SpecialProposal"]) {
-      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i);
-    }
-
-    //Fill the map to get the correlations later as well
-    CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
-
-    //Also loop through the correlations
-    if(param["Systematic"]["Correlations"]) {
-      for(unsigned int Corr_i = 0; Corr_i < param["Systematic"]["Correlations"].size(); ++Corr_i){
-        for (YAML::const_iterator it = param["Systematic"]["Correlations"][Corr_i].begin(); it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
-          Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
-        }
-      }
-    }
-    i++;
-  } // end loop over para
-  if(i != _fNumPar) {
-    MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  // ETA Now that we've been through all systematic let's fill the covmatrix
-  //This makes the root TCov from YAML
-  for(int j = 0; j < _fNumPar; j++) {
-    (*_fCovMatrix)(j, j) = _fError[j]*_fError[j];
-    //Get the map of parameter name to correlation from the Correlations object
-    for (auto const& pair : Correlations[j]) {
-      auto const& key = pair.first;
-      auto const& val = pair.second;
-      int index = -1;
-      //If you found the parameter name then get the index
-      if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
-        index = CorrNamesMap[key];
-      } else {
-        MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-      double Corr1 = val;
-      double Corr2 = 0;
-      if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
-        Corr2 = Correlations[index][_fFancyNames[j]];
-        //Do they agree to better than float precision?
-        if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
-          MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
-          throw MaCh3Exception(__FILE__ , __LINE__ );
-        }
-      } else {
-        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[j], key);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-      (*_fCovMatrix)(j, index)= (*_fCovMatrix)(index, j) = Corr1*_fError[j]*_fError[index];
-    }
-  }
-
-  //Now make positive definite
-  MakePosDef(_fCovMatrix);
-  SetCovMatrix(_fCovMatrix);
-
-  if (_fNumPar <= 0) {
-    MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  for(auto const & matovr : ThrowSubMatrixOverrides){
-    SetSubThrowMatrix(matovr.first.first, matovr.first.second, *matovr.second);
-  }
-
-  Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
-
-  MACH3LOG_INFO("Created covariance matrix from files: ");
-  for(const auto &file : YAMLFile){
-    MACH3LOG_INFO("{} ", file);
-  }
-  MACH3LOG_INFO("----------------");
-  MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
-  MACH3LOG_INFO("----------------");
 }
 
 // ********************************************
@@ -474,7 +224,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
-  _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
   _fPreFitValue     = std::vector<double>(SizeVec, 1.0);
   _fError           = std::vector<double>(SizeVec, 1.0);
@@ -1450,45 +1199,6 @@ void ParameterHandlerBase::SaveUpdatedMatrixConfig() {
   std::ofstream fout("Modified_Matrix.yaml");
   fout << copyNode;
   fout.close();
-}
-
-// ********************************************
-bool ParameterHandlerBase::AppliesToSample(const int SystIndex, const std::string& SampleName) const {
-// ********************************************
-  // Empty means apply to all
-  if (_fSampleNames[SystIndex].size() == 0) return true;
-
-  // Make a copy and to lower case to not be case sensitive
-  std::string SampleNameCopy = SampleName;
-  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);
-
-  // Check for unsupported wildcards in SampleNameCopy
-  if (SampleNameCopy.find('*') != std::string::npos) {
-    MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  bool Applies = false;
-
-  for (size_t i = 0; i < _fSampleNames[SystIndex].size(); i++) {
-    // Convert to low case to not be case sensitive
-    std::string pattern = _fSampleNames[SystIndex][i];
-    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
-
-    // Replace '*' in the pattern with '.*' for regex matching
-    std::string regexPattern = "^" + std::regex_replace(pattern, std::regex("\\*"), ".*") + "$";
-    try {
-      std::regex regex(regexPattern);
-      if (std::regex_match(SampleNameCopy, regex)) {
-        Applies = true;
-        break;
-      }
-    } catch (const std::regex_error& e) {
-      // Handle regex error (for invalid patterns)
-      MACH3LOG_ERROR("Regex error: {}", e.what());
-    }
-  }
-  return Applies;
 }
 
 // ********************************************
