@@ -321,7 +321,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         throw MaCh3Exception(__FILE__, __LINE__);
     } else if (kEnableExperimentalMultiReweight && reweightConfigs.size() > 1) {
         MACH3LOG_WARN("Proceeding with {} reweights in EXPERIMENTAL mode.", reweightConfigs.size());
-        MACH3LOG_WARN("Each weight is written to a separate branch named Weight_<ReweightKey>.");
+        MACH3LOG_WARN("Check your yaml to save as combined or separate weight branches");
     }
 }
 
@@ -329,7 +329,22 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
     // Load configuration
     YAML::Node reweight_yaml = M3OpenConfig(configFile);
-    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"];
+    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"]["WeightConfigs"];
+    YAML::Node general_settings = reweight_yaml["ReweightMCMC"]["Settings"];
+
+   
+    std::string yaml_reweight_dump = YAML::Dump(reweight_settings); // print the config to the log for transparency
+    std::cout << "Loaded reweighting configuration:\n" << yaml_reweight_dump << std::endl;
+    std::string yaml_general_dump = YAML::Dump(general_settings); // print the config to the log for transparency
+    std::cout << "Loaded general settings configuration:\n" << yaml_general_dump << std::endl;
+
+    
+    bool combineWeights = GetFromManager<bool>(general_settings["CombineReweights"], false);
+    if (combineWeights) {
+        MACH3LOG_WARN("CombineWeights is enabled, final weight will be product of all individual weights. This is EXPERIMENTAL and may not be validated, use with caution.");
+    } else {
+        MACH3LOG_WARN("CombineWeights is disabled, all weights will appear in the output file and this may break your plotting/processing scripts!");
+    }
 
     // Parse all reweight configurations first
     std::vector<ReweightConfig> reweightConfigs;
@@ -371,7 +386,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false);
     if (asimovfit) {
         MACH3LOG_WARN("MCMC chain was produced from an Asimov fit");
-        MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
+        MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect depending on what you want from me!");
     } else {
         MACH3LOG_INFO("Not an Asimov fit, proceeding with reweighting");
     }
@@ -441,25 +456,27 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     // Add weight branches
     std::map<std::string, double> weights;
     std::map<std::string, TBranch*> weightBranches;
-    
-    for (const auto& rwConfig : reweightConfigs) {
-        weights[rwConfig.weightBranchName] = 1.0;
-        weightBranches[rwConfig.weightBranchName] = outTree->Branch(
-            rwConfig.weightBranchName.c_str(), 
-            &weights[rwConfig.weightBranchName], 
-            (rwConfig.weightBranchName + "/D").c_str()
-        );
-        MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+    if (combineWeights){
+        weights["CombinedWeight"] = 1.0;
+        weightBranches["CombinedWeight"] = outTree->Branch("Weight", &weights["CombinedWeight"], "Weight/D");
+        MACH3LOG_INFO("Added combined weight branch: Weight");
+    } else {
+        for (const auto& rwConfig : reweightConfigs) {
+            weights[rwConfig.weightBranchName] = 1.0;
+            weightBranches[rwConfig.weightBranchName] = outTree->Branch(
+                rwConfig.weightBranchName.c_str(), 
+                &weights[rwConfig.weightBranchName], 
+                (rwConfig.weightBranchName + "/D").c_str()
+            );
+            MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+        }
     }
-    
+
     bool processMCMCreweighted = false;
 
     // Offload only the single 1D Gaussian case to MCMCProcessor.
     // Any mixed/multiple reweight setup is handled locally so all branches stay in one tree.
-    const bool useProcessMCMCForGaussian =
-        (reweightConfigs.size() == 1 &&
-         reweightConfigs[0].dimension == 1 &&
-         reweightConfigs[0].type == "Gaussian");
+    const bool useProcessMCMCForGaussian = (reweightConfigs.size() == 1 && reweightConfigs[0].dimension == 1 && reweightConfigs[0].type == "Gaussian");
 
     if (useProcessMCMCForGaussian) {
         const auto& rwConfig = reweightConfigs[0];
@@ -483,6 +500,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     // Process all entries for local reweighting path.
     // Process all entries
     Long64_t nEntries = inTree->GetEntries();
+    const Long64_t progressStep = (nEntries >= 20) ? (nEntries / 20) : 1;
     MACH3LOG_INFO("Processing {} entries", nEntries);
     
 
@@ -492,11 +510,15 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
         for (Long64_t i = 0; i < nEntries; ++i) {
-            if (gVerboseLogging && (i % 100000 == 0)) {
+            if (gVerboseLogging && nEntries > 100000 && (i % 100000 == 0)) {
                 MACH3LOG_INFO("Reweight progress (posteriors): entry {}/{}", i, nEntries);
             }
-            if (i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+            if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
             inTree->GetEntry(i);
+
+            if (combineWeights) {
+                weights["CombinedWeight"] = 1.0; // reset combined weight for this entry
+            }
 
             // Calculate weights for all configurations
             for (const auto& rwConfig : reweightConfigs) {
@@ -548,7 +570,12 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                         }
                     }
                 }
-                weights[rwConfig.weightBranchName] = weight;
+
+                if (combineWeights) {
+                    weights["CombinedWeight"] *= weight;
+                } else {
+                    weights[rwConfig.weightBranchName] = weight;
+                }
             }
 
             outTree->Fill();
@@ -597,7 +624,21 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     
     // Load configuration
     YAML::Node reweight_yaml = M3OpenConfig(configFile);
-    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"];
+    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"]["WeightConfigs"];
+    YAML::Node general_settings = reweight_yaml["ReweightMCMC"]["Settings"];
+
+   
+    std::string yaml_reweight_dump = YAML::Dump(reweight_settings); // print the config to the log for transparency
+    std::cout << "Loaded reweighting configuration:\n" << yaml_reweight_dump << std::endl;
+    std::string yaml_general_dump = YAML::Dump(general_settings); // print the config to the log for transparency
+    std::cout << "Loaded general settings configuration:\n" << yaml_general_dump << std::endl;
+
+    bool combineWeights = GetFromManager<bool>(general_settings["CombineReweights"], false);
+    if (combineWeights) {
+        MACH3LOG_WARN("CombineWeights is enabled, final weight will be product of all individual weights. This is EXPERIMENTAL and may not be validated, use with caution.");
+    } else {
+        MACH3LOG_WARN("CombineWeights is disabled, all weights will appear in the output file and this may break your plotting/processing scripts!");
+    }
 
     // Parse all reweight configurations first
     std::vector<ReweightConfig> reweightConfigs;
@@ -728,15 +769,20 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     // Add weight branches
     std::map<std::string, double> weights;
     std::map<std::string, TBranch*> weightBranches;
-    
-    for (const auto& rwConfig : reweightConfigs) {
-        weights[rwConfig.weightBranchName] = 1.0;
-        weightBranches[rwConfig.weightBranchName] = outTree->Branch(
-            rwConfig.weightBranchName.c_str(), 
-            &weights[rwConfig.weightBranchName], 
-            (rwConfig.weightBranchName + "/D").c_str()
-        );
-        MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+    if (combineWeights){
+        weights["CombinedWeight"] = 1.0;
+        weightBranches["CombinedWeight"] = outTree->Branch("Weight", &weights["CombinedWeight"], "Weight/D");
+        MACH3LOG_INFO("Added combined weight branch: Weight");
+    } else {
+        for (const auto& rwConfig : reweightConfigs) {
+            weights[rwConfig.weightBranchName] = 1.0;
+            weightBranches[rwConfig.weightBranchName] = outTree->Branch(
+                rwConfig.weightBranchName.c_str(), 
+                &weights[rwConfig.weightBranchName], 
+                (rwConfig.weightBranchName + "/D").c_str()
+            );
+            MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+        }
     }
     
     // bool processMCMCreweighted=false;
@@ -769,9 +815,13 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
 
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves.
     // Stage 1: cache all required parameter values outside multithread block.
+    // this need to be done in a chunked way, or youll run out of memory
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
     const Long64_t progressStep = (nEntries >= 20) ? (nEntries / 20) : 1;
+    const Long64_t cacheChunkSize = 10000000;
+    MACH3LOG_INFO("Reduced-chain chunk size set to {} entries", cacheChunkSize);
+    MACH3LOG_INFO("If your Jobs are \"Killed\" try decreasing this size!");
 
     // Validate Gaussian priors once before entering the threaded section.
     for (const auto& rwConfig : reweightConfigs) {
@@ -786,35 +836,11 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
         }
     }
 
-    std::map<std::string, std::vector<double>> cachedParamValues;
-    for (const auto& kv : paramValues) {
-        cachedParamValues.emplace(kv.first, std::vector<double>(nEntries, 0.0));
-    }
-    
-
-    /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
-    
-    for (Long64_t i = 0; i < nEntries; ++i) {
-        if (gVerboseLogging && (i % 100000 == 0)) {
-            MACH3LOG_INFO("Caching progress (osc_posteriors): entry {}/{}", i, nEntries);
-        }
-        if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-        inTree->GetEntry(i);
-        for (auto& kv : cachedParamValues) {
-            kv.second[i] = paramValues.at(kv.first);
-        }
-    }
-    MaCh3Utils::PrintProgressBar(nEntries, nEntries);
-
     // Warm up ROOT interpolation internals before entering parallel region.
     for (const auto& rwConfig : reweightConfigs) {
         if (rwConfig.dimension == 1 && rwConfig.type == "TGraph") {
-            const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
-            if (mapIt != paramMapping.end()) {
-                const auto cacheIt = cachedParamValues.find(mapIt->second);
-                if (cacheIt != cachedParamValues.end() && !cacheIt->second.empty()) {
-                    (void)Graph_interpolate1D(rwConfig.graph_1D.get(), cacheIt->second[0]);
-                }
+            if (rwConfig.graph_1D && rwConfig.graph_1D->GetN() > 0) {
+                (void)Graph_interpolate1D(rwConfig.graph_1D.get(), rwConfig.graph_1D->GetX()[0]);
             }
         } else if (rwConfig.dimension == 2 && rwConfig.type == "TGraph2D") {
             if (rwConfig.graph_NO) {
@@ -830,103 +856,134 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
         }
     }
 
-    // Stage 2: compute weights in parallel using cached values only.
-    std::vector<std::vector<double>> cachedWeights(reweightConfigs.size(), std::vector<double>(nEntries, 1.0));
-
     if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
-        #pragma omp parallel for schedule(static)
-        for (Long64_t i = 0; i < nEntries; ++i) {
-            if (gVerboseLogging && (i % 100000 == 0)) {
-                #pragma omp critical
-                MACH3LOG_INFO("Threaded reweight progress (osc_posteriors): entry {}/{}", i, nEntries);
+        /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
+        for (Long64_t chunkStart = 0; chunkStart < nEntries; chunkStart += cacheChunkSize) {
+            const Long64_t chunkEnd = (chunkStart + cacheChunkSize < nEntries) ? (chunkStart + cacheChunkSize) : nEntries;
+            const size_t chunkN = static_cast<size_t>(chunkEnd - chunkStart);
+
+            std::map<std::string, std::vector<double>> cachedParamValues;
+            for (const auto& kv : paramValues) {
+                cachedParamValues.emplace(kv.first, std::vector<double>(chunkN, 0.0));
             }
-            for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
-                const auto& rwConfig = reweightConfigs[cfgIdx];
-                double weight = 1.0;
 
-                if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
-                    // Match MCMCProcessor::ReweightPrior: product of new/old priors for each requested parameter.
-                    for (size_t j = 0; j < rwConfig.paramNames.size(); ++j) {
-                        const std::string& mach3ParamName = rwConfig.paramNames[j];
-                        const auto mapIt = paramMapping.find(mach3ParamName);
-                        if (mapIt == paramMapping.end()) {
-                            weight = 0.0;
-                            break;
-                        }
+            // Stage 1: cache this chunk serially (ROOT tree reads are not thread-safe).
+            for (Long64_t i = chunkStart; i < chunkEnd; ++i) {
+                if (gVerboseLogging && (i % 100000 == 0)) {
+                    MACH3LOG_INFO("Caching progress (osc_posteriors): entry {}/{}", i, nEntries);
+                }
+                inTree->GetEntry(i);
+                const size_t localIdx = static_cast<size_t>(i - chunkStart);
+                for (auto& kv : cachedParamValues) {
+                    kv.second[localIdx] = paramValues.at(kv.first);
+                }
+            }
 
-                        const std::string& reducedParamName = mapIt->second;
-                        const double paramValue = cachedParamValues.at(reducedParamName)[i];
-                        const double newCentral = rwConfig.priorValues[j][0];
-                        const double newError = rwConfig.priorValues[j][1];
-                        if (newError <= 0.0) {
-                            weight = 0.0;
-                            break;
-                        }
+            // Stage 2: compute weights for this chunk in parallel.
+            std::vector<std::vector<double>> cachedWeights(reweightConfigs.size(), std::vector<double>(chunkN, 1.0));
+            #pragma omp parallel for schedule(static)
+            for (Long64_t local = 0; local < static_cast<Long64_t>(chunkN); ++local) {
+                const Long64_t i = chunkStart + local;
+                if (gVerboseLogging && (i % 100000 == 0)) {
+                    #pragma omp critical
+                    MACH3LOG_INFO("Threaded reweight progress (osc_posteriors): entry {}/{}", i, nEntries);
+                }
+                for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
+                    const auto& rwConfig = reweightConfigs[cfgIdx];
+                    double weight = 1.0;
 
-                        const double newChi = (paramValue - newCentral) / newError;
-                        const double newPrior = std::exp(-0.5 * newChi * newChi);
-                        const double oldPrior = 1.0; // reduced-chain fallback assumes flat old prior.
-                        weight *= (newPrior / oldPrior);
-                    }
-                } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
-                    if (rwConfig.type == "TGraph") {
-                        const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
-                        if (mapIt != paramMapping.end()) {
-                            const double paramValue = cachedParamValues.at(mapIt->second)[i];
-                            weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
-                        } else {
-                            weight = 0.0;
+                    if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
+                        // Match MCMCProcessor::ReweightPrior: product of new/old priors for each requested parameter.
+                        for (size_t j = 0; j < rwConfig.paramNames.size(); ++j) {
+                            const std::string& mach3ParamName = rwConfig.paramNames[j];
+                            const auto mapIt = paramMapping.find(mach3ParamName);
+                            if (mapIt == paramMapping.end()) {
+                                weight = 0.0;
+                                break;
+                            }
+
+                            const std::string& reducedParamName = mapIt->second;
+                            const double paramValue = cachedParamValues.at(reducedParamName)[static_cast<size_t>(local)];
+                            const double newCentral = rwConfig.priorValues[j][0];
+                            const double newError = rwConfig.priorValues[j][1];
+                            if (newError <= 0.0) {
+                                weight = 0.0;
+                                break;
+                            }
+
+                            const double newChi = (paramValue - newCentral) / newError;
+                            const double newPrior = std::exp(-0.5 * newChi * newChi);
+                            const double oldPrior = 1.0; // reduced-chain fallback assumes flat old prior.
+                            weight *= (newPrior / oldPrior);
                         }
-                    } else {
-                        weight = 0.0;
-                    }
-                } else if (rwConfig.dimension == 2) {
-                    if (rwConfig.type == "TGraph2D") {
-                        const auto dmMapIt = paramMapping.find(rwConfig.paramNames[0]);
-                        const auto thMapIt = paramMapping.find(rwConfig.paramNames[1]);
-                        if (dmMapIt == paramMapping.end() || thMapIt == paramMapping.end()) {
-                            weight = 0.0;
-                        } else {
-                            const double dm32 = cachedParamValues.at(dmMapIt->second)[i];
-                            const double theta13 = cachedParamValues.at(thMapIt->second)[i];
-                            if (dm32 > 0) {
-                                // Normal Ordering
-                                if (rwConfig.graph_NO) {
-                                    weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
-                                } else {
-                                    weight = 0.0;
-                                }
+                    } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
+                        if (rwConfig.type == "TGraph") {
+                            const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
+                            if (mapIt != paramMapping.end()) {
+                                const double paramValue = cachedParamValues.at(mapIt->second)[static_cast<size_t>(local)];
+                                weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
                             } else {
-                                // Inverted Ordering
-                                if (rwConfig.graph_IO) {
-                                    weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                                weight = 0.0;
+                            }
+                        } else {
+                            weight = 0.0;
+                        }
+                    } else if (rwConfig.dimension == 2) {
+                        if (rwConfig.type == "TGraph2D") {
+                            const auto dmMapIt = paramMapping.find(rwConfig.paramNames[0]);
+                            const auto thMapIt = paramMapping.find(rwConfig.paramNames[1]);
+                            if (dmMapIt == paramMapping.end() || thMapIt == paramMapping.end()) {
+                                weight = 0.0;
+                            } else {
+                                const double dm32 = cachedParamValues.at(dmMapIt->second)[static_cast<size_t>(local)];
+                                const double theta13 = cachedParamValues.at(thMapIt->second)[static_cast<size_t>(local)];
+                                if (dm32 > 0) {
+                                    // Normal Ordering
+                                    if (rwConfig.graph_NO) {
+                                        weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                                    } else {
+                                        weight = 0.0;
+                                    }
                                 } else {
-                                    weight = 0.0;
+                                    // Inverted Ordering
+                                    if (rwConfig.graph_IO) {
+                                        weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                                    } else {
+                                        weight = 0.0;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                cachedWeights[cfgIdx][i] = weight;
+                    cachedWeights[cfgIdx][static_cast<size_t>(local)] = weight;
+                }
+            }
+
+            // Stage 3: fill this chunk serially.
+            for (Long64_t i = chunkStart; i < chunkEnd; ++i) {
+                if (gVerboseLogging && (i % 100000 == 0)) {
+                    MACH3LOG_INFO("Fill progress (osc_posteriors): entry {}/{}", i, nEntries);
+                }
+                if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+                inTree->GetEntry(i);
+                const size_t localIdx = static_cast<size_t>(i - chunkStart);
+                if (combineWeights) {
+                    weights["CombinedWeight"] = 1.0;
+                    for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
+                        weights["CombinedWeight"] *= cachedWeights[cfgIdx][localIdx];
+                    }
+                } else {
+                    for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
+                        const auto& rwConfig = reweightConfigs[cfgIdx];
+                        weights[rwConfig.weightBranchName] = cachedWeights[cfgIdx][localIdx];
+                    }
+                }
+                outTree->Fill();
             }
         }
-    }
-
-    // Stage 3: fill tree serially at the end, using cached weights.
-    for (Long64_t i = 0; i < nEntries; ++i) {
-        if (gVerboseLogging && (i % 100000 == 0)) {
-            MACH3LOG_INFO("Fill progress (osc_posteriors): entry {}/{}", i, nEntries);
-        }
-        if (i % progressStep == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-        inTree->GetEntry(i);
-        for (size_t cfgIdx = 0; cfgIdx < reweightConfigs.size(); ++cfgIdx) {
-            const auto& rwConfig = reweightConfigs[cfgIdx];
-            weights[rwConfig.weightBranchName] = cachedWeights[cfgIdx][i];
-        }
-        outTree->Fill();
     }
     MaCh3Utils::PrintProgressBar(nEntries, nEntries);
     
