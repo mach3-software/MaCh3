@@ -767,7 +767,7 @@ namespace MaCh3Utils {
       case 311:                    // K_0
       case 130:                    // K_0_L
       case 310:                    // K_0_S
-        return 0.497611; 
+        return 0.497611;
       case 321: return 0.493677;   // K_+/-
       case 113: return 0.77526;    // rho_0
       case 213: return 0.77511;    // rho_+/-
