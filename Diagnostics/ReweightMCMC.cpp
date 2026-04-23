@@ -18,6 +18,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include <cmath>
 #include <fstream>
 #include <map>
+#include <chrono>
 #include <omp.h>
 _MaCh3_Safe_Include_End_ //}
 
@@ -46,11 +47,21 @@ struct ReweightConfig {
 
     // For TGraph1D
     std::unique_ptr<TGraph> graph_1D;
+    double graph1D_xmin = 0.0;
+    double graph1D_xmax = 0.0;
 
     // For TGraph2D
     std::string hierarchyType; // "NO", "IO", or "auto"
     std::unique_ptr<TGraph2D> graph_NO;
     std::unique_ptr<TGraph2D> graph_IO;
+    double graphNO_xmin = 0.0;
+    double graphNO_xmax = 0.0;
+    double graphNO_ymin = 0.0;
+    double graphNO_ymax = 0.0;
+    double graphIO_xmin = 0.0;
+    double graphIO_xmax = 0.0;
+    double graphIO_ymin = 0.0;
+    double graphIO_ymax = 0.0;
 };
 
 /// @brief Main executable responsible for reweighting MCMC chains
@@ -68,13 +79,13 @@ bool gVerboseLogging = false;
 }
 
 /// @brief Function to interpolate 2D graph for Normal Ordering
-double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32);
+double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32, double xmin, double xmax, double ymin, double ymax);
 
 /// @brief Function to interpolate 2D graph for Inverted Ordering  
-double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32);
+double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32, double xmin, double xmax, double ymin, double ymax);
 
 /// @brief Function to interpolate 1D graph
-double Graph_interpolate1D(TGraph* graph, double theta13);
+double Graph_interpolate1D(TGraph* graph, double theta13, double xmin, double xmax);
 
 /// @brief Get parameter information from MCMCProcessor
 bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName, 
@@ -224,6 +235,18 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                     auto cloned_graph = static_cast<TGraph*>(graph->Clone());
                     cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                     reweightConfig.graph_1D = std::unique_ptr<TGraph>(cloned_graph);
+
+                    // Cache graph bounds once to avoid per-event bound scans.
+                    double xmin = 999999999;
+                    double xmax = -999999999;
+                    for (int i = 0; i < reweightConfig.graph_1D->GetN(); ++i) {
+                        const double x = reweightConfig.graph_1D->GetX()[i];
+                        if (x < xmin) xmin = x;
+                        if (x > xmax) xmax = x;
+                    }
+                    reweightConfig.graph1D_xmin = xmin;
+                    reweightConfig.graph1D_xmax = xmax;
+
                     MACH3LOG_INFO("Loaded 1D graph: {}", reweightConfig.graphName);
                 } else {
                     MACH3LOG_ERROR("Failed to load graph: {}", reweightConfig.graphName);
@@ -276,6 +299,10 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                         cloned_graph->SetDirectory(nullptr); // Detach from file
                         cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                         reweightConfig.graph_NO = std::unique_ptr<TGraph2D>(cloned_graph);
+                        reweightConfig.graphNO_xmin = reweightConfig.graph_NO->GetXmin();
+                        reweightConfig.graphNO_xmax = reweightConfig.graph_NO->GetXmax();
+                        reweightConfig.graphNO_ymin = reweightConfig.graph_NO->GetYmin();
+                        reweightConfig.graphNO_ymax = reweightConfig.graph_NO->GetYmax();
                         MACH3LOG_INFO("Loaded NO graph: {}", graphName_NO);
                     } else {
                         MACH3LOG_ERROR("Failed to load NO graph: {}", graphName_NO);
@@ -292,6 +319,10 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                         cloned_graph->SetDirectory(nullptr); // Detach from file
                         cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                         reweightConfig.graph_IO = std::unique_ptr<TGraph2D>(cloned_graph);
+                        reweightConfig.graphIO_xmin = reweightConfig.graph_IO->GetXmin();
+                        reweightConfig.graphIO_xmax = reweightConfig.graph_IO->GetXmax();
+                        reweightConfig.graphIO_ymin = reweightConfig.graph_IO->GetYmin();
+                        reweightConfig.graphIO_ymax = reweightConfig.graph_IO->GetYmax();
                         MACH3LOG_INFO("Loaded IO graph: {}", graphName_IO);
                     } else {
                         MACH3LOG_ERROR("Failed to load IO graph: {}", graphName_IO);
@@ -543,7 +574,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                 } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                     if (rwConfig.type == "TGraph") {
                         double paramValue = paramValues[rwConfig.paramNames[0]];
-                        weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
+                        weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
                     } else {
                         MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
                     }
@@ -554,7 +585,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                         if (dm32 > 0) {
                             // Normal Ordering
                             if (rwConfig.graph_NO) {
-                                weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                                weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32, rwConfig.graphNO_xmin, rwConfig.graphNO_xmax, rwConfig.graphNO_ymin, rwConfig.graphNO_ymax);
                             } else {
                                 MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
@@ -562,7 +593,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                         } else {
                             // Inverted Ordering
                             if (rwConfig.graph_IO) {
-                                weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                                weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32, rwConfig.graphIO_xmin, rwConfig.graphIO_xmax, rwConfig.graphIO_ymin, rwConfig.graphIO_ymax);
                             } else {
                                 MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
@@ -813,6 +844,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     // ProcessMCMC cannot handle the 1D rewighting on a reduced chain so we need to do it ourselves even for the 1D gaussian case.
     bool processMCMCreweighted=false;
 
+    const auto totalTimingStart = std::chrono::steady_clock::now(); //REMOVE
+
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves.
     // Stage 1: cache all required parameter values outside multithread block.
     // this need to be done in a chunked way, or youll run out of memory
@@ -840,18 +873,18 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     for (const auto& rwConfig : reweightConfigs) {
         if (rwConfig.dimension == 1 && rwConfig.type == "TGraph") {
             if (rwConfig.graph_1D && rwConfig.graph_1D->GetN() > 0) {
-                (void)Graph_interpolate1D(rwConfig.graph_1D.get(), rwConfig.graph_1D->GetX()[0]);
+                (void)Graph_interpolate1D(rwConfig.graph_1D.get(), rwConfig.graph_1D->GetX()[0], rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
             }
         } else if (rwConfig.dimension == 2 && rwConfig.type == "TGraph2D") {
             if (rwConfig.graph_NO) {
-                const double xmid = 0.5 * (rwConfig.graph_NO->GetXmin() + rwConfig.graph_NO->GetXmax());
-                const double ymid = 0.5 * (rwConfig.graph_NO->GetYmin() + rwConfig.graph_NO->GetYmax());
-                (void)Graph_interpolateNO(rwConfig.graph_NO.get(), xmid, ymid);
+                const double xmid = 0.5 * (rwConfig.graphNO_xmin + rwConfig.graphNO_xmax);
+                const double ymid = 0.5 * (rwConfig.graphNO_ymin + rwConfig.graphNO_ymax);
+                (void)Graph_interpolateNO(rwConfig.graph_NO.get(), xmid, ymid, rwConfig.graphNO_xmin, rwConfig.graphNO_xmax, rwConfig.graphNO_ymin, rwConfig.graphNO_ymax);
             }
             if (rwConfig.graph_IO) {
-                const double xmid = 0.5 * (rwConfig.graph_IO->GetXmin() + rwConfig.graph_IO->GetXmax());
-                const double ymid = 0.5 * (rwConfig.graph_IO->GetYmin() + rwConfig.graph_IO->GetYmax());
-                (void)Graph_interpolateIO(rwConfig.graph_IO.get(), xmid, -ymid);
+                const double xmid = 0.5 * (rwConfig.graphIO_xmin + rwConfig.graphIO_xmax);
+                const double ymid = 0.5 * (rwConfig.graphIO_ymin + rwConfig.graphIO_ymax);
+                (void)Graph_interpolateIO(rwConfig.graph_IO.get(), xmid, -ymid, rwConfig.graphIO_xmin, rwConfig.graphIO_xmax, rwConfig.graphIO_ymin, rwConfig.graphIO_ymax);
             }
         }
     }
@@ -861,6 +894,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     } else {
         /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
         for (Long64_t chunkStart = 0; chunkStart < nEntries; chunkStart += cacheChunkSize) {
+            const auto chunkTimingStart = std::chrono::steady_clock::now(); //REMOVE
             const Long64_t chunkEnd = (chunkStart + cacheChunkSize < nEntries) ? (chunkStart + cacheChunkSize) : nEntries;
             const size_t chunkN = static_cast<size_t>(chunkEnd - chunkStart);
 
@@ -880,6 +914,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                     kv.second[localIdx] = paramValues.at(kv.first);
                 }
             }
+
+            const auto cacheTimingEnd = std::chrono::steady_clock::now(); //REMOVE
 
             // Stage 2: compute weights for this chunk in parallel.
             std::vector<std::vector<double>> cachedWeights(reweightConfigs.size(), std::vector<double>(chunkN, 1.0));
@@ -923,7 +959,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                             const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
                             if (mapIt != paramMapping.end()) {
                                 const double paramValue = cachedParamValues.at(mapIt->second)[static_cast<size_t>(local)];
-                                weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
+                                weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
                             } else {
                                 weight = 0.0;
                             }
@@ -942,14 +978,14 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                                 if (dm32 > 0) {
                                     // Normal Ordering
                                     if (rwConfig.graph_NO) {
-                                        weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                                        weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32, rwConfig.graphNO_xmin, rwConfig.graphNO_xmax, rwConfig.graphNO_ymin, rwConfig.graphNO_ymax);
                                     } else {
                                         weight = 0.0;
                                     }
                                 } else {
                                     // Inverted Ordering
                                     if (rwConfig.graph_IO) {
-                                        weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                                        weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32, rwConfig.graphIO_xmin, rwConfig.graphIO_xmax, rwConfig.graphIO_ymin, rwConfig.graphIO_ymax);
                                     } else {
                                         weight = 0.0;
                                     }
@@ -961,6 +997,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                     cachedWeights[cfgIdx][static_cast<size_t>(local)] = weight;
                 }
             }
+
+            const auto computeTimingEnd = std::chrono::steady_clock::now(); //REMOVE
 
             // Stage 3: fill this chunk serially.
             for (Long64_t i = chunkStart; i < chunkEnd; ++i) {
@@ -983,9 +1021,19 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                 }
                 outTree->Fill();
             }
+
+            const auto fillTimingEnd = std::chrono::steady_clock::now(); //REMOVE
+            const auto cacheMs = std::chrono::duration_cast<std::chrono::milliseconds>(cacheTimingEnd - chunkTimingStart).count();
+            const auto computeMs = std::chrono::duration_cast<std::chrono::milliseconds>(computeTimingEnd - cacheTimingEnd).count();
+            const auto fillMs = std::chrono::duration_cast<std::chrono::milliseconds>(fillTimingEnd - computeTimingEnd).count();
+            MACH3LOG_INFO("Chunk {}-{} timing: cache={} ms, compute={} ms, fill={} ms", chunkStart, chunkEnd, cacheMs, computeMs, fillMs); //REMOVE
         }
     }
     MaCh3Utils::PrintProgressBar(nEntries, nEntries);
+
+    const auto totalTimingEnd = std::chrono::steady_clock::now(); //REMOVE
+    const auto totalMs = std::chrono::duration_cast<std::chrono::milliseconds>(totalTimingEnd - totalTimingStart).count(); //REMOVE
+    MACH3LOG_INFO("Reduced-chain reweight total wall time: {} ms", totalMs); //REMOVE
     
     // Write and close
     outFile->cd();
@@ -1020,17 +1068,12 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     }
 }
 
-double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
+double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32, double xmin, double xmax, double ymin, double ymax)
 {
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    
-    double xmax = graph->GetXmax(); 
-    double xmin = graph->GetXmin(); 
-    double ymin = graph->GetYmin();
-    double ymax = graph->GetYmax();
     
     double chiSquared, prior; 
  
@@ -1044,17 +1087,12 @@ double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
     return prior;
 }
 
-double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
+double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32, double xmin, double xmax, double ymin, double ymax)
 {
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    
-    double xmax = graph->GetXmax();
-    double xmin = graph->GetXmin();
-    double ymax = graph->GetYmax();
-    double ymin = graph->GetYmin();
     
     // The dm32 value is positive for in the TGraph2D so we should compare the abs value of the -delM32 values to get the chisq
     double mod_dm32 = std::abs(dm32);
@@ -1070,21 +1108,12 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
     return prior;
 }
 
-double Graph_interpolate1D(TGraph* graph, double theta13)
+double Graph_interpolate1D(TGraph* graph, double theta13, double xmin, double xmax)
 {
     /// @todo double check implementation of TGraph interpolation for 1D
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    
-    double xmax = -999999999;
-    double xmin =  999999999;
-
-    for (int i = 0; i < graph->GetN(); i++) {
-        double x = graph->GetX()[i];
-        if (x > xmax) xmax = x;
-        if (x < xmin) xmin = x;
     }
     
     double chiSquared, prior; 
