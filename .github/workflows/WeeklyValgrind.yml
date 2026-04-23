@@ -45,7 +45,7 @@ jobs:
           git clone --branch develop https://github.com/mach3-software/MaCh3.git MaCh3Cmake
           cd MaCh3Cmake
           mkdir build && cd build
-          cmake ../ -DMaCh3_DependancyGraph=ON
+          cmake ../ -DMaCh3_DependancyGraph=ON -DMaCh3_NUDOCK_ENABLED=ON
           make -j4 install
 
       - name: Checkout different branch and push plot

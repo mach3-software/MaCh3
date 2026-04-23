@@ -18,13 +18,11 @@ std::vector<double> sigmaArray;
 int PriorKnot = M3::_BAD_INT_;
 
 constexpr const int NVars = 5;
-constexpr const double ScalingFactor = 10;
-
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager* PlotMan;
+M3::Plotting::PlottingManager* PlotMan = nullptr;
 
 /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
 void FindKnot(std::vector<double>& SigmaValues,
@@ -55,6 +53,7 @@ void FindKnot(std::vector<double>& SigmaValues,
   double sigma = 0.0;
   // Find the "_sig_" part in the name
   size_t sig_pos = histname.find("_sig_");
+
   // Extract the part after "_sig_"
   std::string sigma_part = histname.substr(sig_pos + 5);
 
@@ -263,27 +262,9 @@ void MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
 
   Ratio[0]->GetYaxis()->SetTitle("Ratio to Prior");
   Ratio[0]->SetBit(TH1D::kNoTitle);
-  Ratio[0]->SetBit(TH1D::kNoTitle);
 
-  double maxz = -999;
-  double minz = +999;
-  for (int j = 0; j < static_cast<int>(sigmaArray.size())-1; j++)
-  {
-    for (int i = 1; i < Ratio[0]->GetXaxis()->GetNbins(); i++)
-    {
-      maxz = std::max(maxz, Ratio[j]->GetBinContent(i));
-      minz = std::min(minz, Ratio[j]->GetBinContent(i));
-    }
-  }
-  maxz = maxz*1.001;
-  minz = minz*1.001;
-
-  if (std::fabs(1 - maxz) > std::fabs(1-minz))
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-  else
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+  M3::Plotting::SetSymmetricRatioRange(Ratio);
 }
-
 
 void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                const std::unique_ptr<TCanvas>& canv,
@@ -313,8 +294,9 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
     Poly[ik]->SetLineWidth(2.);
     Poly[ik]->SetLineColor(Colours[ik]);
     Poly[ik]->SetLineStyle(Style[ik]);
-    Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-    M3::ScaleHistogram(Poly[ik].get(), ScalingFactor);
+    auto BinWidthScale = PlotMan->style().getBinWidthScale(Poly[ik]->GetXaxis()->GetTitle());
+    Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+    M3::ScaleHistogram(Poly[ik].get(), BinWidthScale);
     max = std::max(max, Poly[ik]->GetMaximum());
   }
   Poly[0]->SetTitle(Title.c_str());
@@ -715,11 +697,13 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
 
   auto PriorHist = Projection[0][PriorKnot].get();
   PriorHist->SetTitle(Title.c_str());
-  PriorHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+
+  auto BinWidthScale = PlotMan->style().getBinWidthScale(PriorHist->GetXaxis()->GetTitle());
+  PriorHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
   PriorHist->Draw("HIST");
   PriorHist->SetLineWidth(2.);
   PriorHist->SetLineColor(kBlack);
-  M3::ScaleHistogram(PriorHist, ScalingFactor);
+  M3::ScaleHistogram(PriorHist, BinWidthScale);
 
   auto PrettyX = PlotMan->style().prettifyKinematicName(PriorHist->GetXaxis()->GetTitle());
   PriorHist->GetXaxis()->SetTitle(PrettyX.c_str());
@@ -732,8 +716,8 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
       Projection[nParam][ik]->SetLineWidth(2.);
       Projection[nParam][ik]->SetLineColor(ParamColour[nParam]);
       Projection[nParam][ik]->SetLineStyle(kDotted);
-      Projection[nParam][ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-      M3::ScaleHistogram(Projection[nParam][ik].get(), ScalingFactor);
+      Projection[nParam][ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+      M3::ScaleHistogram(Projection[nParam][ik].get(), BinWidthScale);
       max = std::max(max, Projection[nParam][ik]->GetMaximum());
     }
     PriorHist->SetMaximum(max*1.2);
@@ -841,7 +825,7 @@ int main(int argc, char **argv)
 
   ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->initialise();
 
   CompareSigVar1D(filename, settings);

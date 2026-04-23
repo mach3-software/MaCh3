@@ -6,6 +6,11 @@
 /// @details This file includes macros and enums for defining spline coefficients.
 /// It is designed to be compatible with older CUDA versions, so be cautious
 /// when adding new features or including other headers.
+///
+/// @warning KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old.
+/// If you add some header with fancy templates it will not compile for older CUDA.
+/// This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h
+///
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 
@@ -29,7 +34,8 @@ enum SplineSegmentCoeffs
 /// the number of knots per spline, and the number of points per spline on the CPU.
 struct SplineMonoStruct {
 // *******************
-  virtual ~SplineMonoStruct() {};
+  /// @brief destructor
+  virtual ~SplineMonoStruct() = default;
 
   /// KS: CPU arrays to hold X coefficient
   std::vector<float> coeff_x;
@@ -49,5 +55,3 @@ struct SplineMonoStruct {
   #endif
 };
 
-
-// WARNING KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old. If you add some header with fancy templates it will not compile for older CUDA. This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h

@@ -18,7 +18,7 @@ class OscillationHandler
   /// @param SubChannels Number of oscillation channels
    /// @warning If @p EqualBinningPerChannel is true then argument @p SubChannels makes no difference
   OscillationHandler(const std::string& ConfigFile, bool EqualBinningPerChannel,
-                     std::vector<const double*> OscParams_, const int SubChannels);
+                     std::vector<const M3::float_t*> OscParams_, const int SubChannels);
   /// @brief Destructor
   virtual ~OscillationHandler();
 
@@ -47,5 +47,5 @@ class OscillationHandler
   std::vector<std::vector<std::unique_ptr<OscillatorBase>>> NuOscProbCalcers;
 
   /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
-  std::vector<const double*> OscParams;
+  std::vector<const M3::float_t*> OscParams;
 };

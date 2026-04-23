@@ -102,7 +102,7 @@ void SplineBase::FindSplineSegment() {
     SplineInfoArray[i].CurrSegment = segment;
     SplineSegments[i] = short(SplineInfoArray[i].CurrSegment);
 
-    #ifdef DEBUG
+    #ifdef MACH3_DEBUG
     CheckSegmentValidity(i, segment, xvar, SplineInfoArray[i].xPts);
     #endif
   } //end loop over params

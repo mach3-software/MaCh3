@@ -14,7 +14,7 @@
 std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
                                    const std::string& Title,
                                    const std::vector<std::string>& Params,
-                                   const std::unique_ptr<MaCh3Plotting::PlottingManager>& man)
+                                   const std::unique_ptr<M3::Plotting::PlottingManager>& man)
 {
   std::vector<int> ParamIndex(Params.size(), M3::_BAD_INT_);
 
@@ -57,6 +57,18 @@ std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
     Hist->GetYaxis()->SetBinLabel(x+1, FancyLabel.c_str());
   }
   return Hist;
+}
+
+void SetupCanvas(TCanvas* canv) {
+  canv->SetGrid();
+  gStyle->SetOptStat(0);
+  canv->SetTickx();
+  canv->SetTicky();
+  canv->SetBottomMargin(0.2);
+  canv->SetTopMargin(0.1);
+  canv->SetRightMargin(0.15);
+  canv->SetLeftMargin(0.15);
+  gStyle->SetOptTitle(1);
 }
 
 void DynamicLabelSize(TH2D* Hist) {
@@ -102,7 +114,7 @@ void SetupInfo(const std::string& Config, std::vector<std::string>& Title, std::
   }
 }
 
-void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, const std::string& Config, const std::string& File)
+void PlotMatrix(const std::unique_ptr<M3::Plotting::PlottingManager>& man, const std::string& Config, const std::string& File)
 {
   // Open the ROOT file
   TFile *file = M3::Open(File, "UPDATE", __FILE__, __LINE__);
@@ -115,16 +127,7 @@ void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, cons
   }
 
   auto MatrixPlot = std::make_unique<TCanvas>("MatrixPlot", "MatrixPlot", 0, 0, 1024, 1024);
-  MatrixPlot->SetGrid();
-  gStyle->SetOptStat(0);
-  gStyle->SetOptTitle(0);
-  MatrixPlot->SetTickx();
-  MatrixPlot->SetTicky();
-  MatrixPlot->SetBottomMargin(0.2);
-  MatrixPlot->SetTopMargin(0.1);
-  MatrixPlot->SetRightMargin(0.15);
-  MatrixPlot->SetLeftMargin(0.15);
-  gStyle->SetOptTitle(1);
+  SetupCanvas(MatrixPlot.get());
   gStyle->SetPaintTextFormat("4.1f");
 
   // Make pretty Correlation colors (red to blue)
@@ -171,7 +174,7 @@ void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, cons
   delete file;
 }
 
-void CompareMatrices(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man,
+void CompareMatrices(const std::unique_ptr<M3::Plotting::PlottingManager>& man,
                      const std::string& Config, const std::string& File1, const std::string& Title1,
                      const std::string& File2, const std::string& Title2)
 {
@@ -187,16 +190,7 @@ void CompareMatrices(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man,
     file[i]->GetObject("Correlation_plot", MatrixFull[i]);
   }
   auto MatrixPlot = std::make_unique<TCanvas>("MatrixPlot", "MatrixPlot", 0, 0, 1024, 1024);
-  MatrixPlot->SetGrid();
-  gStyle->SetOptStat(0);
-  gStyle->SetOptTitle(0);
-  MatrixPlot->SetTickx();
-  MatrixPlot->SetTicky();
-  MatrixPlot->SetBottomMargin(0.2);
-  MatrixPlot->SetTopMargin(0.1);
-  MatrixPlot->SetRightMargin(0.15);
-  MatrixPlot->SetLeftMargin(0.15);
-  gStyle->SetOptTitle(1);
+  SetupCanvas(MatrixPlot.get());
 
   //KS: Fancy colors
   constexpr int NRGBs = 10;
@@ -248,7 +242,7 @@ int main(int argc, char *argv[])
 {
   SetMaCh3LoggerFormat();
 
-  auto man = std::make_unique<MaCh3Plotting::PlottingManager>();
+  auto man = std::make_unique<M3::Plotting::PlottingManager>();
   man->initialise();
 
   if (argc != 3 && argc != 6)

@@ -1,6 +1,5 @@
 #pragma once
 
-
 // C i/o  for printf and others
 #include <stdio.h>
 #include <vector>
@@ -23,7 +22,6 @@
 
 /// KS: Need it for shared memory, there is way to use dynamic shared memory but I am lazy right now
 #define _BlockSize_ 1024
-
 
 /// @file gpuUtils.cuh
 /// @brief Common CUDA utilities and definitions for shared GPU functionality.
@@ -89,3 +87,12 @@ size_t GetMaxTexture1DSize(const int device = 0);
 /// @param device CUDA device ID (default = 0)
 /// @return Maximum shared memory per block in bytes
 size_t GetSharedMemoryPerBlock(const int device = 0);
+
+
+namespace M3 {
+#ifdef _LOW_MEMORY_STRUCTS_
+  using float_t = float;
+#else
+  using float_t = double;
+#endif
+}

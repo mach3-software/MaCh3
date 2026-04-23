@@ -36,7 +36,7 @@ class MR2T2 : public MCMCBase {
     /// @brief The MCMC step proposal and acceptance
     void DoStep() override;
     /// @brief Propose a step
-    void ProposeStep() override;
+    void ProposeStep() final;
     /// @brief Step acceptance probability
     double AcceptanceProbability() override;
 };

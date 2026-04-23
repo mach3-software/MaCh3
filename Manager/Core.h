@@ -92,14 +92,14 @@ namespace M3 {
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
-#ifndef DEBUG
+#ifndef MACH3_DEBUG
 #define _noexcept_ noexcept
 #else
 #define _noexcept_
 #endif
 
 /// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
-#ifndef DEBUG
+#ifndef MACH3_DEBUG
   /// KS: For GCC decoration is here: https://gcc.gnu.org/onlinedocs/gcc/Restricted-Pointers.html
   /// If we are sure other compiler support it as well please add
   #if defined(__GNUC__)

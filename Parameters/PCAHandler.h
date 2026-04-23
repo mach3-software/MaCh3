@@ -4,26 +4,6 @@
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
-#ifdef DEBUG
-  #define DEBUG_PCA 1
-#endif
-
-#ifdef DEBUG_PCA
-//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
-#include "TCanvas.h"
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TColor.h"
-#include "TLine.h"
-#include "TText.h"
-#include "TLegend.h"
-
-#if DEBUG_PCA == 2
-#include "Eigen/Eigenvalues"
-#endif
-
-#endif
-
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 /// @author Clarence Wret
 ///
@@ -72,7 +52,7 @@ class PCAHandler{
   /// @param fCurr_Val pointer to current position of parameter
   /// @param fProp_Val pointer to proposed position of parameter
   void SetupPointers(std::vector<double>* fCurr_Val,
-                     std::vector<double>* fProp_Val);
+                     std::vector<M3::float_t>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
@@ -214,11 +194,6 @@ class PCAHandler{
     else return true;
   }
 
-  #ifdef DEBUG_PCA
-  /// @brief KS: Let's dump all useful matrices to properly validate PCA
-  void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar);
-  #endif
-
  private:
   /// @brief KS: Make sure decomposed matrix isn't correlated with undecomposed
   void SanitisePCA(TMatrixDSym* CovMatrix);
@@ -259,6 +234,6 @@ class PCAHandler{
   /// Pointer to current value of the parameter
   std::vector<double>* _pCurrVal;
   /// Pointer to proposed value of the parameter
-  std::vector<double>* _pPropVal;
+  std::vector<M3::float_t>* _pPropVal;
 };
 

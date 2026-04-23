@@ -33,24 +33,28 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 /// @brief This handy little function lets you interpret a TGraph as a TH1D.
 /// @param graph The graph you want to convert.
 /// @param newName The new name you want to give to the histogram. If not specified, will just use
 /// the name of the graph.
 /// @param newTitle The new title you want to give to the histogram. If not specified, will just use
 /// the title of the graph.
-TH1D TGraphToTH1D(TGraph graph, const std::string& newName = "", const std::string& newTitle = "");
+TH1D TGraphToTH1D(const TGraph& graph, const std::string& newName = "", const std::string& newTitle = "");
 
 
 /// @brief This handy little function lets you interpret a TGraph as a vector containing the same data.
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis
-std::vector<std::vector<double>> TGraphToVector(TGraph graph);
+std::vector<std::vector<double>> TGraphToVector(const TGraph& graph);
 
+/// @brief Set a symmetric Y-axis range around 1 for ratio plots.
+void SetSymmetricRatioRange(const std::vector<std::unique_ptr<TH1D>>& RatioPlot);
 
 /// @brief This handy little function lets you interpret a 2d TGraph as a vector containing the same data.
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis, the 3rd is the z axis
-std::vector<std::vector<double>> TGraphToVector(TGraph2D graph);
-} // namespace MaCh3Plotting
+std::vector<std::vector<double>> TGraphToVector(const TGraph2D& graph);
+} // namespace Plotting
+} // namespace M3

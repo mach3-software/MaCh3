@@ -41,7 +41,7 @@ struct FastSplineInfo {
   M3::int_t CurrSegment;
 
   /// Array of the knots positions
-  const double* splineParsPointer;
+  const M3::float_t* splineParsPointer;
 };
 
 

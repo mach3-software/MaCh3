@@ -10,8 +10,8 @@
 // Other plotting includes
 #include "PlottingUtils.h"
 
-namespace MaCh3Plotting {
-
+namespace M3 {
+namespace Plotting {
 /// @brief Types of possible file that can be read.
 enum fileTypeEnum {
   kLLH,         //!< Log Likelihood scan
@@ -32,6 +32,7 @@ enum fileTypeEnum {
 /// from very different file structures used by different fitters and provide a common format to
 /// be used for plot making. Intended use of this objects is only via InputManager which contains
 /// the methods to fill and manipulate it.
+/// @author Ewan Miller
 struct InputFile {
   /// @brief Create InputFile instance based on a specified file.
   /// @param fName The name of the file to open.
@@ -320,7 +321,7 @@ public:
   /// @brief Get the parameter value for the current step for a particular parameter from a particular input file.
   /// @param fileNum The index of the file you want the data from.
   /// @param paramName The parameter you want the value of.
-  double getMCMCvalue(int fileNum, std::string paramName) const {
+  double getMCMCvalue(int fileNum, const std::string& paramName) const {
     if (!getEnabledMCMCchain(fileNum, paramName))
     {
       MACH3LOG_WARN("file at index {} does not have an MCMC entry for parameter {}", fileNum, paramName);
@@ -421,7 +422,7 @@ public:
   /// @param LLHType The type of likelihood scan you would like to check for, e.h. total, prior etc.
   /// @return true if scan exists, false if not.
   inline bool getEnabledLLH(const int fileNum, const std::string& paramName,
-                             std::string LLHType = "total") const {
+                            const std::string& LLHType = "total") const {
     return _fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
 
@@ -670,4 +671,5 @@ private:
   // vector of InputFile objects that this manager is responsible for
   std::vector<InputFile> _fileVec;
 };
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

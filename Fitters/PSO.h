@@ -98,8 +98,8 @@ class PSO : public LikelihoodFit {
     void run();
     void WriteOutput();
     /// @brief Actual implementation of PSO Fit algorithm
-    void RunMCMC() override;
-    double CalcChi2(const double* x) override;
+    void RunMCMC() final;
+    double CalcChi2(const double* x) final;
     /// @brief Evaluates the Rastrigin function for a given parameter values.
     double rastriginFunc(const double* x);
     double swarmIterate();

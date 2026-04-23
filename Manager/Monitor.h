@@ -26,7 +26,8 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief System and monitoring utilities for printing system information and status updates.
 /// @author Kamil Skwarczynski
 
-namespace MaCh3Utils {
+namespace M3 {
+namespace Utils {
   /// @brief KS: Prints welcome message with MaCh3 logo
   void MaCh3Welcome();
   /// @brief KS: Find out more about operational system
@@ -74,9 +75,8 @@ namespace MaCh3Utils {
   /// @param argv The array of command-line arguments.
   /// @details This function prints a simple usage guide for MaCh3 executables, typically called when incorrect arguments are passed.
   void MaCh3Usage(int argc, char **argv);
-}
+} // end Utils namespace
 
-namespace M3 {
   /// @brief number of threads which we need for example for TRandom3
   int GetNThreads();
   /// @brief Prepends the MACH3 environment path to FilePath if it is not already present.
@@ -90,4 +90,4 @@ namespace M3 {
     return 0;
     #endif
   }
-}
+} // end M3 namespace

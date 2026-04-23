@@ -3,12 +3,11 @@
 // MaCh3 includes
 #include "Samples/SampleStructs.h"
 #include "Parameters/ParameterStructs.h"
+#include "Manager/YamlHelper.h"
 
-_MaCh3_Safe_Include_Start_ //{
-// ROOT include
-#include "TObjString.h"
-#include "TRandom3.h"
-_MaCh3_Safe_Include_End_ //}
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class TRandom3;
+class TObject;
 
 /// @file HistogramUtils.h
 /// @author Will Parker
@@ -92,12 +91,12 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d);
 /// @param inputVec A `std::vector` of pointers to `Derived` objects.
 /// @return A `std::vector` of pointers to `Base` objects.
 template <typename Derived, typename Base>
-std::vector<Base*> CastVector(const std::vector<Derived*>& inputVec) {
-  std::vector<Base*> outputVec;
-  // Reserve space for efficiency
+std::vector<std::unique_ptr<Base>>
+CastVector(std::vector<std::unique_ptr<Derived>>&& inputVec) {
+  std::vector<std::unique_ptr<Base>> outputVec;
   outputVec.reserve(inputVec.size());
-  for (auto* ptr : inputVec) {
-    outputVec.push_back(static_cast<Base*>(ptr));
+  for (auto& ptr : inputVec) {
+    outputVec.push_back(std::unique_ptr<Base>(std::move(ptr)));
   }
   return outputVec;
 }
@@ -170,10 +169,12 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
 void ScaleHistogram(TH1* Sample_Hist, const double scale);
 
 /// @brief KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line);
+void CheckBinningMatch(const TH1D* Hist1, const TH1D* Hist2, const std::string& File, const int Line);
 /// @brief KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line);
+void CheckBinningMatch(const TH2D* Hist1, const TH2D* Hist2, const std::string& File, const int Line);
 /// @brief KS: Helper function check if data and MC binning matches
 void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line);
+/// @brief KS: Convert TH2Poly into yaml config accepted by MaCh3
+YAML::Node PolyToYaml(TH2Poly* Hist, const std::string& YamlName, const std::string& File, const int Line);
 
 } //end M3

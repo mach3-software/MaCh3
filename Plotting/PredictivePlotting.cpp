@@ -11,8 +11,7 @@
 /// @author Kamil Skwarczynski
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager* PlotMan;
-constexpr const double ScalingFactor = 10;
+M3::Plotting::PlottingManager* PlotMan = nullptr;
 
 std::vector<std::string> FindSamples(const std::string& File)
 {
@@ -35,6 +34,7 @@ std::vector<std::string> FindSamples(const std::string& File)
 
     if(dirname == "Total") continue;
     if(dirname == "BetaParameters") continue;
+    if(dirname == "Correlations") continue;
 
     SampleNames.push_back(dirname);
     MACH3LOG_DEBUG("Entering Sample {}", dirname);
@@ -263,9 +263,10 @@ void OverlayPredicitve(const YAML::Node& Settings,
       }
       TH1D* hist = InputFiles[0]->Get<TH1D>((DataLocation).c_str());
 
+      auto BinWidthScale = PlotMan->style().getBinWidthScale(hist->GetXaxis()->GetTitle());
       std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-      M3::ScaleHistogram(DataHist.get(), ScalingFactor);
+      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+      M3::ScaleHistogram(DataHist.get(), BinWidthScale);
       DataHist->SetLineColor(kBlack);
       //KS: +1 for data, we want to get integral before scaling of the histogram
       std::vector<double> Integral(nFiles+1);
@@ -288,8 +289,8 @@ void OverlayPredicitve(const YAML::Node& Settings,
         PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         PredHist[iFile]->SetFillStyle(1001);
-        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
-        M3::ScaleHistogram(PredHist[iFile].get(), ScalingFactor);
+        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+        M3::ScaleHistogram(PredHist[iFile].get(), BinWidthScale);
       }
       pad1->cd();
 
@@ -346,21 +347,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
       RatioPlotData->Divide(DataHist.get());
       PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
 
-      double maxz = -999;
-      double minz = +999;
-      for (int j = 0; j < nFiles; j++) {
-        for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++) {
-          maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
-          minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
-        }
-      }
-      maxz = maxz*1.001;
-      minz = minz*1.001;
-
-      if (std::fabs(1 - maxz) > std::fabs(1-minz))
-        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-      else
-        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+      M3::Plotting::SetSymmetricRatioRange(RatioPlot);
 
       RatioPlot[0]->Draw("p e2");
       for(int ig = 1; ig < nFiles; ig++ ) {
@@ -615,7 +602,7 @@ int main(int argc, char **argv)
     FileNames.emplace_back(argv[i]);
   }
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->initialise();
 
   PredictivePlotting(ConfigName, FileNames);

@@ -13,24 +13,15 @@
 /// @ingroup MaCh3Plotting
 /// @author Ewan Miller
 
-// some options for the plots
-double ratioPlotSplit;
-double yTitleOffset;
-double sampleLabelThreshold;
-int lineWidth;
-bool totalOnSplitPlots;
-bool sameAxis;
-
-double ratioLabelScaling;
-
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
-MaCh3Plotting::PlottingManager *PlotMan;
+M3::Plotting::PlottingManager *PlotMan;
 
 /// @brief TPad is SUPER FRAGILE, it is safer to just make raw pointer, while ROOT behave weirdly with smart pointers
 void SetTPads(TPad*& LLHPad, TPad*& ratioPad)
 {
   int originalErrorLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
+  auto ratioPlotSplit = PlotMan->getOption<double>("ratioPlotSplit");
   if (PlotMan->getPlotRatios())
   {
     LLHPad = new TPad("LLHPad", "LLHPad", 0.0, ratioPlotSplit, 1.0, 1.0);
@@ -47,12 +38,12 @@ void SetTPads(TPad*& LLHPad, TPad*& ratioPad)
   gErrorIgnoreLevel = originalErrorLevel;
 }
 
-void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSams,
+void getSplitSampleStack(int fileIdx, const std::string& parameterName, const TH1D& LLH_allSams,
                          std::vector<float> &cumSums, std::vector<bool> &drawLabel,
                          THStack *sampleStack, TLegend *splitSamplesLegend,
                          float baselineLLH_main = 0.00001) 
-  {
-  std::vector<std::string> sampNames = PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags"));
+{
+  auto sampNames = PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags"));
   size_t nSamples = sampNames.size();
 
   cumSums.resize(nSamples);
@@ -99,7 +90,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
     MACH3LOG_DEBUG("    LLH fraction = {} / {} = {}", LLH_indivSam->Integral(), LLH_main_integ, LLH_indivSam->Integral() / LLH_main_integ);
 
     cumSums[i] = cumSum;
-    
+    auto sampleLabelThreshold = PlotMan->getOption<double>("sampleLabelThreshold");
     // dont draw a label if the likelihood contribution is less than threshold%
     if ((LLH_indivSam->Integral() / LLH_main_integ > sampleLabelThreshold) &&
         (LLH_indivSam->Integral() / baselineLLH_main > sampleLabelThreshold))
@@ -120,6 +111,10 @@ void drawRatioStack(THStack *ratioCompStack) {
   double stackMin = ratioCompStack->GetMinimum("NOSTACK");
 
   double stackLim = std::max(std::abs(1.0 - stackMax), std::abs(1.0 - stackMin));
+  auto yTitleOffset = PlotMan->getOption<double>("yTitleOffset");
+  auto ratioPlotSplit = PlotMan->getOption<double>("ratioPlotSplit");
+  // scale the ratio plot labels by this much to make them same size as the normal plot
+  auto ratioLabelScaling = (1.0 / ratioPlotSplit - 1.0);
 
   ratioCompStack->SetMinimum(1.0 - 1.05 * stackLim);
   ratioCompStack->SetMaximum(1.0 + 1.05 * stackLim);
@@ -164,7 +159,7 @@ void makeLLHScanComparisons(const std::string& paramName,
   legend->AddEntry(&LLH_main, PlotMan->getFileLabel(0).c_str(), "l");
 
   int nBins = LLH_main.GetNbinsX();
-
+  int lineWidth = PlotMan->getOption<int>("lineWidth");
   // go through the other files
   for (unsigned int extraFileIdx = 1; extraFileIdx < PlotMan->input().getNInputFiles(); extraFileIdx++)
   {
@@ -199,7 +194,7 @@ void makeLLHScanComparisons(const std::string& paramName,
     compStack->Add(compHist);
     legend->AddEntry(compHist, PlotMan->getFileLabel(extraFileIdx).c_str(), "l");
   }
-
+  auto yTitleOffset = PlotMan->getOption<double>("yTitleOffset");
   // draw the log likelihoods
   canv->cd();
   canv->Draw();
@@ -283,6 +278,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   gPad->Modified();
   gPad->Update();
 
+  bool totalOnSplitPlots = PlotMan->getOption<bool>("totalOnSplitPlots");
   if (totalOnSplitPlots)
   {
     LLH_main.SetLineWidth(1); // undo SetLineWidth that was done above
@@ -297,12 +293,13 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   label->SetTextAlign(11);
   label->SetTextAngle(-55);
   label->SetTextSize(0.012);
+  const auto& SampleTags = PlotMan->getOption<std::vector<std::string>>("sampleTags");
 
   // need to draw the labels after other stuff or they don't show up
-  for (uint i = 0; i < PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags")).size(); i++)
+  for (uint i = 0; i < PlotMan->input().getTaggedSamples(SampleTags).size(); i++)
   {
     MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
-    std::string sampName = PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags"))[i];
+    std::string sampName = PlotMan->input().getTaggedSamples(SampleTags)[i];
     if (!drawLabel[i])
     { 
       MACH3LOG_DEBUG("   - Not drawing label");
@@ -342,7 +339,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
       delete splitSamplesStack;
       continue;
     }
-
+    bool sameAxis = PlotMan->getOption<bool>("sameAxis");
     // if on the same y axis, also check that the contribution of the sample compared to the
     // baseline LLH integral is above the threshold otherwise the labels might get very crowded if
     // the comparisson LLH is much smaller than the baseline one
@@ -417,6 +414,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   }
   canv->SaveAs(outputFileName.c_str());
   delete LLHPad;
+  delete ratioPad;
 }
 
 int PlotLLH() {
@@ -443,9 +441,9 @@ int PlotLLH() {
     // ###############################################################
     // First lets do just the straight up likelihoods from all samples
     // ###############################################################
-    makeLLHScanComparisons(paramName, "sample", PlotMan->getOutputName("_Sample"), canv);
+    makeLLHScanComparisons(paramName, "sample",  PlotMan->getOutputName("_Sample"), canv);
     makeLLHScanComparisons(paramName, "penalty", PlotMan->getOutputName("_Penalty"), canv);
-    makeLLHScanComparisons(paramName, "total", PlotMan->getOutputName("_Total"), canv);
+    makeLLHScanComparisons(paramName, "total",   PlotMan->getOutputName("_Total"), canv);
     // #########################################
     // ## now lets make plots split by sample ##
     // #########################################
@@ -468,22 +466,11 @@ int PlotLLH() {
 
 int main(int argc, char **argv) {
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
-  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan = new M3::Plotting::PlottingManager();
   PlotMan->parseInputs(argc, argv);
-
   PlotMan->setExec("PlotLLH");
-
-  ratioPlotSplit = PlotMan->getOption<double>("ratioPlotSplit");
-  yTitleOffset = PlotMan->getOption<double>("yTitleOffset");
-  sampleLabelThreshold = PlotMan->getOption<double>("sampleLabelThreshold");
-  lineWidth = PlotMan->getOption<int>("lineWidth");
-  totalOnSplitPlots = PlotMan->getOption<bool>("totalOnSplitPlots");
-  sameAxis = PlotMan->getOption<bool>("sameAxis");
-
-  // scale the ratio plot labels by this much to make them same size as the normal plot
-  ratioLabelScaling = (1.0 / ratioPlotSplit - 1.0);
 
   if(PlotMan->getPlotRatios() && PlotMan->input().getNInputFiles() == 1){
     MACH3LOG_ERROR("Can't plot ratio with single file...");

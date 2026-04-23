@@ -52,10 +52,10 @@ class DelayedMR2T2 : public MR2T2 {
 
  protected:
      /// @brief Step acceptance probability
-    double AcceptanceProbability() override;
+    double AcceptanceProbability() final;
 
     /// @brief The MCMC step proposal
-    void DoStep() override;
+    void DoStep() final;
 
     /// @brief Store information about the current proposed step
     void StoreCurrentStep();

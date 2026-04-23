@@ -28,7 +28,7 @@ class OscProcessor : public MCMCProcessor {
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
     /// Here we allow Jarlskog Shenanigans
-    void LoadAdditionalInfo() override;
+    void LoadAdditionalInfo() final;
 
     /// @brief Perform Jarlskog Plotting
     /// @author Kevin Wood

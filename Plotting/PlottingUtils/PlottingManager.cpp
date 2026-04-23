@@ -1,6 +1,7 @@
 #include "PlottingManager.h"
 
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 // this is the constructor using the default plotting config file
 PlottingManager::PlottingManager() {
   // set config file name
@@ -90,6 +91,13 @@ void PlottingManager::initialise() {
 /// @todo make this able to return any un-parsed arguments so that user can specify their own
 /// arguments for use in their plotting scripts
 void PlottingManager::parseInputs(int argc, char * const *argv) {
+  if (argc < 2)
+  {
+    usage();
+    MACH3LOG_ERROR("no arguments were specified :(");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   // parse the inputs
   int c;
   while ((c = getopt(argc, argv, "o:l:d:c:srgh")) != -1)
@@ -116,7 +124,7 @@ void PlottingManager::parseInputs(int argc, char * const *argv) {
     }
     case 'h': {
       usage();
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      break;
     }
     case 'l': {
       parseFileLabels(optarg, _fileLabels);
@@ -132,6 +140,13 @@ void PlottingManager::parseInputs(int argc, char * const *argv) {
     case 'd': {
       _extraDrawOptions = optarg;
       break;
+    }
+    case '?':
+    default:
+    {
+      MACH3LOG_ERROR("Unknown or malformed option");
+      usage();
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
     }
   }
@@ -150,7 +165,7 @@ void PlottingManager::parseInputs(int argc, char * const *argv) {
 
   if (_plotRatios && _fileNames.size() == 0)
   {
-    MACH3LOG_ERROR("you specified -r <_plotRatios> = true but didnt specify any files to compare against, was this a mistake?");
+    MACH3LOG_ERROR("you specified -r <_plotRatios> = true but didn't specify any files to compare against, was this a mistake?");
   }
 
   if (_fileLabels.size() == 0)
@@ -177,17 +192,38 @@ void PlottingManager::addUserOption() {
   /// @todo Implement this.
 }
 
-std::string PlottingManager::getUserOption(std::string option) {
+std::string PlottingManager::getUserOption(const std::string& option) {
   /// @todo Implement this.
   (void) option;
   return "";
 }
 
-void PlottingManager::usage() {
-  /// @todo Implement this.
+void PlottingManager::usage() const {
   /// @todo could add some function to allow user to specify the help message for their particular
   /// script, then auto generate what the cmd line syntax looks like based on user specified
   /// options?
+  MACH3LOG_INFO("========================================");
+  MACH3LOG_INFO("PlottingManager usage:");
+  MACH3LOG_INFO("========================================");
+
+  MACH3LOG_INFO("Required:");
+  MACH3LOG_INFO("  <input files>               One or more input files (positional args)");
+
+  MACH3LOG_INFO("");
+  MACH3LOG_INFO("Options:");
+  MACH3LOG_INFO("  -o <file>                   Output file name");
+  MACH3LOG_INFO("  -l <labels>                 Comma/space-separated file labels");
+  MACH3LOG_INFO("  -c <config>                 Configuration file name");
+  //MACH3LOG_INFO("  -d <options>                Extra draw options");
+  //MACH3LOG_INFO("  -s                          Split by sample");
+  //MACH3LOG_INFO("  -r                          Plot ratios (requires multiple input files)");
+  MACH3LOG_INFO("  -g                          Draw grid");
+  MACH3LOG_INFO("  -h                          Show this help message");
+
+  MACH3LOG_INFO("");
+  MACH3LOG_INFO("Examples:");
+  MACH3LOG_INFO("  ./plot file1.root -f FancyName");
+  MACH3LOG_INFO("========================================");
 }
 
 /// Will check the provided saveName for file extensions, if it is one of .pdf or .eps, then just
@@ -257,4 +293,5 @@ void PlottingManager::parseFileLabels(std::string labelString, std::vector<std::
   }
   labelVec.push_back(labelString.substr(0, end));
 }
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

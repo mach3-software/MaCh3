@@ -6,7 +6,7 @@
 
 // *******************
 // The constructor
-SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerBase* const sample, const int nSteps) {
+SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerInterface* const sample, const int nSteps) {
 // *******************
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
@@ -1147,7 +1147,7 @@ void SampleSummary::MakeChi2Hists() {
   for (unsigned int i = 0; i < nThrows; ++i)
   {
     if (i % (nThrows/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nThrows);
+      M3::Utils::PrintProgressBar(i, nThrows);
     }
 
     // Set the total LLH to zero to initialise

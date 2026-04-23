@@ -1,7 +1,8 @@
 #include "StyleManager.h"
 
-namespace MaCh3Plotting {
-StyleManager::StyleManager(std::string styleConfigName) {
+namespace M3 {
+namespace Plotting {
+StyleManager::StyleManager(const std::string& styleConfigName) {
   _styleConfig = M3OpenConfig(styleConfigName);
 }
 
@@ -73,4 +74,12 @@ void StyleManager::setTH1Style(TH1 *hist, const std::string& styleName) const {
   hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1, __FILE__, __LINE__));
 }
 
-} // namespace MaCh3Plotting
+double StyleManager::getBinWidthScale(const std::string &Name) const {
+  constexpr const double DefaultScalingFactor = 10;
+  if(!_styleConfig["BinWidthScaleFactor"]) return DefaultScalingFactor;
+
+  return GetFromManager<double>(_styleConfig["BinWidthScaleFactor"][Name], DefaultScalingFactor, __FILE__, __LINE__);
+}
+
+} // namespace Plotting
+} // namespace M3

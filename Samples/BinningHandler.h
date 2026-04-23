@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Samples/SampleStructs.h"
-#include "Samples/FarDetectorCoreInfoStruct.h"
+#include "Samples/SampleInfo.h"
 #include "Manager/Manager.h"
 
 // ***************************
