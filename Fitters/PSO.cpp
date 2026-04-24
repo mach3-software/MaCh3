@@ -33,9 +33,9 @@ void PSO::RunMCMC(){
   if(fTestLikelihood){
     outTree->Branch("nParts", &fParticles, "nParts/I");
     for(int i = 0; i < fDim; ++i){
-      par = new double[fParticles];
-      paramlist.push_back(par);
-      outTree->Branch(Form("Parameter_%d", i), paramlist[i], Form("Parameter_%d[nParts]/D",i));
+      std::vector<double> par(fParticles);
+      paramlist.push_back(std::move(par));
+      outTree->Branch(Form("Parameter_%d", i), paramlist[i].data(), Form("Parameter_%d[nParts]/D",i));
     }
 //  vel = new double[fParticles];
     outTree->Branch("vel", vel, "vel[nParts]/D");
@@ -135,15 +135,15 @@ void PSO::init(){
       }
     }
 
-    particle* new_particle = new particle(init_position,init_velocity);
+    auto new_particle = std::make_unique<particle>(init_position,init_velocity);
     new_particle->set_personal_best_position(init_position);
     double new_value = CalcChi(init_position);
     new_particle->set_personal_best_value(new_value);
     new_particle->set_value(new_value);
-    system.push_back(new_particle);
+    system.push_back(std::move(new_particle));
     if(new_value < fBestValue){
       fBestValue = new_value;
-      set_best_particle(new_particle);
+      set_best_particle(system.back().get());
     }
   }
 }
@@ -322,7 +322,7 @@ void PSO::uncertainty_check(const std::vector<double>& previous_pos){
     position[i] = curr_ival;
     MACH3LOG_INFO("");
     MACH3LOG_INFO("For fDim{} x list is", i+1);
-    for (unsigned int k = 0;k<x.size(); ++k){
+    for (unsigned int k = 0; k < x.size(); ++k){
       MACH3LOG_INFO("  {}", x[k]);
     }
     MACH3LOG_INFO("");
@@ -376,7 +376,7 @@ double PSO::swarmIterate(){
       system[i]->set_personal_best_position(new_pos);
       if(new_value < fBestValue){
         fBestValue = new_value;
-        set_best_particle(system[i]);
+        set_best_particle(system[i].get());
       }
     }
   }
@@ -464,54 +464,54 @@ void PSO::WriteOutput(){
     }
   }
   else{
-    for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
+    for (std::vector<ParameterHandlerBase*>::iterator ParHandler = systematics.begin(); ParHandler != systematics.end(); ++ParHandler)
     {
-      if(!(*it)->IsPCA())
+      if(!(*ParHandler)->IsPCA())
       {
-        for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
+        for(int i = 0; i < (*ParHandler)->GetNumParams(); ++i, ++ParCounter)
         {
           double ParVal = minimum[ParCounter];
           //KS: Basically apply mirroring for parameters out of bounds
           (*PSOParValue)(ParCounter) = ParVal;
           (*PSOParError)(ParCounter) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
           //KS: For fixed params HESS will not calcuate error so we need to pass prior error
-          if((*it)->IsParameterFixed(i))
+          if((*ParHandler)->IsParameterFixed(i))
           {
-            (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
+            (*PSOParError)(ParCounter) = (*ParHandler)->GetDiagonalError(i);
           }
         }
       }
       else
       {
         //KS: We need to convert parameters from PCA to normal base
-        TVectorD ParVals((*it)->GetNumParams());
-        TVectorD ParVals_PCA((*it)->GetNParameters());
+        TVectorD ParVals((*ParHandler)->GetNumParams());
+        TVectorD ParVals_PCA((*ParHandler)->GetNParameters());
 
-        TVectorD ErrorVals((*it)->GetNumParams());
-        TVectorD ErrorVals_PCA((*it)->GetNParameters());
+        TVectorD ErrorVals((*ParHandler)->GetNumParams());
+        TVectorD ErrorVals_PCA((*ParHandler)->GetNParameters());
 
         //First save them
         //KS: This code is super convoluted as MaCh3 can store separate matrices while PSO has one matrix. In future this will be simplified, keep it like this for now.
         const int StartVal = ParCounter;
-        for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
+        for(int i = 0; i < (*ParHandler)->GetNParameters(); ++i, ++ParCounter)
         {
           ParVals_PCA(i) = minimum[ParCounter];
           ErrorVals_PCA(i) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
         }
-        ParVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ParVals_PCA;
-        ErrorVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ErrorVals_PCA;
+        ParVals = ((*ParHandler)->GetPCAHandler()->GetTransferMatrix())*ParVals_PCA;
+        ErrorVals = ((*ParHandler)->GetPCAHandler()->GetTransferMatrix())*ErrorVals_PCA;
 
         ParCounter = StartVal;
         //KS: Now after going from PCA to normal let';s save it
-        for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
+        for(int i = 0; i < (*ParHandler)->GetNumParams(); ++i, ++ParCounter)
         {
           (*PSOParValue)(ParCounter) = ParVals(i);
           (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
           //int ParCounterMatrix = StartVal;
           //If fixed take prior
-          if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
+          if((*ParHandler)->GetPCAHandler()->IsParameterFixedPCA(i))
           {
-            (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
+            (*PSOParError)(ParCounter) = (*ParHandler)->GetDiagonalError(i);
           }
         }
       }
