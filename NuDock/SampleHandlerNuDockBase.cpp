@@ -59,7 +59,10 @@ void SampleHandlerNuDockBase::Reweight() {
   }
 
   // Loop over NuDockOscNameMap_r to get osc params
-  for (auto const& [paramNameM3, paramNameNuDock] : NuDockOscNameMap_r) {
+  for (auto const& pair : NuDockOscNameMap_r) {
+    auto const& paramNameM3 = pair.first;
+    auto const& paramNameNuDock = pair.second;
+    
     int iParam = ParHandler->GetParIndex(paramNameM3);
     double paramValue = ParHandler->GetParProp(iParam);
     // Convert sin2_theta to theta
