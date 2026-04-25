@@ -90,7 +90,7 @@ double SampleHandlerNuDockBase::GetLikelihood() const {
   auto response = nudock_ptr->send_request("/log_likelihood", request);
   try {
     llh_value = response["log_likelihood"].get<double>();
-    llh_value /= 2; // NuDock returns 2NLL, so we divide by 2 to be consistent with M3's definition of LLH. 
+    llh_value /= 2; // NuDock returns 2NLL, so we divide by 2 to be consistent with M3's definition of LLH.
     return llh_value;
   } catch (const std::exception &e) {
     MACH3LOG_ERROR("Error retrieving log-likelihood from NuDock response: {}", e.what());
