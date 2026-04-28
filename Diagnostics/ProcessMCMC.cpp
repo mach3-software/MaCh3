@@ -1,3 +1,4 @@
+#include "Manager/MaCh3Logger.h"
 #include "Diagnostics/ProcessMCMCPlugin.hpp"
 
 int main(int argc, char const* argv[]){

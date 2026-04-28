@@ -5,6 +5,7 @@
 #include <vector>
 #include "api/plugin.hpp"
 #include "Diagnostics/ProcessMCMCPlugin.hpp"
+#include "Diagnostics/DiagMCMCPlugin.hpp"
 
 using namespace std;
 
@@ -175,8 +176,10 @@ int main(int argc, char *argv[]) {
     mach3::MaCh3Program program;
 
     mach3::ProcessMCMCPlugin proc;
+    mach3::DiagMCMCPlugin diag;
 
     program.add_core_plugin(proc);
+    program.add_core_plugin(diag);
     program.load_dynamic_plugins();
 
     try {
