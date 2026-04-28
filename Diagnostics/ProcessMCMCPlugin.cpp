@@ -1,17 +1,18 @@
 //MaCh3 includes
-#include "api/plugin.hpp"
 #include "Fitters/OscProcessor.h"
 #include "Manager/Manager.h"
 #include "Diagnostics/ProcessMCMCPlugin.hpp"
 
+// Not needed for Core plugins as not dynamically loaded
+// extern "C" mach3::IPlugin* create_plugin() {
+//   return new mach3::ProcessMCMCPlugin();
+// }
 
-extern "C" mach3::IPlugin* create_plugin() {
-  return new mach3::ProcessMCMCPlugin();
-}
-
-extern "C" void destroy_plugin(mach3::IPlugin* p) {
-  delete p;
-}
+// extern "C" void destroy_plugin(mach3::IPlugin* p) {
+//   delete p;
+// }
+// if was a dynamic plugin, could now use the convienience macro to generate these
+// MACH3_REGISTER_PLUGIN(mach3::ProcessMCMCPlugin)
 
 namespace mach3{
 
