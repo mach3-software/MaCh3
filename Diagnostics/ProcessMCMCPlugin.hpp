@@ -1,14 +1,11 @@
 //MaCh3 includes
 #pragma once
+// yaml Includes
+#include "yaml-cpp/yaml.h"
+#include "Fitters/MCMCProcessor.h"
 #include "api/plugin.hpp"
-#include "Fitters/OscProcessor.h"
-#include "Manager/Manager.h"
-
-using argparse::ArgumentParser;
 
 namespace mach3{
-
-
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor
@@ -52,8 +49,3 @@ namespace mach3{
       MaCh3ArgumentParser* m_parser;
   };
 };
-
-extern "C" {
-    typedef mach3::IPlugin* (*create_plugin_t)();
-    typedef void (*destroy_plugin_t)(mach3::IPlugin*);
-}
