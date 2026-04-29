@@ -132,6 +132,17 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   // KS: We first check whether OscChannel are defined individually for this sample or taken from global list
   if(SampleSettings["OscChannels"].IsScalar()) {
     auto GlobalChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
+    if(!SampleManager->raw()["GlobalOscChannels"]) {
+      MACH3LOG_ERROR("Trying to use GlobalOscChannels however such field doesn't exist in config for SampleHandler: {}", GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if(!SampleManager->raw()["GlobalOscChannels"][GlobalChannelsName]) {
+      MACH3LOG_ERROR("Didn't find: {}", GlobalChannelsName);
+      for (const auto& item : SampleManager->raw()["GlobalOscChannels"]) {
+        MACH3LOG_ERROR("I know: {}", item.first.as<std::string>());
+      }
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     OscChannelsConfig = SampleManager->raw()["GlobalOscChannels"][GlobalChannelsName];
   } else {
     OscChannelsConfig = SampleSettings["OscChannels"];
