@@ -128,8 +128,28 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   int NChannels = static_cast<M3::int_t>(SampleSettings["OscChannels"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  YAML::Node OscChannelsConfig;
+  // KS: We first check whether OscChannel are defined individually for this sample or taken from list
+  if(SampleSettings["OscChannels"].IsScalar()) {
+    auto PredeterminedChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
+    if(!SampleManager->raw()["OscChannels"]) {
+      MACH3LOG_ERROR("Trying to use Predetermined OscChannels however such field doesn't exist in config for SampleHandler: {}", GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if(!SampleManager->raw()["OscChannels"][PredeterminedChannelsName]) {
+      MACH3LOG_ERROR("I didn't find PredeterminedChannelsName called: {}", PredeterminedChannelsName);
+      MACH3LOG_ERROR("However I have PredeterminedChannelsName known as:");
+      for (const auto& item : SampleManager->raw()["OscChannels"]) {
+        MACH3LOG_ERROR("{}", item.first.as<std::string>());
+      }
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    OscChannelsConfig = SampleManager->raw()["OscChannels"][PredeterminedChannelsName];
+  } else {
+    OscChannelsConfig = SampleSettings["OscChannels"];
+  }
   int OscChannelCounter = 0;
-  for (auto const &osc_channel : SampleSettings["OscChannels"]) {
+  for (auto const &osc_channel : OscChannelsConfig) {
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = Get<std::string>(osc_channel["Name"], __FILE__ , __LINE__);
     OscInfo.flavourName_Latex = Get<std::string>(osc_channel["LatexName"], __FILE__ , __LINE__);
