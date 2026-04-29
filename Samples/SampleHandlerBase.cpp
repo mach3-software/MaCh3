@@ -128,8 +128,18 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   int NChannels = static_cast<M3::int_t>(SampleSettings["OscChannels"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  if(SampleManager->raw()["GlobalOscChannels"]){
+
+  }
+  YAML::Node OscChannelsConfig;
+  if(SampleSettings["OscChannels"].IsScalar()) {
+    auto GlobalChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
+    OscChannelsConfig = SampleManager->raw()["GlobalOscChannels"][GlobalChannelsName];
+  } else {
+    OscChannelsConfig = SampleSettings["OscChannels"];
+  }
   int OscChannelCounter = 0;
-  for (auto const &osc_channel : SampleSettings["OscChannels"]) {
+  for (auto const &osc_channel : OscChannelsConfig) {
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = Get<std::string>(osc_channel["Name"], __FILE__ , __LINE__);
     OscInfo.flavourName_Latex = Get<std::string>(osc_channel["LatexName"], __FILE__ , __LINE__);
