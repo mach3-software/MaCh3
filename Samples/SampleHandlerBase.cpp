@@ -128,10 +128,8 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   int NChannels = static_cast<M3::int_t>(SampleSettings["OscChannels"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
-  if(SampleManager->raw()["GlobalOscChannels"]){
-
-  }
   YAML::Node OscChannelsConfig;
+  // KS: We first check whether OscChannel are defined individually for this sample or taken from global list
   if(SampleSettings["OscChannels"].IsScalar()) {
     auto GlobalChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
     OscChannelsConfig = SampleManager->raw()["GlobalOscChannels"][GlobalChannelsName];
