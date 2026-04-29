@@ -276,9 +276,9 @@ void FitterBase::AddSampleHandler(SampleHandlerInterface* const sample) {
 
   for (const auto &s : samples) {
     if (s->GetName() == sample->GetName()) {
-      MACH3LOG_WARN("SampleHandler with name '{}' already exists!", sample->GetName());
-      MACH3LOG_WARN("Is it intended?");
-      //throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetName());
+      MACH3LOG_ERROR("Is it intended?");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   // Save additional info from samples
@@ -371,7 +371,6 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain (from path {}) and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-
       delete ConfigCov;
     }
 
