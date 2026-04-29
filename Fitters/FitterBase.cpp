@@ -889,10 +889,9 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   if(outputFileName != ""){
     outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
     ownsfile = true;
-  }
-  else
+  } else {
     outputFileLLH = outputFile;
-
+  }
   TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
@@ -925,13 +924,17 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
       // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
       const double Var = 1.;
-      const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
-
+      const double approxSigma = std::abs(Var)/std::sqrt(LLH_val);
+      const double GlobalScale = cov->GetGlobalStepScale();
       // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      const double NewStepScale = approxSigma * 2.38/std::sqrt(npars);
+      const double TargetStep = approxSigma * 2.38 / std::sqrt(npars);
+      // KS: Need to divide by currently used gloalStepScale
+      const double NewStepScale = TargetStep / GlobalScale;
+
       StepScale[i] = NewStepScale;
       MACH3LOG_DEBUG("Sigma: {}", approxSigma);
-      MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
+      MACH3LOG_DEBUG("Target Step Size (before accounting for global step size): {}", TargetStep);
+      MACH3LOG_DEBUG("Optimal Step Size: {}", NewStepScale);
     }
     cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();

@@ -23,19 +23,19 @@ class MCMCBase : public FitterBase {
 
     /// @brief Set how long chain should be
     /// @param L new chain length
-    inline void setChainLength(unsigned int L) { chainLength = L; };
+   void setChainLength(unsigned int L) { chainLength = L; };
  protected:
     /// @brief The full StartStep->DoStep->EndStep chain
-    inline void DoMCMCStep();
+    void DoMCMCStep();
 
     /// @brief Propose a step
     virtual void ProposeStep()=0;
 
     /// @brief Actions before step proposal [start stopwatch]
-    inline void PreStepProcess();
+    void PreStepProcess();
 
     /// @brief Actions after step proposal [end stopwatch, fill tree]
-    inline void PostStepProcess();
+    void PostStepProcess();
 
     /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;
@@ -51,10 +51,10 @@ class MCMCBase : public FitterBase {
     void AcceptStep();
 
     /// @brief Adaptive MCMC step
-    inline void AdaptiveStep();
+    void AdaptiveStep();
 
     /// @brief Print the progress
-    inline void PrintProgress(const bool StepsPrint = true);
+    void PrintProgress(const bool StepsPrint = true);
 
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;
