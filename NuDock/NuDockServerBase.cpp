@@ -121,14 +121,14 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   // reweight sample and add to data
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     samples[ipdf]->Reweight();
-    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
-        base_casted_sample->AddData(iSample, base_casted_sample->GetMCArray(iSample));
-      }
-    } else {
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
       MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      base_casted_sample->AddData(iSample, base_casted_sample->GetMCArray(iSample));
+    }
   }
 
   // set prefit parameter values to the current parameter values
@@ -214,28 +214,27 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
-      (void) base_casted_sample;
-      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
-        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
-        sample_titles.push_back(sample_title);
-
-        int dimension = samples[ipdf]->GetNDim(iSample);
-        response["dimensions"][sample_title] = dimension;
-
-        if (dimension == 1) {
-          TH1toResponse(samples[ipdf]->GetMCHist(iSample), sample_title, response);
-        } else if (dimension == 2) {
-          TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetMCHist(iSample)), sample_title, response);
-        } else {
-          MACH3LOG_ERROR("Not implemented for dim =", dimension);
-          throw MaCh3Exception(__FILE__,__LINE__);
-        }
-      }
-    } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+      sample_titles.push_back(sample_title);
+
+      int dimension = samples[ipdf]->GetNDim(iSample);
+      response["dimensions"][sample_title] = dimension;
+
+      if (dimension == 1) {
+        TH1toResponse(samples[ipdf]->GetMCHist(iSample), sample_title, response);
+      } else if (dimension == 2) {
+        TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetMCHist(iSample)), sample_title, response);
+      } else {
+        MACH3LOG_ERROR("Not implemented for dim =", dimension);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
+    }
   }
   response["sample_names"] = sample_titles;
   return response;
@@ -251,28 +250,27 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
-      (void) base_casted_sample;
-      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
-        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
-        sample_titles.push_back(sample_title);
-
-        int dimension = samples[ipdf]->GetNDim(iSample);
-        response["dimensions"][sample_title] = dimension;
-
-        if (dimension == 1) {
-          TH1toResponse(samples[ipdf]->GetDataHist(iSample), sample_title, response);
-        } else if (dimension == 2) {
-          TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetDataHist(iSample)), sample_title, response);
-        } else {
-          MACH3LOG_ERROR("Not implemented for dim =", dimension);
-          throw MaCh3Exception(__FILE__,__LINE__);
-        }
-      }
-    } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+      sample_titles.push_back(sample_title);
+
+      int dimension = samples[ipdf]->GetNDim(iSample);
+      response["dimensions"][sample_title] = dimension;
+
+      if (dimension == 1) {
+        TH1toResponse(samples[ipdf]->GetDataHist(iSample), sample_title, response);
+      } else if (dimension == 2) {
+        TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetDataHist(iSample)), sample_title, response);
+      } else {
+        MACH3LOG_ERROR("Not implemented for dim =", dimension);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
+    }
   }
   response["sample_names"] = sample_titles;
   return response;
