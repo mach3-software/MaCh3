@@ -131,19 +131,20 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   YAML::Node OscChannelsConfig;
   // KS: We first check whether OscChannel are defined individually for this sample or taken from list
   if(SampleSettings["OscChannels"].IsScalar()) {
-    auto PreambuleChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
+    auto PredeterminedChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
     if(!SampleManager->raw()["OscChannels"]) {
-      MACH3LOG_ERROR("Trying to use Preambule OscChannels however such field doesn't exist in config for SampleHandler: {}", GetName());
+      MACH3LOG_ERROR("Trying to use Predetermined OscChannels however such field doesn't exist in config for SampleHandler: {}", GetName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    if(!SampleManager->raw()["OscChannels"][PreambuleChannelsName]) {
-      MACH3LOG_ERROR("Didn't find: {}", PreambuleChannelsName);
+    if(!SampleManager->raw()["OscChannels"][PredeterminedChannelsName]) {
+      MACH3LOG_ERROR("I didn't find PredeterminedChannelsName called: {}", PredeterminedChannelsName);
+      MACH3LOG_ERROR("However I have PredeterminedChannelsName known as:");
       for (const auto& item : SampleManager->raw()["OscChannels"]) {
-        MACH3LOG_ERROR("I know: {}", item.first.as<std::string>());
+        MACH3LOG_ERROR("{}", item.first.as<std::string>());
       }
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    OscChannelsConfig = SampleManager->raw()["OscChannels"][PreambuleChannelsName];
+    OscChannelsConfig = SampleManager->raw()["OscChannels"][PredeterminedChannelsName];
   } else {
     OscChannelsConfig = SampleSettings["OscChannels"];
   }
