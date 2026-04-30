@@ -34,6 +34,7 @@ else()
 endif()
 
 target_link_libraries(MaCh3NuDock PUBLIC Fitters ${NUDOCK_TARGET})
+target_link_libraries(MaCh3NuDock PRIVATE MaCh3Warnings)
 
 target_include_directories(MaCh3NuDock PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
