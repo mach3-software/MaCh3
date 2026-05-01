@@ -6,6 +6,7 @@
 #include "api/plugin.hpp"
 #include "Diagnostics/ProcessMCMCPlugin.hpp"
 #include "Diagnostics/DiagMCMCPlugin.hpp"
+#include "Diagnostics/GetPenaltyTermPlugin.hpp"
 
 using namespace std;
 
@@ -177,9 +178,11 @@ int main(int argc, char *argv[]) {
 
     mach3::ProcessMCMCPlugin proc;
     mach3::DiagMCMCPlugin diag;
+    mach3::GetPenaltyTermPlugin penterm;
 
     program.add_core_plugin(proc);
     program.add_core_plugin(diag);
+    program.add_core_plugin(penterm);
     program.load_dynamic_plugins();
 
     try {
