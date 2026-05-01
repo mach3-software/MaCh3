@@ -6,6 +6,7 @@
 add_library(CorePlugins STATIC
     ProcessMCMCPlugin.cpp
     DiagMCMCPlugin.cpp
+    GetPenaltyTermPlugin.cpp
 )
 
 target_link_libraries(CorePlugins PRIVATE MaCh3::All)

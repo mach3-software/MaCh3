@@ -86,7 +86,7 @@ namespace mach3{
     {
       MACH3LOG_INFO("Producing single fit output");
       std::string filename = files[0];
-      ProcessMCMC(filename);
+      this->ProcessMCMC(filename);
     }
     // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
     else if (files.size() > 1)
@@ -104,7 +104,7 @@ namespace mach3{
         TitleNames.push_back("THREE");
       }
 
-      MultipleProcessMCMC();
+      this->MultipleProcessMCMC();
     }
     return 0;
   }
@@ -196,7 +196,7 @@ namespace mach3{
       }
     }
     // Make the postfit
-    Processor->MakePostfit(GetCustomBinning(Settings));
+    Processor->MakePostfit(this->GetCustomBinning(Settings));
     Processor->DrawPostfit();
     //KS: Should set via config whether you want below or not
     if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
@@ -204,10 +204,10 @@ namespace mach3{
                                       GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
                                       GetFromManager<bool>(Settings["CredibleInSigmas"], false));
     }
-    if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor.get());
+    if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  this->CalcBayesFactor(Processor.get());
+    if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) this->CalcSavageDickey(Processor.get());
+    if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) this->CalcBipolarPlot(Processor.get());
+    if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) this->CalcParameterEvolution(Processor.get());
 
     if(PlotCorr)
     {
@@ -233,10 +233,10 @@ namespace mach3{
                                       GetFromManager<bool>(Settings["Draw2DPosterior"], true),
                                       GetFromManager<bool>(Settings["DrawBestFit"], true));
       }
-      if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
+      if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) this->GetTrianglePlot(Processor.get());
 
       //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
-      if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
+      if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) this->DiagnoseCovarianceMatrix(Processor.get(), inputFile);
     }
     if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true)) Processor->PerformJarlskogAnalysis();
     if(GetFromManager<bool>(Settings["MakePiePlot"], true))      Processor->MakePiePlot();
@@ -288,7 +288,7 @@ namespace mach3{
       }
     }
 
-    Processor[0]->MakePostfit(GetCustomBinning(Settings));
+    Processor[0]->MakePostfit(this->GetCustomBinning(Settings));
     Processor[0]->DrawPostfit();
     // Get edges from first histogram to ensure all params use same binning
     std::map<std::string, std::pair<double, double>> ParamEdges;
@@ -442,7 +442,7 @@ namespace mach3{
     Posterior->cd();
     Posterior->Clear();
 
-    if(GetFromManager<bool>(Settings["PerformKStest"], true)) KolmogorovSmirnovTest(Processor, Posterior, canvasname);
+    if(GetFromManager<bool>(Settings["PerformKStest"], true)) this->KolmogorovSmirnovTest(Processor, Posterior, canvasname);
     
     // Close the pdf file
     MACH3LOG_INFO("Closing pdf {}", canvasname);
@@ -591,8 +591,8 @@ namespace mach3{
     Processor->SetStepCut(BurnIn);
     Processor->GetCovariance(Covariance, Correlation);
     
-    CovariancePreviousHist = TMatrixIntoTH2D(Covariance, "Covariance"); 
-    CorrelationPreviousHist = TMatrixIntoTH2D(Correlation, "Correlation");
+    CovariancePreviousHist = this->TMatrixIntoTH2D(Covariance, "Covariance"); 
+    CorrelationPreviousHist = this->TMatrixIntoTH2D(Correlation, "Correlation");
         
     delete Covariance;
     Covariance = nullptr;
@@ -607,8 +607,8 @@ namespace mach3{
       Processor->GetCovariance(Covariance, Correlation);
       Processor->Reset2DPosteriors();
       
-      CovarianceHist = TMatrixIntoTH2D(Covariance, "Covariance"); 
-      CorrelationHist = TMatrixIntoTH2D(Correlation, "Correlation");
+      CovarianceHist = this->TMatrixIntoTH2D(Covariance, "Covariance"); 
+      CorrelationHist = this->TMatrixIntoTH2D(Correlation, "Correlation");
               
       TH2D *CovarianceDiff = static_cast<TH2D*>(CovarianceHist->Clone("Covariance_Ratio"));
       TH2D *CorrelationDiff = static_cast<TH2D*>(CorrelationHist->Clone("Correlation_Ratio"));
