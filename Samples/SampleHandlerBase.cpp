@@ -395,7 +395,7 @@ void SampleHandlerBase::FillArray() {
     // Virtual by default does nothing, has to happen before CalcWeightTotal
     CalcWeightFunc(iEvent);
 
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    const M3::float_t totalweight = MCEvent->CalcWeightTotal();
     //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
       continue;
@@ -457,7 +457,7 @@ void SampleHandlerBase::FillArray_MP() {
     // Virtual by default does nothing, has to happen before CalcWeightTotal
     CalcWeightFunc(iEvent);
 
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    const M3::float_t totalweight = MCEvent->CalcWeightTotal();
     //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
       continue;
@@ -602,23 +602,6 @@ void SampleHandlerBase::ApplyShifts(const int iEvent) {
 }
 
 // ***************************************************************************
-// Calculate the spline weight for one event
-M3::float_t SampleHandlerBase::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_ {
-// ***************************************************************************
-  M3::float_t TotalWeight = 1.0;
-  const int TotalWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
-  //DB Loop over stored pointers
-  #ifdef MULTITHREAD
-  #pragma omp simd reduction(*:TotalWeight)
-  #endif
-  for (int iWeight = 0; iWeight < TotalWeights; ++iWeight) {
-    TotalWeight *= *(MCEvent->total_weight_pointers[iWeight]);
-  }
-
-  return TotalWeight;
-}
-
-// ***************************************************************************
 // Setup the osc parameters
 void SampleHandlerBase::SetupOscParameters() {
 // ***************************************************************************
@@ -680,11 +663,8 @@ void SampleHandlerBase::SetupNormParameters() {
   //DB Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
     int counter = 0;
-    const size_t offset = MCEvents[iEvent].total_weight_pointers.size();
-    const size_t addSize = norms_bins[iEvent].size();
-    MCEvents[iEvent].total_weight_pointers.resize(offset + addSize);
     for(auto const & norm_bin: norms_bins[iEvent]) {
-      MCEvents[iEvent].total_weight_pointers[offset + counter] = ParHandler->RetPointer(norm_bin);
+      MCEvents[iEvent].AddWeightPointer(ParHandler->RetPointer(norm_bin));
       counter += 1;
     }
   }
@@ -1145,7 +1125,7 @@ void SampleHandlerBase::SetupNuOscillatorPointers() {
 
    // KS: Do not add unity
    if (osc_w_pointer != &M3::Unity) {
-     MCEvents[iEvent].total_weight_pointers.push_back(osc_w_pointer);
+     MCEvents[iEvent].AddWeightPointer(osc_w_pointer);
    }
   }
 }
@@ -1212,7 +1192,7 @@ M3::float_t SampleHandlerBase::GetEventWeight(const int iEntry) {
   CalcWeightFunc(iEntry);
 
   const EventInfo* _restrict_ MCEvent = &MCEvents[iEntry];
-  M3::float_t totalweight = CalcWeightTotal(MCEvent);
+  M3::float_t totalweight = MCEvent->CalcWeightTotal();
 
   //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
   if (totalweight <= 0.){
@@ -1270,8 +1250,6 @@ void SampleHandlerBase::SetSplinePointers() {
       auto EventSplines = GetSplineBins(j, BinnedSpline, ThrowCrititcal);
       const int NSplines = static_cast<int>(EventSplines.size());
       if(NSplines == 0) continue;
-      auto& w_pointers = MCEvents[j].total_weight_pointers;
-      w_pointers.reserve(w_pointers.size() + NSplines);
       const auto SampleId = MCEvents[j].NominalSample;
       for(int spline = 0; spline < NSplines; spline++) {
         int SystIndex = EventSplines[spline][2];
@@ -1283,16 +1261,15 @@ void SampleHandlerBase::SetSplinePointers() {
           continue;
         }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline][0], EventSplines[spline][1],
+        MCEvents[j].AddWeightPointer(BinnedSpline->RetPointer(EventSplines[spline][0], EventSplines[spline][1],
                                                       EventSplines[spline][2], EventSplines[spline][3],
                                                       EventSplines[spline][4], EventSplines[spline][5],
                                                       EventSplines[spline][6]));
       } // end loop over splines
-      w_pointers.shrink_to_fit();
     } // end loop over events
   } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
-      MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->RetPointer(iEvent));
+      MCEvents[iEvent].AddWeightPointer(UnbinnedSpline->RetPointer(iEvent));
     }
   } else {
     MACH3LOG_ERROR("Not supported splines");
@@ -2169,4 +2146,15 @@ bool SampleHandlerBase::PassesSelection(const ParT& Par, std::size_t iEvent) {
     }
   }
   return IsSelected;
+}
+
+// ***************************************************************************
+void SampleHandlerBase::EventWeightDump(const std::string& OutputFileName) {
+// ***************************************************************************
+  //Could print to file directly
+  (void)OutputFileName;
+
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    std::cout << MCEvents[iEvent].ReturnDumpedEventWeightString() << std::endl;
+  }
 }

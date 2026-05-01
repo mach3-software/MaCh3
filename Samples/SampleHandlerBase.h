@@ -299,8 +299,6 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @param norm_parameters indexed [sample][param] describe norm params and associated kinematic cuts etc.
   void CalcNormsBins(std::vector<std::vector<NormParameter>>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
   template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
-  /// @brief Calculate the total weight weight for a given event
-  M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -358,6 +356,13 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void ResetHistograms();
   /// @brief Setup spline handler (both binned or unbinned)
   void InitialiseSplineObject();
+
+
+
+
+  void EventWeightDump(const std::string& OutputFileName="");
+
+  
 
   //===============================================================================
   //DB Variables required for GetLikelihood
