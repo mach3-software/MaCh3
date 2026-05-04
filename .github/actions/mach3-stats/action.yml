@@ -17,10 +17,12 @@ runs:
       with:
         repository: ${{ inputs.repository }}
         fetch-depth: 0
+        path: ${{ inputs.prefix }}
 
     - name: Git stats
       shell: bash
       run: |
+        cd "${{ inputs.prefix }}"
         PREFIX="${{ inputs.prefix }}"
 
         echo "${PREFIX}_commit_count=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
@@ -48,6 +50,7 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.token }}
       run: |
+        cd "${{ inputs.prefix }}"
         PREFIX="${{ inputs.prefix }}"
         REPO="${{ inputs.repository }}"
 
