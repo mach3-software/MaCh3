@@ -3,9 +3,7 @@ name: Post MaCh3 Newsletter
 on:
   schedule:
     - cron: '0 0 * * 1' # Every Monday at midnight
-  push:
-    branches:
-      - kskwarczynkis/bugfix/newsletter
+
 jobs:
   post_discussion:
     runs-on: ubuntu-latest
