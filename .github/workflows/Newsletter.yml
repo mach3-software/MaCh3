@@ -5,7 +5,7 @@ on:
     - cron: '0 0 * * 1' # Every Monday at midnight
   push:
     branches:
-      - develop
+      - kskwarczynkis/bugfix/newsletter
 jobs:
   post_discussion:
     runs-on: ubuntu-latest
