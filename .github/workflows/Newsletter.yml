@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: MaCh3 stats
         uses: ./.github/actions/mach3-stats
         with:
