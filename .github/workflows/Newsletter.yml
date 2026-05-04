@@ -3,28 +3,30 @@ name: Post MaCh3 Newsletter
 on:
   schedule:
     - cron: '0 0 * * 1' # Every Monday at midnight
-
+  push:
+    branches:
+      - develop
 jobs:
   post_discussion:
     runs-on: ubuntu-latest
 
     steps:
       - name: MaCh3 stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3
           prefix: mach3
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MaCh3Tutorial stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3Tutorial
           prefix: tutorial
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MaCh3SbiTools stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3SbiTools
           prefix: sbi
