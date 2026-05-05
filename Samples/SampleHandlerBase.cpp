@@ -1533,7 +1533,8 @@ std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHist(const int iSample,
                                                      const std::string& ProjectionVar_StrX,
                                                      const std::string& ProjectionVar_StrY,
                                                      const std::vector< KinematicCut >& EventSelectionVec,
-                                                     const int WeightStyle, const std::vector< KinematicCut >& SubEventSelectionVec) {
+                                                     const int WeightStyle,
+                                                     const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1725,10 +1726,11 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
   std::vector<double> BinningVect;
   // We first check if binning for a sample has been specified
   auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
+  bool found_range_specifier = false;
   if(BinningConfig[GetSampleTitle(Sample)] && BinningConfig[GetSampleTitle(Sample)][KinematicParameter]){
-    BinningVect = Get<std::vector<double>>(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], __FILE__, __LINE__);
+    BinningVect = BuildBinEdgesFromNode(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], found_range_specifier);
   } else {
-    BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
+    BinningVect = BuildBinEdgesFromNode(BinningConfig[KinematicParameter], found_range_specifier);
   }
 
   // Ensure binning is increasing
@@ -1743,9 +1745,11 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
 
   if (!IsIncreasing(BinningVect)) {
     MACH3LOG_ERROR("Binning for {} is not increasing [{}]", KinematicParameter, fmt::join(BinningVect, ", "));
-    throw MaCh3Exception(__FILE__,__LINE__);
+    if(found_range_specifier){
+      MACH3LOG_ERROR("A bin range specifier was found. Please carefully check the number of square brackets used.");
+    }
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
   return BinningVect;
 }
 
@@ -1818,7 +1822,7 @@ std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int
 
 // ************************************************
 std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-    const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
+                                                                     const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
 // ************************************************
   auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
   return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle);
@@ -1977,7 +1981,7 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
 // ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                            const int Selection1, const int Selection2, const int WeightStyle) {
+                                                                              const int Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH1>> hHistList;
   std::string legendEntry;
@@ -2047,7 +2051,7 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                         int Selection1, int Selection2, int WeightStyle) {
+                                                                           int Selection1, int Selection2, int WeightStyle) {
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
