@@ -658,7 +658,10 @@ void MakeRidgePlots()
       pad->SetFillStyle(4000);
 
       gPad->SetFrameFillStyle(4000);
-      posteriorDist->GetFunction("Gauss")->SetBit(TF1::kNotDraw);
+      TF1* gausFunc = posteriorDist->GetFunction("Gauss");
+      if (posteriorDist->GetFunction("Gauss")) {
+        gausFunc->SetBit(TF1::kNotDraw);
+      }
       posteriorDist->SetTitle("");
       posteriorDist->SetLineWidth(ridgeLineWidth);
       
