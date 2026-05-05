@@ -34,7 +34,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set date
-        run: echo "current_date=$(date +'%d/%m/%Y')" >> $GITHUB_ENV
+        run: echo "current_date=$(date +'%d/%m/%Y')" >> "$GITHUB_ENV"
 
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x
