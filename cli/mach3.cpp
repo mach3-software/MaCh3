@@ -59,6 +59,7 @@ namespace mach3{
                 catch (const std::exception& err) {
                     std::cerr << err.what() << std::endl;
                     std::cerr << this->get_subcommand_used();
+                    MACH3LOG_ERROR(err.what());
                     throw;
                 }
 
