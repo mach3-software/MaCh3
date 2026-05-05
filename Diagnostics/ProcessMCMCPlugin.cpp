@@ -54,9 +54,12 @@ namespace mach3{
       .metavar("CONFIG")
       .required();
     m_parser->add_argument("mcmc-chain")
-      .help("MCMC chain root file.")
-      .metavar("MCMC_CHAIN")
-      .nargs(1, 3)
+      .help("MCMC chain root files and titles.\n"
+            "single chain mode: MCMC_CHAIN1\n"
+            "two chain mode   : MCMC_CHAIN1 TITLE1 MCMC_CHAIN2 TITLE2\n"
+            "three chain mode : MCMC_CHAIN1 TITLE1 MCMC_CHAIN2 TITLE2 MCMC_CHAIN3 TITLE3")
+      .metavar("MCMC_CHAIN1 [TITLE1 MCMC_CHAIN2 TITLE2 [MCMC_CHAIN3 TITLE3]]")
+      .nargs(1, 6)
       .required();
     return m_parser;
   }
@@ -66,15 +69,16 @@ namespace mach3{
     SetMaCh3LoggerFormat();
     nFiles = 0;
     config = m_parser->get<std::string>("config");
-    auto files = m_parser->get<std::vector<std::string>>("mcmc-chain");
-    // if (argc != 3 && argc !=6 && argc != 8)
-    // {
-    //   MACH3LOG_ERROR("How to use: ");
-    //   MACH3LOG_ERROR("  single chain: {} <Config> <MCMM_ND_Output.root>", m_parser->name());
-    //   MACH3LOG_ERROR("  two chain:    {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2>", m_parser->name());
-    //   MACH3LOG_ERROR("  three chain:  {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2> <MCMC_ND_Output_3.root> <Title 3>", m_parser->name());
-    //   throw MaCh3Exception(__FILE__ , __LINE__ );
-    // }
+    auto mcmc_chain_args = m_parser->get<std::vector<std::string>>("mcmc-chain");
+
+    int nargs = mcmc_chain_args.size();
+    if (nargs != 1 && nargs !=4 && nargs != 6)
+    {
+      MACH3LOG_ERROR("invalid number of arguments: {}", nargs);
+      std::cerr << *m_parser;
+      MACH3LOG_ERROR("invalid number of arguments: {}", nargs);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
 
     YAML::Node card_yaml = M3OpenConfig(config);
     if (!CheckNodeExists(card_yaml, "ProcessMCMC")) {
@@ -82,27 +86,31 @@ namespace mach3{
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    if (files.size() == 1)
+    if (mcmc_chain_args.size() == 1)
     {
       MACH3LOG_INFO("Producing single fit output");
-      std::string filename = files[0];
+      std::string filename = mcmc_chain_args[0];
       this->ProcessMCMC(filename);
     }
     // If we want to compare two or more fits (e.g. binning changes or introducing new params/priors)
-    else if (files.size() > 1)
+    else if (mcmc_chain_args.size() > 1)
     {
-      MACH3LOG_INFO("Producing two fit comparison");
-      FileNames.push_back(files[0]);
-      TitleNames.push_back("ONE"); // todo fix
-
-      FileNames.push_back(files[1]);
-      TitleNames.push_back("TWO");
-      //KS: If there is third file add it
-      if(files.size() == 3)
-      {
-        FileNames.push_back(files[2]);
-        TitleNames.push_back("THREE");
+      for (std::size_t i = 0; i < mcmc_chain_args.size(); i += 2) {
+          FileNames.push_back(mcmc_chain_args[i]);
+          TitleNames.push_back(mcmc_chain_args[i + 1]);
       }
+      // MACH3LOG_INFO("Producing two fit comparison");
+      // FileNames.push_back(files[0]);
+      // TitleNames.push_back("ONE"); // todo fix
+
+      // FileNames.push_back(files[1]);
+      // TitleNames.push_back("TWO");
+      // //KS: If there is third file add it
+      // if(files.size() == 3)
+      // {
+      //   FileNames.push_back(files[2]);
+      //   TitleNames.push_back("THREE");
+      // }
 
       this->MultipleProcessMCMC();
     }
