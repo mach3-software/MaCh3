@@ -11,116 +11,10 @@
 #include "TH1.h"
 #include "TH2.h"
 
+#include "histutils.h"
+
 namespace py = pybind11;
 
-// Helper function to convert TH1 to numpy arrays
-std::tuple<py::array_t<M3::float_t>, py::array_t<M3::float_t>> TH1ToNumpy(std::unique_ptr<TH1>& hist) {
-    if (!hist) {
-        throw std::runtime_error("Histogram pointer is null");
-    }
-    
-    int nbins = hist->GetNbinsX();
-    
-    // Create numpy array for bin contents
-    py::array_t<M3::float_t> contents(nbins);
-    auto contents_buf = contents.request();
-    M3::float_t* contents_ptr = static_cast<M3::float_t*>(contents_buf.ptr);
-    
-    // Create numpy array for bin edges (nbins + 1 edges)
-    py::array_t<M3::float_t> edges(nbins + 1);
-    auto edges_buf = edges.request();
-    M3::float_t* edges_ptr = static_cast<M3::float_t*>(edges_buf.ptr);
-    
-    // Copy bin contents (ROOT bins start at 1, not 0)
-    for (int i = 0; i < nbins; ++i) {
-        contents_ptr[i] = hist->GetBinContent(i + 1);
-    }
-    
-    // Copy bin edges
-    for (int i = 0; i <= nbins; ++i) {
-        edges_ptr[i] = hist->GetBinLowEdge(i + 1);
-    }
-    // Add the upper edge of the last bin
-    edges_ptr[nbins] = hist->GetBinLowEdge(nbins + 1) + hist->GetBinWidth(nbins + 1);
-    
-    return std::make_tuple(contents, edges);
-}
-
-// Helper function to convert TH2 to numpy arrays
-std::tuple<py::array_t<M3::float_t>, py::array_t<M3::float_t>, py::array_t<M3::float_t>> TH2ToNumpy(std::unique_ptr<TH2>& hist) {
-    if (!hist) {
-        throw std::runtime_error("Histogram pointer is null");
-    }
-    
-    int nbinsX = hist->GetNbinsX();
-    int nbinsY = hist->GetNbinsY();
-    
-    // Create 2D numpy array for bin contents (shape: nbinsY x nbinsX to match numpy convention)
-    py::array_t<M3::float_t> contents({nbinsY, nbinsX});
-    auto contents_buf = contents.request();
-    M3::float_t* contents_ptr = static_cast<M3::float_t*>(contents_buf.ptr);
-    
-    // Create numpy arrays for bin edges
-    py::array_t<M3::float_t> edgesX(nbinsX + 1);
-    auto edgesX_buf = edgesX.request();
-    M3::float_t* edgesX_ptr = static_cast<M3::float_t*>(edgesX_buf.ptr);
-    
-    py::array_t<M3::float_t> edgesY(nbinsY + 1);
-    auto edgesY_buf = edgesY.request();
-    M3::float_t* edgesY_ptr = static_cast<M3::float_t*>(edgesY_buf.ptr);
-    
-    // Copy bin contents (ROOT bins start at 1, not 0)
-    // Note: numpy uses row-major order (C-style), so we iterate Y then X
-    for (int iy = 0; iy < nbinsY; ++iy) {
-        for (int ix = 0; ix < nbinsX; ++ix) {
-            contents_ptr[iy * nbinsX + ix] = hist->GetBinContent(ix + 1, iy + 1);
-        }
-    }
-    
-    // Copy X bin edges
-    for (int i = 0; i <= nbinsX; ++i) {
-        edgesX_ptr[i] = hist->GetXaxis()->GetBinLowEdge(i + 1);
-    }
-    edgesX_ptr[nbinsX] = hist->GetXaxis()->GetBinLowEdge(nbinsX + 1) + 
-                         hist->GetXaxis()->GetBinWidth(nbinsX + 1);
-    
-    // Copy Y bin edges
-    for (int i = 0; i <= nbinsY; ++i) {
-        edgesY_ptr[i] = hist->GetYaxis()->GetBinLowEdge(i + 1);
-    }
-    edgesY_ptr[nbinsY] = hist->GetYaxis()->GetBinLowEdge(nbinsY + 1) + 
-                         hist->GetYaxis()->GetBinWidth(nbinsY + 1);
-    
-    return std::make_tuple(contents, edgesX, edgesY);
-}
-
-
-inline py::tuple HistToNumpy(std::unique_ptr<TH1>& hist, int dimension)
-{
-    if (!hist)
-        throw std::runtime_error("Null histogram");
-
-    if (dimension == 1)
-    {
-        auto [c, x] = TH1ToNumpy(hist);
-        py::array_t<M3::float_t> y;
-        return py::make_tuple(c, x, y);
-    }
-
-    if (dimension == 2)
-    {
-        auto h2 = std::unique_ptr<TH2>(static_cast<TH2*>(hist.release()));
-        if (!h2)
-            throw std::runtime_error("Expected TH2");
-
-        auto [c, x, y] = TH2ToNumpy(h2);
-        return py::make_tuple(c, x, y);
-    }
-
-    throw std::invalid_argument("Only 1D or 2D supported");
-}
-
-// Add these bindings to the PySampleHandlerBase class definition:
 
 /// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerInterface : public SampleHandlerInterface {
@@ -482,10 +376,9 @@ void initSamplesModule(py::module &m_samples){
             "get_mc_hist",
             [](SampleHandlerBase &self, const int sample)
             {
-                int Dimension = self.GetNDim(sample);
                 auto hist_original = M3::Clone(self.GetMCHist(sample));
 
-                auto edges = HistToNumpy(hist_original, Dimension);
+                auto edges = HistToNumpy(hist_original);
                 return edges;
             },
 
@@ -574,10 +467,9 @@ void initSamplesModule(py::module &m_samples){
             "get_data_hist",
             [](SampleHandlerBase &self, const int sample)
             {
-                int Dimension = self.GetNDim(sample);
                 auto hist_original = M3::Clone(self.GetDataHist(sample));
 
-                auto edges = HistToNumpy(hist_original, Dimension);
+                auto edges = HistToNumpy(hist_original);
                 return edges;
 
             },
@@ -591,10 +483,9 @@ void initSamplesModule(py::module &m_samples){
             "get_w2_hist",
             [](SampleHandlerBase &self, const int sample)
             {
-                int Dimension = self.GetNDim(sample);
                 auto hist_original = M3::Clone(self.GetW2Hist(sample));
 
-                auto edges = HistToNumpy(hist_original, Dimension);
+                auto edges = HistToNumpy(hist_original);
                 return edges;
             },
 
@@ -623,7 +514,6 @@ void initSamplesModule(py::module &m_samples){
                                              EventSelectionVec,
                                              WeightStyle,
                                              SubEventSelectionVec);
-                    dim = 1;
                 } else{
                     hist = self.Get2DVarHist(iSample, 
                                      ProjectionVarX,
@@ -631,9 +521,8 @@ void initSamplesModule(py::module &m_samples){
                                      EventSelectionVec,
                                      WeightStyle,
                                      SubEventSelectionVec);
-                    dim = 2;
                 }                    
-                return HistToNumpy(hist, dim);
+                return HistToNumpy(hist);
             }
             )
         ; // End of SampleHandler Base
