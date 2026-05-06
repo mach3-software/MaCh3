@@ -630,7 +630,7 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
     }
     // If not empty, set the parameters to the specified
   } else {
-    if (pars.size() != size_t(_fNumPar)) {
+    if (pars.size() != static_cast<size_t>(_fNumPar)) {
       MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
@@ -827,7 +827,7 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-  if (int(stepscale.size()) != _fNumPar)
+  if (static_cast<int>(stepscale.size()) != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
@@ -867,10 +867,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::ResetIndivStepScale() {
 // ********************************************
-  std::vector<double> stepScales(_fNumPar);
-  for (int i = 0; i <_fNumPar; i++) {
-    stepScales[i] = 1.;
-  }
+  std::vector<double> stepScales(_fNumPar, 1.0);
   _fGlobalStepScale = 1.0;
   SetIndivStepScale(stepScales);
 }

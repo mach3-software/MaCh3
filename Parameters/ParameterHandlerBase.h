@@ -83,7 +83,7 @@ class ParameterHandlerBase {
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
-  inline void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
+  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -317,7 +317,7 @@ class ParameterHandlerBase {
   void SetTune(const std::string& TuneName);
 
   /// @brief Get pointer for PCAHandler
-  inline PCAHandler* GetPCAHandler() const {
+  PCAHandler* GetPCAHandler() const {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -342,7 +342,7 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
                                 const std::vector<std::string>& FancyNames = {});
-protected:
+ protected:
   /// @brief Initialisation of the class using matrix from root file
   void InitFromFile(const std::string& name, const std::string& file);
   /// @brief Initialise vectors with parameters information
