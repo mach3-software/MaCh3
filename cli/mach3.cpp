@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 #include <vector>
 #include "api/plugin.hpp"
 #include "Diagnostics/ProcessMCMCPlugin.hpp"
@@ -9,6 +10,7 @@
 #include "Diagnostics/GetPenaltyTermPlugin.hpp"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 namespace mach3{
     class DynamicPlugin: public IPlugin{
@@ -86,60 +88,61 @@ namespace mach3{
                 std::string path;
 
                 while (std::getline(ss, path, ':')) {
-                    void* handle = dlopen(path.c_str(), RTLD_NOW);
-                    if (!handle) {
-                        std::cerr << "dlopen failed - shared library not loaded: " << dlerror() << "\n";
-                        continue;
-                    }
+                    for (const auto& sofile : this->expand_plugin_path(path)) {
+                        void* handle = dlopen(sofile.c_str(), RTLD_NOW);
+                        if (!handle) {
+                            std::cerr << "dlopen failed - shared library '"<< sofile << "' not loaded: " << dlerror() << "\n";
+                            continue;
+                        }
 
-                    auto create = reinterpret_cast<create_plugin_t>(dlsym(handle, "create_plugin"));
-                    auto destroy = reinterpret_cast<destroy_plugin_t>(dlsym(handle, "destroy_plugin"));
+                        auto create = reinterpret_cast<create_plugin_t>(dlsym(handle, "create_plugin"));
+                        auto destroy = reinterpret_cast<destroy_plugin_t>(dlsym(handle, "destroy_plugin"));
 
-                    if (!create || !destroy) {
-                        std::cerr << "Invalid plugin: " << path << "\n";
-                        dlclose(handle);
-                        continue;
-                    }
+                        if (!create || !destroy) {
+                            std::cerr << "Invalid plugin: " << sofile << "\n";
+                            dlclose(handle);
+                            continue;
+                        }
 
-                    IPlugin* plugin = nullptr;
-                    try{
-                        plugin = create();
-                        if (!plugin){
-                            throw std::runtime_error("null pointer");
+                        IPlugin* plugin = nullptr;
+                        try{
+                            plugin = create();
+                            if (!plugin){
+                                throw std::runtime_error("null pointer");
+                            }
+                        }
+                        catch (...){
+                            std::cerr << "Error instantiating plugin: " << sofile << "\n";
+                            dlclose(handle);
+                            continue;
+                        }
+
+                        MaCh3ArgumentParser* parser = nullptr;
+                        try{
+                            parser = plugin->get_parser();
+                            if (!parser){
+                                throw std::runtime_error("null pointer");
+                            }
+                        }
+                        catch(...){
+                            std::cerr<< "Error retrieving parser" << "\n";
+                            destroy(plugin);
+                            dlclose(handle);
+                            continue;
+                        }
+
+
+                        try{
+                            this->add_subparser(*parser);
+                            m_dynamic_plugin_map[parser] = new DynamicPlugin(handle, plugin, destroy);
+                        }
+                        catch(...){
+                            std::cerr<< "Error finalising loading of plugin." << "\n";
+                            destroy(plugin);
+                            dlclose(handle);
+                            continue;    
                         }
                     }
-                    catch (...){
-                        std::cerr << "Error instantiating plugin: " << path << "\n";
-                        dlclose(handle);
-                        continue;
-                    }
-
-                    MaCh3ArgumentParser* parser = nullptr;
-                    try{
-                        parser = plugin->get_parser();
-                        if (!parser){
-                            throw std::runtime_error("null pointer");
-                        }
-                    }
-                    catch(...){
-                        std::cerr<< "Error retrieving parser" << "\n";
-                        destroy(plugin);
-                        dlclose(handle);
-                        continue;
-                    }
-
-
-                    try{
-                        this->add_subparser(*parser);
-                        m_dynamic_plugin_map[parser] = new DynamicPlugin(handle, plugin, destroy);
-                    }
-                    catch(...){
-                        std::cerr<< "Error finalising loading of plugin." << "\n";
-                        destroy(plugin);
-                        dlclose(handle);
-                        continue;    
-                    }
-
                 }
             }
 
@@ -165,6 +168,36 @@ namespace mach3{
                     }
                 }
                 return 0;        
+            }
+
+        private:
+            std::vector<std::string> expand_plugin_path(const std::string& path) const {
+                std::vector<std::string> result;
+
+                fs::path p(path);
+
+                if (!fs::exists(p)) {
+                    std::cerr << "Plugin path does not exist: " << path << "\n";
+                    return result;
+                }
+
+                if (fs::is_regular_file(p)) {
+                    // Single .so file
+                    result.push_back(path);
+                }
+                else if (fs::is_directory(p)) {
+                    // Load all .so files in directory
+                    for (auto& entry : fs::directory_iterator(p)) {
+                        if (entry.is_regular_file() && entry.path().extension() == ".so") {
+                            result.push_back(entry.path().string());
+                        }
+                    }
+                }
+                else {
+                    std::cerr << "Invalid plugin path (not file or directory): " << path << "\n";
+                }
+
+                return result;
             }
 
         private:

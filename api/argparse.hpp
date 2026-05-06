@@ -17,7 +17,7 @@ namespace mach3 {
                 return this->m_subparsers;
             }
 
-            const MaCh3ArgumentParser& get_subcommand_used(){
+            const MaCh3ArgumentParser& get_subcommand_used() const{
                 for (const std::reference_wrapper<ArgumentParser>& subparser : this->m_subparsers) {
                     if (this->is_subcommand_used(subparser.get())) {
                         return static_cast<MaCh3ArgumentParser*>(&(subparser.get()))->get_subcommand_used();
