@@ -54,6 +54,7 @@ class FitterBase {
   void RunLLHMap();
 
   /// @brief LLH scan is good first estimate of step scale
+  /// @param filename by default empty, however if specified it will allow to load LLH scan from external file
   void GetStepScaleBasedOnLLHScan(const std::string& filename = "");
 
   /// @brief Perform a 2D likelihood scan.
@@ -68,7 +69,7 @@ class FitterBase {
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
-  inline std::string GetName() const {return AlgorithmName;};
+  std::string GetName() const {return AlgorithmName;};
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
