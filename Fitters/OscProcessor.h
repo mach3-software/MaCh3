@@ -25,6 +25,10 @@ class OscProcessor : public MCMCProcessor {
     /// @note based on makePiePlot.C
     void MakePiePlot();
 
+    /// @brief MP: Produce unitarity triangles from PMNS matrix elements
+    /// @author Marvin Pfaff
+    /// @note Based on makePMNSelements.C
+    void ProduceUnitarityTriangles();
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
     /// Here we allow Jarlskog Shenanigans
@@ -52,6 +56,10 @@ class OscProcessor : public MCMCProcessor {
     double SamplePriorForParam(const int paramIndex,
                                const std::unique_ptr<TRandom3>& randGen,
                                const std::vector<double>& FlatBounds) const;
+    /// @brief Extract 1D reactor constraint information from an MCMC file.
+    /// @param Sin13_NewPrior Pair containing the prior mean and uncertainty.
+    /// @param DoReweight Set to true if a valid reweighting configuration is found.
+    void Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_NewPrior, bool& DoReweight) const;
 
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
