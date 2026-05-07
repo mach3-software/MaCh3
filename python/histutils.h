@@ -56,5 +56,5 @@ inline py::tuple HistToNumpy(std::unique_ptr<TH1>& hist)
         throw std::runtime_error("TH2Poly is not supported for conversion to numpy arrays");
     }
 
-    return py::make_tuple(THNToNumpy(hist));
+    return THNToNumpy(hist);
 }
