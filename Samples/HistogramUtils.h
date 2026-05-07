@@ -135,6 +135,15 @@ double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
 /// @param name    Name of the output TH1D.
 std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra, const std::string& name);
 
+/// @brief Builds a single dimension's bin edges from YAML::Node
+/// @param bin_edges_node Yaml node containing binning
+/// @param found_range_specifier Whether or not a range specifier (linspace/logspace) was found
+std::vector<double> BuildBinEdgesFromNode(YAML::Node const &bin_edges_node, bool &found_range_specifier);
+
+/// @brief Converts a range (linspace/logspace) to a std::vector<double>
+/// @param bin_edges_node Yaml node containing binning
+std::vector<double> BinRangeToBinEdges(YAML::Node const &bin_range);
+
 namespace M3 {
 /// @brief KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.
 ///

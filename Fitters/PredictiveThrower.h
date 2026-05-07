@@ -30,10 +30,8 @@ struct PredictiveSample {
 /// @author Patrick Dunne
 /// @author Clarence Wret
 
-/// @todo add BIC, DIC, WAIC
-/// @todo add Rate $p$-value
 /// @todo add plots by mode
-/// @todo Post Pred LLH
+/// @todo add mode correlations
 /// @todo unify code with SampleSummary
 class PredictiveThrower : public FitterBase {
  public:
@@ -177,6 +175,10 @@ class PredictiveThrower : public FitterBase {
                      const std::vector<TDirectory*>& SampleDir,
                      const std::string Title);
 
+  /// @brief Study Prior/Posterior correlations between samples etc.
+  void StudyCorrelations(TDirectory* PredictiveDir,
+                         const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                         const bool DebugHistograms) const;
 
   /// @brief Information Criterion
   void StudyInformationCriterion(M3::kInfCrit Criterion,

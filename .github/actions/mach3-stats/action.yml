@@ -1,0 +1,75 @@
+name: "Repo Stats Collector"
+description: "Collect git + PR stats for a given repository with prefixed outputs"
+
+inputs:
+  repository:
+    required: true
+  prefix:
+    required: true
+  token:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        repository: ${{ inputs.repository }}
+        fetch-depth: 0
+        path: ${{ inputs.prefix }}
+
+    - name: Git stats
+      shell: bash
+      run: |
+        cd "${{ inputs.prefix }}"
+        PREFIX="${{ inputs.prefix }}"
+
+        echo "${PREFIX}_commit_count=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
+        echo "${PREFIX}_commits_last_week=$(git rev-list --count --since='1 week ago' HEAD)" >> "$GITHUB_ENV"
+
+        latest_tag=$(git describe --tags --abbrev=0)
+        echo "${PREFIX}_latest_tag=${latest_tag}" >> "$GITHUB_ENV"
+
+        most_active_author=$(git log --since='1 week ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
+
+        echo "${PREFIX}_most_active_author=${most_active_author}" >> "$GITHUB_ENV"
+
+        COUNT=$(echo "$most_active_author" | awk '{print $1}')
+        NAME=$(echo "$most_active_author" | awk '{$1=""; sub(/^ /, ""); print}')
+
+        echo "${PREFIX}_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
+        echo "${PREFIX}_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
+
+    - name: Setup GitHub CLI auth
+      shell: bash
+      run: echo "${{ inputs.token }}" | gh auth login --with-token
+
+    - name: PR stats
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        cd "${{ inputs.prefix }}"
+        PREFIX="${{ inputs.prefix }}"
+        REPO="${{ inputs.repository }}"
+
+        number_of_PR=$(gh search prs \
+          --repo "$REPO" \
+          --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+          --limit 1000 --json number | jq '. | length')
+
+        echo "${PREFIX}_number_of_PR=${number_of_PR}" >> "$GITHUB_ENV"
+
+        most_active_pr_author=$(gh search prs \
+          --repo "$REPO" \
+          --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+          --limit 1000 --json author \
+          | jq -r '.[] | .author.login' \
+          | sort | uniq -c | sort -nr | head -n 1)
+
+        COUNT=$(echo "$most_active_pr_author" | awk '{print $1}')
+        NAME=$(echo "$most_active_pr_author" | awk '{$1=""; sub(/^ /, ""); print}')
+
+        echo "${PREFIX}_most_active_pr_author_count=${COUNT}" >> "$GITHUB_ENV"
+        echo "${PREFIX}_most_active_pr_author_name=${NAME}" >> "$GITHUB_ENV"
