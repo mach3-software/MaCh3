@@ -37,6 +37,10 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Kamil Skwarczynski
 namespace mach3{
 
+  GetPenaltyTermPlugin::~GetPenaltyTermPlugin(){
+    if (this->m_parser) { delete this->m_parser; } 
+  }
+
   MaCh3ArgumentParser* GetPenaltyTermPlugin::get_parser(){
     m_parser = new MaCh3ArgumentParser("penterm", "1.0", argparse::default_arguments::help);
     m_parser->add_argument("inputfile")

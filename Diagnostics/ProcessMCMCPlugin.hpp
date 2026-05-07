@@ -18,9 +18,7 @@ namespace mach3{
   class ProcessMCMCPlugin: public IPlugin{
 
     public:
-      virtual ~ProcessMCMCPlugin(){
-        if (m_parser) { delete m_parser; } 
-      }
+      virtual ~ProcessMCMCPlugin();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 

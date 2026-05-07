@@ -6,9 +6,7 @@ namespace mach3{
   class DiagMCMCPlugin: public IPlugin{
 
     public:
-      virtual ~DiagMCMCPlugin(){
-        if (m_parser) { delete m_parser; } 
-      }
+      virtual ~DiagMCMCPlugin();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 

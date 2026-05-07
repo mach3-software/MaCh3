@@ -7,9 +7,7 @@ namespace mach3{
   class GetPenaltyTermPlugin: public IPlugin{
 
     public:
-      virtual ~GetPenaltyTermPlugin(){
-        if (m_parser) { delete m_parser; } 
-      }
+      virtual ~GetPenaltyTermPlugin();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 

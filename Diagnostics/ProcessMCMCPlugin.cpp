@@ -16,6 +16,10 @@
 
 namespace mach3{
 
+  ProcessMCMCPlugin::~ProcessMCMCPlugin(){
+    if (this->m_parser) { delete this->m_parser; } 
+  }
+
   MaCh3ArgumentParser* ProcessMCMCPlugin::get_parser(){
     m_parser = new MaCh3ArgumentParser("process", "1.0", argparse::default_arguments::help);
     m_parser->add_description("Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc.");
