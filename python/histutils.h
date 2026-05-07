@@ -1,5 +1,4 @@
 #pragma once
-/// HW: Histogram utilities for converting ROOT histograms to numpy arrays for use in Python.
 
 #include "TH1.h"
 #include "TH2.h"
@@ -7,10 +6,14 @@
 
 #include <pybind11/numpy.h>
 
+/// @file histutils.h
+/// @brief HW: Histogram utilities for converting ROOT histograms to numpy arrays for use in Python.
+/// @author Henry Wallace
+/// @author Ewan Miller
+
 namespace py = pybind11;
 
 using HistTuple = std::tuple<py::array_t<M3::float_t>, py::array_t<M3::float_t>, py::array_t<M3::float_t>>;
-
 
 void FillEdgesPointer(py::array_t<M3::float_t> edges_buf, TAxis* axis, int nbins) {
     auto edges_ptr = static_cast<M3::float_t*>(edges_buf.request().ptr);
@@ -56,5 +59,5 @@ inline py::tuple HistToNumpy(std::unique_ptr<TH1>& hist)
         throw std::runtime_error("TH2Poly is not supported for conversion to numpy arrays");
     }
 
-    return THNToNumpy(hist);
+    return py::cast(THNToNumpy(hist));
 }
