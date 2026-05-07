@@ -12,6 +12,10 @@
 // }
 
 namespace mach3{
+  
+  DiagMCMCPlugin::~DiagMCMCPlugin(){
+    if (this->m_parser) { delete this->m_parser; } 
+  }
 
   MaCh3ArgumentParser* DiagMCMCPlugin::get_parser(){
     m_parser = new MaCh3ArgumentParser("diag", "1.0", argparse::default_arguments::help);
