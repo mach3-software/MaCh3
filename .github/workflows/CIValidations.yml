@@ -40,7 +40,11 @@ jobs:
           - name: Fitter Validations
             test: MaCh3CLI --FitterValidations
             compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
-
+          
+          - name: NuDock Validations
+            test: MaCh3CLI --NuDockValidations
+            compilation_flags: -DMaCh3Tutorial_NUDOCK_ENABLED=ON
+    
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
