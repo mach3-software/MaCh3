@@ -156,6 +156,12 @@ double GetIQR(TH1D *Hist);
 
 /// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
 ///
+/// @param Data Vector of data entries.
+/// @param MC Vector of MC entries.
+/// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
+double ComputeKLDivergence(const std::vector<double>& Data, const std::vector<double>& MC);
+/// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
+///
 /// @param DataPoly Pointer to the data histogram (TH2Poly).
 /// @param PolyMC Pointer to the Monte Carlo histogram (TH2Poly).
 /// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.

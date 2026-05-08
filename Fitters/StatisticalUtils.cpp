@@ -1,5 +1,6 @@
 //MaCh3 includes
 #include "Fitters/StatisticalUtils.h"
+#include <numeric>
 
 // **************************
 std::string GetJeffreysScale(const double BayesFactor){
@@ -460,20 +461,37 @@ double GetIQR(TH1D *Hist) {
 }
 
 // ********************
-double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
-// *********************
+double ComputeKLDivergence(const std::vector<double>& Data,
+                           const std::vector<double>& MC) {
+// ********************
   double klDivergence = 0.0;
-  double DataIntegral = NoOverflowIntegral(DataPoly);
-  double MCIntegral = NoOverflowIntegral(PolyMC);
-  for (int i = 1; i < DataPoly->GetNumberOfBins()+1; ++i)
+  double DataIntegral = std::accumulate(Data.begin(), Data.end(), 0.0);
+  double MCIntegral   = std::accumulate(MC.begin(), MC.end(), 0.0);
+  for (size_t i = 0; i < Data.size(); ++i)
   {
-    if (DataPoly->GetBinContent(i) > 0 && PolyMC->GetBinContent(i) > 0) {
-      klDivergence += DataPoly->GetBinContent(i) / DataIntegral *
-      std::log((DataPoly->GetBinContent(i) / DataIntegral) / ( PolyMC->GetBinContent(i) / MCIntegral));
+    if (Data[i] > 0 && MC[i] > 0) {
+      klDivergence += Data[i] / DataIntegral *
+                      std::log((Data[i] / DataIntegral) / ( MC[i] / MCIntegral));
     }
   }
   return klDivergence;
 }
+
+// ********************
+double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
+// *********************
+  int nBins = DataPoly->GetNumberOfBins();
+  std::vector<double> Data(nBins);
+  std::vector<double> MC(nBins);
+
+  for (int i = 0; i < nBins; ++i) {
+    Data[i] = DataPoly->GetBinContent(i+1);
+    MC[i] = PolyMC->GetBinContent(i+1);
+  }
+
+  return ComputeKLDivergence(Data, MC);
+}
+
 // ********************
 double FisherCombinedPValue(const std::vector<double>& pvalues) {
 // ********************

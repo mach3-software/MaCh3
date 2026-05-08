@@ -63,7 +63,7 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the X axis
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors) {
+TH1D* PolyProjectionX(TObject* poly, const std::string& TempName, const std::vector<double>& xbins, const bool computeErrors) {
 // **************************************************
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), int(xbins.size()-1), &xbins[0]);
 
@@ -131,7 +131,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the Y axis
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
+TH1D* PolyProjectionY(TObject* poly, const std::string& TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
