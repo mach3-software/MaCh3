@@ -2085,7 +2085,7 @@ void SampleHandlerBase::CheckEmptyBins() const {
   }
 
   if(iCounter > 0){
-    MACH3LOG_WARN("Found in total {} ({:.2f}%) empty bins for SampleHandler",
+    MACH3LOG_WARN("Found in total {} ({:.2f}%) empty bins for SampleHandler {}",
                   iCounter, 100.0 * static_cast<double>(iCounter) / TotalBins, GetName());
   }
 }
