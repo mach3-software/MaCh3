@@ -766,7 +766,7 @@ void PredictivePlotting(const std::string& ConfigName,
   // Make overlay of violin plots
   OverlayViolin(settings, InputFiles, Samples, Dimensions, canvas);
   // Make By Mode post pred
-  if(Modes.size() != 0) OverlayPredicitveByMode(settings, InputFiles, Samples, Dimensions, Modes, canvas);
+  if(Modes[0].size() != 0) OverlayPredicitveByMode(settings, InputFiles, Samples, Dimensions, Modes, canvas);
   // Get PValue per sample
   PrintPosteriorPValue(settings, InputFiles, Samples);
   // KS: Print Fractional Uncertainties into Latex table format
