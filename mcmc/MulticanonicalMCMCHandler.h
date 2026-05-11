@@ -2,11 +2,18 @@
 
 #include "manager/manager.h"
 #include "covariance/covarianceBase.h"
+#include <string>
 #include <vector>
 #include "TSpline.h"
 
 class MulticanonicalMCMCHandler  {
   public:
+    enum class BiasFunction {
+      Gaussian,
+      VonMises,
+      GeneralisedGaussian
+    };
+
     /// @brief Constructor
     MulticanonicalMCMCHandler();
     /// @brief Destructor
@@ -17,11 +24,13 @@ class MulticanonicalMCMCHandler  {
     void InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics);
 
     /// getters for the multicanonical weights these will take in delta values and return a llh penalty based on the chosen multicanonical method
+    double GetMulticanonicalWeight(double deltacp, double delm23_value);
+
     double GetMulticanonicalWeightSpline(double deltacp, double delm23_value);
-    
-    double GetMulticanonicalWeightSeparate(double deltacp);
 
     double GetMulticanonicalWeightGaussian(double deltacp);
+
+    double GetMulticanonicalWeightTripleGaussian(double deltacp);
 
     double GetMulticanonicalWeightVonMises(double deltacp);
 
@@ -40,6 +49,12 @@ class MulticanonicalMCMCHandler  {
 
     /// multi-canonical separate toggle on/off
     bool multicanonicalSeparate;
+
+    /// selected bias function for non-spline multicanonical weights
+    BiasFunction multicanonicalBiasFunction;
+
+    /// configured bias function name for logging and compatibility
+    std::string multicanonicalBiasFunctionName;
 
     /// multi-canonical spline toggle on/off
     bool multicanonicalSpline;
@@ -63,6 +78,10 @@ class MulticanonicalMCMCHandler  {
     double multicanonicalSeparateMean;
     /// multi-canonical separate sigma
     double multicanonicalSeparateSigma;
+    /// multi-canonical generalised gaussian mean
+    double multicanonicalGenGaussianMean;
+    /// Generalised Gaussian width
+    double multicanonicalGenGaussianWidth;
     /// umbrella number
     int umbrellaNumber;
     /// Toggle for setting umbrella widths based on umbrella overlap
@@ -82,9 +101,4 @@ class MulticanonicalMCMCHandler  {
     double vonMises_kappa;
     /// von Mises I0(kappa) precomputed value
     double vonMises_I0_kappa;
-
-    /// Generalised Gaussian mode toggle
-    bool genGauss_mode;
-    /// Generalised Gaussian width
-    double multicanonicalGenGaussianWidth;
 };

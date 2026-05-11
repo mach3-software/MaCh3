@@ -1,5 +1,20 @@
 #include "mcmc/MulticanonicalMCMCHandler.h"
 #include "covariance/covarianceOsc.h"
+#include <stdexcept>
+
+MulticanonicalMCMCHandler::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
+  if (biasFunctionName == "gaussian") {
+    return MulticanonicalMCMCHandler::BiasFunction::Gaussian;
+  }
+  if (biasFunctionName == "vonMises") {
+    return MulticanonicalMCMCHandler::BiasFunction::VonMises;
+  }
+  if (biasFunctionName == "generalisedGaussian") {
+    return MulticanonicalMCMCHandler::BiasFunction::GeneralisedGaussian;
+  }
+
+  throw std::runtime_error("Unknown multicanonical bias function: " + biasFunctionName);
+}
 
 MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   // Initialize member variables with defaults
@@ -16,6 +31,8 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   dcp_spline_NO = nullptr;
   multicanonicalSeparateMean = 0.0;
   multicanonicalSeparateSigma = 1.0;
+  multicanonicalGenGaussianMean = 0.0;
+  multicanonicalGenGaussianWidth = 0.0;
   umbrellaNumber = 5;
   umbrellaOverlapMode = false;
   umbrellaSigmaOverlap = 3.0;
@@ -26,10 +43,8 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   vonMises_mode = false;
   vonMises_kappa = -1.0;
   vonMises_I0_kappa = -1.0;
-
-  multicanonicalGenGaussianMean = 0.0;
-  multicanonicalGenGaussianWidth = 0.0;
-
+  multicanonicalBiasFunction = BiasFunction::Gaussian;
+  multicanonicalBiasFunctionName = "gaussian";
 }
 
 MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
@@ -79,15 +94,38 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
         throw std::runtime_error("Could not find delm2_23 parameter in osc_cov systematic");
       }
     }
+    const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
+    
+    multicanonicalSpline = GetFromManager<bool>(mcmcConfig["MulticanonicalSpline"],false);
 
-    multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
+    multicanonicalSeparate = GetFromManager<bool>(mcmcConfig["MulticanonicalSeparate"],false);
 
-    multicanonicalSeparate = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparate"],false);
+    const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["MulticanonicalBiasFunction"], "");
+    const bool hasBiasFunction = !biasFunctionName.empty();
 
-    if (multicanonicalSpline && multicanonicalSeparate) {
-      MACH3LOG_ERROR("Cannot use both multicanonical spline and separate method at the same time. Please choose one.");
-      throw std::runtime_error("Cannot use both multicanonical spline and separate method at the same time.");
+    if (multicanonicalSpline && (multicanonicalSeparate || hasBiasFunction)) {
+      MACH3LOG_ERROR("Cannot use multicanonical spline together with umbrella bias function selection.");
+      throw std::runtime_error("Cannot use multicanonical spline together with umbrella bias function selection.");
     }
+
+    if (hasBiasFunction) {
+      multicanonicalBiasFunction = ParseBiasFunction(biasFunctionName);
+      multicanonicalBiasFunctionName = biasFunctionName;
+      multicanonicalSeparate = true;
+    } else if (multicanonicalSeparate) {
+      if (GetFromManager<bool>(mcmcConfig["VonMisesMode"], false)) {
+        multicanonicalBiasFunction = BiasFunction::VonMises;
+        multicanonicalBiasFunctionName = "vonMises";
+      } else if (GetFromManager<bool>(mcmcConfig["MulticanonicalGenGaussian"], false)) {
+        multicanonicalBiasFunction = BiasFunction::GeneralisedGaussian;
+        multicanonicalBiasFunctionName = "genGaussian";
+      } else {
+        multicanonicalBiasFunction = BiasFunction::Gaussian;
+        multicanonicalBiasFunctionName = "gaussian";
+      }
+    }
+
+    MACH3LOG_INFO("Using multicanonical bias function {}", multicanonicalBiasFunctionName);
 
     // setup for spline bias mode
     if (multicanonicalSpline){
@@ -119,8 +157,9 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
 
     } else if (multicanonicalSeparate) { 
       // If we are using the multicanonical method in separate chains, we need to get the separate mean and sigma values
-      MACH3LOG_INFO("Using separate multicanonical method");
-      multicanonicalSeparateMean = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateMean"], -TMath::Pi());
+      MACH3LOG_INFO("Using umbrella multicanonical method");
+      multicanonicalSeparateMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], GetFromManager<double>(mcmcConfig["MulticanonicalSeparateMean"], 0));
+      multicanonicalGenGaussianMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], multicanonicalSeparateMean);
       
       MACH3LOG_INFO("Setting multicanonical mean to {}", multicanonicalSeparateMean);
       umbrellaNumber = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["UmbrellaNumber"], 5);
@@ -132,11 +171,15 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
         umbrellaSigmaOverlap = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaSigmaOverlap"], 3.0);
         MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
         multicanonicalSeparateSigma = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
+        multicanonicalGenGaussianWidth = multicanonicalSeparateSigma;
       } else {
       	// just grab the width directly from the config
-        multicanonicalSeparateSigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateSigma"],(2*TMath::Pi())/umbrellaNumber);
+        multicanonicalSeparateSigma = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalSeparateSigma"], (2*TMath::Pi())/umbrellaNumber));
+        multicanonicalGenGaussianWidth = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalGenGaussianWidth"], multicanonicalSeparateSigma));
         MACH3LOG_INFO("Setting width based on value in config {}", multicanonicalSeparateSigma);
       } 
+
+      multicanonicalSigma = multicanonicalSeparateSigma;
 
       // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
       umbrellaAdjustStepScale = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaAdjustStepScale"], false);
@@ -170,19 +213,24 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     }
 
     // initialize von Mises parameters if needed
-    vonMises_mode = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["VonMisesMode"], false);
-
-    if (vonMises_mode) {
+    if (multicanonicalBiasFunction == BiasFunction::VonMises) {
       double temp_vonMises_sigma;
-
-      temp_vonMises_sigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["VonMisesSigma"], -1.0);
+      temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["VonMisesSigma"], -1.0));
+      multicanonicalSigma = temp_vonMises_sigma;
       vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
       vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
       MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
     }
 
+    if (multicanonicalBiasFunction == BiasFunction::GeneralisedGaussian) {
+      multicanonicalGenGaussianWidth = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalGenGaussianWidth"], multicanonicalSeparateSigma));
+      multicanonicalGenGaussianMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], multicanonicalSeparateMean);
+      multicanonicalSigma = multicanonicalGenGaussianWidth;
+      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", multicanonicalGenGaussianMean, multicanonicalGenGaussianWidth);
+    }
+
     // Get the multicanonical beta value from the configuration file
-    multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
+    multicanonicalBeta = mcmcConfig["MulticanonicalBeta"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 }
 
@@ -216,6 +264,24 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double deltacp
   return -log_vonMises * (multicanonicalBeta);
 }
 
+// this now sorts through the available bias functions in a single function
+double MulticanonicalMCMCHandler::GetMulticanonicalWeight(double deltacp, double delm23){
+  if (multicanonicalSpline) {
+    return GetMulticanonicalWeightSpline(deltacp, delm23);
+  }
+
+  switch (multicanonicalBiasFunction) {
+    case BiasFunction::Gaussian:
+      return GetMulticanonicalWeightGaussian(deltacp);
+    case BiasFunction::VonMises:
+      return GetMulticanonicalWeightVonMises(deltacp);
+    case BiasFunction::GeneralisedGaussian:
+      return GetMulticanonicalWeightGenGaussian(deltacp);
+  }
+
+  return GetMulticanonicalWeightGaussian(deltacp);
+}
+
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, double delm23){
   double dcp_spline_val;
 
@@ -229,13 +295,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
   // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightSeparate(double deltacp){
-  // precalculate constants
-  // TODO::this is ugly, split these out into totally separate paths
-  if (vonMises_mode) {
-    return GetMulticanonicalWeightVonMises(deltacp);
-  }
-
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp){
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   const double neg_half_sigma_sq = -1/(2*multicanonicalSeparateSigma*multicanonicalSeparateSigma); 
   // return the log likelihood, ie the log of the normalised gaussian
@@ -253,13 +313,13 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   // implemenetation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
 
-  double g0 = generalisedGaussian2(deltacp,multicanonicalSeparateMean,multicanonicalGenGaussianWidth);
-  double g1 = generalisedGaussian2(deltacp,multicanonicalSeparateMean - 2*TMath::Pi(),multicanonicalGenGaussianWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
-  double g2 = generalisedGaussian2(deltacp,multicanonicalSeparateMean + 2*TMath::Pi(),multicanonicalGenGaussianWidth); 
+  double g0 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean,multicanonicalGenGaussianWidth);
+  double g1 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean - 2*TMath::Pi(),multicanonicalGenGaussianWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
+  double g2 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean + 2*TMath::Pi(),multicanonicalGenGaussianWidth); 
   return -std::log(g0 + g1 + g2)*(multicanonicalBeta);
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp){ // pretty much deprecated at this point, just here for testing
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightTripleGaussian(double deltacp){ // pretty much deprecated at this point, just here for testing
   // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   double sigma = multicanonicalSigma;

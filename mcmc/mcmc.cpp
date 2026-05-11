@@ -174,16 +174,7 @@ void mcmc::ProposeStep() {
     delta_cp_value = systematics[multicanonicalHandler->oscCovVar]->getParProp(multicanonicalHandler->multicanonicalVar);
     delm23_value = systematics[multicanonicalHandler->oscCovVar]->getParProp(multicanonicalHandler->multicanonicalVar_dm23);
 
-    if (multicanonicalHandler->multicanonicalSpline) {
-      // Get the multicanonical weight from the spline
-      multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightSpline(delta_cp_value, delm23_value);
-    } else if (multicanonicalHandler->multicanonicalSeparate) {
-      // Get the multicanonical weight for a gaussian with the separate mean and sigma
-      multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightSeparate(delta_cp_value);
-    } else {
-      // Get the multicanonical weight from the Gaussian
-      multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeightGaussian(delta_cp_value); // remove, redundant now
-    }
+    multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeight(delta_cp_value, delm23_value);
 
     llh += multicanonical_penalty;
     
