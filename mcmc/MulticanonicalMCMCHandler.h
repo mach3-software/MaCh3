@@ -16,13 +16,19 @@ class MulticanonicalMCMCHandler  {
 
     void InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics);
 
+    /// getters for the multicanonical weights these will take in delta values and return a llh penalty based on the chosen multicanonical method
     double GetMulticanonicalWeightSpline(double deltacp, double delm23_value);
-
+    
     double GetMulticanonicalWeightSeparate(double deltacp);
 
     double GetMulticanonicalWeightGaussian(double deltacp);
 
     double GetMulticanonicalWeightVonMises(double deltacp);
+
+    double GetMulticanonicalWeightGenGaussian(double deltacp);
+
+    /// bias function implementations
+    double generalisedGaussian2(double x, double mean, double width);
 
     /// osc_cov systematic variable we wish to apply multicanonical to
     int oscCovVar;
@@ -77,4 +83,8 @@ class MulticanonicalMCMCHandler  {
     /// von Mises I0(kappa) precomputed value
     double vonMises_I0_kappa;
 
+    /// Generalised Gaussian mode toggle
+    bool genGauss_mode;
+    /// Generalised Gaussian width
+    double multicanonicalGenGaussianWidth;
 };
