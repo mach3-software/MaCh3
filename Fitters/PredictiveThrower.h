@@ -29,10 +29,6 @@ struct PredictiveSample {
 /// @author Kamil Skwarczynski
 /// @author Patrick Dunne
 /// @author Clarence Wret
-
-/// @todo add plots by mode
-/// @todo add mode correlations
-/// @todo unify code with SampleSummary
 class PredictiveThrower : public FitterBase {
  public:
    /// @brief Constructor
