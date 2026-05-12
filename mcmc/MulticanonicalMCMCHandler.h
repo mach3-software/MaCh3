@@ -61,7 +61,6 @@ class MulticanonicalMCMCHandler  {
   protected:
     /// multi-canonical beta
     double multicanonicalBeta;
-    /// multi-canonical sigma (removed; use umbrellaWidth)
     /// osc_cov systematic variable we wish to apply multicanonical to
 
     /// delta_cp parameter value
