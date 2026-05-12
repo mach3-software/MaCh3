@@ -47,164 +47,176 @@ MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
   // Destructor 
 }
 
-void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* fitMan, std::vector<covarianceBase*>& systematics){
+void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<covarianceBase*>& systematics){
+  MACH3LOG_INFO("Looping over systematics to find delta_cp parameter"); 
+  
+  bool foundDeltaCP = false;
+  bool foundDelm23 = false;
+  
+  // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
+  for (size_t s = 0; s < systematics.size(); s++) {
+
+    auto* syst = systematics[static_cast<int>(s)];
+
+    MACH3LOG_INFO("Systematic: {}", syst->getName());
     
-    bool foundDeltaCP = false;
-    bool foundDelm23 = false;
-    
-    MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
-    // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
-    // TODO make this its own grab parameter functions, and use ENUMS instead
-    for (size_t s = 0; s < systematics.size(); s++) {
-      MACH3LOG_INFO("Systematic: {}", systematics[static_cast<int>(s)]->getName());
+    // if we find the covariance object
+    if (syst->getName() == "osc_cov") {
+      oscCovVar = static_cast<int>(s);
+      MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
       
-      // if we find the covariance object
-      if (systematics[static_cast<int>(s)]->getName() == "osc_cov") {
-        oscCovVar = static_cast<int>(s);
-        MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
-        
-	for (int i = 0; i < systematics[static_cast<int>(s)]->GetNumParams(); i++) {
-          MACH3LOG_INFO("Parameter: {}", systematics[static_cast<int>(s)]->GetParName(i));
-          
-	  // check for params of interest
-	  if (systematics[static_cast<int>(s)]->GetParName(i) == "delta_cp") {
-            multicanonicalVar = i;
-            MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
-            foundDeltaCP = true;
-          }
-          if (systematics[static_cast<int>(s)]->GetParName(i) == "delm2_23") {
-            multicanonicalVar_dm23 = i;
-            MACH3LOG_INFO("Setting delm2_23 parameter int {}",i);
-            foundDelm23 = true;
-          }
+      for (int i = 0; i < syst->GetNumParams(); i++) {
+        MACH3LOG_INFO("Parameter: {}", syst->GetParName(i));
+              
+        // check for params of interest
+        if (syst->GetParName(i) == "delta_cp") {
+          multicanonicalVar = i;
+          MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
+          foundDeltaCP = true;
+        }
+        if (syst->GetParName(i) == "delm2_23") {
+          multicanonicalVar_dm23 = i;
+          MACH3LOG_INFO("Setting delm2_23 parameter int {}",i);
+          foundDelm23 = true;
         }
       }
-
-      // if we didn't find both parameters we need throw
-      if (!foundDeltaCP) {
-        MACH3LOG_ERROR("Could not find delta_cp parameter in osc_cov systematic");
-        throw std::runtime_error("Could not find delta_cp parameter in osc_cov systematic");
-      }
-      if (!foundDelm23) {
-        MACH3LOG_ERROR("Could not find delm2_23 parameter in osc_cov systematic");
-        throw std::runtime_error("Could not find delm2_23 parameter in osc_cov systematic");
-      }
     }
-    const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
-    
-    multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"],false);
+  }
 
-    const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaBiasFunction"], "");
-    const bool hasBiasFunction = !biasFunctionName.empty();
+  // if we didn't find both parameters we need to throw
+  if (!foundDeltaCP) {
+    MACH3LOG_ERROR("Could not find delta_cp parameter in osc_cov systematic");
+    throw std::runtime_error("Could not find delta_cp parameter in osc_cov systematic");
+  }
+  if (!foundDelm23) {
+    MACH3LOG_ERROR("Could not find delm2_23 parameter in osc_cov systematic");
+    throw std::runtime_error("Could not find delm2_23 parameter in osc_cov systematic");
+  }
 
-    // Spline and umbrella modes are mutually exclusive
-    if (multicanonicalSpline && hasBiasFunction) {
-      MACH3LOG_ERROR("Cannot use multicanonical spline together with umbrella bias function selection.");
-      throw std::runtime_error("Cannot use multicanonical spline together with umbrella bias function selection.");
-    }
+  return;
+}
 
-    // Umbrella mode requires an explicit bias function selection
-    if (!multicanonicalSpline && !hasBiasFunction) {
-      MACH3LOG_ERROR("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set (gaussian, vonMises, or generalisedGaussian).");
-      throw std::runtime_error("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set.");
-    }
+void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* fitMan, std::vector<covarianceBase*>& systematics){
+  
+  FindOscCovParams(systematics);
+  
+  const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
+  
+  // TODO DR: I realised this will fail if you set spline to true but don't delete the umbrella section, thats not ideal
+  multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"],false);
+  
+  const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaBiasFunction"], "");
+  const bool hasBiasFunction = !biasFunctionName.empty();
 
-    // Parse and set the umbrella bias function
-    if (hasBiasFunction) {
-      umbrellaBiasFunction = ParseBiasFunction(biasFunctionName);
-      umbrellaBiasFunctionName = biasFunctionName;
-    }
+  // Spline and umbrella modes are mutually exclusive
+  if (multicanonicalSpline && hasBiasFunction) {
+    MACH3LOG_ERROR("Cannot use multicanonical spline together with umbrella bias function selection.");
+    throw std::runtime_error("Cannot use multicanonical spline together with umbrella bias function selection.");
+  }
 
+  // Umbrella mode requires an explicit bias function selection
+  if (!multicanonicalSpline && !hasBiasFunction) {
+    MACH3LOG_ERROR("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set (gaussian, vonMises, or generalisedGaussian).");
+    throw std::runtime_error("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set.");
+  }
+
+  // Parse and set the umbrella bias function enum
+  if (hasBiasFunction) {
+    umbrellaBiasFunction = ParseBiasFunction(biasFunctionName);
+    umbrellaBiasFunctionName = biasFunctionName;
     MACH3LOG_INFO("Using umbrella bias function {}", umbrellaBiasFunctionName);
+  }
 
-    // setup for spline bias mode
-    if (multicanonicalSpline){
+  
 
-      std::string splineFile = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"],"nofile");
-      
-      TFile *file = new TFile(splineFile.c_str(), "READ");
-      if (!file || file->IsZombie()) {
-        MACH3LOG_ERROR("Could not open multicanonical spline file: {}", splineFile);
-        throw std::runtime_error("Could not open multicanonical spline file");
-      }
-      
-      // grab the splines and do a quick check that they are evaluatable
-      dcp_spline_IO = static_cast<TSpline3*>(file->Get("dcp_spline_IO"));
-      MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
-      dcp_spline_IO->Eval(0.0); // check that the spline is valid
-      MACH3LOG_INFO("Spline evaluated at 0.0 gives value: {}",dcp_spline_IO->Eval(0.0));
+  // setup for spline bias mode
+  if (multicanonicalSpline){
 
-      dcp_spline_NO = static_cast<TSpline3*>(file->Get("dcp_spline_NO"));
-      MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
-      dcp_spline_NO->Eval(0.0); // check that the spline is valid
-      MACH3LOG_INFO("Spline evaluated at 0.0 gives value {}",dcp_spline_NO->Eval(0.0));
+    std::string splineFile = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"],"nofile");
+    
+    TFile *file = new TFile(splineFile.c_str(), "READ");
+    if (!file || file->IsZombie()) {
+      MACH3LOG_ERROR("Could not open multicanonical spline file: {}", splineFile);
+      throw std::runtime_error("Could not open multicanonical spline file");
+    }
+    
+    // grab the splines and do a quick check that they are evaluatable
+    dcp_spline_IO = static_cast<TSpline3*>(file->Get("dcp_spline_IO"));
+    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+    dcp_spline_IO->Eval(0.0); // check that the spline is valid
+    MACH3LOG_INFO("Spline evaluated at 0.0 gives value: {}",dcp_spline_IO->Eval(0.0));
 
-     } else {
-      // Umbrella mode with explicit bias function selection
-      MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
-      umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
-      MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
-      
-      umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5);
-      
-      // dynamically adjust the width of the gaussians to ensure a certain level of overlap? be careful, not enough windows here will lead to posterior (rather than bias) dominated results
-      umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false);
-      if (umbrellaOverlapMode) {
-        MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
-        umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
-        MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
-        umbrellaWidth = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
-      } else {
-      	// just grab the width directly from the config
-        umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2*TMath::Pi())/umbrellaNumber);
-        MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
-      } 
+    dcp_spline_NO = static_cast<TSpline3*>(file->Get("dcp_spline_NO"));
+    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+    dcp_spline_NO->Eval(0.0); // check that the spline is valid
+    MACH3LOG_INFO("Spline evaluated at 0.0 gives value {}",dcp_spline_NO->Eval(0.0));
 
-      multicanonicalSigma = umbrellaWidth;
+    } else {
+    // Umbrella mode with explicit bias function selection
+    MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
+    umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
+    MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
+    
+    umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5);
+    
+    // dynamically adjust the width of the gaussians to ensure a certain level of overlap? be careful, not enough windows here will lead to posterior (rather than bias) dominated results
+    umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false);
+    if (umbrellaOverlapMode) {
+      MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
+      umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
+      MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
+      umbrellaWidth = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
+    } else {
+      // just grab the width directly from the config
+      umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2*TMath::Pi())/umbrellaNumber);
+      MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
+    } 
 
-      // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
-      umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
-      umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
-      if (umbrellaAdjustStepScale){
-        MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
-        MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
-        double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
-        MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
-        // Set the individual step scale for the multicanonical variable
-        for (auto& syst : systematics) {
-          if (syst->getName() == "osc_cov") {
-            syst->setIndivStepScale(multicanonicalVar, stepScale);
-            MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
-          }
-        }       
-      } else {
-        MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
-      }
+    multicanonicalSigma = umbrellaWidth;
 
-      // Set the flip window flag for the oscillation systematic DO NOT USE THIS 
-      // flipWindow = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"], false);
-      // MACH3LOG_INFO("Flip Window: {}", flipWindow);
-
+    // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
+    umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
+    umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
+    if (umbrellaAdjustStepScale){
+      MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
+      MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
+      double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
+      MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
+      // Set the individual step scale for the multicanonical variable
+      for (auto& syst : systematics) {
+        if (syst->getName() == "osc_cov") {
+          syst->setIndivStepScale(multicanonicalVar, stepScale);
+          MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
+        }
+      }       
+    } else {
+      MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
     }
 
-    // initialize von Mises parameters
-    if (umbrellaBiasFunction == BiasFunction::VonMises) {
-      double temp_vonMises_sigma;
-      temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
-      multicanonicalSigma = temp_vonMises_sigma;
-      vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
-      vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
-      MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
-    }
+    // Set the flip window flag for the oscillation systematic DO NOT USE THIS 
+    // flipWindow = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"], false);
+    // MACH3LOG_INFO("Flip Window: {}", flipWindow);
 
-    if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
-      multicanonicalSigma = umbrellaWidth;
-      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaMean, umbrellaWidth);
-    }
+  }
 
-    // Get the multicanonical beta value from the configuration file
-    multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
-    MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
+  // initialize von Mises parameters
+  if (umbrellaBiasFunction == BiasFunction::VonMises) {
+    double temp_vonMises_sigma;
+    temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
+    multicanonicalSigma = temp_vonMises_sigma;
+    vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
+    vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
+    MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
+  }
+
+  if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+    multicanonicalSigma = umbrellaWidth;
+    MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaMean, umbrellaWidth);
+  }
+
+  // Get the multicanonical beta value from the configuration file
+  multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
+  MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics){
