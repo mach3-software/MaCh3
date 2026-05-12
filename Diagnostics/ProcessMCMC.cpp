@@ -206,6 +206,7 @@ void ProcessMCMC(const std::string& inputFile)
     if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
   }
   if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true))          Processor->PerformJarlskogAnalysis();
+  if(GetFromManager<bool>(Settings["ProducePMNSElements"], true))       Processor->ProducePMNSElements();
   if(GetFromManager<bool>(Settings["ProduceUnitarityTriangles"], true)) Processor->ProduceUnitarityTriangles();
   if(GetFromManager<bool>(Settings["MakePiePlot"], true))               Processor->MakePiePlot();
 }

@@ -3,6 +3,7 @@
 // MaCh3 includes
 #include "Fitters/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+#include "TComplex.h"
 
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
@@ -25,9 +26,14 @@ class OscProcessor : public MCMCProcessor {
     /// @note based on makePiePlot.C
     void MakePiePlot();
 
+    /// @brief MP: Produce PMNS matrix elements
+    /// @author Kevin Wood, Marvin Pfaff, Kamil Skwarczynski
+    /// @note Based on makePMNSelements.C
+    void ProducePMNSElements();
+
     /// @brief MP: Produce unitarity triangles from PMNS matrix elements
     /// @author Marvin Pfaff
-    /// @note Based on makePMNSelements.C
+    /// @note Based on makeUnitarityTriangles.C
     void ProduceUnitarityTriangles();
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
@@ -60,6 +66,11 @@ class OscProcessor : public MCMCProcessor {
     /// @param Sin13_NewPrior Pair containing the prior mean and uncertainty.
     /// @param DoReweight Set to true if a valid reweighting configuration is found.
     void Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_NewPrior, bool& DoReweight) const;
+
+    /// @brief MP: Calculate PMNS matrix elements
+    /// @author Kevin Wood, Marvin Pfaff
+    /// @note Based on makePMNSelements.C
+    std::array<std::array<TComplex, 3>, 3> CalculatePMNSElements(const double s2th13, const double s2th23, const double s2th12, const double dcp) const;
 
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
