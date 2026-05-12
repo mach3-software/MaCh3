@@ -21,7 +21,6 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   oscCovVar = -1;
   multicanonicalVar = -1;
   multicanonicalVar_dm23 = -1;
-  multicanonicalSeparate = false;
   multicanonicalSpline = false;
   multicanonicalBeta = 1.0;
   multicanonicalSigma = 1.0;
@@ -29,10 +28,10 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   delm23_value = 0.0;
   dcp_spline_IO = nullptr;
   dcp_spline_NO = nullptr;
-  multicanonicalSeparateMean = 0.0;
-  multicanonicalSeparateSigma = 1.0;
-  multicanonicalGenGaussianMean = 0.0;
-  multicanonicalGenGaussianWidth = 0.0;
+  umbrellaMean = 0.0;
+  umbrellaWidth = 1.0;
+  umbrellaGenGaussianMean = 0.0;
+  umbrellaGenGaussianWidth = 0.0;
   umbrellaNumber = 5;
   umbrellaOverlapMode = false;
   umbrellaSigmaOverlap = 3.0;
@@ -40,11 +39,10 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   umbrellaStepScaleFactor = 1.0;
   flipWindow = false;
 
-  vonMises_mode = false;
   vonMises_kappa = -1.0;
   vonMises_I0_kappa = -1.0;
-  multicanonicalBiasFunction = BiasFunction::Gaussian;
-  multicanonicalBiasFunctionName = "gaussian";
+  umbrellaBiasFunction = BiasFunction::Gaussian;
+  umbrellaBiasFunctionName = "gaussian";
 }
 
 MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
@@ -96,41 +94,35 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     }
     const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
     
-    multicanonicalSpline = GetFromManager<bool>(mcmcConfig["MulticanonicalSpline"],false);
+    multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"],false);
 
-    multicanonicalSeparate = GetFromManager<bool>(mcmcConfig["MulticanonicalSeparate"],false);
-
-    const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["MulticanonicalBiasFunction"], "");
+    const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaBiasFunction"], "");
     const bool hasBiasFunction = !biasFunctionName.empty();
 
-    if (multicanonicalSpline && (multicanonicalSeparate || hasBiasFunction)) {
+    // Spline and umbrella modes are mutually exclusive
+    if (multicanonicalSpline && hasBiasFunction) {
       MACH3LOG_ERROR("Cannot use multicanonical spline together with umbrella bias function selection.");
       throw std::runtime_error("Cannot use multicanonical spline together with umbrella bias function selection.");
     }
 
-    if (hasBiasFunction) {
-      multicanonicalBiasFunction = ParseBiasFunction(biasFunctionName);
-      multicanonicalBiasFunctionName = biasFunctionName;
-      multicanonicalSeparate = true;
-    } else if (multicanonicalSeparate) {
-      if (GetFromManager<bool>(mcmcConfig["VonMisesMode"], false)) {
-        multicanonicalBiasFunction = BiasFunction::VonMises;
-        multicanonicalBiasFunctionName = "vonMises";
-      } else if (GetFromManager<bool>(mcmcConfig["MulticanonicalGenGaussian"], false)) {
-        multicanonicalBiasFunction = BiasFunction::GeneralisedGaussian;
-        multicanonicalBiasFunctionName = "genGaussian";
-      } else {
-        multicanonicalBiasFunction = BiasFunction::Gaussian;
-        multicanonicalBiasFunctionName = "gaussian";
-      }
+    // Umbrella mode requires an explicit bias function selection
+    if (!multicanonicalSpline && !hasBiasFunction) {
+      MACH3LOG_ERROR("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set (gaussian, vonMises, or generalisedGaussian).");
+      throw std::runtime_error("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set.");
     }
 
-    MACH3LOG_INFO("Using multicanonical bias function {}", multicanonicalBiasFunctionName);
+    // Parse and set the umbrella bias function
+    if (hasBiasFunction) {
+      umbrellaBiasFunction = ParseBiasFunction(biasFunctionName);
+      umbrellaBiasFunctionName = biasFunctionName;
+    }
+
+    MACH3LOG_INFO("Using umbrella bias function {}", umbrellaBiasFunctionName);
 
     // setup for spline bias mode
     if (multicanonicalSpline){
 
-      std::string splineFile = GetFromManager<std::string>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"],"nofile");
+      std::string splineFile = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"],"nofile");
       
       TFile *file = new TFile(splineFile.c_str(), "READ");
       if (!file || file->IsZombie()) {
@@ -149,45 +141,39 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
       dcp_spline_NO->Eval(0.0); // check that the spline is valid
       MACH3LOG_INFO("Spline evaluated at 0.0 gives value {}",dcp_spline_NO->Eval(0.0));
 
-      // // check for empty TSpline
-      // if (dcp_spline == nullptr) {
-      //   MACH3LOG_ERROR("Spline not found in file {}", splineFile);
-      //   throw std::runtime_error("Spline not found in file");
-      // }
-
-    } else if (multicanonicalSeparate) { 
-      // If we are using the multicanonical method in separate chains, we need to get the separate mean and sigma values
-      MACH3LOG_INFO("Using umbrella multicanonical method");
-      multicanonicalSeparateMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], GetFromManager<double>(mcmcConfig["MulticanonicalSeparateMean"], 0));
-      multicanonicalGenGaussianMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], multicanonicalSeparateMean);
+     } else {
+      // Umbrella mode with explicit bias function selection
+      MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
+      umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
+      umbrellaGenGaussianMean = umbrellaMean;
+      MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
       
-      MACH3LOG_INFO("Setting multicanonical mean to {}", multicanonicalSeparateMean);
-      umbrellaNumber = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["UmbrellaNumber"], 5);
+      umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5);
       
       // dynamically adjust the width of the gaussians to ensure a certain level of overlap? be careful, not enough windows here will lead to posterior (rather than bias) dominated results
-      umbrellaOverlapMode = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaOverlapMode"], false);
+      umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false);
       if (umbrellaOverlapMode) {
         MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
-        umbrellaSigmaOverlap = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaSigmaOverlap"], 3.0);
+        umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
         MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
-        multicanonicalSeparateSigma = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
-        multicanonicalGenGaussianWidth = multicanonicalSeparateSigma;
+        umbrellaWidth = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
+        umbrellaGenGaussianWidth = umbrellaWidth;
       } else {
       	// just grab the width directly from the config
-        multicanonicalSeparateSigma = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalSeparateSigma"], (2*TMath::Pi())/umbrellaNumber));
-        multicanonicalGenGaussianWidth = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalGenGaussianWidth"], multicanonicalSeparateSigma));
-        MACH3LOG_INFO("Setting width based on value in config {}", multicanonicalSeparateSigma);
+        umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2*TMath::Pi())/umbrellaNumber);
+        umbrellaGenGaussianWidth = umbrellaWidth;
+        MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
       } 
 
-      multicanonicalSigma = multicanonicalSeparateSigma;
+      multicanonicalSigma = umbrellaWidth;
 
       // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
-      umbrellaAdjustStepScale = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaAdjustStepScale"], false);
-      umbrellaStepScaleFactor = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaStepScaleFactor"], 1.0);
+      umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
+      umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
       if (umbrellaAdjustStepScale){
         MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
         MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
-        double stepScale = (multicanonicalSeparateSigma * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
+        double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
         MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
         // Set the individual step scale for the multicanonical variable
         for (auto& syst : systematics) {
@@ -201,57 +187,52 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
       }
 
       // Set the flip window flag for the oscillation systematic DO NOT USE THIS 
-      // flipWindow = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["FlipWindow"], false);
+      // flipWindow = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"], false);
       // MACH3LOG_INFO("Flip Window: {}", flipWindow);
 
-    } else {
-      // this method is out of date and not much use, remove
-      MACH3LOG_INFO("Using multicanonical Gaussian umbrellas");
-      // Get the multicanonical sigma values from the configuration file
-      multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
-      MACH3LOG_INFO("Setting multicanonical sigma to {}", multicanonicalSigma);
     }
 
-    // initialize von Mises parameters if needed
-    if (multicanonicalBiasFunction == BiasFunction::VonMises) {
+    // initialize von Mises parameters
+    if (umbrellaBiasFunction == BiasFunction::VonMises) {
       double temp_vonMises_sigma;
-      temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["VonMisesSigma"], -1.0));
+      temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
       multicanonicalSigma = temp_vonMises_sigma;
       vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
       vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
       MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
     }
 
-    if (multicanonicalBiasFunction == BiasFunction::GeneralisedGaussian) {
-      multicanonicalGenGaussianWidth = GetFromManager<double>(mcmcConfig["MulticanonicalWidth"], GetFromManager<double>(mcmcConfig["MulticanonicalGenGaussianWidth"], multicanonicalSeparateSigma));
-      multicanonicalGenGaussianMean = GetFromManager<double>(mcmcConfig["MulticanonicalMean"], multicanonicalSeparateMean);
-      multicanonicalSigma = multicanonicalGenGaussianWidth;
-      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", multicanonicalGenGaussianMean, multicanonicalGenGaussianWidth);
+    if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+      umbrellaGenGaussianWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
+      umbrellaGenGaussianMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], umbrellaMean);
+      multicanonicalSigma = umbrellaGenGaussianWidth;
+      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaGenGaussianMean, umbrellaGenGaussianWidth);
     }
 
     // Get the multicanonical beta value from the configuration file
-    multicanonicalBeta = mcmcConfig["MulticanonicalBeta"].as<double>();
+    multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics){
-  if (multicanonicalSeparate){
-  // set the starting point of the chain to the mean value of the multicanonical umbrella
+  // Set starting point of chain to umbrella center for non-spline umbrella modes
+  if (!multicanonicalSpline) {
     for (auto& syst : systematics) {
       if (syst->getName() == "osc_cov") {
         syst->printNominalCurrProp();
-        syst->setParCurrProp(multicanonicalVar, multicanonicalSeparateMean);
-        syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
-        MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
+        syst->setParCurrProp(multicanonicalVar, umbrellaMean);
+        syst->setParProp(multicanonicalVar, umbrellaMean);
+        MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", umbrellaMean);
         // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE
         //if (flipWindow) {
         //  auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
         //  if (oscCov) {
         //    oscCov->setFlipWindow(flipWindow);
-        //    oscCov->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
+        //    oscCov->setMulticanonicalSeparateMean(umbrellaMean);
         //  }
         //}
         syst->printNominalCurrProp();
+        MACH3LOG_INFO("Setting starting point of chain to umbrella center: {}", umbrellaMean);
       }
     }
   }
@@ -259,7 +240,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<covar
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double deltacp){
   // calculate the Log form of the von Mises instead to avoid numerical issues and return directly
-  double log_vonMises = vonMises_kappa * std::cos(deltacp - multicanonicalSeparateMean) - std::log(2 * TMath::Pi() * vonMises_I0_kappa);
+  double log_vonMises = vonMises_kappa * std::cos(deltacp - umbrellaMean) - std::log(2 * TMath::Pi() * vonMises_I0_kappa);
   // return the log likelihood, ie the log of the normalised von Mises
   return -log_vonMises * (multicanonicalBeta);
 }
@@ -270,7 +251,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeight(double deltacp, double
     return GetMulticanonicalWeightSpline(deltacp, delm23);
   }
 
-  switch (multicanonicalBiasFunction) {
+  switch (umbrellaBiasFunction) {
     case BiasFunction::Gaussian:
       return GetMulticanonicalWeightGaussian(deltacp);
     case BiasFunction::VonMises:
@@ -297,9 +278,9 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp){
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
-  const double neg_half_sigma_sq = -1/(2*multicanonicalSeparateSigma*multicanonicalSeparateSigma); 
+  const double neg_half_sigma_sq = -1/(2*umbrellaWidth*umbrellaWidth); 
   // return the log likelihood, ie the log of the normalised gaussian
-  return (-std::log(inv_sqrt_2pi * (1/multicanonicalSeparateSigma) * std::exp(neg_half_sigma_sq * (deltacp - multicanonicalSeparateMean) * (deltacp - multicanonicalSeparateMean))))*(multicanonicalBeta);
+  return (-std::log(inv_sqrt_2pi * (1/umbrellaWidth) * std::exp(neg_half_sigma_sq * (deltacp - umbrellaMean) * (deltacp - umbrellaMean))))*(multicanonicalBeta);
 }
 
 double MulticanonicalMCMCHandler::generalisedGaussian2(double x, double mean, double width){
@@ -313,9 +294,9 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   // implemenetation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
 
-  double g0 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean,multicanonicalGenGaussianWidth);
-  double g1 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean - 2*TMath::Pi(),multicanonicalGenGaussianWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
-  double g2 = generalisedGaussian2(deltacp,multicanonicalGenGaussianMean + 2*TMath::Pi(),multicanonicalGenGaussianWidth); 
+  double g0 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean,umbrellaGenGaussianWidth);
+  double g1 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean - 2*TMath::Pi(),umbrellaGenGaussianWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
+  double g2 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean + 2*TMath::Pi(),umbrellaGenGaussianWidth); 
   return -std::log(g0 + g1 + g2)*(multicanonicalBeta);
 }
 

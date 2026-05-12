@@ -81,7 +81,7 @@ void mcmc::runMCMC() {
 
   // *******************
   // Multicanonical method toggle from spline
-  multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"],false);
+  multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"],false);
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
   if (multicanonical) {

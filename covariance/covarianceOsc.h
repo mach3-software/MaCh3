@@ -18,7 +18,7 @@ class covarianceOsc : public covarianceBase
   /// @brief Sets whether to flip delta M23.
   void setFlipDeltaM23(bool flip){flipdelM = flip;}
   void setFlipWindow(bool flip = false){flipWindow = flip;}
-  void setMulticanonicalSeparateMean(double mean){multicanonicalSeparateMean = mean;MACH3LOG_INFO("Set multicanonical separate mean to: {}, for parameter flipping", multicanonicalSeparateMean);}
+  void setMulticanonicalSeparateMean(double mean){umbrellaMean = mean;MACH3LOG_INFO("Set multicanonical separate mean to: {}, for parameter flipping", umbrellaMean);}
   /// @brief Get pointers to Osc params from Sample name
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
@@ -33,7 +33,7 @@ class covarianceOsc : public covarianceBase
     /// @author Henry Wallace
     void CircularPrior(const int i, const double LowBound, const double UpBound);
     /// @brief Mean value for delta CP in multicanonical separate method
-    double multicanonicalSeparateMean;  
+    double umbrellaMean;  
     bool flipWindow;
     /// Do we flip DeltaM23 or not
     bool flipdelM;

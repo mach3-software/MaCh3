@@ -47,14 +47,11 @@ class MulticanonicalMCMCHandler  {
     int multicanonicalVar_dm23;
 
 
-    /// multi-canonical separate toggle on/off
-    bool multicanonicalSeparate;
-
     /// selected bias function for non-spline multicanonical weights
-    BiasFunction multicanonicalBiasFunction;
+    BiasFunction umbrellaBiasFunction;
 
     /// configured bias function name for logging and compatibility
-    std::string multicanonicalBiasFunctionName;
+    std::string umbrellaBiasFunctionName;
 
     /// multi-canonical spline toggle on/off
     bool multicanonicalSpline;
@@ -74,14 +71,14 @@ class MulticanonicalMCMCHandler  {
     TSpline3 *dcp_spline_IO;
     TSpline3 *dcp_spline_NO;
     
-    /// multi-canonical separate mean
-    double multicanonicalSeparateMean;
-    /// multi-canonical separate sigma
-    double multicanonicalSeparateSigma;
-    /// multi-canonical generalised gaussian mean
-    double multicanonicalGenGaussianMean;
+    /// umbrella mean
+    double umbrellaMean;
+    /// umbrella width
+    double umbrellaWidth;
+    /// umbrella generalised gaussian mean
+    double umbrellaGenGaussianMean;
     /// Generalised Gaussian width
-    double multicanonicalGenGaussianWidth;
+    double umbrellaGenGaussianWidth;
     /// umbrella number
     int umbrellaNumber;
     /// Toggle for setting umbrella widths based on umbrella overlap
@@ -95,8 +92,6 @@ class MulticanonicalMCMCHandler  {
     /// flip window toggle
     bool flipWindow;
 
-    /// von Mises mode toggle
-    bool vonMises_mode;
     /// von Mises kappa parameter
     double vonMises_kappa;
     /// von Mises I0(kappa) precomputed value

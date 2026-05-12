@@ -79,7 +79,8 @@ void covarianceOsc::proposeStep() {
     
   }
   // now octant flip
-  if(random_number[0]->Uniform() < 0.5) {
+  bool flipOctant = false;
+  if(random_number[0]->Uniform() < 0.5 && flipOctant){
     // flip octant around point of maximal disappearance (0.5112)
     // this ensures we move to a parameter value which has the same oscillation probability
     _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
@@ -87,7 +88,7 @@ void covarianceOsc::proposeStep() {
 
   if(random_number[0]->Uniform() < 0.5 && flipWindow){
     // flip delta_cp around mean value
-    _fPropVal[kDeltaCP] = multicanonicalSeparateMean - (_fPropVal[kDeltaCP] - multicanonicalSeparateMean);
+    _fPropVal[kDeltaCP] = umbrellaMean - (_fPropVal[kDeltaCP] - umbrellaMean);
   }
 
 
