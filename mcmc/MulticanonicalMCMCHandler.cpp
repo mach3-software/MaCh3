@@ -127,8 +127,6 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     MACH3LOG_INFO("Using umbrella bias function {}", umbrellaBiasFunctionName);
   }
 
-  
-
   // setup for spline bias mode
   if (multicanonicalSpline){
 
@@ -151,7 +149,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     dcp_spline_NO->Eval(0.0); // check that the spline is valid
     MACH3LOG_INFO("Spline evaluated at 0.0 gives value {}",dcp_spline_NO->Eval(0.0));
 
-    } else {
+  } else {
     // Umbrella mode with explicit bias function selection
     MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
     umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
@@ -161,6 +159,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     
     // dynamically adjust the width of the gaussians to ensure a certain level of overlap? be careful, not enough windows here will lead to posterior (rather than bias) dominated results
     umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false);
+    
     if (umbrellaOverlapMode) {
       MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
       umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
@@ -177,21 +176,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
     umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
     umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
-    if (umbrellaAdjustStepScale){
-      MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
-      MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
-      double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
-      MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
-      // Set the individual step scale for the multicanonical variable
-      for (auto& syst : systematics) {
-        if (syst->getName() == "osc_cov") {
-          syst->setIndivStepScale(multicanonicalVar, stepScale);
-          MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
-        }
-      }       
-    } else {
-      MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
-    }
+    AdjustUmbrellaStepScale(systematics);
 
     // Set the flip window flag for the oscillation systematic DO NOT USE THIS 
     // flipWindow = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"], false);
@@ -217,6 +202,23 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
   // Get the multicanonical beta value from the configuration file
   multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
   MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
+}
+
+void MulticanonicalMCMCHandler::AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics){
+  if (umbrellaAdjustStepScale){
+    MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
+    MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
+    double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
+    MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
+    for (auto& syst : systematics) {
+      if (syst->getName() == "osc_cov") {
+        syst->setIndivStepScale(multicanonicalVar, stepScale);
+        MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
+      }
+    }       
+  } else {
+    MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
+  }
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics){

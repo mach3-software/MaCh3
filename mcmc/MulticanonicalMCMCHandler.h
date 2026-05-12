@@ -20,6 +20,7 @@ class MulticanonicalMCMCHandler  {
     virtual ~MulticanonicalMCMCHandler();
 
     void FindOscCovParams(const std::vector<covarianceBase*>& systematics);
+    void AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics);
     
     void InitializeMulticanonicalHandlerConfig(manager* fitMan, std::vector<covarianceBase*>& systematics);
 
