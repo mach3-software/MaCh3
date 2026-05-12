@@ -23,7 +23,6 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   multicanonicalVar_dm23 = -1;
   multicanonicalSpline = false;
   multicanonicalBeta = 1.0;
-  multicanonicalSigma = 1.0;
   delta_cp_value = 0.0;
   delm23_value = 0.0;
   dcp_spline_IO = nullptr;
@@ -102,6 +101,11 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
   
   const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
   
+  // Get the multicanonical beta value from the configuration file
+  // This acts as a global bias strength factor
+  multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
+  MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
+
   // TODO DR: I realised this will fail if you set spline to true but don't delete the umbrella section, thats not ideal
   multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"],false);
   
@@ -171,11 +175,12 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
       MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
     } 
 
-    multicanonicalSigma = umbrellaWidth;
+
 
     // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
     umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
     umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
+    
     AdjustUmbrellaStepScale(systematics);
 
     // Set the flip window flag for the oscillation systematic DO NOT USE THIS 
@@ -188,20 +193,15 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
   if (umbrellaBiasFunction == BiasFunction::VonMises) {
     double temp_vonMises_sigma;
     temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
-    multicanonicalSigma = temp_vonMises_sigma;
     vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
     vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
     MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
   }
 
   if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
-    multicanonicalSigma = umbrellaWidth;
     MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaMean, umbrellaWidth);
   }
 
-  // Get the multicanonical beta value from the configuration file
-  multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
-  MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 }
 
 void MulticanonicalMCMCHandler::AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics){
@@ -310,7 +310,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightTripleGaussian(double deltacp){ // pretty much deprecated at this point, just here for testing
   // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
-  double sigma = multicanonicalSigma;
+  double sigma = umbrellaWidth;
   const double neg_half_sigma_sq = -1/(2*sigma*sigma);
   // three gaussians centered at -pi, 0, pi with sigma pre-defined above
   double exp1 = std::exp(neg_half_sigma_sq * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
