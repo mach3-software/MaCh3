@@ -30,8 +30,6 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   dcp_spline_NO = nullptr;
   umbrellaMean = 0.0;
   umbrellaWidth = 1.0;
-  umbrellaGenGaussianMean = 0.0;
-  umbrellaGenGaussianWidth = 0.0;
   umbrellaNumber = 5;
   umbrellaOverlapMode = false;
   umbrellaSigmaOverlap = 3.0;
@@ -145,7 +143,6 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
       // Umbrella mode with explicit bias function selection
       MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
       umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
-      umbrellaGenGaussianMean = umbrellaMean;
       MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
       
       umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5);
@@ -157,11 +154,9 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
         umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
         MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
         umbrellaWidth = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
-        umbrellaGenGaussianWidth = umbrellaWidth;
       } else {
       	// just grab the width directly from the config
         umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2*TMath::Pi())/umbrellaNumber);
-        umbrellaGenGaussianWidth = umbrellaWidth;
         MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
       } 
 
@@ -203,10 +198,8 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     }
 
     if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
-      umbrellaGenGaussianWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
-      umbrellaGenGaussianMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], umbrellaMean);
-      multicanonicalSigma = umbrellaGenGaussianWidth;
-      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaGenGaussianMean, umbrellaGenGaussianWidth);
+      multicanonicalSigma = umbrellaWidth;
+      MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaMean, umbrellaWidth);
     }
 
     // Get the multicanonical beta value from the configuration file
@@ -294,9 +287,9 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   // implemenetation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
 
-  double g0 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean,umbrellaGenGaussianWidth);
-  double g1 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean - 2*TMath::Pi(),umbrellaGenGaussianWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
-  double g2 = generalisedGaussian2(deltacp,umbrellaGenGaussianMean + 2*TMath::Pi(),umbrellaGenGaussianWidth); 
+  double g0 = generalisedGaussian2(deltacp,umbrellaMean,umbrellaWidth);
+  double g1 = generalisedGaussian2(deltacp,umbrellaMean - 2*TMath::Pi(),umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
+  double g2 = generalisedGaussian2(deltacp,umbrellaMean + 2*TMath::Pi(),umbrellaWidth); 
   return -std::log(g0 + g1 + g2)*(multicanonicalBeta);
 }
 

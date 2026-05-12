@@ -75,10 +75,6 @@ class MulticanonicalMCMCHandler  {
     double umbrellaMean;
     /// umbrella width
     double umbrellaWidth;
-    /// umbrella generalised gaussian mean
-    double umbrellaGenGaussianMean;
-    /// Generalised Gaussian width
-    double umbrellaGenGaussianWidth;
     /// umbrella number
     int umbrellaNumber;
     /// Toggle for setting umbrella widths based on umbrella overlap
