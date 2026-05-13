@@ -123,8 +123,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 //****************************************
   // Map: iSample → iSyst → modeSuffix → {totalSplines, zeroCount}
   std::map<unsigned int, std::map<unsigned int, std::map<std::string, std::pair<unsigned int, unsigned int>>>> systZeroCounts;
-  for (const auto& entry : IndexVect)
-  {
+  for (const auto& entry : IndexVect) {
     unsigned int iSample = entry.iSample;
     unsigned int iSyst   = entry.iSyst;
 
@@ -192,7 +191,7 @@ void BinnedSplineHandler::TransferToMonolith() {
   }
 
   MACH3LOG_INFO("Now transferring splines to a monolith if size {}", MonolithSize);
-
+  // Maps single spline object with single parameter
   uniquesplinevec_Monolith.resize(MonolithSize);
   weightvec_Monolith.resize(MonolithSize);
   isflatarray = new bool[MonolithSize];
@@ -205,15 +204,18 @@ void BinnedSplineHandler::TransferToMonolith() {
     weightvec_Monolith[splineindex] = 1.0;
 
     bool foundUniqueSpline = false;
+    // We are trying to match Spline Object with single parameter (like MAQE)
     for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
     {
       if (SplineFileParPrefixNames[entry.iSample][entry.iSyst] == UniqueSystNames[iUniqueSyst])
       {
         uniquesplinevec_Monolith[splineindex] = iUniqueSyst;
         foundUniqueSpline = true;
+        break;
       }
-    }//unique syst loop end
+    } //unique syst loop end
 
+    // If current spline object hasn't been matched with actual parameter this means misconfiguration
     if (!foundUniqueSpline)
     {
       MACH3LOG_ERROR("Unique spline index not found");
@@ -446,6 +448,7 @@ int GetSplineIndex(const std::vector<SplineIndex>& vec,
                    const int sample, const int oscchan, const int syst, const int mode,
                    const int var1bin, const int var2bin, const int var3bin) {
 //****************************************
+  /// @todo KS: quoting Dan: I imagine all splines are loaded such that they are sequential in varbins etc. so we could optimise this finding function.
   for (size_t i = 0; i < vec.size(); i++)
   {
     const auto& entry = vec[i];
@@ -549,8 +552,6 @@ void BinnedSplineHandler::PrepForReweight() {
     }
     std::string SystName = SplineFileParPrefixNames[entry.iSample][entry.iSyst];
     bool FoundSyst = false;
-    //ETA - this always seems to be empty to begin with??
-    //so this loop never gets used?
     for (unsigned int iFoundSyst = 0; iFoundSyst < UniqueSystNames.size(); iFoundSyst++) {
       if (SystName == UniqueSystNames[iFoundSyst]) {
         FoundSyst = true;
@@ -602,7 +603,6 @@ void BinnedSplineHandler::PrepForReweight() {
     MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
   }
 
-  //ETA Isn't this just doing what CountNumberOfLoadedSplines() does?
   int nCombinations_FlatSplines = 0;
   int nCombinations_All = 0;
   // DB Now actually loop over splines to determine which are all null i.e. flat
