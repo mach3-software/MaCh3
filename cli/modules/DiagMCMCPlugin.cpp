@@ -1,6 +1,6 @@
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
-#include "Diagnostics/DiagMCMCPlugin.hpp"
+#include "cli/modules/DiagMCMCPlugin.hpp"
 
 // Not needed for Core plugins as not dynamically loaded
 // extern "C" mach3::IPlugin* create_plugin() {
