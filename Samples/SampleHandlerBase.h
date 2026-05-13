@@ -133,11 +133,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
   /// @brief Produce 1D projection into X-variable, for a single MaCh3 mode
-  std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
+  [[deprecated]] std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
   }
   /// @brief Produce 2D projection into X-variable, and Y-variable for a single MaCh3 mode
-  std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
+  [[deprecated]] std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
   }
   /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
