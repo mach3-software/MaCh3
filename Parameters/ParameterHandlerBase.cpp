@@ -595,6 +595,9 @@ int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
   for (int i = 0; i < _fNumPar; ++i) {
+    // KS: Count how many parameters are outside bounds using branchless logic
+    // faster by at least factor two
+    // Do not multithread even with 5k params no gains
     NOutside += (_fPropVal[i] > _fUpBound[i]) | (_fPropVal[i] < _fLowBound[i]);
   }
   return NOutside;
