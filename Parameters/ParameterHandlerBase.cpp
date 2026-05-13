@@ -148,6 +148,13 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
                      _fLowBound.at(Index), _fUpBound.at(Index));
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    // KS: Make sure CircularPrior is applied only to param with flat prior. Sadly doesn't work with Gaussian
+    if(GetFlatPrior(Index) == false) {
+      MACH3LOG_ERROR("Enabled CircularPrior for parameter {}, which has gaussian prior", GetParFancyName(Index));
+      MACH3LOG_ERROR("This is not supported, CircularPrior only works with flat prior");
+      MACH3LOG_ERROR("Change FlatPrior in Parameter config to true");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   if (FlipEnabled) {
