@@ -150,7 +150,7 @@ class PSO : public LikelihoodFit {
     std::vector<bool> fixed;
     std::vector<double> ranges_max;
     std::vector<double> ranges_min;
-    std::vector<particle*> system;
+    std::vector<std::unique_ptr<particle>> system;
     double fInertia;
     double fOne;
     double fTwo;
@@ -160,11 +160,9 @@ class PSO : public LikelihoodFit {
     std::vector<std::vector<double> > uncertainties;
 
     int fParticles;
-    std::vector<double*> paramlist;
+    std::vector<std::vector<double>> paramlist;
     constexpr static const int kMaxParticles = 10000;
     double vel[kMaxParticles];
-    double* par;
-
     int fDim;
 };
 

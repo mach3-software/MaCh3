@@ -229,6 +229,7 @@ void SampleHandlerBase::Initialise() {
   MACH3LOG_INFO("Initialising Data");
   InititialiseData();
   MACH3LOG_INFO("=======================================================");
+  CheckEmptyBins();
 }
 
 // ************************************************
@@ -1767,7 +1768,6 @@ bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) const {
   }
   return false;
 }
-// ===============================================================
 
 // ************************************************
 std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const {
@@ -1871,9 +1871,10 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim(iSample) == 1) {
-      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0),1,i,WeightStyle);
+      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0), SamplePlotType::kOscChannelPlot, i, WeightStyle);
     } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),1,i,WeightStyle));
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),
+                                                                      SamplePlotType::kOscChannelPlot, i, WeightStyle));
     }
   }
 
@@ -1980,6 +1981,22 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 }
 
 // ************************************************
+int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const {
+// ************************************************
+  switch (TypeEnum) {
+    case SamplePlotType::kModePlot:
+      return Modes->GetNModes();
+      break;
+    case SamplePlotType::kOscChannelPlot:
+      return GetNOscChannels(iSample);
+      break;
+    default:
+      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", static_cast<int>(TypeEnum));
+      throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+// ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
                                                                               const int Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
@@ -1989,27 +2006,16 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
   if (THStackLeg != nullptr) {delete THStackLeg;}
   THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
 
-  int iMax = -1;
-  if (Selection1 == FDPlotType::kModePlot) {
-    iMax = Modes->GetNModes();
-  }
-  if (Selection1 == FDPlotType::kOscChannelPlot) {
-    iMax = GetNOscChannels(iSample);
-  }
-  if (iMax == -1) {
-    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  const int iMax = GetRangeForPlotType(static_cast<SamplePlotType>(Selection1), iSample);
   for (int i=0;i<iMax;i++) {
-    if (Selection1 == FDPlotType::kModePlot) {
+    if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle));
       THStackLeg->AddEntry(hHistList[i].get(), (Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
-    if (Selection1 == FDPlotType::kOscChannelPlot) {
+    if (Selection1 == SamplePlotType::kOscChannelPlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,Selection2,i,WeightStyle));
       THStackLeg->AddEntry(hHistList[i].get(),(GetFlavourName(iSample, i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
@@ -2025,23 +2031,12 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 // ************************************************
   std::vector<std::unique_ptr<TH2>> hHistList;
 
-  int iMax = -1;
-  if (Selection1 == FDPlotType::kModePlot) {
-    iMax = Modes->GetNModes();
-  }
-  if (Selection1 == FDPlotType::kOscChannelPlot) {
-    iMax = GetNOscChannels(iSample);
-  }
-  if (iMax == -1) {
-    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  const int iMax = GetRangeForPlotType(static_cast<SamplePlotType>(Selection1), iSample);
   for (int i=0;i<iMax;i++) {
-    if (Selection1 == FDPlotType::kModePlot) {
+    if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle));
     }
-    if (Selection1 == FDPlotType::kOscChannelPlot) {
+    if (Selection1 == SamplePlotType::kOscChannelPlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle));
     }
   }
@@ -2051,7 +2046,7 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                           int Selection1, int Selection2, int WeightStyle) {
+                                                                           const int Selection1, int Selection2, int WeightStyle) {
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
@@ -2068,6 +2063,25 @@ const double* SampleHandlerBase::GetPointerToOscChannel(const int iEvent) const 
   auto& OscillationChannels = SampleDetails[MCEvents[iEvent].NominalSample].OscChannels;
   const int Channel = GetOscChannel(OscillationChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
   return &(OscillationChannels[Channel].ChannelIndex);
+}
+
+// ***************************************************************************
+void SampleHandlerBase::CheckEmptyBins() const {
+// ***************************************************************************
+  const auto TotalBins = Binning->GetNBins();
+  int iCounter = 0;
+  for(int iBin = 0; iBin < TotalBins; iBin++) {
+    if(SampleHandler_array[iBin] == 0) {
+      iCounter++;
+      MACH3LOG_DEBUG("Bin {}, for sample {}, has 0 entries",
+                     Binning->GetBinName(iBin), GetSampleTitle(Binning->GetSampleIndex(iBin)));
+    }
+  }
+
+  if(iCounter > 0){
+    MACH3LOG_WARN("Found in total {} ({:.2f}%) empty bins for SampleHandler: {}",
+                  iCounter, 100.0 * static_cast<double>(iCounter) / TotalBins, GetName());
+  }
 }
 
 // ***************************************************************************

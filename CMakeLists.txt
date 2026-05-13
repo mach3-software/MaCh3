@@ -269,9 +269,9 @@ LIST(APPEND ALL_FEATURES
   GPU
   PYTHON
   LOW_MEMORY_STRUCTS
+  NUDOCK
   Oscillator
   Fitter
-  NUDOCK
   )
 cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})

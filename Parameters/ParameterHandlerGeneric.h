@@ -37,13 +37,13 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param i spline parameter index, not confuse with global index
     SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}
     /// @brief Get the interpolation types for splines affecting a particular SampleName
-    const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName);
+    const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName) const;
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
     std::string GetParSplineName(const int i) const {return SplineParams.at(i)._fSplineNames;}
 
     /// @brief DB Get spline parameters depending on given SampleName
-    const std::vector<int> GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
+    const std::vector<int> GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const;
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     double GetParSplineKnotUpperBound(const int i) const {return SplineParams.at(i)._SplineKnotUpBound;}
@@ -54,23 +54,23 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief DB Grab the number of parameters for the relevant SampleName
     /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type);
+    int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) const;
     /// @brief DB Grab the parameter names for the relevant SampleName
     /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type);
+    const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) const;
     /// @brief DB Grab the parameter indices for the relevant SampleName
     /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type);
+    const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) const;
 
     /// @brief DB Get spline parameters depending on given SampleName
-    const std::vector<std::string> GetSplineParsNamesFromSampleName(const std::string& SampleName);
+    const std::vector<std::string> GetSplineParsNamesFromSampleName(const std::string& SampleName) const;
     /// @brief DB Get spline parameters depending on given SampleName
-    const std::vector<std::string> GetSplineFileParsNamesFromSampleName(const std::string& SampleName);
+    const std::vector<std::string> GetSplineFileParsNamesFromSampleName(const std::string& SampleName) const;
 
     /// @brief DB Grab the Spline Modes for the relevant SampleName
-    const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName);
+    const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName) const;
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
@@ -116,20 +116,13 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
     void SetFreeGroupOnlyParameters(const std::vector<std::string>& Groups);
 
-    /// @brief TN Method to toggle fix/free parameters within a group
-    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
-    void ToggleFixGroupOnlyParameters(const std::string& Group);   
-    /// @brief TN Method to toggle fix/free parameters within given groups
-    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
-    void ToggleFixGroupOnlyParameters(const std::vector<std::string>& Groups);
-
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
 
     /// @brief Get pointers to Osc params from Sample name
-    std::vector<const M3::float_t*> GetOscParsFromSampleName(const std::string& SampleName);
+    std::vector<const M3::float_t*> GetOscParsFromSampleName(const std::string& SampleName) const;
 
   protected:
     /// @brief Initialisation of the class using config
@@ -171,7 +164,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// parameter.
     /// @param SampleName The Sample ID used to filter parameters.
     template <typename FilterFunc, typename ActionFunc>
-    void IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action);
+    void IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) const;
 
     /// @brief Initializes the systematic parameters from the configuration file.
     /// This function loads parameters like normalizations and splines from the provided YAML file.
@@ -185,26 +178,26 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Get Norm params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    NormParameter GetNormParameter(const YAML::Node& param, const int Index);
+    NormParameter GetNormParameter(const YAML::Node& param, const int Index) const;
 
     /// @brief Get Osc params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    OscillationParameter GetOscillationParameters(const YAML::Node& param, const int Index);
+    OscillationParameter GetOscillationParameters(const YAML::Node& param, const int Index) const;
 
     /// @brief Get Func params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
+    FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index) const;
     /// @brief Get Spline params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
-    SplineParameter GetSplineParameter(const YAML::Node& param, const int Index);
+    SplineParameter GetSplineParameter(const YAML::Node& param, const int Index) const;
     /// @brief Fill base parameters
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
     /// @param Parameter Object storing info
-    void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
+    void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) const;
 
     /// @brief Check if parameter is affecting given sample name
     /// @param SystIndex number of parameter

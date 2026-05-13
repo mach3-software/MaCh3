@@ -44,7 +44,6 @@ struct FastSplineInfo {
   const M3::float_t* splineParsPointer;
 };
 
-
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
 inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
