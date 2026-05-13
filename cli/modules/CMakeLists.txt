@@ -3,14 +3,14 @@
 # )
 
 
-add_library(CoreBinaryModules SHARED
+add_library(CLIModules SHARED
     ProcessMCMCPlugin.cpp
     DiagMCMCPlugin.cpp
     GetPenaltyTermPlugin.cpp
 )
 
-target_link_libraries(CoreBinaryModules PRIVATE MaCh3::All)
-target_include_directories(CoreBinaryModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+target_link_libraries(CLIModules PRIVATE MaCh3::All)
+target_include_directories(CLIModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 # set_target_properties(Plugins PROPERTIES
 #     PUBLIC_HEADER "${HEADERS}"
@@ -22,4 +22,4 @@ target_include_directories(CoreBinaryModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BI
 #         LIBRARY DESTINATION lib/
 #         PUBLIC_HEADER DESTINATION include/Plugins)
 
-add_library(MaCh3::CoreBinaryModules ALIAS CoreBinaryModules)
+add_library(MaCh3::CLIModules ALIAS CLIModules)
