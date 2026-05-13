@@ -594,13 +594,8 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:NOutside)
-  #endif
-  for (int i = 0; i < _fNumPar; ++i){
-    if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-      NOutside++;
-    }
+  for (int i = 0; i < _fNumPar; ++i) {
+    NOutside += (_fPropVal[i] > _fUpBound[i]) | (_fPropVal[i] < _fLowBound[i]);
   }
   return NOutside;
 }
