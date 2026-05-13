@@ -27,7 +27,8 @@ class OscProcessor : public MCMCProcessor {
     void MakePiePlot();
 
     /// @brief MP: Produce PMNS matrix elements
-    /// @author Kevin Wood, Marvin Pfaff, Kamil Skwarczynski
+    /// @author Kevin Wood
+    /// @author Marvin Pfaff
     /// @note Based on makePMNSelements.C
     void ProducePMNSElements();
 
@@ -68,7 +69,8 @@ class OscProcessor : public MCMCProcessor {
     void Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_NewPrior, bool& DoReweight) const;
 
     /// @brief MP: Calculate PMNS matrix elements
-    /// @author Kevin Wood, Marvin Pfaff
+    /// @author Kevin Wood
+    /// @author Marvin Pfaff
     /// @note Based on makePMNSelements.C
     std::array<std::array<TComplex, 3>, 3> CalculatePMNSElements(const double s2th13, const double s2th23, const double s2th12, const double dcp) const;
 
