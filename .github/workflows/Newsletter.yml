@@ -9,29 +9,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: MaCh3 stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3
           prefix: mach3
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MaCh3Tutorial stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3Tutorial
           prefix: tutorial
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MaCh3SbiTools stats
-        uses: ./.github/actions/repo-stats
+        uses: ./.github/actions/mach3-stats
         with:
           repository: mach3-software/MaCh3SbiTools
           prefix: sbi
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set date
-        run: echo "current_date=$(date +'%d/%m/%Y')" >> $GITHUB_ENV
+        run: echo "current_date=$(date +'%d/%m/%Y')" >> "$GITHUB_ENV"
 
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x

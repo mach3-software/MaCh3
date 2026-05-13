@@ -124,10 +124,10 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
 
-  std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
+  [[deprecated]] std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
   }
-  std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
+  [[deprecated]] std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
   }
 
@@ -188,6 +188,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetW2Array(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array_w2);
   }
+  /// @brief Loop over bins and checks if there are any which have 0 entries
+  void CheckEmptyBins() const;
 
  protected:
   /// @brief including Dan's magic NuOscillator

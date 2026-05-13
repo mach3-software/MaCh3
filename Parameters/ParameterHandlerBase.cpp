@@ -20,7 +20,7 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
     pca = false;
   }
 
-  Init(name, file);
+  InitFromFile(name, file);
 
   // Call the innocent helper function
   if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
@@ -70,7 +70,7 @@ void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstP
 }
 
 // ********************************************
-void ParameterHandlerBase::Init(const std::string& name, const std::string& file) {
+void ParameterHandlerBase::InitFromFile(const std::string& name, const std::string& file) {
 // ********************************************
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file.c_str(), "READ");
@@ -100,24 +100,10 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
-  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++) {
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++) {
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
+  ReserveMemory(_fNumPar);
   SetName(name);
   MakePosDef(CovMat);
   SetCovMatrix(CovMat);
-  if (_fNumPar <= 0) {
-    MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", GetName(), _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  ReserveMemory(_fNumPar);
 
   infile->Close();
 
@@ -222,6 +208,11 @@ void ParameterHandlerBase::SetCovMatrix(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
+  if (SizeVec <= 0) {
+    MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", GetName(), SizeVec);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
 
@@ -242,6 +233,16 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   for(int i = 0; i < SizeVec; i++) {
     corr_throw[i] = 0.0;
     randParams[i] = 0.0;
+  }
+
+  InvertCovMatrix.resize(SizeVec, std::vector<double>(SizeVec, 0.0));
+  throwMatrixCholDecomp = new double*[SizeVec]();
+  // Set the defaults to true
+  for(int i = 0; i < SizeVec; i++) {
+    throwMatrixCholDecomp[i] = new double[SizeVec]();
+    for (int j = 0; j < SizeVec; j++) {
+      throwMatrixCholDecomp[i][j] = 0.;
+    }
   }
 
   _fGlobalStepScale = 1.0;
@@ -629,7 +630,7 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
     }
     // If not empty, set the parameters to the specified
   } else {
-    if (pars.size() != size_t(_fNumPar)) {
+    if (pars.size() != static_cast<size_t>(_fNumPar)) {
       MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
@@ -826,7 +827,7 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-  if (int(stepscale.size()) != _fNumPar)
+  if (static_cast<int>(stepscale.size()) != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
@@ -866,10 +867,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::ResetIndivStepScale() {
 // ********************************************
-  std::vector<double> stepScales(_fNumPar);
-  for (int i = 0; i <_fNumPar; i++) {
-    stepScales[i] = 1.;
-  }
+  std::vector<double> stepScales(_fNumPar, 1.0);
   _fGlobalStepScale = 1.0;
   SetIndivStepScale(stepScales);
 }
@@ -1149,7 +1147,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 
 // ********************************************
 // KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
-TH2D* ParameterHandlerBase::GetCorrelationMatrix() {
+TH2D* ParameterHandlerBase::GetCorrelationMatrix() const {
 // ********************************************
   TH2D* hMatrix = new TH2D(GetName().c_str(), GetName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
   hMatrix->SetDirectory(nullptr);
