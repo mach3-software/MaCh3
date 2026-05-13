@@ -15,6 +15,6 @@ add_executable(mach3
     # ${CLI_MODULES}
 )
 
-target_link_libraries(mach3 PRIVATE MaCh3::CoreBinaryModules MaCh3::All)
+target_link_libraries(mach3 PRIVATE MaCh3::CLIModules MaCh3::All)
 
 install(TARGETS mach3 DESTINATION bin)

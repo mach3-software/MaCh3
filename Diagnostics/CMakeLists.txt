@@ -48,7 +48,7 @@ foreach(app
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(DiagApps ${app})
-    target_link_libraries(${app} MaCh3::CoreBinaryModules MaCh3::All MaCh3Warnings ROOT::ROOTDataFrame)  # dont need plugins in MaCh3::All at root scope as only used here. Once all transferred to plugins wont need MaCh3::All either
+    target_link_libraries(${app} MaCh3::CLIModules MaCh3::All MaCh3Warnings ROOT::ROOTDataFrame)  # dont need plugins in MaCh3::All at root scope as only used here. Once all transferred to plugins wont need MaCh3::All either
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
