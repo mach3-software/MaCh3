@@ -1,7 +1,7 @@
 //MaCh3 includes
 #include "Fitters/OscProcessor.h"
 #include "Manager/Manager.h"
-#include "Diagnostics/ProcessMCMCPlugin.hpp"
+#include "cli/modules/ProcessMCMCPlugin.hpp"
 
 // Not needed for Core plugins as not dynamically loaded
 // extern "C" mach3::IPlugin* create_plugin() {

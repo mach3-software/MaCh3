@@ -1,5 +1,5 @@
 #include "Manager/MaCh3Logger.h"
-#include "Diagnostics/DiagMCMCPlugin.hpp"
+#include "cli/modules/DiagMCMCPlugin.hpp"
 
 int main(int argc, char const* argv[]){
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");

@@ -1,0 +1,25 @@
+# set(HEADERS
+#     ProcessMCMCPlugin.hpp
+# )
+
+
+add_library(CoreBinaryModules SHARED
+    ProcessMCMCPlugin.cpp
+    DiagMCMCPlugin.cpp
+    GetPenaltyTermPlugin.cpp
+)
+
+target_link_libraries(CoreBinaryModules PRIVATE MaCh3::All)
+target_include_directories(CoreBinaryModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+
+# set_target_properties(Plugins PROPERTIES
+#     PUBLIC_HEADER "${HEADERS}"
+#     EXPORT_NAME Plugins)
+
+
+# install(TARGETS Plugins
+#         EXPORT MaCh3-targets
+#         LIBRARY DESTINATION lib/
+#         PUBLIC_HEADER DESTINATION include/Plugins)
+
+add_library(MaCh3::CoreBinaryModules ALIAS CoreBinaryModules)
