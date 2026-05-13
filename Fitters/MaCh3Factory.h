@@ -92,12 +92,10 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
 
   // Fixed CovObject parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {
-    for (int j = 0; j < CovObject->GetNumParams(); j++) {
-      CovObject->ToggleFixParameter(j);
-    }
+    CovObject->SetFixAllParameters();
   } else {
     for (unsigned int j = 0; j < FixParams.size(); j++) {
-      CovObject->ToggleFixParameter(FixParams.at(j));
+      CovObject->SetFixParameter(FixParams.at(j));
     }
   }
 

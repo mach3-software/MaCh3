@@ -219,7 +219,7 @@ class AdaptiveMCMCHandler
   }
 
   /// @brief Get the current adaption scale
-  double GetAdaptionScale()
+  double GetAdaptionScale() const
   {
     return adaption_scale;
   }

@@ -3,7 +3,7 @@ name: MaCh3 Valgrind
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # Every Monday at midnight
+    - cron: '0 12 * * 1' # KS: Every Monday at 12:00 PM (noon) to not disturb during weekend...
 
 permissions:
   # Required permissions for GitHub Pages deployment and content updates
