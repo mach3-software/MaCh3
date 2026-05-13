@@ -202,6 +202,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetW2Array(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array_w2);
   }
+  /// @brief Loop over bins and checks if there are any which have 0 entries
+  void CheckEmptyBins() const;
 
  protected:
   /// @brief including Dan's magic NuOscillator

@@ -199,14 +199,16 @@ int main(int argc, char *argv[]) {
       TH2D* hprof2d = new TH2D(hName.c_str(), hTitle.c_str(), nx, minx, maxx, ny, miny, maxy);
 
       MACH3LOG_INFO("The 2D histogram has {} x-bins from {} to {} and {} y-bins from {} to {}", nx, minx, maxx, ny, miny, maxy);
-
-      for(int bidx = 1; bidx < hprof2d->GetNbinsX() + 1; ++bidx)
+      const Long64_t nBinsX = static_cast<Long64_t>(hprof2d->GetNbinsX());
+      const Long64_t nBinsY = static_cast<Long64_t>(hprof2d->GetNbinsY());
+      const Long64_t TotalBins = nBinsX * nBinsY;
+      for(int bidx = 1; bidx < nBinsX + 1; ++bidx)
       {
-        for(int bidy = 1; bidy < hprof2d->GetNbinsY() + 1; ++bidy)
+        for(int bidy = 1; bidy < nBinsY + 1; ++bidy)
         {
-          const int count = int(double(hprof2d->GetNbinsX()*hprof2d->GetNbinsY())/double(5));
+          const int count = int(double(TotalBins)/double(5));
           if ( ((bidx-1)*hprof2d->GetNbinsY() + bidy) % count == 0)
-            M3::Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, hprof2d->GetNbinsX()*hprof2d->GetNbinsY());
+            M3::Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, TotalBins);
 
           auto bx_lo = hprof2d->GetXaxis()->GetBinLowEdge(bidx);
           auto bx_hi = bx_lo + hprof2d->GetXaxis()->GetBinWidth(bidx);
