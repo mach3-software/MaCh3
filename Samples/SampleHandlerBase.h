@@ -15,6 +15,11 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLegend.h"
 _MaCh3_Safe_Include_End_ //}
 
+enum SamplePlotType {
+  kModePlot = 0,
+  kOscChannelPlot = 1
+};
+
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
@@ -38,6 +43,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @copydoc SampleHandlerInterface::GetSampleTitle
   std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
   /// @brief Sample name tag used only for getting relevant uncertainties
+  /// @param Sample Index of the sample.
   std::string GetSampleName(const int Sample) const {return SampleDetails[Sample].SampleName;}
   /// @copydoc SampleHandlerInterface::GetKinVarName
   std::string GetKinVarName(const int iSample, const int Dimension) const final;
@@ -108,11 +114,14 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                                     const std::vector< KinematicCut >& EventSelectionVec = {},
                                     int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
+  /// @brief Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc.
+  /// @param Sample Index of the sample.
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
-
+  /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
                           int WeightStyle=0);
+  /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill2DSubEventHist(const int iSample, TH2* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
   /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
@@ -123,20 +132,25 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
-
-  std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
+  /// @brief Produce 1D projection into X-variable, for a single MaCh3 mode
+  [[deprecated]] std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
   }
-  std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
+  /// @brief Produce 2D projection into X-variable, and Y-variable for a single MaCh3 mode
+  [[deprecated]] std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
   }
+  /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
+  /// @param TypeEnum Plot type enumerator see @ref SamplePlotType
+  /// @param iSample Sample enumerator
+  int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
                                                              const int Selection1, const int Selection2 = -1,
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const int Selection1, const int Selection2=-1,
+                                                             const int Selection1, const int Selection2 = -1,
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
                                           const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
@@ -188,6 +202,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetW2Array(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array_w2);
   }
+  /// @brief Loop over bins and checks if there are any which have 0 entries
+  void CheckEmptyBins() const;
 
  protected:
   /// @brief including Dan's magic NuOscillator
@@ -439,9 +455,4 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   /// Mapping from input file names to final neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
-
-  enum FDPlotType {
-    kModePlot = 0,
-    kOscChannelPlot = 1
-  };
 };

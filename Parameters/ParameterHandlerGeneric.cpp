@@ -83,8 +83,7 @@ void ParameterHandlerGeneric::LoadAndMergeYAML(const std::vector<std::string>& Y
         // with PCAHandler, not the first index after the end as is more common
         // throughout computer science...
         ThrowSubMatrixOverrides[{running_num_file_pars,
-          running_num_file_pars + (numrows - 1)}] =
-          std::move(submatrix);
+          running_num_file_pars + (numrows - 1)}] = std::move(submatrix);
 
           // LP: check names by default, but have option to disable check if you
           // know what you're doing
@@ -202,14 +201,6 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   // Set the covariance matrix
   _fNumPar = int(_fYAMLDoc["Systematics"].size());
 
-  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  for(int i = 0; i < _fNumPar; i++) {
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++) {
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
   ReserveMemory(_fNumPar);
 
   int i = 0;
@@ -239,7 +230,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
 
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
-      ToggleFixParameter(_fFancyNames[i]);
+      SetFixParameter(_fFancyNames[i]);
     }
 
     if(param["Systematic"]["SpecialProposal"]) {
@@ -369,7 +360,7 @@ ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 
 // ********************************************
 // DB Grab the Spline Names for the relevant SampleName
-const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) {
+const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -383,7 +374,7 @@ const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSa
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) {
+const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -399,7 +390,7 @@ const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpo
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant SampleName
-const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) {
+const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -416,7 +407,7 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
 
 // ********************************************
 // Get Norm params
-NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
+NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) const {
 // ********************************************
   NormParameter norm;
 
@@ -441,7 +432,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
 
 // ********************************************
 // Get Base Param
-void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) const {
 // ********************************************
   Parameter.name = GetParFancyName(Index);
 
@@ -484,7 +475,7 @@ void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const in
 // ********************************************
 // Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -513,8 +504,8 @@ const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const
 }
 
 // ********************************************
-// Get Norm params
-SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) {
+// Get Spline params
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) const {
 // ********************************************
   SplineParameter Spline;
 
@@ -530,7 +521,7 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
     Spline._SplineInterpolationType = kTSpline3;
   }
 
-  Spline._fSplineNames = SplinePar["SplineName"].as<std::string>();
+  Spline._fSplineNames = Get<std::string>(SplinePar["SplineName"], __FILE__ , __LINE__);
   Spline._SplineKnotUpBound = GetFromManager<double>(SplinePar["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
   Spline._SplineKnotLowBound = GetFromManager<double>(SplinePar["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
 
@@ -585,7 +576,7 @@ bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::st
 
 // ********************************************
 // Get Func params
-FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
+FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) const {
 // ********************************************
   FunctionalParameter func;
   GetBaseParameter(param, Index, func);
@@ -598,7 +589,7 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
 
 // ********************************************
 // Get Osc params
-OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) {
+OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) const {
 // ********************************************
   OscillationParameter OscParamInfo;
   GetBaseParameter(param, Index, OscParamInfo);
@@ -629,7 +620,8 @@ const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSam
 
 // ********************************************
 template<typename ParamT>
-std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap,
+                                                                         const std::vector<ParamT>& params, const std::string& SampleName) const {
 // ********************************************
   std::vector<ParamT> returnVec;
   for (const auto& pair : indexMap) {
@@ -644,7 +636,7 @@ std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const s
 
 // ********************************************
 // DB Grab the number of parameters for the relevant SampleName
-int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) {
+int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   int returnVal = 0;
   IterateOverParams(SampleName,
@@ -656,7 +648,7 @@ int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& Sampl
 
 // ********************************************
 // DB Grab the parameter names for the relevant SampleName
-const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<std::string> returnVec;
   IterateOverParams(SampleName,
@@ -668,7 +660,7 @@ const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleNa
 
 // ********************************************
 // DB DB Grab the parameter indices for the relevant SampleName
-const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   IterateOverParams(SampleName,
@@ -680,7 +672,7 @@ const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
+void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) const {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     if ((AppliesToSample(i, SampleName)) && filter(i)) { // Common filter logic
@@ -1001,22 +993,6 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
 }
 
 // ********************************************
-// Toggle fix/free to parameters of a given group
-void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::string& Group) {
-// ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
-    if(IsParFromGroup(i, Group)) ToggleFixParameter(i);
-}
-
-// ********************************************
-// Toggle fix/free to parameters of several groups
-void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
-// ********************************************
-  for(size_t i = 0; i < Groups.size(); i++)
-    ToggleFixGroupOnlyParameters(Groups[i]); 
-}
-
-// ********************************************
 // Set parameters to be fixed in a given group
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group) {
 // ********************************************
@@ -1074,7 +1050,7 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
+std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector<const M3::float_t*> returnVec;
   for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {

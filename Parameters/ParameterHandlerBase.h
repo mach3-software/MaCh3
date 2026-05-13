@@ -83,7 +83,7 @@ class ParameterHandlerBase {
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
-  inline void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
+  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -182,7 +182,7 @@ class ParameterHandlerBase {
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
   /// @return A pointer to a TH2D object representing the correlation matrix
-  TH2D* GetCorrelationMatrix();
+  TH2D* GetCorrelationMatrix() const;
 
   /// @brief DB Pointer return to param position
   ///
@@ -193,7 +193,7 @@ class ParameterHandlerBase {
   /// push_back then the pointer is no longer valid... maybe need a better
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
-  const M3::float_t* RetPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
+  const M3::float_t* RetPointer(const int iParam) const {return &(_fPropVal.data()[iParam]);}
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()
@@ -317,7 +317,7 @@ class ParameterHandlerBase {
   void SetTune(const std::string& TuneName);
 
   /// @brief Get pointer for PCAHandler
-  inline PCAHandler* GetPCAHandler() const {
+  PCAHandler* GetPCAHandler() const {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -342,9 +342,9 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
                                 const std::vector<std::string>& FancyNames = {});
-protected:
+ protected:
   /// @brief Initialisation of the class using matrix from root file
-  void Init(const std::string& name, const std::string& file);
+  void InitFromFile(const std::string& name, const std::string& file);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
