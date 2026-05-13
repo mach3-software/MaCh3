@@ -7,6 +7,7 @@ FetchContent_MakeAvailable(argparse)
 
 set(HEADERS
     plugin.hpp
+    argparse.hpp
 )
 
 
