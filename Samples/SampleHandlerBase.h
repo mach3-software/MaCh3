@@ -15,6 +15,11 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLegend.h"
 _MaCh3_Safe_Include_End_ //}
 
+enum SamplePlotType {
+  kModePlot = 0,
+  kOscChannelPlot = 1
+};
+
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
@@ -112,7 +117,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc.
   /// @param Sample Index of the sample.
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
-  /// @brief Fill projection histogram by looping over all events, and skipping one which doens't pass specified condition
+  /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
                           int WeightStyle=0);
@@ -136,19 +141,19 @@ class SampleHandlerBase :  public SampleHandlerInterface
     return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
   }
   /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
-  /// @param TypeEnum Plot type enumerator see @ref SampleHandlerBase::SamplePlotType
+  /// @param TypeEnum Plot type enumerator see @ref SamplePlotType
   /// @param iSample Sample enumerator
-  int GetRangeForPlotType(const int TypeEnum, const int iSample) const;
+  int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const int Selection1, const int Selection2=-1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
+                                          const SamplePlotType Selection1, const int Selection2 = -1, const int WeightStyle = 0);
   /// @brief Return the legend used for stacked histograms with sample info
   const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
@@ -448,9 +453,4 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   /// Mapping from input file names to final neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
-
-  enum SamplePlotType {
-    kModePlot = 0,
-    kOscChannelPlot = 1
-  };
 };

@@ -1870,9 +1870,10 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim(iSample) == 1) {
-      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0),1,i,WeightStyle);
+      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0), SamplePlotType::kOscChannelPlot, i, WeightStyle);
     } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),1,i,WeightStyle));
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),
+                                                                      SamplePlotType::kOscChannelPlot, i, WeightStyle));
     }
   }
 
@@ -1979,26 +1980,24 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 }
 
 // ************************************************
-int SampleHandlerBase::GetRangeForPlotType(const int TypeEnum, const int iSample) const {
+int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const {
 // ************************************************
-  int iMax = -1;
   switch (TypeEnum) {
     case SamplePlotType::kModePlot:
-      iMax = Modes->GetNModes();
+      return Modes->GetNModes();
       break;
     case SamplePlotType::kOscChannelPlot:
-      iMax = GetNOscChannels(iSample);
+      return GetNOscChannels(iSample);
       break;
     default:
       MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
       throw MaCh3Exception(__FILE__, __LINE__);
   }
-  return iMax;
 }
 
 // ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                              const int Selection1, const int Selection2, const int WeightStyle) {
+                                                                              const SamplePlotType Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH1>> hHistList;
   std::string legendEntry;
@@ -2026,7 +2025,7 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
 
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                                                              const std::string& KinematicProjectionY, const int Selection1,
+                                                                              const std::string& KinematicProjectionY, const SamplePlotType Selection1,
                                                                               const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH2>> hHistList;
@@ -2046,7 +2045,7 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                           int Selection1, int Selection2, int WeightStyle) {
+                                                                           const SamplePlotType Selection1, int Selection2, int WeightStyle) {
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
