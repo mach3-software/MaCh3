@@ -148,6 +148,13 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
                      _fLowBound.at(Index), _fUpBound.at(Index));
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    // KS: Make sure CircularPrior is applied only to param with flat prior. Sadly doesn't work with Gaussian
+    if(GetFlatPrior(Index) == false) {
+      MACH3LOG_ERROR("Enabled CircularPrior for parameter {}, which has gaussian prior", GetParFancyName(Index));
+      MACH3LOG_ERROR("This is not supported, CircularPrior only works with flat prior");
+      MACH3LOG_ERROR("Change FlatPrior in Parameter config to true");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   if (FlipEnabled) {
@@ -594,13 +601,11 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:NOutside)
-  #endif
-  for (int i = 0; i < _fNumPar; ++i){
-    if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-      NOutside++;
-    }
+  for (int i = 0; i < _fNumPar; ++i) {
+    // KS: Count how many parameters are outside bounds using branchless logic
+    // faster by at least factor two
+    // Do not multithread even with 5k params no gains
+    NOutside += (_fPropVal[i] > _fUpBound[i]) | (_fPropVal[i] < _fLowBound[i]);
   }
   return NOutside;
 }
