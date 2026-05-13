@@ -1991,7 +1991,7 @@ int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const 
       return GetNOscChannels(iSample);
       break;
     default:
-      MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
+      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", TypeEnum);
       throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
