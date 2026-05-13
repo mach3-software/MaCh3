@@ -1991,7 +1991,7 @@ int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const 
       return GetNOscChannels(iSample);
       break;
     default:
-      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", TypeEnum);
+      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", static_cast<int>(TypeEnum));
       throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
