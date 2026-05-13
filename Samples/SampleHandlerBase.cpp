@@ -229,6 +229,7 @@ void SampleHandlerBase::Initialise() {
   MACH3LOG_INFO("Initialising Data");
   InititialiseData();
   MACH3LOG_INFO("=======================================================");
+  CheckEmptyBins();
 }
 
 // ************************************************
@@ -2068,6 +2069,25 @@ const double* SampleHandlerBase::GetPointerToOscChannel(const int iEvent) const 
   auto& OscillationChannels = SampleDetails[MCEvents[iEvent].NominalSample].OscChannels;
   const int Channel = GetOscChannel(OscillationChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
   return &(OscillationChannels[Channel].ChannelIndex);
+}
+
+// ***************************************************************************
+void SampleHandlerBase::CheckEmptyBins() const {
+// ***************************************************************************
+  const auto TotalBins = Binning->GetNBins();
+  int iCounter = 0;
+  for(int iBin = 0; iBin < TotalBins; iBin++) {
+    if(SampleHandler_array[iBin] == 0) {
+      iCounter++;
+      MACH3LOG_DEBUG("Bin {}, for sample {}, has 0 entries",
+                     Binning->GetBinName(iBin), GetSampleTitle(Binning->GetSampleIndex(iBin)));
+    }
+  }
+
+  if(iCounter > 0){
+    MACH3LOG_WARN("Found in total {} ({:.2f}%) empty bins for SampleHandler: {}",
+                  iCounter, 100.0 * static_cast<double>(iCounter) / TotalBins, GetName());
+  }
 }
 
 // ***************************************************************************
