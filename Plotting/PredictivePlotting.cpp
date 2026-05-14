@@ -434,13 +434,13 @@ void OverlayPredicitveByMode(const YAML::Node& Settings,
   auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
   auto RelevantModesName = Get<std::vector<std::string>>(Settings["RelevantModesName"], __FILE__, __LINE__);
   auto RelevantColors = Get<std::vector<Color_t>>(Settings["RelevantModesColors"], __FILE__, __LINE__);
-  int nRelevaneModes = static_cast<int>(RelevantModesName.size());
+  int nRelevantModes = static_cast<int>(RelevantModesName.size());
   const int nFiles = static_cast<int>(InputFiles.size());
   if(Titles.size() < InputFiles.size()){
     MACH3LOG_ERROR("Passed {} files, while only {} titles", InputFiles.size(), Titles.size());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(RelevantModesName.size() < RelevantColors.size()){
+  if(RelevantModesName.size() != RelevantColors.size()) {
     MACH3LOG_ERROR("Colors ({}) doesn't match relevant modes {}", RelevantColors.size(), RelevantModesName.size());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -480,12 +480,12 @@ void OverlayPredicitveByMode(const YAML::Node& Settings,
         }
         int nModes = static_cast<int>(Modes[iSample].size());
         // Simple map to keep track which mode is relevant and which will be added to "Other"
-        std::vector<bool> isRelvantMode(nModes, false);
+        std::vector<bool> isRelevantMode(nModes, false);
         std::vector<Color_t > ColorMap(nModes, DefaultColor);
         for(int iMode = 0; iMode < nModes; iMode++) {
-          for(int iRelevant = 0; iRelevant < nRelevaneModes; iRelevant++) {
+          for(int iRelevant = 0; iRelevant < nRelevantModes; iRelevant++) {
             if(Modes[iSample][iMode] == RelevantModesName[iRelevant]) {
-              isRelvantMode[iMode] = true;
+              isRelevantMode[iMode] = true;
               ColorMap[iMode] = RelevantColors[iRelevant];
             }
           }
@@ -515,7 +515,7 @@ void OverlayPredicitveByMode(const YAML::Node& Settings,
             Sample_MC_Other->SetFillColor(DefaultColor);
             Sample_MC_Other->SetLineColor(DefaultColor);
           }
-          if(!isRelvantMode[iMode]) {
+          if(!isRelevantMode[iMode]) {
             Sample_MC_Other->Add(Sample_MC[iMode].get());
           }
           Sample_MC[iMode]->SetFillColor(ColorMap[iMode]);
@@ -524,7 +524,7 @@ void OverlayPredicitveByMode(const YAML::Node& Settings,
         Sample_Stack->Add(Sample_MC_Other.get());
         // KS: We do this other way around as we want to have most relevant modes first
         for(int iMode = nModes-1; iMode >= 0; iMode--) {
-          if(isRelvantMode[iMode]) Sample_Stack->Add( Sample_MC[iMode].get() );
+          if(isRelevantMode[iMode]) Sample_Stack->Add( Sample_MC[iMode].get() );
         }
         Sample_Stack->Draw("hist");
         Sample_MC_Full->Draw("SAME he");
@@ -541,7 +541,7 @@ void OverlayPredicitveByMode(const YAML::Node& Settings,
         if(Sample_Data) legend.AddEntry(Sample_Data.get(), "Data","ple");
         legend.AddEntry(Sample_MC_Full.get(), Titles[iFile].c_str(),"fple");
         for(int iMode = 0; iMode < nModes; iMode++) {
-          if(isRelvantMode[iMode]) {
+          if(isRelevantMode[iMode]) {
             std::string Label = Form("%s: %.1f%%", Modes[iSample][iMode].c_str(), Integrals[iMode]/FullIntegral*100);
             legend.AddEntry(Sample_MC[iMode].get(), Label.c_str() ,"lf");
           } else{

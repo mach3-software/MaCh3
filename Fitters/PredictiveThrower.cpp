@@ -787,12 +787,14 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
   if(ToyDir == nullptr) {
     ToyDir = outputFile->GetDirectory("Toys_ByMode");
   }
-  /// @todo KS: Here we assume each sample has same modes
+  /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
+  /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
+  /// so we can reuse this functionality
   auto* mode = SampleInfo[0].SamHandler->GetMaCh3Modes();
   auto NModes = mode->GetNModes()+1;
-  // [sample], [toy], [dim], [mode]
+  // [mode], [sample], [toy], [dim]
   std::vector<std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>> ProjectionToys(NModes);
-  for(int iMode = 0; iMode < mode->GetNModes()+1; iMode++) {
+  for(int iMode = 0; iMode < NModes; iMode++) {
     ProjectionToys[iMode].resize(TotalNumberOfSamples);
     for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
       ProjectionToys[iMode][sample].resize(Ntoys);
