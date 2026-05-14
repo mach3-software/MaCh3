@@ -420,6 +420,37 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
+void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
+                                        const int iToy) {
+// *************************
+  int SampleCounter = 0;
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
+  {
+    auto* SampleHandler = samples[iPDF];
+    auto* modes = SampleHandler->GetMaCh3Modes();
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
+    {
+      ByModeDirectory->cd();
+
+      auto SampleName = SampleHandler->GetSampleTitle(iSample);
+      for (int iMode = 0; iMode < modes->GetNModes()+1; ++iMode) {
+        auto ModeName = modes->GetMaCh3ModeName(iMode);
+        for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
+          std::string ProjectionName = SampleHandler->GetKinVarName(iSample, iDim);
+          std::string PlotSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+
+          auto hist = SampleHandler->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          hist->SetTitle((SampleName + PlotSuffix).c_str());
+          hist->SetName((SampleName + PlotSuffix).c_str());
+          hist->Write();
+        } // end loop over dimension
+      } // end loop over mode
+      SampleCounter++;
+    } // end loop over sample
+  } // end loop over sample handler objects
+}
+
+// *************************
 bool CheckBounds(const std::vector<const M3::float_t*>& BoundValuePointer,
                  const std::vector<std::pair<double,double>>& ParamBounds) {
 // *************************
@@ -511,6 +542,10 @@ void PredictiveThrower::ProduceToys() {
 
   TDirectory* Toy_1DDirectory = outputFile->mkdir("Toys_1DHistVar");
   TDirectory* Toy_2DDirectory = outputFile->mkdir("Toys_2DHistVar");
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
+  TDirectory* ByModeDirectory = nullptr;
+  if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
+
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
@@ -613,6 +648,7 @@ void PredictiveThrower::ProduceToys() {
     }
     // Save histograms to file
     WriteToy(ToyDirectory, Toy_1DDirectory, Toy_2DDirectory, i);
+    if(doByMode) WriteByModeToys(ByModeDirectory, i);
 
     // Fill parameter value so we know throw values
     for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
@@ -627,6 +663,10 @@ void PredictiveThrower::ProduceToys() {
   ToyDirectory->Close(); delete ToyDirectory;
   Toy_1DDirectory->Close(); delete Toy_1DDirectory;
   Toy_2DDirectory->Close(); delete Toy_2DDirectory;
+  if(doByMode){
+    ByModeDirectory->Close();
+    delete ByModeDirectory;
+  }
 
   outputFile->cd();
   ToyTree->Write(); delete ToyTree;
@@ -729,9 +769,80 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
 }
 
 // *************************
+void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>& SampleDirectories) const {
+// *************************
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  TDirectory * ogdir = gDirectory;
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+  gErrorIgnoreLevel = originalErrorWarning;
+  TDirectory* ToyDir = file->GetDirectory("Toys_ByMode");
+  // If toys not amiable in posterior file this means they must be in output file
+  if(ToyDir == nullptr) {
+    ToyDir = outputFile->GetDirectory("Toys_ByMode");
+  }
+  /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
+  /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
+  /// so we can reuse this functionality
+  auto* mode = SampleInfo[0].SamHandler->GetMaCh3Modes();
+  auto NModes = mode->GetNModes()+1;
+  // [mode], [sample], [toy], [dim]
+  std::vector<std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>> ProjectionToys(NModes);
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    ProjectionToys[iMode].resize(TotalNumberOfSamples);
+    for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+      ProjectionToys[iMode][sample].resize(Ntoys);
+      const int nDims = SampleInfo[sample].Dimenstion;
+      for (int iToy = 0; iToy < Ntoys; ++iToy) {
+        ProjectionToys[iMode][sample][iToy].resize(nDims);
+      }
+    }
+  }
+
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    if (iToy % 100 == 0) MACH3LOG_INFO("   Loaded Projection toys {}", iToy);
+    for(int iMode = 0; iMode < NModes; iMode++) {
+      auto ModeName = mode->GetMaCh3ModeName(iMode);
+      for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+        const int nDims = SampleInfo[sample].Dimenstion;
+        for(int iDim = 0; iDim < nDims; iDim ++) {
+          std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+          TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleInfo[sample].Name + ProjectionSuffix).c_str()));
+          ProjectionToys[iMode][sample][iToy][iDim] = M3::Clone(MCHist1D);
+        }
+      }
+    } // end loop over samples
+  } // end loop over toys
+
+  // ByMode directory
+  std::vector<TDirectory*> ModeDirectory(TotalNumberOfSamples);
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample] = SampleDirectories[iSample]->mkdir("ByMode");
+  }
+  // Produce By Mode Spectra
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    auto ModeName = mode->GetMaCh3ModeName(iMode);
+    ProduceSpectra(ProjectionToys[iMode], ModeDirectory, ModeName, false);
+  }
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample]->Close();
+    delete ModeDirectory[iSample];
+  }
+  file->Close(); delete file;
+  if(ogdir){ ogdir->cd(); }
+}
+
+// *************************
 void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
                                        const std::vector<TDirectory*>& SampleDirectories,
-                                       const std::string suffix) const {
+                                       const std::string suffix,
+                                       const bool DoSummary) const {
 // *************************
   std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
 
@@ -812,7 +923,7 @@ void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector
     for (long unsigned int dim = 0; dim < Spectra[sample].size(); dim++) {
       Spectra[sample][dim]->Write();
       // For case of 2D make additional histograms
-      if(nDims == 2) {
+      if(nDims == 2 && DoSummary) {
         const std::string name = SampleInfo[sample].Name + "_" + suffix+ "_PostPred_dim" + std::to_string(dim);
         auto Summary = MakeSummaryFromSpectra(Spectra[sample][dim].get(), name);
         Summary->Write();
@@ -1023,6 +1134,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   TempClock.Start();
 
   auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
@@ -1035,6 +1147,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 
   // Produce Violin style spectra
   Study1DProjections(SampleDirectories);
+  // Produce Post pred by each mode individually
+  if(doByMode) StudyByMode1DProjections(SampleDirectories);
   // Produce posterior predictive distribution for mc
   auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
   // Produce posterior predictive distribution for w2
