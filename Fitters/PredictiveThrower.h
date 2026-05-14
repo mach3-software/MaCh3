@@ -29,10 +29,6 @@ struct PredictiveSample {
 /// @author Kamil Skwarczynski
 /// @author Patrick Dunne
 /// @author Clarence Wret
-
-/// @todo add plots by mode
-/// @todo add mode correlations
-/// @todo unify code with SampleSummary
 class PredictiveThrower : public FitterBase {
  public:
    /// @brief Constructor
@@ -68,6 +64,9 @@ class PredictiveThrower : public FitterBase {
   bool LoadToys();
   /// @brief Save histograms for a single MCMC Throw/Toy
   void WriteToy(TDirectory* ToyDirectory, TDirectory* Toy_1DDirectory, TDirectory* Toy_2DDirectory, const int iToy);
+  /// @brief Save mode histograms for a single MCMC Throw/Toy
+  void WriteByModeToys(TDirectory* ByModeDirectory, const int iToy);
+
   /// @brief Setup sample information
   void SetupSampleInformation();
 
@@ -83,10 +82,14 @@ class PredictiveThrower : public FitterBase {
 
   /// @brief Load 1D projections and later produce violin plots for each
   void Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
+  /// @brief Load 1D projections by mode and produce post pred for each
+  void StudyByMode1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
+
   /// @brief Produce Violin style spectra
   void ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
                       const std::vector<TDirectory*>& Director,
-                      const std::string suffix) const;
+                      const std::string suffix,
+                      const bool DoSummary = true) const;
 
   /// @brief Make Poisson fluctuation of TH1D hist
   /// @param FluctHist Histogram to store fluctuated values (must match Hist type)
