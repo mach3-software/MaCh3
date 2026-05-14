@@ -1,6 +1,7 @@
 #include "mcmc/MulticanonicalMCMCHandler.h"
 #include "covariance/covarianceOsc.h"
 #include <stdexcept>
+#include <ostream>
 
 MulticanonicalMCMCHandler::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
   if (biasFunctionName == "gaussian") {
@@ -45,6 +46,13 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
 MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
   // Destructor 
 }
+
+#ifdef DEBUG
+void MulticanonicalMCMCHandler::setDebugStream(std::ostream* os, bool enabled) {
+  debugStream = os;
+  debugEnabled = enabled;
+}
+#endif
 
 void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<covarianceBase*>& systematics){
   MACH3LOG_INFO("Looping over systematics to find delta_cp parameter"); 
@@ -304,6 +312,9 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   double g0 = generalisedGaussian2(deltacp,umbrellaMean,umbrellaWidth);
   double g1 = generalisedGaussian2(deltacp,umbrellaMean - 2*TMath::Pi(),umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
   double g2 = generalisedGaussian2(deltacp,umbrellaMean + 2*TMath::Pi(),umbrellaWidth); 
+    #ifdef DEBUG
+      if (debugStream && debugEnabled) (*debugStream) << " g0: " << g0 << " g1: " << g1 << " g2: " << g2 << std::endl;
+    #endif
   return -std::log(g0 + g1 + g2)*(multicanonicalBeta);
 }
 

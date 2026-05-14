@@ -3,6 +3,7 @@
 #include "manager/manager.h"
 #include "covariance/covarianceBase.h"
 #include <string>
+#include <ostream>
 #include <vector>
 #include "TSpline.h"
 
@@ -18,6 +19,10 @@ class MulticanonicalMCMCHandler  {
     MulticanonicalMCMCHandler();
     /// @brief Destructor
     virtual ~MulticanonicalMCMCHandler();
+
+    #ifdef DEBUG
+    void setDebugStream(std::ostream* os, bool enabled);
+    #endif
 
     void FindOscCovParams(const std::vector<covarianceBase*>& systematics);
     void AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics);
@@ -93,4 +98,9 @@ class MulticanonicalMCMCHandler  {
     double vonMises_kappa;
     /// von Mises I0(kappa) precomputed value
     double vonMises_I0_kappa;
+
+    #ifdef DEBUG
+    std::ostream* debugStream = nullptr;
+    bool debugEnabled = false;
+    #endif
 };

@@ -85,6 +85,9 @@ void mcmc::runMCMC() {
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
   if (multicanonical) {
+    #ifdef DEBUG
+    multicanonicalHandler->setDebugStream(&debugFile, debug);
+    #endif
     multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
   }
 
@@ -175,6 +178,10 @@ void mcmc::ProposeStep() {
     delm23_value = systematics[multicanonicalHandler->oscCovVar]->getParProp(multicanonicalHandler->multicanonicalVar_dm23);
 
     multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeight(delta_cp_value, delm23_value);
+    
+    #ifdef DEBUG
+    if (debug) debugFile << " delta_cp: " << delta_cp_value << " delm23: " << delm23_value << " multicanonical_penalty: " << multicanonical_penalty << std::endl;
+    #endif
 
     llh += multicanonical_penalty;
     
