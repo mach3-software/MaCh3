@@ -3,7 +3,7 @@
 
 using argparse::ArgumentParser;
 
-namespace mach3 {
+namespace M3 {
 
     class MaCh3ArgumentParser: public ArgumentParser{
         public:

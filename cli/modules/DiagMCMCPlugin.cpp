@@ -11,7 +11,7 @@
 //   delete p;
 // }
 
-namespace mach3{
+namespace M3{
   
   DiagMCMCPlugin::~DiagMCMCPlugin(){
     if (this->m_parser) { delete this->m_parser; } 

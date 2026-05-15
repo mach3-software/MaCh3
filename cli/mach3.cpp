@@ -5,11 +5,11 @@
 
 
 int main(int argc, char *argv[]) {
-    mach3::MaCh3Program program;
+    M3::MaCh3Program program;
 
-    mach3::ProcessMCMCPlugin proc;
-    mach3::DiagMCMCPlugin diag;
-    mach3::GetPenaltyTermPlugin penterm;
+    M3::ProcessMCMCPlugin proc;
+    M3::DiagMCMCPlugin diag;
+    M3::GetPenaltyTermPlugin penterm;
 
     program.add_core_plugin(proc);
     program.add_core_plugin(diag);

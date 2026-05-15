@@ -5,7 +5,7 @@ int main(int argc, char const* argv[]){
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
     MACH3LOG_WARN("                   : you can use 'mach3 penterm' as a direct replacement instead.");
     argv[0] = "penterm";
-    mach3::GetPenaltyTermPlugin proc;
+    M3::GetPenaltyTermPlugin proc;
     ArgumentParser* parser = proc.get_parser();
     parser->parse_args(argc, argv);
     proc.run();

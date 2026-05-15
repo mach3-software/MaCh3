@@ -1,7 +1,7 @@
 #pragma once
 #include "api/plugin.hpp"
 
-namespace mach3{
+namespace M3{
 
   class DiagMCMCPlugin: public IPlugin{
 

@@ -14,7 +14,7 @@
 // if was a dynamic plugin, could now use the convienience macro to generate these
 // MACH3_REGISTER_PLUGIN(mach3::ProcessMCMCPlugin)
 
-namespace mach3{
+namespace M3{
 
   ProcessMCMCPlugin::~ProcessMCMCPlugin(){
     if (this->m_parser) { delete this->m_parser; } 
