@@ -2,7 +2,7 @@
 #include <dlfcn.h>
 #include "api/plugin.hpp"
 
-namespace mach3{
+namespace M3{
     class DynamicPlugin: public IPlugin{
         public:
             DynamicPlugin(void* handle,

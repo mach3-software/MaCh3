@@ -6,7 +6,7 @@
 #include "cli/DynamicPlugin.hpp"
 
 
-namespace mach3{
+namespace M3{
 
     class NoArgsException: public std::exception{};
 
