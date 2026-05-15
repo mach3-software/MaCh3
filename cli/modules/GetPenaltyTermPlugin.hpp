@@ -2,7 +2,7 @@
 #include "yaml-cpp/yaml.h"
 #include "api/plugin.hpp"
 
-namespace mach3{
+namespace M3{
 
   class GetPenaltyTermPlugin: public IPlugin{
 

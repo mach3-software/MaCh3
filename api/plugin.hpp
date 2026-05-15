@@ -2,7 +2,7 @@
 #include "api/argparse.hpp"
 
 
-namespace mach3 {
+namespace M3 {
 
     class IPlugin {
         public:
@@ -15,15 +15,15 @@ namespace mach3 {
 
 // Factory function typedefs
 extern "C" {
-    typedef mach3::IPlugin* (*create_plugin_t)();
-    typedef void (*destroy_plugin_t)(mach3::IPlugin*);
+    typedef M3::IPlugin* (*create_plugin_t)();
+    typedef void (*destroy_plugin_t)(M3::IPlugin*);
 }
 
 #define MACH3_REGISTER_PLUGIN(PluginClass)                     \
-static_assert(std::is_base_of<mach3::IPlugin, PluginClass>::value, "PluginClass must derive from mach3::IPlugin");  \
-extern "C" mach3::IPlugin* create_plugin() {                   \
+static_assert(std::is_base_of<M3::IPlugin, PluginClass>::value, "PluginClass must derive from M3::IPlugin");  \
+extern "C" M3::IPlugin* create_plugin() {                   \
     return new PluginClass();                                  \
 }                                                              \
-extern "C" void destroy_plugin(mach3::IPlugin* p) {            \
+extern "C" void destroy_plugin(M3::IPlugin* p) {            \
     delete p;                                                  \
 }

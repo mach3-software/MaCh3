@@ -5,7 +5,7 @@
 #include "Fitters/MCMCProcessor.h"
 #include "api/plugin.hpp"
 
-namespace mach3{
+namespace M3{
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor

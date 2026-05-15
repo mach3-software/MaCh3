@@ -35,7 +35,7 @@ _MaCh3_Safe_Include_End_ //}
 /// @ingroup MaCh3DiagnosticProcessing
 ///
 /// @author Kamil Skwarczynski
-namespace mach3{
+namespace M3{
 
   GetPenaltyTermPlugin::~GetPenaltyTermPlugin(){
     if (this->m_parser) { delete this->m_parser; } 

@@ -8,7 +8,7 @@
 using std::vector, std::string, std::map;
 namespace fs = std::filesystem;
 
-namespace mach3{
+namespace M3{
 
                 
     void MaCh3Program::parse_args(int argc, const char *const argv[]) {

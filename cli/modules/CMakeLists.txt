@@ -12,6 +12,8 @@ add_library(CLIModules SHARED
 target_link_libraries(CLIModules PRIVATE MaCh3::All)
 target_include_directories(CLIModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
+install(TARGETS CLIModules LIBRARY DESTINATION lib)
+
 # set_target_properties(Plugins PROPERTIES
 #     PUBLIC_HEADER "${HEADERS}"
 #     EXPORT_NAME Plugins)
