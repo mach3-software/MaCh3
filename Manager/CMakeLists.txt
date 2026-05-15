@@ -40,6 +40,7 @@ install(TARGETS Manager
         PUBLIC_HEADER DESTINATION include/Manager)
 
 add_library(MaCh3::Manager ALIAS Manager)
+target_link_libraries(MaCh3 INTERFACE Manager)
 
 
 install(TARGETS yaml-cpp

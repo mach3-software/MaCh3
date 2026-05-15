@@ -50,3 +50,4 @@ install(TARGETS MaCh3NuDock
         PUBLIC_HEADER DESTINATION include/MaCh3NuDock)
 
 add_library(MaCh3::MaCh3NuDock ALIAS MaCh3NuDock)
+target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
