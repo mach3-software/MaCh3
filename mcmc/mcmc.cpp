@@ -1,12 +1,11 @@
 #include "mcmc.h"
 #include "covariance/covarianceOsc.h"
 
-
 // *************************
 // Initialise the manager and make it an object of mcmc class
 // Now we can dump manager settings to the output file
-mcmc::mcmc(manager *man) : FitterBase(man) {
-// *************************
+mcmc::mcmc(manager* man) : FitterBase(man) {
+  // *************************
   // Beginning step number
   stepStart = 0;
 
@@ -15,9 +14,8 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
   chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
 
   AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
-  if(AnnealTemp < 0) anneal = false;
-  else
-  {
+  if (AnnealTemp < 0) anneal = false;
+  else {
     MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
     anneal = true;
   }
@@ -26,22 +24,22 @@ mcmc::mcmc(manager *man) : FitterBase(man) {
 // *************************
 // Destructor: close the logger and output file
 mcmc::~mcmc() {
-// *************************
-
+  // *************************
 }
 
 // **********************
 // Do we accept the proposed step for all the parameters?
 void mcmc::CheckStep() {
-// **********************
+  // **********************
   bool accept = false;
 
   // Set the acceptance probability to zero
   accProb = 0.0;
 
   // Calculate acceptance probability
-  if (anneal) accProb = TMath::Min(1.,TMath::Exp( -(logLProp-logLCurr) / (TMath::Exp(-step/AnnealTemp)))); 
-  else accProb = TMath::Min(1., TMath::Exp(logLCurr-logLProp));
+  if (anneal) accProb = TMath::Min(1., TMath::Exp(-(logLProp - logLCurr) / (TMath::Exp(-step / AnnealTemp))));
+  else
+    accProb = TMath::Min(1., TMath::Exp(logLCurr - logLProp));
 
   // Get the random number
   double fRandom = random->Rndm();
@@ -54,9 +52,9 @@ void mcmc::CheckStep() {
     accept = false;
   }
 
-  #ifdef DEBUG
+#ifdef DEBUG
   if (debug) debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
-  #endif
+#endif
 
   // Update all the handlers to accept the step
   if (accept && !reject) {
@@ -81,13 +79,13 @@ void mcmc::runMCMC() {
 
   // *******************
   // Multicanonical method toggle from spline
-  multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"],false);
+  multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"], false);
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
   if (multicanonical) {
-    #ifdef DEBUG
+#ifdef DEBUG
     multicanonicalHandler->setDebugStream(&debugFile, debug);
-    #endif
+#endif
     multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
   }
 
@@ -99,29 +97,32 @@ void mcmc::runMCMC() {
 
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
-  if(stepStart == 0){
-      ProposeStep();
-      multicanonicalHandler->InitializeMulticanonicalParams(systematics);
+  if (stepStart == 0) {
+    ProposeStep();
+    multicanonicalHandler->InitializeMulticanonicalParams(systematics);
 
-      // Set the current logL to the proposed logL for the 0th step
-      // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
-      logLCurr = logLProp;
+    // Set the current logL to the proposed logL for the 0th step
+    // Accept the first step to set logLCurr: this shouldn't affect the MCMC
+    // because we ignore the first N steps in burn-in
+    if ((logLProp > M3::_LARGE_LOGL_ || std::isnan(logLProp)) && !std::isinf(logLProp)) {
+      logLProp = 0; // this shouldn't be a problem? could handle this more elegantly
+    }
+    logLCurr = logLProp;
   }
 
   // Begin MCMC
-  for (step = stepStart; step < stepStart+chainLength; ++step)
-  {
+  for (step = stepStart; step < stepStart + chainLength; ++step) {
     stepClock->Start();
     // Set the initial rejection to false
     reject = false;
 
     // Print 10 steps in total
-    if ( (step-stepStart) % (chainLength/10) == 0) {
+    if ((step - stepStart) % (chainLength / 10) == 0) {
       PrintProgress();
     }
 
-    // Propose current step variation and save the systematic likelihood that results in this step being taken
-    // Updates logLProp
+    // Propose current step variation and save the systematic likelihood that
+    // results in this step being taken Updates logLProp
     ProposeStep();
 
     // Does the MCMC accept this step?
@@ -134,9 +135,9 @@ void mcmc::runMCMC() {
   // Save all the MCMC output
   SaveOutput();
 
-  //Save the Adaptive output
-  for(const auto& syst : systematics){
-    if(syst->getUseAdaptive()){
+  // Save the Adaptive output
+  for (const auto& syst : systematics) {
+    if (syst->getUseAdaptive()) {
       syst->getAdaptiveHandler()->SaveAdaptiveToFile(syst->getAdaptiveHandler()->output_file_name, syst->getName(), true);
     }
   }
@@ -148,7 +149,7 @@ void mcmc::runMCMC() {
 // *******************
 // Do the initial reconfigure of the MCMC
 void mcmc::ProposeStep() {
-// *******************
+  // *******************
   // Initial likelihood
   double llh = 0.0;
 
@@ -165,26 +166,29 @@ void mcmc::ProposeStep() {
     syst_llh[s] = systematics[s]->GetLikelihood();
     llh += syst_llh[s];
 
-    #ifdef DEBUG
+#ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
-    #endif
+#endif
   }
 
-  // if we're using the multicanonical method, we need to add the penalty to the likelihood now prior to the Large LLH check
-  if (multicanonical){
-    // get the proposed value of delta_cp and apply the multicanonical pentalty, weighting it using the beta value to increase or decrease the strenght of the penalty
+  // if we're using the multicanonical method, we need to add the penalty to the
+  // likelihood now prior to the Large LLH check
+  if (multicanonical) {
+    // get the proposed value of delta_cp and apply the multicanonical pentalty,
+    // weighting it using the beta value to increase or decrease the strenght of
+    // the penalty
 
     delta_cp_value = systematics[multicanonicalHandler->oscCovVar]->getParProp(multicanonicalHandler->multicanonicalVar);
     delm23_value = systematics[multicanonicalHandler->oscCovVar]->getParProp(multicanonicalHandler->multicanonicalVar_dm23);
 
     multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeight(delta_cp_value, delm23_value);
-    
-    #ifdef DEBUG
-    if (debug) debugFile << " delta_cp: " << delta_cp_value << " delm23: " << delm23_value << " multicanonical_penalty: " << multicanonical_penalty << std::endl;
-    #endif
+
+#ifdef DEBUG
+    if (debug)
+      debugFile << " delta_cp: " << delta_cp_value << " delm23: " << delm23_value << " multicanonical_penalty: " << multicanonical_penalty << std::endl;
+#endif
 
     llh += multicanonical_penalty;
-    
 
     // MACH3LOG_INFO("Delta CP value: {}", delta_cp_value);
     // MACH3LOG_INFO("Multicanonical penalty: {}", multicanonical_penalty);
@@ -195,40 +199,43 @@ void mcmc::ProposeStep() {
   // In this case we can save time by not having to reconfigure the simulation
   if (llh >= M3::_LARGE_LOGL_) {
     reject = true;
-    #ifdef DEBUG
+#ifdef DEBUG
     if (debug) debugFile << "Rejecting based on boundary" << std::endl;
-    #endif
+#endif
   }
 
   // Only reweight when we have a good parameter configuration
-  // This speeds things up considerably because for every bad parameter configuration we don't have to reweight the MC
-  if (!reject)
-  {
+  // This speeds things up considerably because for every bad parameter
+  // configuration we don't have to reweight the MC
+  if (!reject) {
     // Could multi-thread this
-    // But since sample reweight is multi-threaded it's probably better to do that
-    for (size_t i = 0; i < samples.size(); ++i)
-    {
+    // But since sample reweight is multi-threaded it's probably better to do
+    // that
+    for (size_t i = 0; i < samples.size(); ++i) {
       samples[i]->reweight();
     }
 
-    //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
+    // DB for atmospheric event by event sample migration, need to fully
+    // reweight all samples to allow event passing prior to likelihood
+    // evaluation
     for (size_t i = 0; i < samples.size(); ++i) {
       // Get the sample likelihoods and add them
       sample_llh[i] = samples[i]->GetLikelihood();
       llh += sample_llh[i];
-      #ifdef DEBUG
+#ifdef DEBUG
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
-      #endif
+#endif
     }
 
-  // For when we don't have to reweight, set sample to madness
+    // For when we don't have to reweight, set sample to madness
   } else {
     for (size_t i = 0; i < samples.size(); ++i) {
-      // Set the sample_llh[i] to be madly high also to signify a step out of bounds
+      // Set the sample_llh[i] to be madly high also to signify a step out of
+      // bounds
       sample_llh[i] = M3::_LARGE_LOGL_;
-      #ifdef DEBUG
+#ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
-      #endif
+#endif
     }
   }
 
@@ -236,41 +243,40 @@ void mcmc::ProposeStep() {
   logLProp = llh;
 }
 
-
 // *******************
 // Print the fit output progress
 void mcmc::PrintProgress() {
-// *******************
+  // *******************
   MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-  for (covarianceBase *cov : systematics) {
+  for (covarianceBase* cov : systematics) {
     if (cov->getName() == "xsec_cov") {
       MACH3LOG_INFO("Cross-section parameters: ");
       cov->printNominalCurrProp();
     }
   }
-  #ifdef DEBUG
+#ifdef DEBUG
   if (debug) {
     debugFile << "\n-------------------------------------------------------" << std::endl;
     debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
   }
-  #endif
+#endif
 }
 
 // *******************
 void mcmc::StartFromPreviousFit(const std::string& FitName) {
-// *******************
+  // *******************
   // Use base class
   FitterBase::StartFromPreviousFit(FitName);
 
   // For MCMC we also need to set stepStart
-  TFile *infile = new TFile(FitName.c_str(), "READ");
-  TTree *posts = infile->Get<TTree>("posteriors");
+  TFile* infile = new TFile(FitName.c_str(), "READ");
+  TTree* posts = infile->Get<TTree>("posteriors");
   int step_val = -1;
 
-  posts->SetBranchAddress("step",&step_val);
-  posts->GetEntry(posts->GetEntries()-1);
+  posts->SetBranchAddress("step", &step_val);
+  posts->GetEntry(posts->GetEntries() - 1);
 
   stepStart = step_val + 1;
   infile->Close();

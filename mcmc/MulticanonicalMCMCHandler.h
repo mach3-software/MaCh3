@@ -1,106 +1,104 @@
 #pragma once
 
-#include "manager/manager.h"
-#include "covariance/covarianceBase.h"
-#include <string>
-#include <ostream>
-#include <vector>
 #include "TSpline.h"
+#include "covariance/covarianceBase.h"
+#include "manager/manager.h"
+#include <ostream>
+#include <string>
+#include <vector>
 
-class MulticanonicalMCMCHandler  {
-  public:
-    enum class BiasFunction {
-      Gaussian,
-      VonMises,
-      GeneralisedGaussian
-    };
+class MulticanonicalMCMCHandler {
+public:
+  enum class BiasFunction { Gaussian, VonMises, GeneralisedGaussian };
 
-    /// @brief Constructor
-    MulticanonicalMCMCHandler();
-    /// @brief Destructor
-    virtual ~MulticanonicalMCMCHandler();
+  /// @brief Constructor
+  MulticanonicalMCMCHandler();
+  /// @brief Destructor
+  virtual ~MulticanonicalMCMCHandler();
 
-    #ifdef DEBUG
-    void setDebugStream(std::ostream* os, bool enabled);
-    #endif
+#ifdef DEBUG
+  void setDebugStream(std::ostream* os, bool enabled);
+#endif
 
-    void FindOscCovParams(const std::vector<covarianceBase*>& systematics);
-    void AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics);
-    
-    void InitializeMulticanonicalHandlerConfig(manager* fitMan, std::vector<covarianceBase*>& systematics);
+  void FindOscCovParams(const std::vector<covarianceBase*>& systematics);
+  void AdjustUmbrellaStepScale(const std::vector<covarianceBase*>& systematics);
 
-    void InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics);
+  void InitializeMulticanonicalHandlerConfig(manager* fitMan, std::vector<covarianceBase*>& systematics);
 
-    /// getters for the multicanonical weights these will take in delta values and return a llh penalty based on the chosen multicanonical method
-    double GetMulticanonicalWeight(double deltacp, double delm23_value);
+  void InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics);
 
-    double GetMulticanonicalWeightSpline(double deltacp, double delm23_value);
+  /// getters for the multicanonical weights these will take in delta values and return a llh penalty based on the chosen multicanonical method
+  double GetMulticanonicalWeight(double deltacp, double delm23_value);
 
-    double GetMulticanonicalWeightGaussian(double deltacp);
+  double GetMulticanonicalWeightSpline(double deltacp, double delm23_value);
 
-    double GetMulticanonicalWeightTripleGaussian(double deltacp);
+  double GetMulticanonicalWeightGaussian(double deltacp);
 
-    double GetMulticanonicalWeightVonMises(double deltacp);
+  double GetMulticanonicalWeightTripleGaussian(double deltacp);
 
-    double GetMulticanonicalWeightGenGaussian(double deltacp);
+  double GetMulticanonicalWeightVonMises(double deltacp);
 
-    /// bias function implementations
-    double generalisedGaussian2(double x, double mean, double width);
+  double GetMulticanonicalWeightGenGaussian(double deltacp);
 
-    /// osc_cov systematic variable we wish to apply multicanonical to
-    int oscCovVar;
-    /// multi-canonical par number
-    int multicanonicalVar;
-    /// multi-canonical par number
-    int multicanonicalVar_dm23;
+  double circularDistance(double x, double mean);
 
+  /// bias function implementations
+  double generalisedGaussian2(double x, double mean, double width);
 
-    /// selected bias function for non-spline multicanonical weights
-    BiasFunction umbrellaBiasFunction;
+  /// osc_cov systematic variable we wish to apply multicanonical to
+  int oscCovVar;
+  /// multi-canonical par number
+  int multicanonicalVar;
+  /// multi-canonical par number
+  int multicanonicalVar_dm23;
 
-    /// configured bias function name for logging and compatibility
-    std::string umbrellaBiasFunctionName;
+  /// selected bias function for non-spline multicanonical weights
+  BiasFunction umbrellaBiasFunction;
 
-    /// multi-canonical spline toggle on/off
-    bool multicanonicalSpline;
-  protected:
-    /// multi-canonical beta
-    double multicanonicalBeta;
-    /// osc_cov systematic variable we wish to apply multicanonical to
+  /// configured bias function name for logging and compatibility
+  std::string umbrellaBiasFunctionName;
 
-    /// delta_cp parameter value
-    double delta_cp_value;
-    /// dm23 parameter value
-    double delm23_value;
+  /// multi-canonical spline toggle on/off
+  bool multicanonicalSpline;
 
-     /// multi-canonical spline object
-    TSpline3 *dcp_spline_IO;
-    TSpline3 *dcp_spline_NO;
-    
-    /// umbrella mean
-    double umbrellaMean;
-    /// umbrella width
-    double umbrellaWidth;
-    /// umbrella number
-    int umbrellaNumber;
-    /// Toggle for setting umbrella widths based on umbrella overlap
-    bool umbrellaOverlapMode;
-    /// the desired overlap of evenly placed umbrellas
-    double umbrellaSigmaOverlap;
-    /// umbrella auto adjust step scale mode
-    bool umbrellaAdjustStepScale;
-    /// umbrella relative step scale
-    double umbrellaStepScaleFactor;
-    /// flip window toggle
-    bool flipWindow;
+protected:
+  /// multi-canonical beta
+  double multicanonicalBeta;
+  /// osc_cov systematic variable we wish to apply multicanonical to
 
-    /// von Mises kappa parameter
-    double vonMises_kappa;
-    /// von Mises I0(kappa) precomputed value
-    double vonMises_I0_kappa;
+  /// delta_cp parameter value
+  double delta_cp_value;
+  /// dm23 parameter value
+  double delm23_value;
 
-    #ifdef DEBUG
-    std::ostream* debugStream = nullptr;
-    bool debugEnabled = false;
-    #endif
+  /// multi-canonical spline object
+  TSpline3* dcp_spline_IO;
+  TSpline3* dcp_spline_NO;
+
+  /// umbrella mean
+  double umbrellaMean;
+  /// umbrella width
+  double umbrellaWidth;
+  /// umbrella number
+  int umbrellaNumber;
+  /// Toggle for setting umbrella widths based on umbrella overlap
+  bool umbrellaOverlapMode;
+  /// the desired overlap of evenly placed umbrellas
+  double umbrellaSigmaOverlap;
+  /// umbrella auto adjust step scale mode
+  bool umbrellaAdjustStepScale;
+  /// umbrella relative step scale
+  double umbrellaStepScaleFactor;
+  /// flip window toggle
+  bool flipWindow;
+
+  /// von Mises kappa parameter
+  double vonMises_kappa;
+  /// von Mises I0(kappa) precomputed value
+  double vonMises_I0_kappa;
+
+#ifdef DEBUG
+  std::ostream* debugStream = nullptr;
+  bool debugEnabled = false;
+#endif
 };
