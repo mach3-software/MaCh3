@@ -9,17 +9,17 @@
 #include <numeric>
 
 // ************************************************
-SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                                      const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerInterface() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerBase object");
 
-  //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov) {
+  //ETA - safety feature so you can't pass a NULL _ParHandler
+  if(!_ParHandler) {
     MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
-  ParHandler = xsec_cov;
+  ParHandler = _ParHandler;
 
   nSamples = 1;
 

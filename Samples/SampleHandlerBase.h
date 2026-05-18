@@ -31,7 +31,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   //######################################### Functions #########################################
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                   const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerBase();
@@ -157,9 +157,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Return the legend used for stacked histograms with sample info
   const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
-  /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @brief ETA function to generically convert a string from param handler to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
-  /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @brief ETA function to generically convert a kinematic type from param handler to a string
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
   /// @copydoc SampleHandlerInterface::SaveAdditionalInfo
