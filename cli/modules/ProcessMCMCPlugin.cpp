@@ -166,7 +166,7 @@ namespace M3{
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
     
-    const bool PlotCorr = GetFromManager<bool>(Settings["PlotCorr"], false);
+    const bool PlotCorr = m_parser->get<bool>("--corr") || GetFromManager<bool>(Settings["PlotCorr"], false);
 
     Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
     Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
@@ -211,15 +211,15 @@ namespace M3{
     Processor->MakePostfit(this->GetCustomBinning(Settings));
     Processor->DrawPostfit();
     //KS: Should set via config whether you want below or not
-    if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
+    if(m_parser->get<bool>("--MakeCredibleIntervals") || GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
       Processor->MakeCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
                                       GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
                                       GetFromManager<bool>(Settings["CredibleInSigmas"], false));
     }
-    if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  this->CalcBayesFactor(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) this->CalcSavageDickey(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) this->CalcBipolarPlot(Processor.get());
-    if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) this->CalcParameterEvolution(Processor.get());
+    if(m_parser->get<bool>("--CalcBayesFactor") || GetFromManager<bool>(Settings["CalcBayesFactor"], true))  this->CalcBayesFactor(Processor.get());
+    if(m_parser->get<bool>("--CalcSavageDickey") || GetFromManager<bool>(Settings["CalcSavageDickey"], true)) this->CalcSavageDickey(Processor.get());
+    if(m_parser->get<bool>("--CalcBipolarPlot") || GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) this->CalcBipolarPlot(Processor.get());
+    if(m_parser->get<bool>("--CalcParameterEvolution") || GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) this->CalcParameterEvolution(Processor.get());
 
     if(PlotCorr)
     {
