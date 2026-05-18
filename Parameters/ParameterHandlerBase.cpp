@@ -1024,8 +1024,6 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
       }
     }
   }
-  // Ensure there is no misconfiguration in adaption config
-  SanitizeAdaption();
 
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName,
@@ -1033,9 +1031,10 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
   if (success) {
+    // Ensure there is no misconfiguration in adaption config
+    SanitizeAdaption();
     AdaptiveHandler->Print();
-  }
-  else {
+  } else {
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 
