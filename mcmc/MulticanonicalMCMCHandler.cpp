@@ -143,7 +143,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
   // setup for spline bias mode
   if (multicanonicalSpline) {
 
-    std::string splineFile = GetFromManager < std::string(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], "nofile");
+    std::string splineFile = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], "nofile");
 
     TFile* file = new TFile(splineFile.c_str(), "READ");
     if (!file || file->IsZombie()) {
