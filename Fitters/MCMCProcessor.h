@@ -463,7 +463,7 @@ class MCMCProcessor {
     std::vector<std::string> ExcludedGroups;
 
     /// Is the ith parameter varied
-    std::vector<bool> IamVaried;
+    std::vector<bool> ParamVaried;
     /// Name of parameters which we are going to analyse
     std::vector<std::vector<TString>> ParamNames;
     /// Parameters central values which we are going to analyse
