@@ -179,6 +179,9 @@ class MCMCProcessor {
                           const std::string& Title,
                           const double EvaluationPoint) const ;
 
+    /// @brief Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
+    void ProduceChi2(const std::string& GroupName) const;
+
     /// @brief Reweight Prior by giving new central value and new error
     /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight

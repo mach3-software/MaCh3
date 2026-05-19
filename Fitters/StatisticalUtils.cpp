@@ -672,7 +672,31 @@ void Get2DBayesianpValue(TH2D *Histogram) {
   TempCanvas->Write();
 }
 
+// ****************
+// Converts posterior likelihood to dchi2
+std::unique_ptr<TH1D> GetDeltaChi2(TH1D* posterior_probability_hist) {
+// ****************
+  auto delta_chi2 = M3::Clone(posterior_probability_hist);
+  TString title = delta_chi2->GetTitle();
+  title+=";#Delta#chi^{2}";
 
+  delta_chi2->GetYaxis()->SetTitle("#Delta#chi^{2}");
+
+  int max_bin = delta_chi2->GetMaximumBin();
+  double max_content = delta_chi2->GetBinContent(max_bin);
+
+  double NewMaximum = M3::_BAD_DOUBLE_;
+  for(int iBin = 1; iBin < delta_chi2->GetNbinsX()+1; iBin++) {
+    double bin_content = delta_chi2->GetBinContent(iBin);
+    if(bin_content == 0) bin_content = 1.0 ;
+
+    double chi2_likelihood = -2*std::log(bin_content/max_content);
+    delta_chi2->SetBinContent(iBin, chi2_likelihood);
+    NewMaximum = std::max(NewMaximum, chi2_likelihood);
+  }
+  delta_chi2->SetMaximum(NewMaximum*1.1);
+  return delta_chi2;
+}
 
 // ****************
 void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {

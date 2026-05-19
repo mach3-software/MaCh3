@@ -1764,6 +1764,38 @@ void MCMCProcessor::DrawCorrelations1D() {
   gStyle->SetOptTitle(OptTitle);
 }
 
+
+// *********************
+// Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
+void MCMCProcessor::ProduceChi2(const std::string& GroupName) const {
+// *********************
+  if(GroupName == "") return;
+  MACH3LOG_INFO("Starting {}", __func__);
+  TDirectory* Chi2Folder = OutputFile->mkdir("DeltaChi2");
+
+  Chi2Folder->cd();
+  for (int iPar = 0; iPar < nDraw; iPar++)
+  {
+    std::string GroupNameCurr;
+    if(ParamType[iPar] == kXSecPar){
+      const int InternalNumeration = iPar - ParamTypeStartPos[kXSecPar];
+      GroupNameCurr = ParameterGroup[InternalNumeration];
+    } else {
+      GroupNameCurr = "Other"; // Use Other for all legacy params
+    }
+    if (IamVaried[iPar] == false) continue;
+    if (GroupName != "All" && GroupNameCurr != GroupName) continue;
+
+    auto Chi2 = GetDeltaChi2(hpost[iPar]);
+    RemoveFitter(Chi2.get(), "Gauss");
+
+    Chi2->Write();
+  }
+  Chi2Folder->Close();
+  delete Chi2Folder;
+  OutputFile->cd();
+}
+
 // *********************
 // Make fancy Credible Intervals plots
 void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
