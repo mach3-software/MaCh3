@@ -57,8 +57,10 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @param eL bool telling if it will be flat or not
   void SetFlatPrior(const int i, const bool eL);
-
-  /// @brief Set random value useful for debugging/CI
+  /// @brief Initialise the random_number vector with a specified seed
+  /// @param seed Seed for the random number generator
+  /// \ingroup Setters
+  void SetRandomSeed(const int seed);  
   /// @param i Parameter index
   /// @param rand New value for random number
   void SetRandomThrow(const int i, const double rand) { randParams[i] = rand;}
