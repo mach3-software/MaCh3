@@ -864,6 +864,20 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
   }
 }
 
+void covarianceBase::SetRandomSeed(const int seed) {
+  const int nThreads = M3::GetNThreads();
+  random_number.clear(); // this is ugly, need to do it because I didn't want to modify the constructor 
+                         // of the covarianceBase object without knowing what I was doing
+  random_number.reserve(nThreads);
+  for (int i = 0; i < nThreads; ++i){
+    // when seed = 0, TRandom3 will use a random seed based on the clock for every different thread (all = 0)
+    // when seed != 0, each thread will have a different seed in a deterministic way (seed = 1 -> thread 0 has seed = 1, thread 1 has seed = 2, etc)
+    // Note: using a different number of threads will break reproducibility!
+    random_number.emplace_back(std::make_unique<TRandom3>(seed + i*seed)); 
+  }  
+  MACH3LOG_DEBUG("Set random seed to {} for {} threads", seed, nThreads);
+}
+
 // ********************************************
 //KS: Custom function to perform multiplication of matrix and vector with multithreading
 void covarianceBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {

@@ -72,6 +72,11 @@ class covarianceBase {
   /// @param eL bool telling if it will be flat or not
   /// \ingroup Setters
   void setFlatPrior(const int i, const bool eL);
+ 
+  /// @brief Initialise the random_number vector with a specified seed
+  /// @param seed Seed for the random number generator
+  /// \ingroup Setters
+  void SetRandomSeed(const int seed);
   
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
