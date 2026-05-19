@@ -677,13 +677,15 @@ void Get2DBayesianpValue(TH2D *Histogram) {
 std::unique_ptr<TH1D> GetDeltaChi2(TH1D* posterior_probability_hist) {
 // ****************
   auto delta_chi2 = M3::Clone(posterior_probability_hist);
-  TString title = delta_chi2->GetTitle();
-  title+=";#Delta#chi^{2}";
-
   delta_chi2->GetYaxis()->SetTitle("#Delta#chi^{2}");
 
   int max_bin = delta_chi2->GetMaximumBin();
   double max_content = delta_chi2->GetBinContent(max_bin);
+  if (max_content == 0) {
+    MACH3LOG_ERROR("Histogram {}, has larges bin with 0", delta_chi2->GetTitle());
+    MACH3LOG_ERROR("This suggest you skewed binning for posterior probability or something else");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   double NewMaximum = M3::_BAD_DOUBLE_;
   for(int iBin = 1; iBin < delta_chi2->GetNbinsX()+1; iBin++) {
