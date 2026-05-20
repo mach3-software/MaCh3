@@ -105,6 +105,8 @@ void covarianceBase::init(std::string name, std::string file) {
   const int nThreads = M3::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
+  //DR: WARNING these are now overridden by SetRandomSeed 
+  MACH3LOG_WARN("random_number may be overriden by SetRandomSeed");
   random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number.emplace_back(std::make_unique<TRandom3>(0));
@@ -159,6 +161,8 @@ void covarianceBase::init(const std::vector<std::string>& YAMLFile) {
   const int nThreads = M3::GetNThreads();
   //KS: set Random numbers for each thread so each thread has different seed
   //or for one thread if without MULTITHREAD
+  //DR: WARNING these are now overridden by SetRandomSeed 
+  MACH3LOG_WARN("random_number may be overriden by SetRandomSeed");
   random_number.reserve(nThreads);
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number.emplace_back(std::make_unique<TRandom3>(0));
@@ -866,8 +870,8 @@ void covarianceBase::setFlatPrior(const int i, const bool eL) {
 
 void covarianceBase::SetRandomSeed(const int seed) {
   const int nThreads = M3::GetNThreads();
-  random_number.clear(); // this is ugly, need to do it because I didn't want to modify the constructor 
-                         // of the covarianceBase object without knowing what I was doing
+  random_number.clear(); // DR: this is ugly, need to do it because I didn't want to modify the constructor 
+                         // of the covarianceBase object without knowing what I was doing, would be better not to create unused TRandom3 with (0) at all
   random_number.reserve(nThreads);
   for (int i = 0; i < nThreads; ++i){
     // when seed = 0, TRandom3 will use a random seed based on the clock for every different thread (all = 0)
