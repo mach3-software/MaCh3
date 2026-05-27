@@ -1426,7 +1426,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
 
     SetSplinePointers();
 
-    BinnedSplines->cleanUpMemory();
+    BinnedSplines->CleanUpMemory();
   } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     (void) UnbinnedSpline;
     SetSplinePointers();
