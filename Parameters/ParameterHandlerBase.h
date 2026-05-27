@@ -273,19 +273,15 @@ class ParameterHandlerBase {
   /// @param name Name of the parameter to be treated as free
   void SetFreeParameter(const std::string& name);
 
-  /// @brief Toggle fixing parameters at prior values
-  void ToggleFixAllParameters();
-  /// @brief Toggle fixing parameter at prior values
-  /// @param i Parameter index
-  void ToggleFixParameter(const int i);
-  /// @brief Toggle fixing parameter at prior values
-  /// @param name Name of parameter you want to fix
-  void ToggleFixParameter(const std::string& name);
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
-    if (_fError[i] < 0) { return true; }
-    else                { return false; }
+    if (pca) {
+      return PCAObj->IsParameterFixedPCA(i);
+    } else {
+      if (_fError[i] < 0) { return true; }
+      else                { return false; }
+    }
   }
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
@@ -465,4 +461,12 @@ class ParameterHandlerBase {
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
+
+ private:
+  /// @brief Toggle fixing parameter at prior values
+  /// @param i Parameter index
+  void ToggleFixParameter(const int i);
+  /// @brief Toggle fixing parameter at prior values
+  /// @param name Name of parameter you want to fix
+  void ToggleFixParameter(const std::string& name);
 };

@@ -757,14 +757,6 @@ void ParameterHandlerBase::SetFreeParameter(const std::string& name) {
 }
 
 // ********************************************
-void ParameterHandlerBase::ToggleFixAllParameters() {
-// ********************************************
-  // toggle fix/free all parameters
-  if(!pca) for (int i = 0; i < _fNumPar; i++) ToggleFixParameter(i);
-  else PCAObj->ToggleFixAllParameters(_fNames);
-}
-
-// ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
@@ -794,7 +786,6 @@ void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
     ToggleFixParameter(Index);
     return;
   }
-
   MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
 }
 
