@@ -146,14 +146,14 @@ class SampleHandlerBase :  public SampleHandlerInterface
   int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
+                                          const SamplePlotType Selection1, const int Selection2 = -1, const int WeightStyle = 0);
   /// @brief Return the legend used for stacked histograms with sample info
   const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
