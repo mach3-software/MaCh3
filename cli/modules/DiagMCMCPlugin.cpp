@@ -33,7 +33,7 @@ namespace M3{
   int DiagMCMCPlugin::run() {
     SetMaCh3LoggerFormat();
     MACH3LOG_INFO("Producing single fit output");
-    std::string inputFile = m_parser->get<std::string>("mcmc-chain");
+    std::string inputFile = m_parser->get<std::string>("mcmc-output");
     std::string config = m_parser->get<std::string>("config");
 
     MACH3LOG_INFO("File for study: {}", inputFile);
