@@ -716,7 +716,7 @@ int ParameterHandlerBase::GetParIndex(const std::string& name) const {
 void ParameterHandlerBase::SetFixAllParameters() {
 // ********************************************
   // Check if the parameter is fixed and if not, toggle fix it
-  for (int i = 0; i < GetNParameters(); ++i)
+  for (int i = 0; i < _fNumPar; ++i)
     if(!IsParameterFixed(i)) ToggleFixParameter(i);
 }
 
@@ -738,7 +738,7 @@ void ParameterHandlerBase::SetFixParameter(const std::string& name) {
 void ParameterHandlerBase::SetFreeAllParameters() {
 // ********************************************
   // Check if the parameter is fixed and if not, toggle fix it
-  for (int i = 0; i < GetNParameters(); ++i)
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParameterFixed(i)) ToggleFixParameter(i);
 }
 

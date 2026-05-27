@@ -276,12 +276,8 @@ class ParameterHandlerBase {
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
-    if (pca) {
-      return PCAObj->IsParameterFixedPCA(i);
-    } else {
-      if (_fError[i] < 0) { return true; }
-      else                { return false; }
-    }
+    if (_fError[i] < 0) { return true; }
+    else                { return false; }
   }
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
