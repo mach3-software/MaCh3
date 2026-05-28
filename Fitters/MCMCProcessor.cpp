@@ -3549,7 +3549,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   clock.Stop();
   MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
 
-  if(AllUnique(StepNumber, nEntries)){
+  if(AllUnique(StepNumber, nEntries) == false){
     MACH3LOG_ERROR("Found steps with duplicate StepNumber, this indicate merged chain has been passed to DiagMCMC");
     MACH3LOG_ERROR("Code hasn't been optimised to work with merged chains, results may be unintended");
     throw MaCh3Exception(__FILE__ , __LINE__ );
