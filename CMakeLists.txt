@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.5.1 LANGUAGES CXX)
+project(MaCh3 VERSION 2.6.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -279,7 +279,10 @@ foreach(f ${ALL_FEATURES})
 endforeach()
 
 ################################# Build MaCh3 ##################################
-
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
+add_library(MaCh3 INTERFACE)
+target_link_libraries(MaCh3 INTERFACE MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 # Build components
 add_subdirectory(Manager)
 add_subdirectory(Parameters)
@@ -299,13 +302,6 @@ foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscP
   )
 endforeach()
 
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
-if (MaCh3_NUDOCK_ENABLED)
-  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
-endif()
-target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -350,7 +346,6 @@ if(MaCh3_DependancyGraph)
 endif()
 
 ############################  Install  ####################################
-
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
   ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/MaCh3Config.cmake.in ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
@@ -397,6 +392,7 @@ add_custom_command(
           -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
+          -DNuOscillator_VERSION=${MaCh3_NuOscillatorBranch}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
           -P ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
   COMMENT "Generating version.h and _version.h"

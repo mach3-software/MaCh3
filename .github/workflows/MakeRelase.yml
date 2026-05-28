@@ -22,4 +22,4 @@ jobs:
               --repo="${{ github.repository }}" \
               --title="${{ github.ref_name }}" \
               --generate-notes \
-              --discussion-category "Announcements"
+              --discussion-category "announcements"
