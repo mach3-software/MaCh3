@@ -452,7 +452,7 @@ int GetSplineIndex(const std::vector<SplineIndex>& vec,
   for (size_t i = 0; i < vec.size(); i++)
   {
     const auto& entry = vec[i];
-    if (entry.iSample == sample  &&
+    if (entry.iSample  == sample  &&
         entry.iOscChan == oscchan &&
         entry.iSyst    == syst    &&
         entry.iMode    == mode    &&
@@ -470,10 +470,10 @@ int GetSplineIndex(const std::vector<SplineIndex>& vec,
 }
 
 //****************************************
-const M3::float_t* BinnedSplineHandler::RetPointer(const int sample, const int oscchan, const int syst, const int mode,
-                              const int var1bin, const int var2bin, const int var3bin) const {
+const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables) const {
 //****************************************
-  auto Index = GetSplineIndex(IndexVect, sample, oscchan, syst, mode, var1bin, var2bin, var3bin);
+  auto Index = GetSplineIndex(IndexVect, Variables.iSample, Variables.iOscChan,
+                              Variables.iSyst, Variables.iMode, Variables.iVar1, Variables.iVar2, Variables.iVar3);
   return &weightvec_Monolith[IndexVect[Index].value];
 }
 
@@ -752,11 +752,11 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
+std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
                                                                      int iOscChan, int EventMode, double Var1Val,
                                                                      double Var2Val, double Var3Val) {
 //****************************************
-  std::vector<std::vector<int>> ReturnVec;
+  std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
 
   int Mode = -1;
@@ -794,7 +794,16 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
         int splineID = IndexVect[index].value;
         //Also check that the spline isn't flat
         if(!isflatarray[splineID]) {
-          ReturnVec.push_back({SampleIndex, iOscChan, iSyst, iMode, Var1Bin, Var2Bin, Var3Bin});
+          SplineIndex idx;
+          idx.iSample  = SampleIndex;
+          idx.iOscChan = iOscChan;
+          idx.iSyst    = iSyst;
+          idx.iMode    = iMode;
+          idx.iVar1    = Var1Bin;
+          idx.iVar2    = Var2Bin;
+          idx.iVar3    = Var3Bin;
+
+          ReturnVec.push_back(idx);
         }
       }
     }
