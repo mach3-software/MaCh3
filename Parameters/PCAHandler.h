@@ -117,14 +117,12 @@ class PCAHandler{
 
   /// @brief Is parameter fixed in PCA base or not
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   bool IsParameterFixedPCA(const int i) const {
     if (_fErrorPCA[i] < 0) { return true;  }
     else                   { return false; }
   }
 
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
-  /// @ingroup ParameterHandlerGetters
   const TMatrixD GetEigenVectors() const {
     return eigen_vectors;
   }
@@ -132,7 +130,6 @@ class PCAHandler{
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
-  /// @ingroup ParameterHandlerSetters
   void SetParPropPCA(const int i, const double value) {
     _fParPropPCA(i) = value;
     // And then transfer back to the parameter basis
@@ -150,45 +147,38 @@ class PCAHandler{
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetParPropPCA(const int i) const {
     return _fParPropPCA(i);
   }
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetPreFitValuePCA(const int i) const {
     return _fPreFitValuePCA[i];
   }
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetParCurrPCA(const int i) const {
     return _fParCurrPCA(i);
   }
 
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
-  /// @ingroup ParameterHandlerGetters
   const TMatrixD GetTransferMatrix() const {
     return TransferMat;
   }
 
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMaster
-  /// @ingroup ParameterHandlerGetters
   const TVectorD GetEigenValues() const {
     return eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use GetEigenValues
-  /// @ingroup ParameterHandlerGetters
   const std::vector<double> GetEigenValuesMaster() const {
     return eigen_values_master;
   }
 
   /// @brief Check if parameter in PCA base is decomposed or not
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   bool IsParameterDecomposed(const int i) const {
     if(isDecomposedPCA[i] >= 0) return false;
     else return true;

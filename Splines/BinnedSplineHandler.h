@@ -30,7 +30,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief flatten multidimensional spline array into proper monolith
     void TransferToMonolith();
     /// @brief Remove setup variables not needed for spline evaluations
-    void cleanUpMemory();
+    void CleanUpMemory();
 
     /// @brief Loads and processes splines from ROOT files for a given sample.
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)

@@ -158,7 +158,7 @@ void initParametersModule(py::module &m_parameters){
              )pbdoc")
 
              
-        .def("get_par_init", &ParameterHandlerBase::GetParInit, py::arg("index"),
+        .def("get_par_init", &ParameterHandlerBase::GetParPreFit, py::arg("index"),
             "Get initial value of parameter at index i\n\
             :param index: index of the parameter")
 
