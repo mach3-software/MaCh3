@@ -72,7 +72,7 @@ void PSO::init(){
         fDim += (*it)->GetNumParams();
         for(int i = 0; i < (*it)->GetNumParams(); ++i)
         {
-          double curr = (*it)->GetParInit(i);
+          double curr = (*it)->GetParPreFit(i);
           double lim = 10.0*(*it)->GetDiagonalError(i);
           double low = (*it)->GetLowerBound(i);
           double high = (*it)->GetUpperBound(i);
@@ -97,7 +97,7 @@ void PSO::init(){
         {
           ranges_min.push_back(-100.0);
           ranges_max.push_back(100.0);
-          prior.push_back((*it)->GetParInit(i));
+          prior.push_back((*it)->GetParPreFit(i));
           if((*it)->GetPCAHandler()->IsParameterFixedPCA(i)){
             fixed.push_back(1);
           }

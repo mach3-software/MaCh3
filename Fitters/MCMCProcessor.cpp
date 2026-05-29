@@ -344,7 +344,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
       MACH3LOG_WARN("Found fixed parameter: {} ({}), moving on", Title, i);
-      IamVaried[i] = false;
+      ParamVaried[i] = false;
       //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
       (*Means_HPD)(i)  = Prior;
       (*Errors_HPD)(i) = PriorError;
@@ -360,7 +360,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     }
 
     // Store that this parameter is indeed being varied
-    IamVaried[i] = true;
+    ParamVaried[i] = true;
 
     // Draw onto the TCanvas
     hpost[i]->Draw();
@@ -746,7 +746,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 
   for (int i = 0; i < nDraw; ++i)
   {
-    if(!IamVaried[i]) continue;
+    if(!ParamVaried[i]) continue;
 
     // Now make the TLine for the Asimov
     TString Title = "";
@@ -854,7 +854,7 @@ void MCMCProcessor::MakeViolin() {
   for (int x = 0; x < nDraw; ++x)
   {
     //KS: Consider another treatment for fixed params
-    //if (IamVaried[x] == false) continue;
+    //if (ParamVaried[x] == false) continue;
     for (int k = 0; k < nEntries; ++k)
     {
       //KS: Burn in cut
@@ -985,7 +985,7 @@ void MCMCProcessor::MakeCovariance() {
       if (j == i) continue;
 
       // If this parameter isn't varied
-      if (IamVaried[j] == false) {
+      if (ParamVaried[j] == false) {
         (*Covariance)(i,j) = 0.0;
         (*Covariance)(j,i) = (*Covariance)(i,j);
         (*Correlation)(i,j) = 0.0;
@@ -1228,7 +1228,7 @@ void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
       if (j == i) continue;
       
       // If this parameter isn't varied
-      if (IamVaried[j] == false) {
+      if (ParamVaried[j] == false) {
         (*Covariance)(i,j) = 0.0;
         (*Covariance)(j,i) = (*Covariance)(i,j);
         (*Correlation)(i,j) = 0.0;
@@ -1271,7 +1271,7 @@ void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
         {
           // Skip the diagonal elements which we've already done above
           if (j == i) continue;
-          if (IamVaried[j] == false) continue;
+          if (ParamVaried[j] == false) continue;
 
           if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
           {
@@ -1707,7 +1707,7 @@ void MCMCProcessor::DrawCorrelations1D() {
 
   for(int i = 0; i < nDraw; i++)
   {
-    if (IamVaried[i] == false) continue;
+    if (ParamVaried[i] == false) continue;
 
     Corr1DHist[i][0]->GetXaxis()->LabelsOption("v");
     Corr1DHist[i][0]->SetMaximum(+1.);
@@ -1762,6 +1762,38 @@ void MCMCProcessor::DrawCorrelations1D() {
 
   SetMargins(Posterior, Margins);
   gStyle->SetOptTitle(OptTitle);
+}
+
+
+// *********************
+// Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
+void MCMCProcessor::ProduceChi2(const std::string& GroupName) const {
+// *********************
+  if(GroupName == "") return;
+  MACH3LOG_INFO("Starting {}", __func__);
+  TDirectory* Chi2Folder = OutputFile->mkdir("DeltaChi2");
+
+  Chi2Folder->cd();
+  for (int iPar = 0; iPar < nDraw; iPar++)
+  {
+    std::string GroupNameCurr;
+    if(ParamType[iPar] == kXSecPar){
+      const int InternalNumeration = iPar - ParamTypeStartPos[kXSecPar];
+      GroupNameCurr = ParameterGroup[InternalNumeration];
+    } else {
+      GroupNameCurr = "Other"; // Use Other for all legacy params
+    }
+    if (ParamVaried[iPar] == false) continue;
+    if (GroupName != "All" && GroupNameCurr != GroupName) continue;
+
+    auto Chi2 = GetDeltaChi2(hpost[iPar]);
+    RemoveFitter(Chi2.get(), "Gauss");
+
+    Chi2->Write();
+  }
+  Chi2Folder->Close();
+  delete Chi2Folder;
+  OutputFile->cd();
 }
 
 // *********************
@@ -1822,7 +1854,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
     {
       // Skip the diagonal elements which we've already done above
       if (j == i) continue;
-      if (IamVaried[j] == false) continue;
+      if (ParamVaried[j] == false) continue;
 
       auto legend = std::make_unique<TLegend>(0.20, 0.7, 0.4, 0.92);
       legend->SetTextColor(kRed);
@@ -2280,7 +2312,7 @@ void MCMCProcessor::ScanInput() {
   // Check order of parameter types
   ScanParameterOrder();
 
-  IamVaried.resize(nDraw, true);
+  ParamVaried.resize(nDraw, true);
 
   // Print useful Info
   PrintInfo();

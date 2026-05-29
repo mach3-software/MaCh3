@@ -205,6 +205,7 @@ void ProcessMCMC(const std::string& inputFile)
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
     if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
   }
+  Processor->ProduceChi2(GetFromManager<std::string>(Settings["Chi2Group"], "Osc"));
   if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true))          Processor->PerformJarlskogAnalysis();
   if(GetFromManager<bool>(Settings["ProducePMNSElements"], true))       Processor->ProducePMNSElements();
   if(GetFromManager<bool>(Settings["ProduceUnitarityTriangles"], true)) Processor->ProduceUnitarityTriangles();

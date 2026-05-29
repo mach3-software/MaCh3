@@ -135,7 +135,6 @@ class AdaptiveMCMCHandler
   }
 
   /// @brief Get the number of fixed parameters
-  /// @ingroup ParameterHandlerGetters
   int GetNFixed() const
   {
     if (!_fFixedPars)
@@ -154,7 +153,6 @@ class AdaptiveMCMCHandler
   }
 
   /// @brief Get the current values of the parameters
-  /// @ingroup ParameterHandlerGetters
   int GetNumParams() const
   {
     return static_cast<int>(_fCurrVal->size());
@@ -174,7 +172,6 @@ class AdaptiveMCMCHandler
   double CurrVal(const int par_index) const;
 
   /// @brief Get Total Number of Steps
-  /// @ingroup ParameterHandlerGetters
   int GetTotalSteps() const
   {
     return total_steps;
@@ -197,22 +194,19 @@ class AdaptiveMCMCHandler
     prev_step_accepted = true;
   }
 
-  /// @brief Increase by one number of total steps
-  /// @ingroup ParameterHandlerGetters
-  TMatrixDSym *GetAdaptiveCovariance() const
+  /// @brief Return matrix used for adaption
+  const TMatrixDSym *GetAdaptiveCovariance() const
   {
     return adaptive_covariance;
   }
 
   /// @brief Get the parameter means used in the adaptive handler
-  /// @ingroup ParameterHandlerGetters
   std::vector<double> GetParameterMeans() const
   {
     return par_means;
   }
 
   /// @brief Get Name of Output File
-  /// @ingroup ParameterHandlerGetters
   std::string GetOutFileName() const
   {
     return output_file_name;

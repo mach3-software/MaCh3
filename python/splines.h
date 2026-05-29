@@ -196,7 +196,7 @@ void initSplinesModule(py::module &m_splines){
 
         .def(
             "set_param_value_array",
-            // Wrap up the setSplinePointers method so that we can take in a numpy array and get 
+            // Wrap up the SetSplinePointers method so that we can take in a numpy array and get 
             // pointers to it's sweet sweet data and use those pointers in the splineMonolith 
             [](UnbinnedSplineHandler &self, py::array_t<M3::float_t, py::array::c_style> &array)
             {
@@ -221,7 +221,7 @@ void initSplinesModule(py::module &m_splines){
                     paramVec[idx] = array.data() + idx;
                 } 
 
-                self.setSplinePointers(paramVec);
+                self.SetSplinePointers(paramVec);
             },
             "Set the array that the monolith should use to read parameter values from. \n"
             "Usage of this might vary a bit from what you're used to in python. \n"

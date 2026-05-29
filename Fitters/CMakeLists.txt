@@ -56,3 +56,4 @@ install(TARGETS Fitters
         PUBLIC_HEADER DESTINATION include/Fitters)
 
 add_library(MaCh3::Fitters ALIAS Fitters)
+target_link_libraries(MaCh3 INTERFACE Fitters)

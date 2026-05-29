@@ -163,7 +163,7 @@ class ParameterHandlerBase {
   /// @brief Do we adapt or not
   bool GetDoAdaption() const {return use_adaptive;}
   /// @brief Use new throw matrix, used in adaptive MCMC
-  void SetThrowMatrix(TMatrixDSym *cov);
+  void SetThrowMatrix(const TMatrixDSym *cov);
   void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
@@ -216,7 +216,7 @@ class ParameterHandlerBase {
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  double GetParInit(const int i) const { return _fPreFitValue[i]; }
+  double GetParPreFit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   double GetUpperBound(const int i) const { return _fUpBound[i];}

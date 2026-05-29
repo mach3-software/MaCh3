@@ -40,9 +40,9 @@ BinnedSplineHandler::~BinnedSplineHandler(){
   if(ParamValues != nullptr) delete[] ParamValues;
 }
 //****************************************
-void BinnedSplineHandler::cleanUpMemory() {
+void BinnedSplineHandler::CleanUpMemory() {
 //****************************************
-  //Call once everything's been allocated in SampleHandlerFDBase, cleans up junk from memory!
+  //Call once everything's been allocated in SampleHandlerBase, cleans up junk from memory!
   //Not a huge saving but it's better than leaving everything up to the compiler
   MACH3LOG_INFO("Cleaning up spline memory");
   CleanVector(IndexVect);
@@ -238,7 +238,7 @@ void BinnedSplineHandler::TransferToMonolith() {
       M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*_nCoeff_];
 
       int iCoeff=coeffindexvec[splineindex];
-      getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
+      GetSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
       for(int i = 0; i < splineKnots; i++){
         xcoeff_arr[iCoeff+i] = tmpXCoeffArr[i];
@@ -621,7 +621,7 @@ void BinnedSplineHandler::PrepForReweight() {
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray) {
+void BinnedSplineHandler::GetSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray) {
 //****************************************
   //No point evaluating a flat spline
   int nPoints = splinevec_Monolith[splineindex]->GetNp();

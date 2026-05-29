@@ -546,7 +546,7 @@ void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParInit(i));
+    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParPreFit(i));
   }
 }
 
@@ -896,7 +896,7 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
-void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
+void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
 // ********************************************
    if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
