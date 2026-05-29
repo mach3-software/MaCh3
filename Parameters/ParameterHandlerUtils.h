@@ -330,7 +330,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node& syst_i = it_i->second;
 
       syst_i["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
-      syst_i["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+      syst_i["Error"] = M3::Utils::FormatDouble(Errors[i], 4);
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < FancyNames.size(); ++j) {
@@ -358,7 +358,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       }
 
       syst["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
-      syst["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+      syst["Error"] = M3::Utils::FormatDouble(Errors[i], 4);
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < Correlation[i].size(); ++j) {
