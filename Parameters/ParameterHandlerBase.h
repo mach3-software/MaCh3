@@ -361,7 +361,8 @@ class ParameterHandlerBase {
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
+  /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
+  void SanitizeAdaption() const;
   /// @brief KS: Flip parameter around given value, for example mass ordering around 0
   /// @param index parameter index you want to flip
   /// @param FlipPoint Value around which flipping is done
