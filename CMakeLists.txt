@@ -26,7 +26,7 @@ if (NOT DEFINED CMAKE_BUILD_TYPE OR
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(MaCh3_DEBUG_ENABLED ON)
 else()
-  cmessage(FATAL_ERROR "Passed not supported build type: ${CMAKE_BUILD_TYPE}")
+  message(FATAL_ERROR "Passed not supported build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
 if ("${MaCh3_PYTHON_INSTALL_DIR}" STREQUAL "")
