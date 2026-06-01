@@ -26,9 +26,9 @@ ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 ARG REPOSITORY_URL
 ENV REPOSITORY_URL=${REPOSITORY_URL:-https://github.com/mach3-software/MaCh3}
 
-RUN dnf -y update && dnf install -y \
+RUN dnf install -y \
     python3 \
-    python3-dev \
+    python3-devel \
     python3-pip
     
 RUN mkdir -p ${MACH3_WORK_DIR}
