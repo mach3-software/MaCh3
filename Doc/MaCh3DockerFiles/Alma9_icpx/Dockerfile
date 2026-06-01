@@ -1,12 +1,12 @@
 #To run use:  docker build -t mach3 .
 # KS: Get glorious container from Kamil which will work as a base
-FROM kamilskwarczynski/nukamil:alma9intellatest AS mach3_build
+FROM kamilskwarczynski/nukamil:alma9icpxroot64000 AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
 LABEL compiler="icpx 2025.2.1"
-LABEL root_version="v6.26.04"
+LABEL root_version="v6.40.00"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
