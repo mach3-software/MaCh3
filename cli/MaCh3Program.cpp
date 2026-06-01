@@ -10,28 +10,99 @@ namespace fs = std::filesystem;
 
 namespace M3{
 
-                
-    void MaCh3Program::parse_args(int argc, const char *const argv[]) {
-        try{
-            MaCh3ArgumentParser::parse_args(argc, argv);
-        }
-        catch (const std::exception& err) {
-            std::cerr << err.what() << std::endl;
-            std::cerr << this->get_subcommand_used();
-            MACH3LOG_ERROR(err.what());
-            throw;
-        }
-
-        if (!this->get_subcommand_used()){
-            std::cerr << this->get_subcommand_used();
-            throw NoArgsException();
+    const bool MaCh3Program::write_file(const fs::path& path, std::string_view content) const{
+        try {
+            fs::create_directories(path.parent_path());
+            std::ofstream out(path);
+            if (!out) return false;
+            out << content;
+            return true;
+        } catch (...) {
+            return false;
         }
     }
+
+    const std::string MaCh3Program::detect_shell() const{
+        const char* shell = std::getenv("SHELL");
+        if (!shell) return "";
+
+        std::string s(shell);
+        if (s.find("bash") != std::string::npos) return "bash";
+        if (s.find("zsh")  != std::string::npos) return "zsh";
+
+        return "";
+    }
+
+    const void MaCh3Program::install_completions() const{
+        const char* home = std::getenv("HOME");
+        if (!home) {
+            std::cerr << "Cannot determine HOME directory\n";
+            return;
+        }
+
+        std::string shell = detect_shell();
+        if (shell.empty()) {
+            std::cerr << "Could not detect your shell. Supported: bash, zsh\n";
+            return;
+        }
+
+        fs::path home_path(home);
+
+        if (shell == "bash") {
+            fs::path path = home_path / ".local/share/bash-completion/completions/mach3";
+            if (write_file(path, MaCh3Program::BASH_COMPLETION))
+                std::cout << "Installed bash completions → " << path << "\n";
+            return;
+        }
+
+        if (shell == "zsh") {
+            fs::path path = home_path / ".local/share/zsh/site-functions/_mach3";
+            if (write_file(path, MaCh3Program::ZSH_COMPLETION))
+                std::cout << "Installed zsh completions → " << path << "\n";
+            return;
+        }
+
+    }
+                
+    const void MaCh3Program::completions(const std::string& prefix) const{
+        for (const std::string& cmd : m_subcommands) {
+            if (cmd.rfind(prefix, 0) == 0)
+                std::cout << cmd << "\n";
+        }
+    }
+
+    // void MaCh3Program::parse_args(int argc, const char *const argv[]) {
+    //     try{
+    //         MaCh3ArgumentParser::parse_args(argc, argv);
+
+    //     }
+    //     catch (const std::exception& err) {
+    //         if (auto prefix = this->present<std::string>("--complete")) {
+    //             this->completions(*prefix);
+    //             exit(0);
+    //         }
+
+    //         if (this->get<bool>("--install-completions")) {
+    //             this->install_completions();
+    //             exit(0);
+    //         }
+    //         std::cerr << err.what() << std::endl;
+    //         std::cerr << this->get_subcommand_used();
+    //         MACH3LOG_ERROR(err.what());
+    //         throw;
+    //     }
+
+    //     if (!this->get_subcommand_used()){
+    //         std::cerr << this->get_subcommand_used();
+    //         throw NoArgsException();
+    //     }
+    // }
 
     void MaCh3Program::add_core_plugin(IPlugin& plugin){
         MaCh3ArgumentParser* parser = plugin.get_parser();
         this->add_subparser(*parser);
         m_plugin_map[parser] = &plugin;
+        m_subcommands.push_back(parser->name());
     }
 
     void MaCh3Program::load_dynamic_plugins(){
@@ -92,6 +163,7 @@ namespace M3{
                 try{
                     this->add_subparser(*parser);
                     m_dynamic_plugin_map[parser] = new DynamicPlugin(handle, plugin, destroy);
+                    m_subcommands.push_back(parser->name());
                 }
                 catch(...){
                     std::cerr<< "Error finalising loading of plugin." << "\n";
