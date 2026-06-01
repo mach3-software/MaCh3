@@ -3403,6 +3403,12 @@ void MCMCProcessor::DiagMCMC() {
   AcceptanceProbabilities();
 }
 
+// Check if all entries in StepNumber are unique
+bool AllUnique(unsigned int* StepNumber, size_t size) {
+  std::unordered_set<unsigned int> s(StepNumber, StepNumber + size);
+  return s.size() == size;
+}
+
 // **************************
 //CW: Prepare branches etc. for DiagMCMC
 void MCMCProcessor::PrepareDiagMCMC() {
@@ -3543,6 +3549,11 @@ void MCMCProcessor::PrepareDiagMCMC() {
   clock.Stop();
   MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
 
+  if(AllUnique(StepNumber, nEntries) == false){
+    MACH3LOG_ERROR("Found steps with duplicate StepNumber, this indicate merged chain has been passed to DiagMCMC");
+    MACH3LOG_ERROR("Code hasn't been optimised to work with merged chains, results may be unintended");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
   // Make the sums into average
   #ifdef MULTITHREAD
   #pragma omp parallel for
