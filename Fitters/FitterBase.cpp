@@ -323,7 +323,7 @@ void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
   CovFolder->cd();
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i) {
-    n_vec[i] = cov->GetParInit(i);
+    n_vec[i] = cov->GetParPreFit(i);
   }
   cov->GetCovMatrix()->Write(cov->GetName().c_str());
 
@@ -571,7 +571,7 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   CentralValue = cov->GetParProp(i);
   if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-  double prior = cov->GetParInit(i);
+  double prior = cov->GetParPreFit(i);
   if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
   if (std::abs(CentralValue - prior) > 1e-10) {
@@ -1126,7 +1126,7 @@ void FitterBase::RunLLHMap() {
     if (IsPCA)
       CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-    double prior = cov->GetParInit(i);
+    double prior = cov->GetParPreFit(i);
     if (IsPCA)
       prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
@@ -1429,7 +1429,7 @@ void FitterBase::RunSigmaVar() {
       ParamDir->cd();
 
       const double ParamCentralValue = systematics[s]->GetParProp(i);
-      const double Prior = systematics[s]->GetParInit(i);
+      const double Prior = systematics[s]->GetParPreFit(i);
       const double ParamLower = systematics[s]->GetLowerBound(i);
       const double ParamUpper = systematics[s]->GetUpperBound(i);
 

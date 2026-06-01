@@ -12,7 +12,7 @@ class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
     /// @brief Constructor
-    BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
+    BinnedSplineHandler(ParameterHandlerGeneric *ParamHandler, MaCh3Modes *Modes_);
     /// @brief Destructor
     /// @todo it need some love
     virtual ~BinnedSplineHandler();
@@ -30,7 +30,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief flatten multidimensional spline array into proper monolith
     void TransferToMonolith();
     /// @brief Remove setup variables not needed for spline evaluations
-    void cleanUpMemory();
+    void CleanUpMemory();
 
     /// @brief Loads and processes splines from ROOT files for a given sample.
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
@@ -77,7 +77,7 @@ class BinnedSplineHandler : public SplineBase {
     /// of modes in case many interaction modes get averaged into one spline
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) const;
     /// @brief Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-    void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
+    void GetSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
 
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* ParHandler;

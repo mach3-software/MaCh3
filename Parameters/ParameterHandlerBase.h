@@ -163,7 +163,7 @@ class ParameterHandlerBase {
   /// @brief Do we adapt or not
   bool GetDoAdaption() const {return use_adaptive;}
   /// @brief Use new throw matrix, used in adaptive MCMC
-  void SetThrowMatrix(TMatrixDSym *cov);
+  void SetThrowMatrix(const TMatrixDSym *cov);
   void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
@@ -216,7 +216,7 @@ class ParameterHandlerBase {
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  double GetParInit(const int i) const { return _fPreFitValue[i]; }
+  double GetParPreFit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   double GetUpperBound(const int i) const { return _fUpBound[i];}
@@ -353,7 +353,8 @@ class ParameterHandlerBase {
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
+  /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
+  void SanitizeAdaption() const;
   /// @brief KS: Flip parameter around given value, for example mass ordering around 0
   /// @param index parameter index you want to flip
   /// @param FlipPoint Value around which flipping is done
