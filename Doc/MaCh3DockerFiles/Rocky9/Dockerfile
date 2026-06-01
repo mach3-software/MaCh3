@@ -1,12 +1,12 @@
 #To run use:  docker build -t mach3 .
 # KS: Get glorious container from Kamil which will work as a base
-FROM kamilskwarczynski/nukamil:latest AS mach3_build
+FROM kamilskwarczynski/nukamil:rocky9cudaroot63612 AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
 LABEL compiler="GNU 11.4.1"
-LABEL root_version="v6.30.04"
+LABEL root_version="v6.36.12"
 LABEL cuda_version="v12.6.2"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
