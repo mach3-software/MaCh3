@@ -20,8 +20,9 @@ option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU 
 set(MaCh3_PYTHON_INSTALL_DIR  CACHE STRING "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If not set then will be installed in the build location of MaCh3")
 
 if (NOT DEFINED CMAKE_BUILD_TYPE OR
+        CMAKE_BUILD_TYPE STREQUAL "" OR
         CMAKE_BUILD_TYPE STREQUAL "Release" OR
-        CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo ")
+        CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   # Do nothing as this is default
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(MaCh3_DEBUG_ENABLED ON)
