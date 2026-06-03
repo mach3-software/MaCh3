@@ -1,10 +1,10 @@
 #pragma once
 #include "yaml-cpp/yaml.h"
-#include "api/plugin.hpp"
+#include "cli/api/plugin.hpp"
 
 namespace M3{
 
-  class GetPenaltyTermPlugin: public IPlugin{
+  class GetPenaltyTermPlugin: public IModule{
 
     public:
       virtual ~GetPenaltyTermPlugin();

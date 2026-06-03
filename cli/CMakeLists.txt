@@ -1,3 +1,4 @@
+add_subdirectory(api)
 add_subdirectory(modules)
 # set(CLI_MODULES
 #     ProcessMCMCPlugin.cpp
