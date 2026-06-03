@@ -1,23 +1,15 @@
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
-#include "cli/modules/DiagMCMCPlugin.hpp"
+#include "cli/modules/DiagMCMCModule.hpp"
 
-// Not needed for Core plugins as not dynamically loaded
-// extern "C" mach3::IPlugin* create_plugin() {
-//   return new mach3::DiagMCMCPlugin();
-// }
-
-// extern "C" void destroy_plugin(mach3::IPlugin* p) {
-//   delete p;
-// }
 
 namespace M3{
   
-  DiagMCMCPlugin::~DiagMCMCPlugin(){
+  DiagMCMCModule::~DiagMCMCModule(){
     if (this->m_parser) { delete this->m_parser; } 
   }
 
-  MaCh3ArgumentParser* DiagMCMCPlugin::get_parser(){
+  MaCh3ArgumentParser* DiagMCMCModule::get_parser(){
     m_parser = new MaCh3ArgumentParser("diag", "1.0", argparse::default_arguments::help);
     m_parser->add_argument("mcmc-output")
       .help("MCMC chain root file.")
@@ -30,7 +22,7 @@ namespace M3{
     return m_parser;
   }
 
-  int DiagMCMCPlugin::run() {
+  int DiagMCMCModule::run() {
     SetMaCh3LoggerFormat();
     MACH3LOG_INFO("Producing single fit output");
     std::string inputFile = m_parser->get<std::string>("mcmc-output");

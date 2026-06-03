@@ -15,10 +15,10 @@ namespace M3{
 
 /// @brief Main function processing MCMC and Producing plots
 
-  class ProcessMCMCPlugin: public IModule{
+  class ProcessMCMCModule: public IModule{
 
     public:
-      virtual ~ProcessMCMCPlugin();
+      virtual ~ProcessMCMCModule();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 
