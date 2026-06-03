@@ -3,7 +3,7 @@
 #include "Samples/SampleStructs.h"
 #include "Samples/HistogramUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
-#include "cli/modules/GetPenaltyTermPlugin.hpp"
+#include "cli/modules/GetPenaltyTermModule.hpp"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -37,11 +37,11 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Kamil Skwarczynski
 namespace M3{
 
-  GetPenaltyTermPlugin::~GetPenaltyTermPlugin(){
+  GetPenaltyTermModule::~GetPenaltyTermModule(){
     if (this->m_parser) { delete this->m_parser; } 
   }
 
-  MaCh3ArgumentParser* GetPenaltyTermPlugin::get_parser(){
+  MaCh3ArgumentParser* GetPenaltyTermModule::get_parser(){
     m_parser = new MaCh3ArgumentParser("penterm", "1.0", argparse::default_arguments::help);
     m_parser->add_argument("inputfile")
       .help("Root file to analyse.")
@@ -54,7 +54,7 @@ namespace M3{
     return m_parser;
   }
 
-  int GetPenaltyTermPlugin::run()//int argc, char *argv[])
+  int GetPenaltyTermModule::run()//int argc, char *argv[])
   {
     SetMaCh3LoggerFormat();
     M3::Utils::MaCh3Welcome();
@@ -65,7 +65,7 @@ namespace M3{
     return 0;
   }
 
-  void GetPenaltyTermPlugin::ReadCovFile(const std::string& inputFile,
+  void GetPenaltyTermModule::ReadCovFile(const std::string& inputFile,
                                          std::vector <double>& Prior,
                                          std::vector <bool>& isFlat,
                                          std::vector<std::string>& ParamNames,
@@ -149,7 +149,7 @@ namespace M3{
     delete TempFile;
   }
 
-  void GetPenaltyTermPlugin::LoadSettings(YAML::Node& Settings,
+  void GetPenaltyTermModule::LoadSettings(YAML::Node& Settings,
                                           std::vector<std::string>& SetsNames,
                                           std::vector<std::string>& FancyTitle,
                                           std::vector<std::vector<bool>>& isRelevantParam,
@@ -220,7 +220,7 @@ namespace M3{
     }
   }
 
-  void GetPenaltyTermPlugin::GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
+  void GetPenaltyTermModule::GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   {
     auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
     canvas->SetGrid();

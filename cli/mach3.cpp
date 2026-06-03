@@ -1,7 +1,7 @@
 #include "cli/MaCh3Program.hpp"
-#include "cli/modules/ProcessMCMCPlugin.hpp"
-#include "cli/modules/DiagMCMCPlugin.hpp"
-#include "cli/modules/GetPenaltyTermPlugin.hpp"
+#include "cli/modules/ProcessMCMCModule.hpp"
+#include "cli/modules/DiagMCMCModule.hpp"
+#include "cli/modules/GetPenaltyTermModule.hpp"
 
 
 int main(int argc, char *argv[]) {
@@ -17,9 +17,9 @@ int main(int argc, char *argv[]) {
         .help("")
         .flag();
 
-    M3::ProcessMCMCPlugin proc;
-    M3::DiagMCMCPlugin diag;
-    M3::GetPenaltyTermPlugin penterm;
+    M3::ProcessMCMCModule proc;
+    M3::DiagMCMCModule diag;
+    M3::GetPenaltyTermModule penterm;
 
     program.add_core_module(proc);
     program.add_core_module(diag);
