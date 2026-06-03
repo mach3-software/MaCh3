@@ -285,6 +285,8 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   auto matrix_file = std::make_unique<TFile>(matrix_file_name.c_str());
   use_adaptive = true;
 
+  adaption_scale = 1;
+
   if(matrix_file->IsZombie()){
     MACH3LOG_ERROR("Couldn't find {}", matrix_file_name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
