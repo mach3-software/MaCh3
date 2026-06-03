@@ -1,5 +1,5 @@
 #pragma once
-#include "api/argparse.hpp"
+#include "cli/api/argparse.hpp"
 
 
 namespace M3 {
@@ -11,6 +11,7 @@ namespace M3 {
             virtual MaCh3ArgumentParser* get_parser() = 0;
     };
 
+    typedef IPlugin IModule;
 };
 
 // Factory function typedefs

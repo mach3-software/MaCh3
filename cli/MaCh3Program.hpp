@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include "api/plugin.hpp"
+#include "cli/api/plugin.hpp"
 #include "cli/DynamicPlugin.hpp"
 
 namespace fs = std::filesystem;
 
 namespace M3{
 
-    class NoArgsException: public std::exception{};
+    // class NoArgsException: public std::exception{};
 
     class MaCh3Program: public MaCh3ArgumentParser{
         public:
@@ -20,7 +20,7 @@ namespace M3{
                 this->unload_dynamic_plugins();
             }          
             // void parse_args(int argc, const char *const argv[]);
-            void add_core_plugin(IPlugin& plugin);
+            void add_core_module(IModule& module);
             void load_dynamic_plugins();
             const void install_completions() const;
             const void completions(const std::string& prefix) const;
@@ -34,7 +34,7 @@ namespace M3{
 
         private:
             std::vector<std::string> m_subcommands;
-            std::map<const MaCh3ArgumentParser*, IPlugin*> m_plugin_map;
+            std::map<const MaCh3ArgumentParser*, IModule*> m_module_map;
             std::map<const MaCh3ArgumentParser*, DynamicPlugin*> m_dynamic_plugin_map;
 
             static constexpr std::string_view BASH_COMPLETION = R"(

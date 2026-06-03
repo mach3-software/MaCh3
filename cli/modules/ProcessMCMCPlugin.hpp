@@ -3,7 +3,7 @@
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 #include "Fitters/MCMCProcessor.h"
-#include "api/plugin.hpp"
+#include "cli/api/plugin.hpp"
 
 namespace M3{
 
@@ -15,7 +15,7 @@ namespace M3{
 
 /// @brief Main function processing MCMC and Producing plots
 
-  class ProcessMCMCPlugin: public IPlugin{
+  class ProcessMCMCPlugin: public IModule{
 
     public:
       virtual ~ProcessMCMCPlugin();
