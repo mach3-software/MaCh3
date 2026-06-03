@@ -4,10 +4,10 @@
 
 namespace M3{
 
-  class GetPenaltyTermPlugin: public IModule{
+  class GetPenaltyTermModule: public IModule{
 
     public:
-      virtual ~GetPenaltyTermPlugin();
+      virtual ~GetPenaltyTermModule();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 

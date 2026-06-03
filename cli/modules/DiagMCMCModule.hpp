@@ -3,10 +3,10 @@
 
 namespace M3{
 
-  class DiagMCMCPlugin: public IModule{
+  class DiagMCMCModule: public IModule{
 
     public:
-      virtual ~DiagMCMCPlugin();
+      virtual ~DiagMCMCModule();
       MaCh3ArgumentParser* get_parser() override;
       int run() override;
 

@@ -4,9 +4,9 @@
 
 
 add_library(CLIModules SHARED
-    ProcessMCMCPlugin.cpp
-    DiagMCMCPlugin.cpp
-    GetPenaltyTermPlugin.cpp
+    ProcessMCMCModule.cpp
+    DiagMCMCModule.cpp
+    GetPenaltyTermModule.cpp
 )
 
 target_link_libraries(CLIModules PRIVATE MaCh3::All)

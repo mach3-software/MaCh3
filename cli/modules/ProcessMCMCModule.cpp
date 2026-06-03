@@ -1,26 +1,16 @@
 //MaCh3 includes
 #include "Fitters/OscProcessor.h"
 #include "Manager/Manager.h"
-#include "cli/modules/ProcessMCMCPlugin.hpp"
+#include "cli/modules/ProcessMCMCModule.hpp"
 
-// Not needed for Core plugins as not dynamically loaded
-// extern "C" mach3::IPlugin* create_plugin() {
-//   return new mach3::ProcessMCMCPlugin();
-// }
-
-// extern "C" void destroy_plugin(mach3::IPlugin* p) {
-//   delete p;
-// }
-// if was a dynamic plugin, could now use the convienience macro to generate these
-// MACH3_REGISTER_PLUGIN(mach3::ProcessMCMCPlugin)
 
 namespace M3{
 
-  ProcessMCMCPlugin::~ProcessMCMCPlugin(){
+  ProcessMCMCModule::~ProcessMCMCModule(){
     if (this->m_parser) { delete this->m_parser; } 
   }
 
-  MaCh3ArgumentParser* ProcessMCMCPlugin::get_parser(){
+  MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){
     m_parser = new MaCh3ArgumentParser("process", "1.0", argparse::default_arguments::help);
     m_parser->add_description("Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc.");
     m_parser->add_epilog("""\
@@ -69,7 +59,7 @@ namespace M3{
   }
 
 
-  int ProcessMCMCPlugin::run() {
+  int ProcessMCMCModule::run() {
     SetMaCh3LoggerFormat();
     nFiles = 0;
     config = m_parser->get<std::string>("config");
@@ -135,7 +125,7 @@ namespace M3{
   ///
   /// @param Settings YAML configuration node containing the optional
   ///        `CustomBinEdges` section.
-  std::map<std::string, std::pair<double, double>> ProcessMCMCPlugin::GetCustomBinning(const YAML::Node& Settings)
+  std::map<std::string, std::pair<double, double>> ProcessMCMCModule::GetCustomBinning(const YAML::Node& Settings)
   {
     std::map<std::string, std::pair<double, double>> CustomBinning;
     if (Settings["CustomBinEdges"]) {
@@ -157,7 +147,7 @@ namespace M3{
     return CustomBinning;
   }
 
-  void ProcessMCMCPlugin::ProcessMCMC(const std::string& inputFile)
+  void ProcessMCMCModule::ProcessMCMC(const std::string& inputFile)
   {
     MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
     // Make the processor)
@@ -254,7 +244,7 @@ namespace M3{
     if(GetFromManager<bool>(Settings["MakePiePlot"], true))      Processor->MakePiePlot();
   }
 
-  void ProcessMCMCPlugin::MultipleProcessMCMC()
+  void ProcessMCMCModule::MultipleProcessMCMC()
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -463,7 +453,7 @@ namespace M3{
   }
 
   /// @brief KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
-  void ProcessMCMCPlugin::CalcBayesFactor(MCMCProcessor* Processor)
+  void ProcessMCMCModule::CalcBayesFactor(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -483,7 +473,7 @@ namespace M3{
     Processor->GetBayesFactor(ParNames, Model1Bounds, Model2Bounds, ModelNames);
   }
 
-  void ProcessMCMCPlugin::CalcSavageDickey(MCMCProcessor* Processor)
+  void ProcessMCMCModule::CalcSavageDickey(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -501,7 +491,7 @@ namespace M3{
     Processor->GetSavageDickey(ParNames, EvaluationPoint, Bounds);
   }
 
-  void ProcessMCMCPlugin::CalcParameterEvolution(MCMCProcessor* Processor)
+  void ProcessMCMCModule::CalcParameterEvolution(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -516,7 +506,7 @@ namespace M3{
     Processor->ParameterEvolution(ParNames, Intervals);
   }
 
-  void ProcessMCMCPlugin::CalcBipolarPlot(MCMCProcessor* Processor)
+  void ProcessMCMCModule::CalcBipolarPlot(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -529,7 +519,7 @@ namespace M3{
     Processor->GetPolarPlot(ParNames);
   }
 
-  void ProcessMCMCPlugin::GetTrianglePlot(MCMCProcessor* Processor) {
+  void ProcessMCMCModule::GetTrianglePlot(MCMCProcessor* Processor) {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
 
@@ -549,7 +539,7 @@ namespace M3{
   }
 
   /// @brief KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
-  void ProcessMCMCPlugin::DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
+  void ProcessMCMCModule::DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
   {
     //Turn of plots from Processor
     Processor->SetPrintToPDF(false);
@@ -725,7 +715,7 @@ namespace M3{
   }
 
   //KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
-  TH2D* ProcessMCMCPlugin::TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
+  TH2D* ProcessMCMCModule::TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
   {
     TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix->GetNrows(), 0.0, Matrix->GetNrows(), Matrix->GetNcols(), 0.0, Matrix->GetNcols());
     for(int i = 0; i < Matrix->GetNrows(); i++)
@@ -740,7 +730,7 @@ namespace M3{
   }
 
   // KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
-  void ProcessMCMCPlugin::KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
+  void ProcessMCMCModule::KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                                           const std::unique_ptr<TCanvas>& Posterior,
                                           const TString& canvasname)
   {
