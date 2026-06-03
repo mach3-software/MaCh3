@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     M3::DiagMCMCPlugin diag;
     M3::GetPenaltyTermPlugin penterm;
 
-    program.add_core_plugin(proc);
-    program.add_core_plugin(diag);
-    program.add_core_plugin(penterm);
+    program.add_core_module(proc);
+    program.add_core_module(diag);
+    program.add_core_module(penterm);
     program.load_dynamic_plugins();
 
     try {

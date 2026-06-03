@@ -98,10 +98,10 @@ namespace M3{
     //     }
     // }
 
-    void MaCh3Program::add_core_plugin(IPlugin& plugin){
-        MaCh3ArgumentParser* parser = plugin.get_parser();
+    void MaCh3Program::add_core_module(IModule& module){
+        MaCh3ArgumentParser* parser = module.get_parser();
         this->add_subparser(*parser);
-        m_plugin_map[parser] = &plugin;
+        m_module_map[parser] = &module;
         m_subcommands.push_back(parser->name());
     }
 
@@ -187,8 +187,8 @@ namespace M3{
         const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
         
         if (sub_parser){
-            auto plugin_itr = m_plugin_map.find(&sub_parser);
-            if (plugin_itr != m_plugin_map.end()){
+            auto plugin_itr = m_module_map.find(&sub_parser);
+            if (plugin_itr != m_module_map.end()){
                 return plugin_itr->second->run();
             }
             auto dplugin_itr = m_dynamic_plugin_map.find(&sub_parser);

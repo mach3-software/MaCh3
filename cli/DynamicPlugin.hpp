@@ -1,6 +1,6 @@
 #pragma once
 #include <dlfcn.h>
-#include "api/plugin.hpp"
+#include "cli/api/plugin.hpp"
 
 namespace M3{
     class DynamicPlugin: public IPlugin{

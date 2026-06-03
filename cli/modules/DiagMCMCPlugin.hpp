@@ -1,9 +1,9 @@
 #pragma once
-#include "api/plugin.hpp"
+#include "cli/api/plugin.hpp"
 
 namespace M3{
 
-  class DiagMCMCPlugin: public IPlugin{
+  class DiagMCMCPlugin: public IModule{
 
     public:
       virtual ~DiagMCMCPlugin();
