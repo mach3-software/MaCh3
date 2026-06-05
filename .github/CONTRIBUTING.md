@@ -347,7 +347,7 @@ MaCh3blarb
 MaCh3 uses the CERN ROOT package for plotting and I/O operations. While MaCh3 does not require a specific ROOT version—ensuring compatibility across a wide range of scientific clusters used by different users—be aware that ROOT developers occasionally introduce bugs or breaking changes in new releases.
 To improve stability and portability, it is recommended to prefer standard C++ (STL) counterparts whenever possible.
 
-# AI Usage
+## AI Usage
 The following rules are in service of producing correct, maintainable code while not inundating the maintainers.
 
 1. You (the author of the PR) are responsible for the PR, regardless of the tools you use to create it. Make sure you understand it thoroughly and agree with its contents before you submit a PR.
