@@ -248,8 +248,7 @@ Putting it all together might look like:
 This allows us to disable the diagnostic just for the relevant line.
 
 ## C++ Standard
-As of May 2025, the minimum supported C++ standard for MaCh3 is **C++14**, although the codebase is compatible with newer standards such as **C++17** and beyond.
-These are often referred to collectively as *modern C++*.
+The minimum supported C++ standard for MaCh3 is **C++17**. This is
 MaCh3 aims to use modern C++ features to encourage safer, cleaner, and more maintainable code.
 
 ### Pointers

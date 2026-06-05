@@ -745,8 +745,7 @@ namespace Utils {
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
-  /// @todo this could be constexpr in c++17
-  inline double GetMassFromPDG(const int PDG) {
+  inline constexpr double GetMassFromPDG(const int PDG) {
   // *****************************
     switch (abs(PDG)) {
       // Leptons
