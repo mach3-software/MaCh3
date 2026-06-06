@@ -26,17 +26,6 @@ DelayedMR2T2::DelayedMR2T2(Manager* const FitManager) : MR2T2(FitManager) {
         // Since we're not delaying at all set max_rejections = 0 to save time
         max_rejections = 0;
     }
-
-    for(size_t i = 0; i < systematics.size(); ++i){
-        if(systematics[i]->GetDoAdaption()){
-            if(systematics[i]->GetAdaptiveHandler()->GetUseRobbinsMonro()){
-                MACH3LOG_ERROR("Right now Robbins-Monro doesn't work with Delayed MCMC");
-                MACH3LOG_ERROR("Usual adaptive works fine though");
-                MACH3LOG_ERROR("Ask Dr Wacky for details");
-                throw MaCh3Exception(__FILE__ , __LINE__ );
-            }
-        }
-    }
     MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, max_rejections);
 }
 
@@ -63,6 +52,16 @@ void DelayedMR2T2::PrepareOutput() {
 // *************************
     FitterBase::PrepareOutput();
 
+    for(size_t i = 0; i < systematics.size(); ++i){
+        if(systematics[i]->GetDoAdaption()){
+            if(systematics[i]->GetAdaptiveHandler()->GetUseRobbinsMonro()){
+                MACH3LOG_ERROR("Right now Robbins-Monro doesn't work with Delayed MCMC");
+                MACH3LOG_ERROR("Usual adaptive works fine though");
+                MACH3LOG_ERROR("Ask Dr Wacky for details");
+                throw MaCh3Exception(__FILE__ , __LINE__ );
+            }
+        }
+    }
     // Store delayed specific settings
     outTree->Branch("DelayedStep", &accepted_delayed, "DelayedStep/B");
 }
