@@ -351,7 +351,7 @@ To improve stability and portability, it is recommended to prefer standard C++ (
 The following rules are in service of producing correct, maintainable code while not inundating the maintainers.
 
 1. You (the author of the PR) are responsible for the PR, regardless of the tools you use to create it. Make sure you understand it thoroughly and agree with its contents before you submit a PR.
-2. Corollary: AI is not a co-author, AI is a tool. If you wouldn't list Emacs as a co-author, don't list Claude either.
+2. Corollary: AI is not a co-author, AI is a tool. If you wouldn't list Emacs as a co-author, don't list Claude either. Following this principle, we will not allow AI systems to directly commit to MaCh3.
 3. Do not use AI to generate documentation. If you need AI to help with wording or grammar that's ok. However avoid "AI generate documentation" and copy pasting without reading. It is difficult read with ton of unnecessary and artificial text.
 
 Highly inspired by [yaml-cpp](https://github.com/jbeder/yaml-cpp/blob/2decf96e915d2b0c26c68c1659665789dfef2633/CONTRIBUTING.md?plain=1#L28-L35)
