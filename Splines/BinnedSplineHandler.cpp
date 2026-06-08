@@ -681,23 +681,7 @@ bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int
 //****************************************
   int iSample = GetSampleIndex(SampleTitle);
 
-  // find matching entry in flat structure
-  bool found = false;
-
-  for (const auto& entry : IndexVect)
-  {
-    if (entry.iSample  == iSample  &&
-       entry.iOscChan == iOscChan &&
-       entry.iSyst    == iSyst    &&
-       entry.iMode    == iMode    &&
-       entry.iVar1    == iVar1    &&
-       entry.iVar2    == iVar2    &&
-       entry.iVar3    == iVar3)
-    {
-      found = true;
-      break;
-    }
-  }
+  bool found = IndexVectMap.find(std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3)) != IndexVectMap.end();
 
   if (!found)
   {
