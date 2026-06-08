@@ -57,7 +57,7 @@ void DelayedMR2T2::PrepareOutput() {
             if(systematics[i]->GetAdaptiveHandler()->GetUseRobbinsMonro()){
                 MACH3LOG_ERROR("Right now Robbins-Monro doesn't work with Delayed MCMC");
                 MACH3LOG_ERROR("Usual adaptive works fine though");
-                MACH3LOG_ERROR("Ask Dr Wacky for details");
+                MACH3LOG_ERROR("Ask Dr Wallace for details");
                 throw MaCh3Exception(__FILE__ , __LINE__ );
             }
         }
@@ -144,14 +144,14 @@ void DelayedMR2T2::DoStep() {
             break;
         }
         /// OOB Check
-        if(out_of_bounds == false && delay_on_oob_only) {
+        if(!out_of_bounds && delay_on_oob_only) {
             // If we are not out of bounds and only delaying on out of bounds steps
             // We can skip the delay
             break;
         }
         
         /// Probabilistic condition
-        if (ProbabilisticDelay() == false) {
+        if (!ProbabilisticDelay()) {
             break;
         }
 
