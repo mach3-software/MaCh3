@@ -46,6 +46,7 @@ void BinnedSplineHandler::CleanUpMemory() {
   //Not a huge saving but it's better than leaving everything up to the compiler
   MACH3LOG_INFO("Cleaning up spline memory");
   CleanVector(IndexVect);
+  IndexVectMap.clear();
   CleanVector(SplineFileParPrefixNames);
   CleanVector(GlobalSystIndex);
   CleanVector(SplineModeVecs);
@@ -1067,6 +1068,11 @@ void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
   for (Long64_t iEntry = 0; iEntry < IndexTree->GetEntries(); ++iEntry) {
     IndexTree->GetEntry(iEntry);
     IndexVect[iEntry] = *IndexTemp;
+
+    auto key = std::make_tuple(IndexTemp->iSample, IndexTemp->iOscChan, IndexTemp->iSyst,
+                               IndexTemp->iMode, IndexTemp->iVar1, IndexTemp->iVar2, 
+                               IndexTemp->iVar3);
+    IndexVectMap[key] = static_cast<int>(iEntry);
   }
 
   // Load SplineBinning data
