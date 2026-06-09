@@ -266,50 +266,96 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetupReweightArrays();
   //===============================================================================
 
-  // ----- Functional Parameters -----
-  /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters();
-  /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
+// ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
-  virtual void RegisterFunctionalParameters() = 0;
+  virtual void RegisterFunctionalParameters(){};
   /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
   virtual void PrepFunctionalParameters(){};
+
+  /// @brief Helper object for storing/updating information related to functional shift parameters
+  /// @author Luke Pickering
+  ///
+  /// @details For each shift (which may consume multiple parameters) this class
+  ///          stores the function that applies the shift to a given event index
+  ///          given the current vector of parameter values
+  ///          (Functional::Shift::apply), which is supplied by the an
+  ///          experiment sample calling RegisterIndividualFunctionalParameter.
+  ///          It also stores the last parameter values for all parameters
+  ///          consumed by a given shift (Functional::Shift::par_vals) and
+  ///          a function that will get the current parameter values from the
+  ///          ParHandler object (Functional::Shift::update_vals).
+  ///          For each event managed by the SampleHandlerBase instance, a
+  ///          vector of indexes of functional shifts that are applicable is
+  ///          stored (Functional::event_shifts). i.e. to iterate over the
+  ///          relevant Functional::Shift instance for event ev_it you might do
+  ///          for(auto & fs_it : functional.event_shifts[ev_it]){
+  ///            // do something with functional.shifts[fs_it]
+  ///          }
+  ///          functional.update_vals() will update the current parameter values
+  ///          for all registered shifts.
+  struct Functional {
+    struct Shift {
+      std::vector<double> par_vals;
+      std::function<void(std::vector<double> &)> update_vals;
+      std::function<void(std::vector<double> const &, const int)> apply;
+    };
+    std::vector<Shift> shifts;
+    void update_vals(){
+      for(auto &shift : shifts){
+        shift.update_vals(shift.par_vals);
+      }
+    }
+    std::vector<std::vector<int>> event_shifts;
+  } functional;
+
+  /// @brief LP - Registration template function for multi-dimensional functional shifts
+  /// @details This method is templated over the EventType and the response
+  ///          function type because the response function type is a function
+  ///          of the event type. The implementation checks via static assert
+  ///          that the passed function object has the correct call signature.
+  ///          The experiment class event vector is passed so that the function
+  ///          objects that are used to apply the shifts are able to access the
+  ///          full event information from the experiment class, rather than
+  ///          only being able to respond to event properties defined in
+  ///          Samples/EventInfo.h
+  ///          A vector of input parameter names that should be consumed by the
+  ///          functional shift is also passed. For a 1D version of this method,
+  ///          see below.
+  ///          This function might be used like below:
+  ///
+  ///          RegisterIndividualFunctionalParameter(ExptEventInfo, {"par1", "par2"},
+  ///            [](std::vector<double> const & par_vals, ExptEventType & ev){
+  ///              constexpr static const double a = 1.2345;
+  ///              ev.property += par_vals[0] * a + par_vals[1];
+  ///          });
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(
+      std::vector<EventType> &ExptEvents,
+      std::vector<std::string> const &par_names,
+      SFType shift_func);
+
+  /// @brief LP - Registration template function for one-dimensional functional shifts
+  /// @details See above for more details on the call signature and usage.
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(std::vector<EventType> &ExptEvents,
+                                             std::string const &par_name,
+                                             SFType shift_func);
   /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(const int iEvent);
+  void ApplyShifts(const int iEvent);
+  /// @brief HH - reset the shifted values to the original values
+  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
+  /// @brief LP - Optionally calculate derived observables after all shifts have been applied
+  /// @details For example, have shifts that varied lepton energy and hadron energy separately
+  ///          in a subclass implementation of this method you may add the shifted quantities
+  ///          together to build a shifted neutrino energy estimator
+  virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
+  // ----- end Functional Parameters -----
+
 
   /// @brief DB Function which determines if an event is selected based on @ref KinematicCut
   bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
-  /// @brief HH - reset the shifted values to the original values
-  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
-  /// @brief LP - Optionally calculate derived observables after all shifts have been applied
-  /// @details LP - For example, have shifts that varied lepton energy and hadron energy separately
-  ///               in a subclass implementation of this method you may add the shifted quantities
-  ///               together to build a shifted neutrino energy estimator
-  virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
-  /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<FunctionalShifter*>> funcParsGrid;
-  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
-  /// struct
-  /// HH - Changed to a vector of pointers since it's faster than unordered_map
-  /// and we are using ints as keys
-  std::vector<FunctionalShifter> funcParsMap;
-
-  /// @todo KS: Below functional variables are used only on setup, thus we should refactor them in such a way
-  /// that they are removed as class members but this would be breaking change thus keep it for the time being.
-
-  /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<std::vector<FunctionalParameter>> funcParsVec;
-  /// @brief HH - a map that relates the name of the functional parameter to
-  /// funcpar enum
-  std::unordered_map<std::string, int> funcParsNamesMap;
-  /// @brief HH - a map that relates the funcpar enum to pointer of the actual
-  /// function
-  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
-  /// @brief HH - a vector of string names for each functional parameter
-  std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
   /// @param norm_parameters indexed [sample][param] describe norm params and associated kinematic cuts etc.
