@@ -546,7 +546,7 @@ void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParInit(i));
+    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParPreFit(i));
   }
 }
 
@@ -757,14 +757,6 @@ void ParameterHandlerBase::SetFreeParameter(const std::string& name) {
 }
 
 // ********************************************
-void ParameterHandlerBase::ToggleFixAllParameters() {
-// ********************************************
-  // toggle fix/free all parameters
-  if(!pca) for (int i = 0; i < _fNumPar; i++) ToggleFixParameter(i);
-  else PCAObj->ToggleFixAllParameters(_fNames);
-}
-
-// ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
@@ -794,7 +786,6 @@ void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
     ToggleFixParameter(Index);
     return;
   }
-
   MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
 }
 
@@ -896,9 +887,8 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
-void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
+void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
 // ********************************************
-
    if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -929,6 +919,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
     }
   }
 }
+
 // ********************************************
 void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
                                              TMatrixDSym const &subcov) {
@@ -961,6 +952,39 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
   SetThrowMatrix(cov);
 }
 
+
+// ********************************************
+void ParameterHandlerBase::SanitizeAdaption() const {
+// ********************************************
+  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
+    const int index = FlipParameterIndex[i];
+    if(!param_skip_adapt_flags[index]) {
+      MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
+      MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
+      MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
+  // We don't want to change one parameter while keeping the other fixed as this would
+  // lead to weird penalty terms in the prior after adapting
+  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
+  for (int i = 0; i < _fNumPar; ++i) {
+    for (int j = 0; j <= i; ++j) {
+      // The symmetry should have been checked during the Init phase
+      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
+        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
+        if(std::fabs(corr) > max_correlation) {
+          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
+                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    }
+  }
+}
+
 // ********************************************
 // HW : Here be adaption
 void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
@@ -980,7 +1004,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   _fGlobalStepScaleInitial = _fGlobalStepScale;
 
   // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
-  std::vector<std::string> params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
+  auto params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
   // Build a list of skip flags
   param_skip_adapt_flags.resize(_fNumPar, false);
   for (int i = 0; i <_fNumPar; ++i) {
@@ -991,32 +1015,17 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
       }
     }
   }
-  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
-  // We don't want to change one parameter while keeping the other fixed as this would
-  // lead to weird penalty terms in the prior after adapting
-  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
-  for (int i = 0; i < _fNumPar; ++i) {
-    for (int j = 0; j <= i; ++j) {
-      // The symmetry should have been checked during the Init phase
-      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
-        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
-        if(std::fabs(corr) > max_correlation) {
-          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
-                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-      }
-    }
-  }
+
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName,
     &_fFancyNames, &_fCurrVal, &_fError,
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
   if (success) {
+    // Ensure there is no misconfiguration in adaption config
+    SanitizeAdaption();
     AdaptiveHandler->Print();
-  }
-  else {
+  } else {
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 

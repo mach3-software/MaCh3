@@ -32,3 +32,4 @@ install(TARGETS Plotting
 )
 
 add_library(MaCh3::Plotting ALIAS Plotting)
+target_link_libraries(MaCh3 INTERFACE Plotting)

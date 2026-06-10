@@ -36,7 +36,6 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // Destructor:
 PredictiveThrower::~PredictiveThrower() {
 // *************************
-
 }
 
 // *************************
@@ -65,7 +64,7 @@ void PredictiveThrower::SetParamters(std::vector<std::string>& ParameterGroupsNo
     for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
       // KS: If parameter is in map then we are skipping this, otherwise for params that we don't want to vary we simply set it to prior
       if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
-        ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
+        ModelSystematic->SetParProp(i, ModelSystematic->GetParPreFit(i));
       }
     }
   }

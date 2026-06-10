@@ -35,19 +35,6 @@ struct SplineIndex {
   /// @brief destructor
   virtual ~SplineIndex() = default;
 
-  /// @brief Compare spline lookup indices (excluding value)
-  /// @todo Add this to BinnedSplineHandler::GetSplineIndex
-  bool operator==(const SplineIndex& idx) const
-  {
-    return iSample  == idx.iSample  &&
-           iOscChan == idx.iOscChan &&
-           iSyst    == idx.iSyst    &&
-           iMode    == idx.iMode    &&
-           iVar1    == idx.iVar1    &&
-           iVar2    == idx.iVar2    &&
-           iVar3    == idx.iVar3;
-  }
-
   /// Index into the flattened spline weight vector
   int value    = 0;
   /// Sample index

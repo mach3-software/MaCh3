@@ -173,6 +173,17 @@ double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC);
 /// @return The combined p-value, representing the overall significance.
 double FisherCombinedPValue(const std::vector<double>& pvalues);
 
+/// @brief Convert a posterior probability histogram into a \f$\Delta\chi^2\f$ distribution. Using
+/// the likelihood-ratio definition:
+///
+/// \f[
+///   \Delta\chi^2 = -2 \ln\left(\frac{L}{L_{\max}}\right)
+/// \f]
+///
+/// @param posterior_probability_hist Pointer to a TH1D histogram containing posterior probabilities
+/// @note based on CompareMaCh3PThetaDeltaChi2.C
+std::unique_ptr<TH1D> GetDeltaChi2(TH1D* posterior_probability_hist);
+
 /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
 ///
 /// @param FilePath Path to MCMC chain you want to thin

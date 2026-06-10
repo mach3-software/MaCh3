@@ -31,7 +31,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   //######################################### Functions #########################################
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                   const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerBase();
@@ -146,20 +146,20 @@ class SampleHandlerBase :  public SampleHandlerInterface
   int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
+                                          const SamplePlotType Selection1, const int Selection2 = -1, const int WeightStyle = 0);
   /// @brief Return the legend used for stacked histograms with sample info
   const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
-  /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @brief ETA function to generically convert a string from param handler to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
-  /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @brief ETA function to generically convert a kinematic type from param handler to a string
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
   /// @copydoc SampleHandlerInterface::SaveAdditionalInfo

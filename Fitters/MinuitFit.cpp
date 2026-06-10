@@ -35,7 +35,6 @@ MinuitFit::~MinuitFit() {
 // *************************
 }
 
-
 // *******************
 // Run the Minuit with all the systematic objects added
 void MinuitFit::RunMCMC() {
@@ -70,11 +69,8 @@ void MinuitFit::RunMCMC() {
     }
   }
 
-
-
   MACH3LOG_INFO("Preparing Minuit");
   int ParCounter = 0;
-
   for (std::vector<ParameterHandlerBase*>::iterator it = systematics.begin(); it != systematics.end(); ++it)
   {
     if(!(*it)->IsPCA())
@@ -82,8 +78,8 @@ void MinuitFit::RunMCMC() {
       for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
         //KS: Index, name, prior, step scale [different to MCMC],
-        minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->GetParInit(i), (*it)->GetDiagonalError(i)/10);
-        minuit->SetVariableValue(ParCounter, (*it)->GetParInit(i));
+        minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->GetParPreFit(i), (*it)->GetDiagonalError(i)/10);
+        minuit->SetVariableValue(ParCounter, (*it)->GetParPreFit(i));
         //KS: lower bound, upper bound, if Mirroring enabled then ignore
         if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));
         if((*it)->IsParameterFixed(i))
@@ -220,4 +216,3 @@ void MinuitFit::RunMCMC() {
   // Save all the output
   SaveOutput();
 }
-

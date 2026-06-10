@@ -53,7 +53,7 @@ class SampleHandlerInterface
   virtual void CleanMemoryBeforeFit() = 0;
   /// @brief Store additional info in a chain
   /// @param Dir directory to which we save additional info
-  virtual void SaveAdditionalInfo(TDirectory* Dir) {(void) Dir;};
+  virtual void SaveAdditionalInfo([[maybe_unused]] TDirectory* Dir) {};
   /// @brief Return pointer to MaCh3 modes
   MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
   /// @brief main routine modifying MC prediction based on proposed parameter values

@@ -12,7 +12,7 @@ class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
     /// @brief Constructor
-    BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
+    BinnedSplineHandler(ParameterHandlerGeneric *ParamHandler, MaCh3Modes *Modes_);
     /// @brief Destructor
     /// @todo it need some love
     virtual ~BinnedSplineHandler();
@@ -30,7 +30,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief flatten multidimensional spline array into proper monolith
     void TransferToMonolith();
     /// @brief Remove setup variables not needed for spline evaluations
-    void cleanUpMemory();
+    void CleanUpMemory();
 
     /// @brief Loads and processes splines from ROOT files for a given sample.
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
@@ -40,7 +40,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer() const final {return;}
     /// @brief Count how many splines we have
-    int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
+    int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0) const;
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* RetPointer(const SplineIndex& Variables) const;
@@ -76,7 +76,7 @@ class BinnedSplineHandler : public SplineBase {
     /// of modes in case many interaction modes get averaged into one spline
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) const;
     /// @brief Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-    void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
+    void GetSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
 
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* ParHandler;
@@ -110,6 +110,8 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief Variables related to determined which modes have splines and which piggy-back of other modes
     std::vector<SplineIndex> IndexVect;
+    /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
+    std::map<std::tuple<int, int, int, int, int, int, int>, int> IndexVectMap;
 
     std::vector<int > coeffindexvec;
     /// Unique coefficient indices

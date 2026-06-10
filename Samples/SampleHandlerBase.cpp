@@ -9,17 +9,17 @@
 #include <numeric>
 
 // ************************************************
-SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                                      const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerInterface() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerBase object");
 
-  //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov) {
+  //ETA - safety feature so you can't pass a NULL _ParHandler
+  if(!_ParHandler) {
     MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
-  ParHandler = xsec_cov;
+  ParHandler = _ParHandler;
 
   nSamples = 1;
 
@@ -1423,7 +1423,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
 
     SetSplinePointers();
 
-    BinnedSplines->cleanUpMemory();
+    BinnedSplines->CleanUpMemory();
   } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     (void) UnbinnedSpline;
     SetSplinePointers();
@@ -1995,7 +1995,7 @@ int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const 
 
 // ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                              const int Selection1, const int Selection2, const int WeightStyle) {
+                                                                              const SamplePlotType Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH1>> hHistList;
   std::string legendEntry;
@@ -2003,7 +2003,7 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
   if (THStackLeg != nullptr) {delete THStackLeg;}
   THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
 
-  const int iMax = GetRangeForPlotType(static_cast<SamplePlotType>(Selection1), iSample);
+  const int iMax = GetRangeForPlotType(Selection1, iSample);
   for (int i=0;i<iMax;i++) {
     if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle));
@@ -2023,12 +2023,12 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
 
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                                                              const std::string& KinematicProjectionY, const int Selection1,
+                                                                              const std::string& KinematicProjectionY, const SamplePlotType Selection1,
                                                                               const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH2>> hHistList;
 
-  const int iMax = GetRangeForPlotType(static_cast<SamplePlotType>(Selection1), iSample);
+  const int iMax = GetRangeForPlotType(Selection1, iSample);
   for (int i=0;i<iMax;i++) {
     if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle));
@@ -2043,7 +2043,7 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                           const int Selection1, int Selection2, int WeightStyle) {
+                                                                           const SamplePlotType Selection1, int Selection2, int WeightStyle) {
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");

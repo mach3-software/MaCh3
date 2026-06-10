@@ -169,7 +169,7 @@ You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cm
 MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https://cmake.org), and [ROOT](https://root.cern/). Based on several tests, recommended versions are:
 ```bash
   GCC:   >= 8.5   [lower versions may work]
-  C++:   >= 14
+  C++:   >= 17
   CMake: >= 3.14
   ROOT:  >= 6.20
 ```
@@ -207,7 +207,7 @@ are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 | Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
 | Ubuntu25.04 | ✅     |
-| Fedora32    | ✅     |
+| Fedora34    | ✅     |
 | CentOS7     | ❔     |
 | MacOS       | ❔     |
 | Windows     | ❌     |

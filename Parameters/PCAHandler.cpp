@@ -317,7 +317,6 @@ void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>&
   }
 }
 
-
 // ********************************************
 void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
                                  double** throwMatrixCholDecomp,

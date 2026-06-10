@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.5.1 LANGUAGES CXX)
+project(MaCh3 VERSION 2.6.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -18,6 +18,17 @@ option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved perfor
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
 set(MaCh3_PYTHON_INSTALL_DIR  CACHE STRING "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If not set then will be installed in the build location of MaCh3")
+
+if (NOT DEFINED CMAKE_BUILD_TYPE OR
+        CMAKE_BUILD_TYPE STREQUAL "" OR
+        CMAKE_BUILD_TYPE STREQUAL "Release" OR
+        CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  # Do nothing as this is default
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(MaCh3_DEBUG_ENABLED ON)
+else()
+  message(FATAL_ERROR "Passed not supported build type: ${CMAKE_BUILD_TYPE}")
+endif()
 
 if ("${MaCh3_PYTHON_INSTALL_DIR}" STREQUAL "")
   set(MaCh3_PYTHON_INSTALL_DIR ${PROJECT_BINARY_DIR}/pyMaCh3)
@@ -61,7 +72,7 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
-set(CXX_MINIMAL_STANDARD 14)
+set(CXX_MINIMAL_STANDARD 17)
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   set(CMAKE_CXX_STANDARD ${CXX_MINIMAL_STANDARD})
   cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
@@ -279,7 +290,10 @@ foreach(f ${ALL_FEATURES})
 endforeach()
 
 ################################# Build MaCh3 ##################################
-
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
+add_library(MaCh3 INTERFACE)
+target_link_libraries(MaCh3 INTERFACE MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 # Build components
 add_subdirectory(Manager)
 add_subdirectory(Parameters)
@@ -299,13 +313,6 @@ foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscP
   )
 endforeach()
 
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
-if (MaCh3_NUDOCK_ENABLED)
-  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
-endif()
-target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -350,7 +357,6 @@ if(MaCh3_DependancyGraph)
 endif()
 
 ############################  Install  ####################################
-
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
   ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/MaCh3Config.cmake.in ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
@@ -397,6 +403,7 @@ add_custom_command(
           -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
+          -DNuOscillator_VERSION=${MaCh3_NuOscillatorBranch}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
           -P ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
   COMMENT "Generating version.h and _version.h"
