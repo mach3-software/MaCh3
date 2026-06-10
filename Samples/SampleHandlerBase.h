@@ -9,8 +9,7 @@
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
 #include "Samples/BinningHandler.h"
-
-#include "Samples/detail/SampleHandlerFunctional.h"
+#include "Samples/SampleHandlerFunctional.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "THStack.h"
