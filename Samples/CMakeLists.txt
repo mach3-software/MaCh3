@@ -34,5 +34,7 @@ install(TARGETS Samples
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/Samples)
 
+install(DIRECTORY detail DESTINATION include/Samples)
+
 add_library(MaCh3::Samples ALIAS Samples)
 target_link_libraries(MaCh3 INTERFACE Samples)
