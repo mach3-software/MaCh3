@@ -2,6 +2,7 @@ set(HEADERS
     BinningHandler.h
     SampleHandlerInterface.h
     SampleHandlerBase.h
+    SampleHandlerBase.txx
     SampleStructs.h
     HistogramUtils.h
     SampleInfo.h

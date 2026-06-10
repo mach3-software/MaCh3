@@ -471,3 +471,6 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Helper object for storing/updating information related to functional shift parameters
   M3::detail::Functional functional;
 };
+
+//template implementation details live here
+#include "Samples/SampleHandlerBase.txx"

@@ -2068,36 +2068,3 @@ std::vector<double> SampleHandlerBase::GetArrayForSample(const int Sample, std::
 
   return std::vector<double>(array.begin() + Start, array.begin() + End);
 }
-
-// ***************************************************************************
-template <typename ParT>
-bool SampleHandlerBase::PassesSelection(const ParT& Par, std::size_t iEvent) {
-// ***************************************************************************
-  bool IsSelected = true;
-  if (Par.hasKinBounds) {
-    const auto& kinVars = Par.KinematicVarStr;
-    const auto& selection = Par.Selection;
-
-    for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-      const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
-
-      bool passedAnyBound = false;
-      const auto& boundsList = selection[iKinPar];
-
-      for (const auto& bounds : boundsList) {
-        if (kinVal > bounds[0] && kinVal <= bounds[1]) {
-          passedAnyBound = true;
-          break;
-        }
-      }
-
-      if (!passedAnyBound) {
-        MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                       iEvent, kinVars[iKinPar], Par.name);
-        IsSelected = false;
-        break;
-      }
-    }
-  }
-  return IsSelected;
-}
