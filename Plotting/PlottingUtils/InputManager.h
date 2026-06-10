@@ -228,7 +228,7 @@ public:
   /// @param translationConfigName The config file defining the fitter file structures, fit
   /// parameter, and what the parameters are called in each fitter.
   /// @return Constructed InputManager instance.
-  InputManager(const std::string &translationConfigName);
+  InputManager(const std::string &translationConfigName, const std::vector<std::string>& _fileNames);
 
   /// @brief Add a new InputFile object to this input manager.
   /// @param fileName The name of the file to read.
@@ -635,6 +635,9 @@ private:
     // EM: Default to just return the specified name
     return sample;
   }
+
+
+  std::vector<std::string> TryToFindDefaultParamNames(const std::string& fileNames) const;
 
   // helper fn to test if string "str" ends with other string "ending"
   inline bool strEndsWith(const std::string& str, const std::string& ending) const {

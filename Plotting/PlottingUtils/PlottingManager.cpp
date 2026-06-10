@@ -56,11 +56,7 @@ void PlottingManager::initialise() {
   _styleMan = std::make_unique<StyleManager>(styleConfig);
 
   // create the InputManager and add all the files to it
-  _inputMan = std::make_unique<InputManager>(translationConfig);
-  for (std::string fileName : _fileNames)
-  {
-    _inputMan->addFile(fileName);
-  }
+  _inputMan = std::make_unique<InputManager>(translationConfig, _fileNames);
 }
 
 /// Takes in c style command line arguments and parses particular general ones that are useful for a
