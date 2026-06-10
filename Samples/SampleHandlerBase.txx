@@ -11,18 +11,34 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       "Function call signature for single parameter Functional shift must be "
       "void(std::vector<double> const &, EventType &).");
 
-  auto sample_func_pars =
-      ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
+  // check against all parameters defined on all Samples handled by this
+  // SampleHandler
+  std::vector<std::vector<FunctionalParameter>> all_sample_pars;
+  std::map<int, std::vector<int>> par_applicable_samplenames;
+  for (int iSample = 0; iSample < nSamples; ++iSample) {
+    all_sample_pars.push_back(ParHandler->GetFunctionalParametersFromSampleName(
+        GetSampleName(iSample)));
+    for (auto const &fp : all_sample_pars.back()) {
+      par_applicable_samplenames[fp.index].push_back(iSample);
+    }
+  }
 
   std::stringstream ss_pars, ss_miss;
   std::vector<FunctionalParameter const *> matched_pars;
   for (auto const &par_name : par_names) {
     ss_pars << par_name << " ";
     bool found = false;
-    for (auto const &fp : sample_func_pars) {
-      if (fp.name == par_name) {
-        matched_pars.push_back(&fp);
-        found = true;
+
+    for (int iSample = 0; iSample < nSamples; ++iSample) {
+      for (auto const &fp : all_sample_pars[iSample]) {
+        if (fp.name == par_name) {
+          matched_pars.push_back(&fp);
+          found = true;
+          break;
+        }
+      }
+      if(found){
+        break;
       }
     }
     if (!found) {
@@ -103,21 +119,28 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
   int neventsaffected = 0;
   for (int iEvent = 0; iEvent < NEvents; ++iEvent) {
     int nmatch = 0;
-    for (auto const &par : matched_pars) {
+    for (auto const &fp : matched_pars) {
       const int Mode = static_cast<int>(
           std::round(ReturnKinematicParameter("Mode", iEvent)));
-      if (!MatchCondition(par->modes, Mode)) {
+      if (!MatchCondition(fp->modes, Mode)) {
         MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent,
-                       Mode, par->name);
+                       Mode, fp->name);
         break;
       }
-      if (!PassesSelection((*par), iEvent)) {
+      if (!MatchCondition(par_applicable_samplenames[fp->index],
+                          MCEvents[iEvent].NominalSample)) {
+        MACH3LOG_TRACE("Event {}, missed Sample check ({}) for dial {}", iEvent,
+                       MCEvents[iEvent].NominalSample, fp->name);
+        break;
+      }
+      if (!PassesSelection((*fp), iEvent)) {
         MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}",
-                       iEvent, par->name);
+                       iEvent, fp->name);
         break;
       }
       nmatch++;
     }
+    // check sample name vs event.NominalSample
     if (!nmatch) {
       continue;
     }
@@ -162,20 +185,21 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
 
 // ***************************************************************************
 template <typename ParT>
-bool SampleHandlerBase::PassesSelection(const ParT& Par, std::size_t iEvent) {
-// ***************************************************************************
+bool SampleHandlerBase::PassesSelection(const ParT &Par, std::size_t iEvent) {
+  // ***************************************************************************
   bool IsSelected = true;
   if (Par.hasKinBounds) {
-    const auto& kinVars = Par.KinematicVarStr;
-    const auto& selection = Par.Selection;
+    const auto &kinVars = Par.KinematicVarStr;
+    const auto &selection = Par.Selection;
 
     for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-      const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
+      const double kinVal =
+          ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
 
       bool passedAnyBound = false;
-      const auto& boundsList = selection[iKinPar];
+      const auto &boundsList = selection[iKinPar];
 
-      for (const auto& bounds : boundsList) {
+      for (const auto &bounds : boundsList) {
         if (kinVal > bounds[0] && kinVal <= bounds[1]) {
           passedAnyBound = true;
           break;
@@ -192,4 +216,3 @@ bool SampleHandlerBase::PassesSelection(const ParT& Par, std::size_t iEvent) {
   }
   return IsSelected;
 }
-
