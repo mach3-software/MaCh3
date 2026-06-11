@@ -583,7 +583,6 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
 
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
-  func.valuePtr = RetPointer(Index);
   return func;
 }
 
@@ -996,7 +995,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
 // Set parameters to be fixed in a given group
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group) {
 // ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParFromGroup(i, Group)) SetFixParameter(i);
 }
 
@@ -1005,14 +1004,14 @@ void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
   for(size_t i = 0; i < Groups.size(); i++)
-    SetFixGroupOnlyParameters(Groups[i]); 
+    SetFixGroupOnlyParameters(Groups[i]);
 }
 
 // ********************************************
 // Set parameters to be free in a given group
 void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::string& Group) {
 // ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParFromGroup(i, Group)) SetFreeParameter(i);
 }
 
@@ -1021,7 +1020,7 @@ void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::string& Grou
 void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
   for(size_t i = 0; i < Groups.size(); i++)
-    SetFreeGroupOnlyParameters(Groups[i]); 
+    SetFreeGroupOnlyParameters(Groups[i]);
 }
 
 // ********************************************
