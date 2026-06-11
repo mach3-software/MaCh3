@@ -1136,7 +1136,7 @@ M3::float_t SampleHandlerBase::GetEventWeight(const int iEntry) {
 }
 
 // ************************************************
-std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
+std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
 // ************************************************
   const int SampleIndex = MCEvents[Event].NominalSample;
   const auto SampleTitle = GetSampleTitle(SampleIndex);
@@ -1149,7 +1149,7 @@ std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, Binn
                                                          MCEvents[Event].nupdgUnosc, MCEvents[Event].nupdg);
   const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", Event)));
   const double Etrue = MCEvents[Event].enu_true;
-  std::vector< std::vector<int> > EventSplines;
+  std::vector< SplineIndex > EventSplines;
   switch(GetNDim(SampleIndex)) {
     case 1:
       EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), 0.);
@@ -1188,7 +1188,7 @@ void SampleHandlerBase::SetSplinePointers() {
       w_pointers.reserve(w_pointers.size() + NSplines);
       const auto SampleId = MCEvents[j].NominalSample;
       for(int spline = 0; spline < NSplines; spline++) {
-        int SystIndex = EventSplines[spline][2];
+        int SystIndex = EventSplines[spline].iSyst;
 
         bool IsSelected = PassesSelection(SplineParsVec[SampleId][SystIndex], j);
         // Need to then break the event loop
@@ -1197,10 +1197,7 @@ void SampleHandlerBase::SetSplinePointers() {
           continue;
         }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                      EventSplines[spline][2], EventSplines[spline][3],
-                                                      EventSplines[spline][4], EventSplines[spline][5],
-                                                      EventSplines[spline][6]));
+        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline]));
       } // end loop over splines
       w_pointers.shrink_to_fit();
     } // end loop over events

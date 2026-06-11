@@ -446,15 +446,15 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
 }
 
 //****************************************
-const M3::float_t* BinnedSplineHandler::RetPointer(const int sample, const int oscchan, const int syst, const int mode,
-                              const int var1bin, const int var2bin, const int var3bin) const {
+const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables) const {
 //****************************************
-  int Index = IndexVectMap.at(std::make_tuple(sample, oscchan, syst, mode, var1bin, var2bin, var3bin));
+  int Index = IndexVectMap.at(std::make_tuple(Variables.iSample, Variables.iOscChan, Variables.iSyst,
+                                              Variables.iMode, Variables.iVar1, Variables.iVar2, Variables.iVar3));
   return &weightvec_Monolith[IndexVect[Index].value];
 }
 
 //****************************************
-int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity) {
+int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity) const {
 //****************************************
   std::vector<int> SampleAll(SampleTitles.size(), 0);
   std::vector<int> SampleNonFlat(SampleTitles.size(), 0);
@@ -469,7 +469,6 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
     int iSample = entry.iSample;
 
     std::string SampleTitle = SampleTitles[iSample];
-
 
     if (!isValidSplineIndex(SampleTitle, entry.iOscChan, entry.iSyst,
          entry.iMode, entry.iVar1,
@@ -712,11 +711,11 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
+std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
                                                                      int iOscChan, int EventMode, double Var1Val,
                                                                      double Var2Val, double Var3Val) {
 //****************************************
-  std::vector<std::vector<int>> ReturnVec;
+  std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
 
   int Mode = -1;
@@ -754,7 +753,16 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
         int splineID = IndexVect[index].value;
         //Also check that the spline isn't flat
         if(!isflatarray[splineID]) {
-          ReturnVec.push_back({SampleIndex, iOscChan, iSyst, iMode, Var1Bin, Var2Bin, Var3Bin});
+          SplineIndex idx;
+          idx.iSample  = SampleIndex;
+          idx.iOscChan = iOscChan;
+          idx.iSyst    = iSyst;
+          idx.iMode    = iMode;
+          idx.iVar1    = Var1Bin;
+          idx.iVar2    = Var2Bin;
+          idx.iVar3    = Var3Bin;
+
+          ReturnVec.push_back(idx);
         }
       }
     }
@@ -884,8 +892,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       }
 
       mySpline = Key->ReadObject<TSpline3>();
-
-      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
+      // loop over all the spline knots and check their value
+      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) {
         MACH3LOG_TRACE("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
         nKnots = mySpline->GetNp();

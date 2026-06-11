@@ -244,20 +244,15 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
 
-  /// @brief Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
-  std::unique_ptr<SplineBase> SplineHandler;
-
-  /// @brief Contains oscillator handling calculating oscillation probabilities
-  std::shared_ptr<OscillationHandler> Oscillator;
   //===============================================================================
   /// @brief Set pointers for each event to appropriate weights, for unbinned based on event number
   /// while for binned based on other kinematical properties
   void SetSplinePointers();
   /// @brief Retrieve the spline bin indices associated with a given event.
   /// @warning ThrowCrititcal argument will be eventually removed
-  std::vector< std::vector<int> > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
+  std::vector< SplineIndex > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
 
-  //Functions which find the nominal bin and bin edges
+  /// @brief Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges();
 
   /// @brief set the binning for 2D sample used for the likelihood calculation
@@ -385,6 +380,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void ResetHistograms();
   /// @brief Setup spline handler (both binned or unbinned)
   void InitialiseSplineObject();
+
+  /// Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
+  std::unique_ptr<SplineBase> SplineHandler;
+
+  /// Contains oscillator handling calculating oscillation probabilities
+  std::shared_ptr<OscillationHandler> Oscillator;
 
   //===============================================================================
   //DB Variables required for GetLikelihood

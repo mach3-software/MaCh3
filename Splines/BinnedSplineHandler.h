@@ -36,15 +36,14 @@ class BinnedSplineHandler : public SplineBase {
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
     virtual void FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames);
     /// @brief Return the splines which affect a given event
-    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer() const final {return;}
     /// @brief Count how many splines we have
-    int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
+    int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0) const;
 
     /// @brief get pointer to spline weight based on bin variables
-    const M3::float_t* RetPointer(const int sample, const int oscchan, const int syst, const int mode,
-                                  const int var1bin, const int var2bin, const int var3bin) const;
+    const M3::float_t* RetPointer(const SplineIndex& Variables) const;
     /// @brief KS: Prepare spline file that can be used for fast loading
     void PrepareSplineFile(std::string FileName) final;
     /// @brief KS: Load preprocessed spline file
