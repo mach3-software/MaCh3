@@ -2,6 +2,8 @@ set(HEADERS
     BinningHandler.h
     SampleHandlerInterface.h
     SampleHandlerBase.h
+    SampleHandlerBase.txx
+    SampleHandlerFunctional.h
     SampleStructs.h
     HistogramUtils.h
     SampleInfo.h
@@ -33,6 +35,7 @@ install(TARGETS Samples
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/Samples)
+
 
 add_library(MaCh3::Samples ALIAS Samples)
 target_link_libraries(MaCh3 INTERFACE Samples)
