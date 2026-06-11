@@ -27,6 +27,19 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
+Some BibTeX styles abbreviate the author name `The MaCh3 Collaboration` as `T. M. Collaboration`. To prevent this, wrap the collaboration name in an extra pair of braces so that BibTeX treats it as a single entity.
+
+Use:
+
+```bibtex
+author = "{The MaCh3 Collaboration}",
+```
+
+instead of:
+
+```bibtex
+author = {The MaCh3 Collaboration},
+```
 
 ## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
