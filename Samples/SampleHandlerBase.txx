@@ -144,7 +144,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
     if (!nmatch) {
       continue;
     }
-    if (nmatch != matched_pars.size()) {
+    if (nmatch != static_cast<int>(matched_pars.size())) {
       MACH3LOG_ERROR(
           "When determining wether functional shift consuming parameters: "
           "[ {}], in SampleHandler: {} should apply to event: {}, only {}/{} "
