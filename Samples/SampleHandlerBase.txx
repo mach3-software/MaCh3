@@ -100,7 +100,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
   }
 
   shift.par_vals.resize(par_indices.size());
-  shift.update_vals = [=](std::vector<double> &par_vals) {
+  shift.update_vals = [par_indices,this](std::vector<double> &par_vals) {
     for (size_t i = 0; i < par_indices.size(); ++i) {
       auto const &fpi = par_indices[i];
       par_vals[i] = ParHandler->GetParPropVec()[fpi];
