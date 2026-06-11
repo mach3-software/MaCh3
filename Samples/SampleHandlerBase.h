@@ -306,7 +306,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                              std::string const &par_name,
                                              SFType shift_func);
   /// @brief ETA - generic function applying shifts
-  void ApplyShifts(const int iEvent);
+  virtual void ApplyShifts(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
   virtual void ResetShifts(const int iEvent) {(void)iEvent;};
   /// @brief LP - Optionally calculate derived observables after all shifts have been applied
