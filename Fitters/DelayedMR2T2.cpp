@@ -4,31 +4,28 @@
 DelayedMR2T2::DelayedMR2T2(Manager* const FitManager) : MR2T2(FitManager) {
 // *************************
     AlgorithmName = "DelayedMR2T2";
+    auto Config = fitMan->raw();
     // Step scale for delayed step = step scale prev delay * decay_rate
-    decay_rate = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DecayRate"], 0.1);
+    decay_rate = GetFromManager<double>(Config["General"]["MCMC"]["DecayRate"], 0.1, __FILE__, __LINE__);
     // Maximum number of rejections
-    max_rejections = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["MaxRejections"], 1);
+    max_rejections = GetFromManager<int>(Config["General"]["MCMC"]["MaxRejections"], 1, __FILE__, __LINE__);
     // How big is the first step scale. This scales parameter step by initial_scale * <step scale in ParameterHandler>
-    initial_scale = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["InitialScale"], 1);
-
+    initial_scale = GetFromManager<int>(Config["General"]["MCMC"]["InitialScale"], 1, __FILE__, __LINE__);
     // On delayed on out of bounds steps. This saves some compute time and possibly regains efficiency
-    delay_on_oob_only = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["DelayOnlyOutBounds"], false);
-
-    // 
-    delay_probability = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DelayProbability"], 1.0);
-
+    delay_on_oob_only = GetFromManager<bool>(Config["General"]["MCMC"]["DelayOnlyOutBounds"], false, __FILE__, __LINE__);
+    // Allow to intrude another delayed rejection based on defined here probability
+    delay_probability = GetFromManager<double>(Config["General"]["MCMC"]["DelayProbability"], 1.0, __FILE__, __LINE__);
 
     if(delay_probability > 1.0){
         MACH3LOG_WARN("Probability of delaying steps > 1, setting to 1");
         delay_probability = 1.0;
     }
-    if(delay_probability<=0.0){
+    if(delay_probability <= 0.0){
         MACH3LOG_CRITICAL("Probability of delaying steps <= 0, setting to 0, delay will no longer have an impact!");
         delay_probability = 0.0;
         // Since we're not delaying at all set max_rejections = 0 to save time
         max_rejections = 0;
     }
-
     MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, max_rejections);
 }
 
@@ -55,6 +52,16 @@ void DelayedMR2T2::PrepareOutput() {
 // *************************
     FitterBase::PrepareOutput();
 
+    for(size_t i = 0; i < systematics.size(); ++i){
+        if(systematics[i]->GetDoAdaption()){
+            if(systematics[i]->GetAdaptiveHandler()->GetUseRobbinsMonro()){
+                MACH3LOG_ERROR("Right now Robbins-Monro doesn't work with Delayed MCMC");
+                MACH3LOG_ERROR("Usual adaptive works fine though");
+                MACH3LOG_ERROR("Ask Dr Wallace for details");
+                throw MaCh3Exception(__FILE__ , __LINE__ );
+            }
+        }
+    }
     // Store delayed specific settings
     outTree->Branch("DelayedStep", &accepted_delayed, "DelayedStep/B");
 }
@@ -62,9 +69,7 @@ void DelayedMR2T2::PrepareOutput() {
 //**********************************************
 void DelayedMR2T2::StoreCurrentStep() {
 // *********************************************
-    /*
-    Stores values from  step
-    */
+    // Stores values from  step
     // Ensure vector is correctly sized
     current_step_vals.resize(systematics.size());
     start_step_scale.resize(systematics.size());
@@ -85,7 +90,7 @@ double DelayedMR2T2::AcceptanceProbability() {
     if (denominator <= 0.0) return 1.0;
 
     // Large enough that the the minus 1 will make NO difference so the max term cancels
-    if(std::isinf(numerator) or std::isinf(denominator) ){
+    if(std::isinf(numerator) || std::isinf(denominator) ){
         return MR2T2::AcceptanceProbability();
     }
 
@@ -107,7 +112,7 @@ void DelayedMR2T2::DoStep() {
 
     MinLogLikelihood = M3::_LARGE_LOGL_;
 
-    for(int i=0; i<=max_rejections; ++i)
+    for(int i = 0; i<= max_rejections; ++i)
     {
         ProposeStep();
 
@@ -117,11 +122,11 @@ void DelayedMR2T2::DoStep() {
             syst->AcceptStep();
         }
 
-        if(out_of_bounds or logLProp>MinLogLikelihood){
+        if(out_of_bounds || logLProp > MinLogLikelihood){
             continue;
         }
 
-        if(i==0){
+        if(i == 0){
             accProb = MR2T2::AcceptanceProbability();
         }
         else{
@@ -139,14 +144,14 @@ void DelayedMR2T2::DoStep() {
             break;
         }
         /// OOB Check
-        if(not out_of_bounds and delay_on_oob_only){
+        if(!out_of_bounds && delay_on_oob_only) {
             // If we are not out of bounds and only delaying on out of bounds steps
             // We can skip the delay
             break;
         }
         
-        /// Probabalistic condition
-        if(not ProbabilisticDelay()){
+        /// Probabilistic condition
+        if (!ProbabilisticDelay()) {
             break;
         }
 
