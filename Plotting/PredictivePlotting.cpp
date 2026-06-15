@@ -207,7 +207,7 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
   std::cout<<"\\end{tabular}"<<std::endl;
   std::cout<<"\\end{table}"<<std::endl;
 
-  auto Threshold = GetFromManager<double>(Settings["Significance"], 0.05);
+  auto Threshold = GetFromManager<double>(Settings["Significance"], 0.05, __FILE__ , __LINE__);
   for(unsigned int f = 0; f < InputFiles.size(); f++)
   {
     MACH3LOG_INFO("Calculating Shape for file {}", Titles[f]);

@@ -101,15 +101,15 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         const YAML::Node& reweightConfigNode = reweight.second;
 
         // Check if this particular reweight is enabled !!! Currently only support one reweight at a time so this defaults to enabled
-        if (!GetFromManager<bool>(reweightConfigNode["Enabled"], true)) {
+        if (!GetFromManager<bool>(reweightConfigNode["Enabled"], true, __FILE__ , __LINE__)) {
             MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
             continue;
         }
 
         ReweightConfig reweightConfig;
         reweightConfig.key = reweightKey;
-        reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey);
-        reweightConfig.type = GetFromManager<std::string>(reweightConfigNode["ReweightType"], "Gaussian");
+        reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey, __FILE__ , __LINE__);
+        reweightConfig.type = GetFromManager<std::string>(reweightConfigNode["ReweightType"], "Gaussian", __FILE__ , __LINE__);
         reweightConfig.dimension = GetFromManager<int>(reweightConfigNode["ReweightDim"], 1);
         // reweightConfig.weightBranchName = "Weight_" + reweightKey; // for now all weights will be stored in branches called Weight until multi weight support
         reweightConfig.weightBranchName = "Weight";
@@ -119,7 +119,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         if (reweightConfig.dimension == 1) {
             if (reweightConfig.type == "Gaussian") {
                 // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
-                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
+                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
 
                 // Get prior values - handle both single [mean, sigma] pair and list of pairs for safety
                 auto priorNode = reweightConfigNode["ReweightPrior"];
@@ -129,14 +129,14 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                     // Check if first element is a number (single [mean, sigma] pair) or sequence (list of pairs)
                     if (priorNode[0].IsScalar()) {
                         // Single [mean, sigma] pair - convert to list format
-                        auto priorValues = GetFromManager<std::vector<double>>(priorNode, {});
+                        auto priorValues = GetFromManager<std::vector<double>>(priorNode, {}, __FILE__ , __LINE__);
                         if (priorValues.size() == 2) {
                             allPriorValues.push_back(priorValues);
                         }
                     } else {
                         // List of [mean, sigma] pairs
                         for (const auto& priorPair : priorNode) {
-                            auto priorValues = GetFromManager<std::vector<double>>(priorPair, {});
+                            auto priorValues = GetFromManager<std::vector<double>>(priorPair, {}, __FILE__ , __LINE__);
                             if (priorValues.size() == 2) {
                                 allPriorValues.push_back(priorValues);
                             }
@@ -154,9 +154,9 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                 }
             } else if (reweightConfig.type == "TGraph") {
                 // For TGraph reweights, we need the parameter name and the TGraph file and name
-                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
-                std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
-                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "");
+                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
+                std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "", __FILE__ , __LINE__);
+                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "", __FILE__ , __LINE__);
                 reweightConfig.paramNames = paramNames;
                 reweightConfig.fileName = fileName;
                 reweightConfig.graphName = graphName;
@@ -191,7 +191,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
             }
 
         } else if (reweightConfig.dimension == 2) {
-            auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
+            auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
 
             // 2D reweights need 2 parameter names
             if (paramNames.size() != 2) {
@@ -203,9 +203,9 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 
             if (reweightConfig.type == "TGraph2D") {
                 auto priorConfig = reweightConfigNode["ReweightPrior"];
-                reweightConfig.fileName = GetFromManager<std::string>(priorConfig["file"], "");
-                reweightConfig.graphName = GetFromManager<std::string>(priorConfig["graph_name"], "");
-                reweightConfig.hierarchyType = GetFromManager<std::string>(priorConfig["hierarchy"], "auto");
+                reweightConfig.fileName = GetFromManager<std::string>(priorConfig["file"], "", __FILE__ , __LINE__);
+                reweightConfig.graphName = GetFromManager<std::string>(priorConfig["graph_name"], "", __FILE__ , __LINE__);
+                reweightConfig.hierarchyType = GetFromManager<std::string>(priorConfig["hierarchy"], "auto", __FILE__ , __LINE__);
 
                 if (reweightConfig.fileName.empty() || reweightConfig.graphName.empty()) {
                     MACH3LOG_ERROR("Invalid TGraph2D configuration for {}", reweightKey);
@@ -321,7 +321,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     }
     MACH3LOG_INFO("Loading YAML config from MCMC chain");
     YAML::Node Settings = TMacroToYAML(*Config);
-    bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false);
+    bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false, __FILE__ , __LINE__);
     if (asimovfit) {
         MACH3LOG_WARN("MCMC chain was produced from an Asimov fit");
         MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");

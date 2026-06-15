@@ -150,9 +150,9 @@ void OscProcessor::Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_N
     // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
     if(CheckNodeExists(Settings, "ReweightMCMC")) {
       YAML::Node firstReweight = Settings["ReweightMCMC"].begin()->second;
-      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1);
-      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "");
-      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {});
+      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1, __FILE__ , __LINE__);
+      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "", __FILE__ , __LINE__);
+      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {}, __FILE__ , __LINE__);
       if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
         Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"],__FILE__,__LINE__);
         DoReweight = true;

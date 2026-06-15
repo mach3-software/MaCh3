@@ -367,8 +367,8 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
   gErrorIgnoreLevel = kWarning;
   canvas->Print((outfilename+"[").c_str());
 
-  auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {});
-  auto ExcludeString = GetFromManager<std::vector<std::string>>(Settings["ExcludeString"], {});
+  auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {}, __FILE__ , __LINE__);
+  auto ExcludeString = GetFromManager<std::vector<std::string>>(Settings["ExcludeString"], {}, __FILE__ , __LINE__);
   TDirectory *dir = nullptr;
 
   for(size_t id = 0; id < DialNameVector.size(); id++)
@@ -482,8 +482,8 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
   gErrorIgnoreLevel = kWarning;
   canvas->Print((outfilename+"[").c_str());
 
-  auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {});
-  auto ExcludeString = GetFromManager<std::vector<std::string>>(Settings["ExcludeString"], {});
+  auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {}, __FILE__ , __LINE__);
+  auto ExcludeString = GetFromManager<std::vector<std::string>>(Settings["ExcludeString"], {}, __FILE__ , __LINE__);
   TDirectory *dir = nullptr;
 
   for(size_t id = 0; id < DialNameVector.size(); id++)
@@ -740,8 +740,8 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
 
 void OverlaySigVar1D(const std::string& filename, const YAML::Node& Settings)
 {
-  auto ParamNames = GetFromManager<std::vector<std::string>>(Settings["ParamNames"], {});
-  auto SigColours = GetFromManager<std::vector<int>>(Settings["Coulour"], {});
+  auto ParamNames = GetFromManager<std::vector<std::string>>(Settings["ParamNames"], {}, __FILE__ , __LINE__);
+  auto SigColours = GetFromManager<std::vector<int>>(Settings["Coulour"], {}, __FILE__ , __LINE__);
 
   if(ParamNames.size() == 0) return;
 

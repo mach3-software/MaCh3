@@ -2503,7 +2503,7 @@ void MCMCProcessor::FindInputFiles() {
 
   bool InputNotFound = false;
   //CW: Get the xsec Covariance matrix
-  CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+  CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"}, __FILE__ , __LINE__);
   if(CovPos[kXSecPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find XsecCov branch in output");
@@ -2563,24 +2563,24 @@ void MCMCProcessor::FindInputFilesLegacy() {
   YAML::Node Settings = TMacroToYAML(*Config);
 
   //CW: And the ND Covariance matrix
-  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
+  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none", __FILE__ , __LINE__));
 
   if(CovPos[kNDPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find NDCov (legacy) branch in output");
   } else{
     //If the FD Cov is not none, then you need the name of the covariance object to grab
-    CovNamePos[kNDPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none");
+    CovNamePos[kNDPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none", __FILE__ , __LINE__);
     MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNamePos[kNDPar]);
   }
 
   //CW: And the FD Covariance matrix
-  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
+  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none", __FILE__ , __LINE__));
 
   if(CovPos[kFDDetPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find FDCov (legacy) branch in output");
   } else {
     //If the FD Cov is not none, then you need the name of the covariance object to grab
-    CovNamePos[kFDDetPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none");
+    CovNamePos[kFDDetPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none", __FILE__ , __LINE__);
     MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar]);
   }
 
@@ -2633,7 +2633,7 @@ void MCMCProcessor::ReadModelFile() {
     ParamNames[kXSecPar].push_back(ParName);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
-    ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
+    ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__));
 
     ParameterGroup.push_back(Group);
 

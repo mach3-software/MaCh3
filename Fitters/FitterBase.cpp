@@ -1397,8 +1397,8 @@ void FitterBase::RunSigmaVar() {
   // Save the settings into the output file
   SaveSettings();
 
-  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false);
-  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false);
+  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false, __FILE__ , __LINE__);
+  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["SigmaVar"]["SkipVector"], {}, __FILE__ , __LINE__);
 
   if (plot_by_mode) MACH3LOG_INFO("Plotting by sample and mode");

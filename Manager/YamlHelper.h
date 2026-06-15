@@ -288,7 +288,7 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 /// @param File name of file in which function is being called to make better error message
 /// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type Get(const YAML::Node& node, const std::string File, const int Line) {
+Type Get(const YAML::Node& node, const std::string& File, const int Line) {
 // **********************
   try {
     // Attempt to convert the node to the expected type
@@ -326,7 +326,7 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
 /// @param File name of file in which function is being called to make better error message
 /// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, const Type defval, const std::string File = "", const int Line = 1) {
+Type GetFromManager(const YAML::Node& node, const Type defval, const std::string& File = "", const int Line = 1) {
 // **********************
   if (!node) {
     return defval;

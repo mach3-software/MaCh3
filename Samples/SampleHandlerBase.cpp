@@ -60,7 +60,7 @@ void SampleHandlerBase::ReadConfig()
 
   fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
-    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false, __FILE__ , __LINE__);
   }
 
   if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
