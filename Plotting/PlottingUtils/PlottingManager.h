@@ -133,7 +133,7 @@ public:
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string getOutputName() { return _outputName; }
+  const std::string getOutputName() const { return _outputName; }
 
   /// @brief Get the output name but can specify a suffix to add to the name, before the file
   /// extension.
