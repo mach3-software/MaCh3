@@ -1,5 +1,5 @@
 #pragma once
-#include "cli/api/plugin.hpp"
+#include "CLI/API/plugin.hpp"
 
 namespace M3{
 

@@ -19,7 +19,7 @@ target_include_directories(CLIApi INTERFACE ${argparse_SOURCE_DIR}/include)
 target_include_directories(CLIApi
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include/cli/api>
+        $<INSTALL_INTERFACE:include/CLI/API>
 )
 
 set_target_properties(CLIApi PROPERTIES
@@ -30,7 +30,7 @@ set_target_properties(CLIApi PROPERTIES
 install(TARGETS CLIApi
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/cli/api)
+        PUBLIC_HEADER DESTINATION include/CLI/API)
 
 #install(FILES ${HEADERS} DESTINATION include/api)
 add_library(MaCh3::CLIApi ALIAS CLIApi)
