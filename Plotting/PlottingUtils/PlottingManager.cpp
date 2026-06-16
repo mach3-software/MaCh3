@@ -253,7 +253,7 @@ void PlottingManager::setOutFileName(const std::string& saveName) {
 /// Output file name, including the file extension will be returned, but with specified suffix after
 /// the name but before the extension. This is useful for e.g. saving multiple LLH scan types to
 /// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext
-const std::string PlottingManager::getOutputName(const std::string &suffix) const {
+const std::string PlottingManager::getOutputName(const std::string &suffix) {
   std::filesystem::path path(_outputName);
   // ".root", ".pdf", etc.
   std::string ext = path.extension().string();
