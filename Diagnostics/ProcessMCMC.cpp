@@ -1,5 +1,5 @@
 #include "Manager/MaCh3Logger.h"
-#include "cli/modules/ProcessMCMCModule.hpp"
+#include "CLI/Modules/ProcessMCMCModule.hpp"
 
 int main(int argc, char const* argv[]){
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");

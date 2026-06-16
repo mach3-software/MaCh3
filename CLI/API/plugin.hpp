@@ -1,5 +1,5 @@
 #pragma once
-#include "cli/api/argparse.hpp"
+#include "CLI/API/argparse.hpp"
 
 
 namespace M3 {

@@ -1,7 +1,7 @@
 //MaCh3 includes
 #include "Fitters/OscProcessor.h"
 #include "Manager/Manager.h"
-#include "cli/modules/ProcessMCMCModule.hpp"
+#include "CLI/Modules/ProcessMCMCModule.hpp"
 
 
 namespace M3{

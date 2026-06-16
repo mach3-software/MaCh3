@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include "Manager/MaCh3Logger.h"
-#include "cli/MaCh3Program.hpp"
+#include "CLI/MaCh3Program.hpp"
 
 using std::vector, std::string, std::map;
 namespace fs = std::filesystem;
