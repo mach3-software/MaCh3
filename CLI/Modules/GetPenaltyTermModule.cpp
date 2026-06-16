@@ -3,7 +3,7 @@
 #include "Samples/SampleStructs.h"
 #include "Samples/HistogramUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
-#include "cli/modules/GetPenaltyTermModule.hpp"
+#include "CLI/Modules/GetPenaltyTermModule.hpp"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

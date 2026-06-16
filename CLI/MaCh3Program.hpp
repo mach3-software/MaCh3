@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include "cli/api/plugin.hpp"
-#include "cli/DynamicPlugin.hpp"
+#include "CLI/API/plugin.hpp"
+#include "CLI/DynamicPlugin.hpp"
 
 namespace fs = std::filesystem;
 

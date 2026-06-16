@@ -1,7 +1,7 @@
-#include "cli/MaCh3Program.hpp"
-#include "cli/modules/ProcessMCMCModule.hpp"
-#include "cli/modules/DiagMCMCModule.hpp"
-#include "cli/modules/GetPenaltyTermModule.hpp"
+#include "CLI/Modules/ProcessMCMCModule.hpp"
+#include "CLI/Modules/DiagMCMCModule.hpp"
+#include "CLI/Modules/GetPenaltyTermModule.hpp"
+#include "CLI/MaCh3Program.hpp"
 
 
 int main(int argc, char *argv[]) {

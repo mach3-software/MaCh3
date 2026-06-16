@@ -3,7 +3,7 @@
 // yaml Includes
 #include "yaml-cpp/yaml.h"
 #include "Fitters/MCMCProcessor.h"
-#include "cli/api/plugin.hpp"
+#include "CLI/API/plugin.hpp"
 
 namespace M3{
 

@@ -1,6 +1,6 @@
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
-#include "cli/modules/DiagMCMCModule.hpp"
+#include "CLI/Modules/DiagMCMCModule.hpp"
 
 
 namespace M3{
