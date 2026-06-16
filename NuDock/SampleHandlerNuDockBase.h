@@ -49,75 +49,61 @@ public:
   /// @return The log-likelihood value from the remote server.
   double GetLikelihood() const override;
 
-  /// @brief Get the title string for a given sample index.
-  /// @param Sample Sample index (unused - always returns "NuDockSample").
-  /// @return The fixed string "NuDockSample".
-  std::string GetSampleTitle(const int Sample) const override { (void)Sample; return "NuDockSample"; };
+  /// @copydoc SampleHandlerInterface::GetSampleTitle
+  std::string GetSampleTitle([[maybe_unused]] const int Sample) const override { return "NuDockSample"; };
 
-  /// @brief Get the name of this sample handler.
-  /// @return The fixed string "NuDockSample".
+  /// @copydoc SampleHandlerInterface::GetName
   std::string GetName() const override { return "NuDockSample"; };
 
   /// @brief Get the likelihood for a specific sub-sample.
   /// @param isample Sub-sample index (unused -- delegates to GetLikelihood()).
   /// @return The total log-likelihood from the remote server.
-  double GetSampleLikelihood(const int isample) const override { (void)isample; return GetLikelihood(); };
+  double GetSampleLikelihood([[maybe_unused]] const int isample) const override { return GetLikelihood(); };
 
   /// @brief Print event rates (no-op for the NuDock client).
   /// @param DataOnly Whether to print data-only rates (unused).
-  void PrintRates(const bool DataOnly = false) override { (void)DataOnly; MACH3LOG_INFO("No rates to print for NuDock sample handler"); };
+  void PrintRates([[maybe_unused]] const bool DataOnly = false) override { MACH3LOG_INFO("No rates to print for NuDock sample handler"); };
 
   /// @brief Get the number of oscillation channels for a sample.
   /// @param iSample Sample index (unused).
   /// @return Always returns 0 - oscillation channels are managed server-side.
-  int GetNOscChannels(const int iSample) const override { (void)iSample; return 0; };
+  int GetNOscChannels([[maybe_unused]] const int iSample) const override { return 0; };
 
-  // Functions for posterior predictive - left unimplemented in the base class since they are not needed for likelihood evaluation and may require experiment-specific handling
-  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
-  /// @param iSample Sample index
-  /// @param Dimension Dimension index
-  std::string GetKinVarName(const int iSample, const int Dimension) const override { (void)iSample; (void)Dimension; return ""; };
+  /// @copydoc SampleHandlerInterface::GetKinVarName
+  /// @note Functions for posterior predictive - left unimplemented in the base class since they are not needed for likelihood evaluation and may require experiment-specific handling
+  /// @copydoc SampleHan
+  std::string GetKinVarName([[maybe_unused]] const int iSample, [[maybe_unused]] const int Dimension) const override { return ""; };
 
-  /// @brief Get Data histogram
-  const TH1* GetDataHist(const int Sample) override { (void)Sample; return nullptr; };
-  /// @brief Get MC histogram
-  const TH1* GetMCHist(const int Sample) override { (void)Sample; return nullptr; };
-  /// @brief Get W2 histogram
-  const TH1* GetW2Hist(const int Sample) override { (void)Sample; return nullptr; };
+  /// @copydoc SampleHandlerInterface::GetDataHist
+  const TH1* GetDataHist([[maybe_unused]] const int Sample) override { return nullptr; };
+  /// @copydoc SampleHandlerInterface::GetMCHist
+  const TH1* GetMCHist([[maybe_unused]] const int Sample) override { return nullptr; };
+  /// @copydoc SampleHandlerInterface::GetW2Hist
+  const TH1* GetW2Hist([[maybe_unused]] const int Sample) override { return nullptr; };
 
-  /// @brief DB Function to differentiate 1D or 2D binning
-  int GetNDim(const int Sample) const override { (void)Sample; return 0; };
-  std::string GetFlavourName(const int iSample, const int iChannel) const override { (void)iSample; (void)iChannel; return ""; };
+  /// @copydoc SampleHandlerInterface::GetNDim
+  int GetNDim([[maybe_unused]] const int Sample) const override { return 0; };
+  /// @copydoc SampleHandlerInterface::GetFlavourName
+  std::string GetFlavourName([[maybe_unused]] const int iSample, [[maybe_unused]] const int iChannel) const override { return ""; };
 
-  /// @brief Return the binning used to draw a kinematic parameter
-  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override { (void)Sample; (void)KinematicParameter; return {}; };
-
-  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                            int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0) override {
-    (void)iSample; (void)ProjectionVar_Str; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle;
-    return nullptr;
-  };
-
-  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
-                                            int kChannelToFill = -1, int WeightStyle = 0) override {
-    (void)iSample; (void)ProjectionVar_StrX; (void)ProjectionVar_StrY; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle;
-    return nullptr;
-  };
-
-  std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
-                           const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
-                           const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
-    (void)iSample; (void)ProjectionVar; (void)EventSelectionVec; (void)WeightStyle; (void)SubEventSelectionVec;
-    return nullptr;
-  };
-
-  std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                            const std::vector< KinematicCut >& EventSelectionVec = {},
-                            int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) override {
-    (void)iSample; (void)ProjectionVarX; (void)ProjectionVarY; (void)EventSelectionVec; (void)WeightStyle; (void)SubEventSelectionVec;
-    return nullptr;
-  };
+  /// @copydoc SampleHandlerInterface::ReturnKinematicParameterBinning
+  std::vector<double> ReturnKinematicParameterBinning([[maybe_unused]] const int Sample, [[maybe_unused]] const std::string &KinematicParameter) const override { return {}; };
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
+  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_Str,
+                                            [[maybe_unused]] int kModeToFill = -1, [[maybe_unused]] int kChannelToFill = -1,
+                                            [[maybe_unused]] int WeightStyle = 0) override { return nullptr; };
+                                            /// @copydoc SampleHandlerInterface::Get2DVarHistByModeAndChannel
+  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_StrX,
+                                            [[maybe_unused]] const std::string& ProjectionVar_StrY, [[maybe_unused]] int kModeToFill = -1,
+                                            [[maybe_unused]] int kChannelToFill = -1, [[maybe_unused]] int WeightStyle = 0) override { return nullptr;};
+  /// @copydoc SampleHandlerInterface::Get1DVarHist
+  std::unique_ptr<TH1> Get1DVarHist([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string &ProjectionVar,
+                           [[maybe_unused]] const std::vector<KinematicCut> &EventSelectionVec = {}, [[maybe_unused]] int WeightStyle = 0,
+                           [[maybe_unused]] const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {return nullptr;};
+  /// @copydoc SampleHandlerInterface::Get2DVarHist
+  std::unique_ptr<TH2> Get2DVarHist([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVarX,
+                                    [[maybe_unused]] const std::string& ProjectionVarY, [[maybe_unused]] const std::vector< KinematicCut >& EventSelectionVec = {},
+                                    [[maybe_unused]] int WeightStyle = 0, [[maybe_unused]] const std::vector< KinematicCut >& SubEventSelectionVec = {}) override { return nullptr; };
 
 protected:
   /// @brief No-op -- memory cleanup is handled by the NuDock server.

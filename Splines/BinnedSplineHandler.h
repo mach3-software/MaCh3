@@ -9,12 +9,10 @@
 /// @author Ed Atkin
 /// @author Henry Wallace
 class BinnedSplineHandler : public SplineBase {
-  /// @todo ETA - do all of these functions and members actually need to be public?
   public:
     /// @brief Constructor
     BinnedSplineHandler(ParameterHandlerGeneric *ParamHandler, MaCh3Modes *Modes_);
     /// @brief Destructor
-    /// @todo it need some love
     virtual ~BinnedSplineHandler();
 
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays

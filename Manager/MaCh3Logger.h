@@ -39,8 +39,7 @@ _MaCh3_Safe_Include_End_ //}
 #define MACH3LOG_OFF SPDLOG_OFF
 
 /// @brief KS: Map string macro to spdlog::level enum
-/// @todo make constexpr with c++17
-inline spdlog::level::level_enum get_default_log_level() {
+inline constexpr spdlog::level::level_enum get_default_log_level() {
   #ifdef SPDLOG_ACTIVE_LEVEL
   switch (SPDLOG_ACTIVE_LEVEL) {
     case SPDLOG_LEVEL_TRACE:    return spdlog::level::trace;

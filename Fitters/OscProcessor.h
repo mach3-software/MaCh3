@@ -8,6 +8,7 @@
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 /// @brief This class extends MCMC and allow specialised for Oscillation parameters analysis which require specialised hardcoding
+/// This include Jarlskog, Unitarity triangles etc.
 class OscProcessor : public MCMCProcessor {
   public:
     /// @brief Constructs an OscProcessor object with the specified input file and options.

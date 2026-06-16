@@ -39,6 +39,7 @@ BinnedSplineHandler::~BinnedSplineHandler(){
   if(SplineSegments != nullptr) delete[] SplineSegments;
   if(ParamValues != nullptr) delete[] ParamValues;
 }
+
 //****************************************
 void BinnedSplineHandler::CleanUpMemory() {
 //****************************************

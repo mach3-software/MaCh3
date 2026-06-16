@@ -17,7 +17,6 @@ OscProcessor::OscProcessor(const std::string &InputFile) : MCMCProcessor(InputFi
   //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
 
-  /// @todo Here where we should add all unitarity triangles, fancy Jarlskog studies and other hacky things that only make sense for oscitations
   Sin2Theta13Index = M3::_BAD_INT_;
   Sin2Theta12Index = M3::_BAD_INT_;
   Sin2Theta23Index = M3::_BAD_INT_;
