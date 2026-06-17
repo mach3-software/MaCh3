@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0
 
       - name: Run Super Linter
-        uses: github/super-linter@v7
+        uses: super-linter/super-linter@12150456a73e248bdc94d0794898f94e23127c88  # v7.4.0
         env:
           VALIDATE_MARKDOWN: true  # Enable Markdown linting
           VALIDATE_DOCKERFILE: true  # Enable Dockerfile linting
