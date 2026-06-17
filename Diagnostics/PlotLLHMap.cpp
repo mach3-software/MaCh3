@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
   // Open the settings and output file
   YAML::Node Settings = M3OpenConfig(std::string(argv[1]));
-  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root");
+  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root", __FILE__ , __LINE__);
 
   auto OutFile = new TFile(OutFileName.c_str(),"UPDATE");
   OutFile->cd();
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   ROOT::RDataFrame LLHMap("llhmap", inpFileList);
 
   // Process what parameters to plot
-  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{});
+  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{}, __FILE__ , __LINE__);
   std::vector<std::string> ParamsToProfile = GetParams(ParamsOfInterest, LLHMap);
 
   // This now only works for uniform LLHMaps

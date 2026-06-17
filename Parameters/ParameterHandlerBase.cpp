@@ -1004,7 +1004,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   _fGlobalStepScaleInitial = _fGlobalStepScale;
 
   // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
-  auto params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
+  auto params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {}, __FILE__ , __LINE__);
   // Build a list of skip flags
   param_skip_adapt_flags.resize(_fNumPar, false);
   for (int i = 0; i <_fNumPar; ++i) {

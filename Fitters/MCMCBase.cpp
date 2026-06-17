@@ -16,7 +16,7 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
+    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
     if (AnnealTemp < 0)
         anneal = false;
     else

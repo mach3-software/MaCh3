@@ -6,7 +6,7 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
 // ********************************************
   std::unique_ptr<FitterBase> MaCh3Fitter = nullptr;
 
-  auto Algorithm = GetFromManager<std::string>(fitMan->raw()["General"]["FittingAlgorithm"], "MCMC");
+  auto Algorithm = GetFromManager<std::string>(fitMan->raw()["General"]["FittingAlgorithm"], "MCMC", __FILE__ , __LINE__);
 
   if(Algorithm == "MCMC" || Algorithm == "MR2T2") 
   {

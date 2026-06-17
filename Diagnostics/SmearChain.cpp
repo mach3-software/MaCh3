@@ -25,7 +25,7 @@ void SmearChain(const std::string& inputFile, const std::string& config)
   std::vector<std::string> Names = Get<std::vector<std::string>>(Smear["Smear"][0], __FILE__, __LINE__);
   std::vector<double> ErrorValue = Get<std::vector<double>>(Smear["Smear"][1], __FILE__, __LINE__);
 
-  bool SaveUnsmearedBranch = GetFromManager<bool>(Smear["SaveUnsmearedBranch"], false);
+  bool SaveUnsmearedBranch = GetFromManager<bool>(Smear["SaveUnsmearedBranch"], false, __FILE__ , __LINE__);
   Processor->SmearChain(Names, ErrorValue, SaveUnsmearedBranch);
 }
 
