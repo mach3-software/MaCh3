@@ -23,6 +23,8 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Get MaCh3 Validations
+        env:
+          MACH3_BRANCH: ${{ github.head_ref }}
         run: |
           cd /opt/
           # Clone the MaCh3Tutorial repository with the current branch
@@ -30,7 +32,7 @@ jobs:
           cd MaCh3Validations
           mkdir build
           cd build
-          cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+          cmake ../ -DMaCh3_Branch="$MACH3_BRANCH"
 
       - name: Build MaCh3 Validations
         run: |
@@ -71,7 +73,7 @@ jobs:
           #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary and artifact link
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9  # v5.0.0
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
