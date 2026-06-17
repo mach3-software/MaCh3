@@ -30,6 +30,14 @@ void PSO::RunMCMC(){
   // Remove obsolete memory and make other checks before fit starts
   SanitiseInputs();
 
+  // Sanitise the adaptive MCMC
+  for (const auto &syst : systematics) {
+    if (syst->GetDoAdaption()) {
+      MACH3LOG_ERROR("Param Handler {} has enabled Adaption, this is not needed for {} so please turn it off", syst->GetName(), GetName());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   if(fTestLikelihood){
     outTree->Branch("nParts", &fParticles, "nParts/I");
     for(int i = 0; i < fDim; ++i){
@@ -51,7 +59,7 @@ void PSO::init(){
 // *************************
   fBestValue = M3::_LARGE_LOGL_;
 
-  //KS: For none PCA this will be eqaul to normal parameters
+  //KS: For none PCA this will be equal to normal parameters
   //const int NparsPSOFull = NPars;
   //const int NparsPSO = NParsPCA;
 

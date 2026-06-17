@@ -27,6 +27,13 @@ MinuitFit::MinuitFit(Manager *man) : LikelihoodFit(man) {
 
   minuit = std::unique_ptr<ROOT::Math::Minimizer>(
     ROOT::Math::Factory::CreateMinimizer(MinimizerType.c_str(), MinimizerAlgo.c_str()));
+
+  std::string Features = gROOT->GetConfigFeatures();
+  if (Features.find("minuit2_omp") != std::string::npos) {
+    MACH3LOG_ERROR("Minuit in ROOT has been compiled with OMP support");
+    MACH3LOG_ERROR("Since MaCh3 uses OMP for reweight this could cause terrible clash");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 }
 
 // *************************
@@ -77,7 +84,8 @@ void MinuitFit::RunMCMC() {
     {
       for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
-        //KS: Index, name, prior, step scale [different to MCMC],
+        // KS: Index, name, prior, step scale [different to MCMC],
+        // divide by 10 because this is what BANFF used to do...
         minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->GetParPreFit(i), (*it)->GetDiagonalError(i)/10);
         minuit->SetVariableValue(ParCounter, (*it)->GetParPreFit(i));
         //KS: lower bound, upper bound, if Mirroring enabled then ignore
@@ -92,6 +100,8 @@ void MinuitFit::RunMCMC() {
     {
       for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
       {
+        // KS: Index, name, prior, step scale [different to MCMC],
+        // divide by 10 because this is what BANFF used to do...
         minuit->SetVariable(ParCounter, Form("%i_PCA", i), (*it)->GetPCAHandler()->GetParPropPCA(i), (*it)->GetPCAHandler()->GetEigenValuesMaster()[i]/10);
         if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
         {
