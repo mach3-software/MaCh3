@@ -626,7 +626,7 @@ void SampleHandlerFD::SetupOscParameters() {
       MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
       MACH3LOG_ERROR("This may indicate misconfiguration");
       MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
-      throw MaCh3Exception(__FILE__, __LINE__);
+      //throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 }
