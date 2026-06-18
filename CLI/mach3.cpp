@@ -1,9 +1,26 @@
+/**
+ * @file mach3.cpp
+ * @brief Main entry point for the MaCh3 command-line interface
+ *
+ * This file contains the main function that initializes the MaCh3 program,
+ * registers core modules, loads dynamic plugins, and processes command-line arguments.
+ */
+
 #include "CLI/Modules/ProcessMCMCModule.hpp"
 #include "CLI/Modules/DiagMCMCModule.hpp"
 #include "CLI/Modules/GetPenaltyTermModule.hpp"
 #include "CLI/MaCh3Program.hpp"
 
-
+/**
+ * @brief Main entry point for the MaCh3 application
+ *
+ * Initializes the MaCh3 program with core modules and dynamic plugins,
+ * parses command-line arguments, and executes the selected subcommand.
+ *
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line argument strings
+ * @return Exit code (0 on success, non-zero on error)
+ */
 int main(int argc, char *argv[]) {
     M3::MaCh3Program program("mach3");
 

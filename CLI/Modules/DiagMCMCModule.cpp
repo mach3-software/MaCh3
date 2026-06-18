@@ -1,10 +1,15 @@
+/**
+ * @file DiagMCMCModule.cpp
+ * @brief Implementation of the DiagMCMCModule class
+ */
+
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
 #include "CLI/Modules/DiagMCMCModule.hpp"
 
 
 namespace M3{
-  
+
   DiagMCMCModule::~DiagMCMCModule(){
     if (this->m_parser) { delete this->m_parser; } 
   }
