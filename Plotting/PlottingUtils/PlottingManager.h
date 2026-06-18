@@ -119,7 +119,7 @@ public:
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
   template <typename T> T getOption(const std::string& option) { return _execOptions[option].as<T>(); }
-  YAML::Node getOption(std::string option) { return _execOptions[option]; }
+  YAML::Node getOption(const std::string& option) const { return _execOptions[option]; }
 
   // ############# getters ##############
   /// @name General getters
@@ -133,9 +133,9 @@ public:
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string getOutputName() const { return _outputName; }
+  const std::string getOutputName() { return _outputName; }
 
-  /// @brief Get the output name but can specify a siffix to add to the name, before the file
+  /// @brief Get the output name but can specify a suffix to add to the name, before the file
   /// extension.
   /// @param suffix The suffix to add to the file name.
   /// @return Output file name with suffix added before the extension.

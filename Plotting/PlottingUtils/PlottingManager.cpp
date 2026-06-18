@@ -1,3 +1,4 @@
+#include <filesystem>
 #include "PlottingManager.h"
 
 namespace M3 {
@@ -24,7 +25,7 @@ PlottingManager::PlottingManager(const std::string &PlottingConfigName) {
 /// @warning This should always be called *After* parseInputs() unless you are
 /// manually specifying all input file names and config file names in your drawing application.
 void PlottingManager::initialise() {
-  /// @todo should add some kind of validataConfigs() method to got throught all of the specified
+  /// @todo should add some kind of validataConfigs() method to got through all of the specified
   /// config files and make sure that all provided options are valid and all necessary options are provided
   /// as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails
   /// to find an option at runtime
@@ -231,18 +232,15 @@ void PlottingManager::usage() const {
 /// so plots will be saved as pdf. if some other file extension is specified, replace with .pdf as
 /// only .pdf and .eps support printing multiple plots to one file in root.
 void PlottingManager::setOutFileName(const std::string& saveName) {
-  if (saveName.find(".") == std::string::npos)
-  {
-    _outputName = saveName + ".pdf";
+  std::filesystem::path path(saveName);
+  if (!path.has_extension()) {
+    path.replace_extension(".pdf");
+    _outputName = path.string();
     return;
   }
 
-  std::string ext = saveName;
-  // if there are .'s then remove everything before them until we only have the file extension left
-  while (ext.find(".") != std::string::npos)
-    ext.erase(0, ext.find(".") + 1);
-  if (ext == "pdf" || ext == "ps" || ext == "eps")
-  {
+  std::string ext = path.extension().string();
+  if (ext == ".pdf" || ext == ".ps" || ext == ".eps") {
     _outputName = saveName;
     return;
   }
@@ -255,20 +253,14 @@ void PlottingManager::setOutFileName(const std::string& saveName) {
 /// Output file name, including the file extension will be returned, but with specified suffix after
 /// the name but before the extension. This is useful for e.g. saving multiple LLH scan types to
 /// separate files: can specify suffix "_PriotLLH" will return OutputName_PriorLLH.ext
-/// @todo Make this support .root files too
 const std::string PlottingManager::getOutputName(const std::string &suffix) {
-  std::string ext = _outputName;
-  std::string name = _outputName;
+  std::filesystem::path path(_outputName);
+  // ".root", ".pdf", etc.
+  std::string ext = path.extension().string();
+  // filename without extension
+  std::string stem = path.stem().string();
 
-  size_t dotPos = 0;
-  while (ext.find(".") != std::string::npos)
-  {
-    dotPos += ext.find(".");
-    ext.erase(0, ext.find(".") + 1);
-  }
-
-  name.erase(dotPos, ext.size() + 1);
-  return name + suffix + "." + ext;
+  return stem + suffix + ext;
 }
 
 /// This is used by e.g. getOption() so the PlottingManager knows where to look for the option in
