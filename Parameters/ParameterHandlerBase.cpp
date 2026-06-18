@@ -292,6 +292,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 
     //ETA - now for parameters which are optional and have default values
     _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
+    _fRegParam[i] = GetFromManager<bool>(param["Systematic"]["RegParam"], false, __FILE__ , __LINE__);
 
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
@@ -482,6 +483,7 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fLowBound = std::vector<double>(SizeVec);
   _fUpBound = std::vector<double>(SizeVec);
   _fFlatPrior = std::vector<bool>(SizeVec);
+  _fRegParam = std::vector<bool>(SizeVec);
   _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
@@ -498,6 +500,7 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
     _fLowBound.at(i) = -999.99;
     _fUpBound.at(i) = 999.99;
     _fFlatPrior.at(i) = false;
+    _fRegParam.at(i) = false;
     _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
     randParams[i] = 0.0;
@@ -804,7 +807,7 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
   for (int i = 0; i < _fNumPar; ++i) {
-    MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
+    MACH3LOG_INFO("{:<30} {:<10.6f} {:<10.6f} {:<10.6f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
 }
 
@@ -819,6 +822,20 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
+  for(int k = 1; k < 480; k++){ // Left regularisation
+    if(_fPropVal[k] == 0 || _fPropVal[k-1] == 0 || k % 40 == 0) { // Do not regularise across boundaries or if params are 0
+      continue;
+    }
+    double ParamDiff = _fPropVal[k] - _fPropVal[k-1];
+    logL += RegVal * ParamDiff * ParamDiff / (_fPropVal[k] * _fPropVal[k]); 
+  }
+  for(int k = 0; k < 479; k++){ // Right regularisation
+    if(_fPropVal[k] == 0 || _fPropVal[k+1] == 0 || (k+1) % 40 == 0) { // Do not regularise across boundaries or if params are 0
+      continue;
+    }
+    double ParamDiff = _fPropVal[k] - _fPropVal[k+1];
+    logL += RegVal * ParamDiff * ParamDiff / (_fPropVal[k] * _fPropVal[k]); 
+  }
   for(int i = 0; i < _fNumPar; ++i) {
     if(_fFlatPrior[i]){
       //HW: Flat prior, no need to calculate anything
@@ -1072,6 +1089,25 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 }
 
 // ********************************************
+void ParameterHandlerBase::SetRegParam(const int i, const bool eL) {
+// ********************************************
+  if (i > _fNumPar) {
+    MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
+    MACH3LOG_ERROR("Fix this in your config file please!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  } else {
+    if(eL){
+      MACH3LOG_INFO("Setting {} (parameter {}) to regularised", GetParName(i), i);
+    }
+    else{
+      // HW :: This is useful
+      MACH3LOG_INFO("Setting {} (parameter {}) to not be regularised", GetParName(i), i);
+    }
+    _fRegParam[i] = eL;
+  }
+}
+
+// ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
   if (int(stepscale.size()) != _fNumPar)
@@ -1085,7 +1121,7 @@ void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscal
   for (int iParam = 0 ; iParam < _fNumPar; iParam++) {
     _fIndivStepScale[iParam] = stepscale[iParam];
   }
-  PrintIndivStepScale();
+  //PrintIndivStepScale();
 }
 
 // ********************************************
@@ -1133,9 +1169,9 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
       _fIndivStepScale[i] = _fIndivStepScaleInitial[i] * _fGlobalStepScaleInitial / _fGlobalStepScale;
     }
   }
-  MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
-  MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
-  PrintIndivStepScale();
+  //MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
+  //MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
+  //PrintIndivStepScale();
 }
 
 // ********************************************
