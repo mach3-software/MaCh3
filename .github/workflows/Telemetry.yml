@@ -20,9 +20,11 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Get MaCh3 Validations
+        env:
+          MACH3_BRANCH: ${{ github.head_ref }}
         run: |
           cd /opt/
           # Clone the MaCh3Tutorial repository with the current branch
@@ -30,7 +32,7 @@ jobs:
           cd MaCh3Validations
           mkdir build
           cd build
-          cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+          cmake ../ -DMaCh3_Branch="$MACH3_BRANCH"
 
       - name: Build MaCh3 Validations
         run: |
@@ -45,7 +47,7 @@ jobs:
       - name: Upload memory usage plot artifact
         id: upload-artifact
         if: success()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: memory-usage-plot
           path: /opt/MaCh3Validations/build/ram_cpu_usage.pdf
@@ -71,7 +73,7 @@ jobs:
           #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary and artifact link
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9  # v5.0.0
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |

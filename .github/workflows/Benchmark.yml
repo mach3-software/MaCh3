@@ -22,7 +22,7 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Get MaCh3 Validations
         env:
@@ -57,7 +57,7 @@ jobs:
           ./CIValidations/Benchmark/MaCh3Benchmark | tee output.txt
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba  # v1.22.1
         with:
           tool: 'catch2' # Specify that the benchmark tool is Catch2
           github-token: ${{ secrets.MACH3_VALIDATIONS_PAT || secrets.GITHUB_TOKEN }} # Use GitHub token for authentication

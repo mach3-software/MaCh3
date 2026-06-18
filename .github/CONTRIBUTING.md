@@ -42,7 +42,7 @@ When creating a Pull Request (PR), make sure the title starts with one of the fo
 
 ## Continuous Integration
 
-MaCh3 undergoes rigorous checks via multiple continuous integration (CI) processes. You can find the full list of CI checks [here](https://github.com/mach3-software/MaCh3/tree/develop/.github/workflows#readme).
+MaCh3 undergoes rigorous checks via multiple continuous integration (CI) processes. You can find the full list of CI checks [here](https://github.com/mach3-software/MaCh3/tree/develop/.github/workflows#readme). We try to follow guidelines outlined [here](https://github.com/github/awesome-copilot/blob/main/instructions/github-actions-ci-cd-best-practices.instructions.md).
 
 CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
 
