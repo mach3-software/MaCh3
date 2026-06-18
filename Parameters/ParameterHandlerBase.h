@@ -64,7 +64,13 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @param eL bool telling if it will be flat or not
   void SetFlatPrior(const int i, const bool eL);
-
+  /// @brief Set if parameter should have regularisation or not
+  /// @param i Parameter index
+  /// @param eL bool telling if it will be regularised or not
+  void SetRegParam(const int i, const bool eL);
+  /// @brief Set the value of the regularisation parameter
+  /// @param val Parameter value
+  void SetRegVal(const double val){ RegVal = val; }
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
@@ -133,6 +139,10 @@ class ParameterHandlerBase {
   /// @brief Get if param has flat prior or not
   /// @param i Parameter index
   bool GetFlatPrior(const int i) const { return _fFlatPrior[i]; }
+
+  /// @brief Get if param should be regularised or not
+  /// @param i Parameter index
+  bool GetRegParam(const int i) const { return _fRegParam[i]; }
 
   /// @brief Get name of covariance
   std::string GetName() const { return matrixName; }
@@ -451,6 +461,8 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
+  /// Whether to apply regularisation or not
+  std::vector<bool> _fRegParam; 
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 
@@ -467,6 +479,9 @@ protected:
   TMatrixDSym* throwMatrix;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
+
+  /// Initial regularisation -> set to 0 so it is not applied initially
+  double RegVal = 0.0; 
 
   /// perform PCA or not
   bool pca;
