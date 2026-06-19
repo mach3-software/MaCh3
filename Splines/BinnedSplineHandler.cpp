@@ -713,8 +713,8 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 
 //****************************************
 std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
-                                                                     int iOscChan, int EventMode, double Var1Val,
-                                                                     double Var2Val, double Var3Val) {
+                                                              int iOscChan, int EventMode, double Var1Val,
+                                                              double Var2Val, double Var3Val) {
 //****************************************
   std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
