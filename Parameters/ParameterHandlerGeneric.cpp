@@ -541,15 +541,15 @@ bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::st
   // Empty means apply to all
   if (_fSampleNames[SystIndex].size() == 0) return true;
 
-  // Check for unsupported wildcards in SampleNameCopy
-  if (SampleNameCopy.find('*') != std::string::npos) {
+  // Check for unsupported wildcards in SampleName
+  if (SampleName.find('*') != std::string::npos) {
     MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   bool Applies = false;
   for (size_t i = 0; i < _fSampleNames[SystIndex].size(); i++) {
-    if (M3::RegexMatch(SampleNameCopy, pattern)) {
+    if (M3::RegexMatch(SampleName, _fSampleNames[SystIndex][i])) {
       Applies = true;
       break;
     }

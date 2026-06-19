@@ -52,7 +52,7 @@ inline bool RegexMatch(std::string Text, std::string Pattern) {
     // Replace '*' in the Pattern with '.*' for regex matching
     std::string RegexPattern = "^" + std::regex_replace(Pattern, std::regex("\\*"), ".*") + "$";
     std::regex Regex(RegexPattern);
-    return std::regex_match(text, Regex);
+    return std::regex_match(Text, Regex);
   }
   catch (const std::regex_error& e) {
     MACH3LOG_ERROR("Regex error: {}", e.what());
