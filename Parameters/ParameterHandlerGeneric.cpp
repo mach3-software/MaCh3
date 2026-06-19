@@ -541,10 +541,6 @@ bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::st
   // Empty means apply to all
   if (_fSampleNames[SystIndex].size() == 0) return true;
 
-  // Make a copy and to lower case to not be case sensitive
-  std::string SampleNameCopy = SampleName;
-  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);
-
   // Check for unsupported wildcards in SampleNameCopy
   if (SampleNameCopy.find('*') != std::string::npos) {
     MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
@@ -552,23 +548,10 @@ bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::st
   }
 
   bool Applies = false;
-
   for (size_t i = 0; i < _fSampleNames[SystIndex].size(); i++) {
-    // Convert to low case to not be case sensitive
-    std::string pattern = _fSampleNames[SystIndex][i];
-    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
-
-    // Replace '*' in the pattern with '.*' for regex matching
-    std::string regexPattern = "^" + std::regex_replace(pattern, std::regex("\\*"), ".*") + "$";
-    try {
-      std::regex regex(regexPattern);
-      if (std::regex_match(SampleNameCopy, regex)) {
-        Applies = true;
-        break;
-      }
-    } catch (const std::regex_error& e) {
-      // Handle regex error (for invalid patterns)
-      MACH3LOG_ERROR("Regex error: {}", e.what());
+    if (M3::RegexMatch(SampleNameCopy, pattern)) {
+      Applies = true;
+      break;
     }
   }
   return Applies;

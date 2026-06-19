@@ -542,8 +542,7 @@ bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, 
   bool skip = false;
   for(unsigned int is = 0; is < SkipVector.size(); ++is)
   {
-    if(ParamName.substr(0, SkipVector[is].length()) == SkipVector[is])
-    {
+    if (M3::RegexMatch(ParamName, SkipVector[is])) {
       skip = true;
       break;
     }

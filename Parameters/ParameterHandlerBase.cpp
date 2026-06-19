@@ -1009,7 +1009,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   param_skip_adapt_flags.resize(_fNumPar, false);
   for (int i = 0; i <_fNumPar; ++i) {
     for (const auto& name : params_to_skip) {
-      if(name == _fFancyNames[i]) {
+      if(M3::RegexMatch(_fFancyNames[i], name)) {
         param_skip_adapt_flags[i] = true;
         break;
       }
