@@ -24,15 +24,15 @@
 int main(int argc, char *argv[]) {
     M3::MaCh3Program program("mach3");
 
-    // Hidden completion option
-    program.add_argument("--complete")
-        .hidden()
-        .nargs(1);
+    // // Hidden completion option
+    // program.add_argument("--complete")
+    //     .hidden()
+    //     .nargs(1);
 
-    // Hidden installer option
-    program.add_argument("--install-completions")
-        .help("")
-        .flag();
+    // // Hidden installer option
+    // program.add_argument("--install-completions")
+    //     .help("")
+    //     .flag();
 
     M3::ProcessMCMCModule proc;
     M3::DiagMCMCModule diag;
@@ -47,11 +47,11 @@ int main(int argc, char *argv[]) {
         program.parse_args(argc, argv);
     }
     catch (const std::exception& err) {
-        // completions count as parsing error
-        if (auto prefix = program.present<std::string>("--complete")) {
-            program.completions(*prefix);
-            return 0;
-        }
+        // // completions count as parsing error
+        // if (auto prefix = program.present<std::string>("--complete")) {
+        //     program.completions(*prefix);
+        //     return 0;
+        // }
 
         std::cerr << err.what() << std::endl;
         std::cerr << program.get_subcommand_used();
@@ -70,10 +70,10 @@ int main(int argc, char *argv[]) {
     }
 
 
-    if (program.get<bool>("--install-completions")) {
-        program.install_completions();
-        return 0;
-    }
+    // if (program.get<bool>("--install-completions")) {
+    //     program.install_completions();
+    //     return 0;
+    // }
 
     try{
         program.run();
