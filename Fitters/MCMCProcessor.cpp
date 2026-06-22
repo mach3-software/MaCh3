@@ -2612,7 +2612,7 @@ void MCMCProcessor::ReadModelFile() {
     bool rejected = false;
     for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
     {
-      if (M3::RegexMatch(ParName, ExcludedNames[ik]))
+      if (M3::CaseInsentiveMatch(ParName, ExcludedNames[ik]))
       {
         MACH3LOG_DEBUG("Excluding param {}, from group {}", ParName, Group);
         rejected = true;
