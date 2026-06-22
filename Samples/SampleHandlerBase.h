@@ -226,7 +226,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetupKinematicMap();
 
   /// @todo abstract the spline initialisation completely to core
-  /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
+  /// @brief initialise your splineXX object and then use InitialiseSplineObject to conveniently setup everything up
   virtual void SetupSplines() = 0;
 
   //DB Require all objects to have a function which reads in the MC
@@ -262,7 +262,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetupReweightArrays();
   //===============================================================================
 
-// ----- start Functional Parameters -----
+  // ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters(){};
   /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
@@ -301,16 +301,16 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                              std::string const &par_name,
                                              SFType shift_func);
   /// @brief ETA - generic function applying shifts
+  /// @note It is virtual so we can perform unorthodox shifts, ideally we should de-virtualise once we ensure we can support everything in core
   virtual void ApplyShifts(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
-  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
+  virtual void ResetShifts([[maybe_unused]] const int iEvent) {};
   /// @brief LP - Optionally calculate derived observables after all shifts have been applied
   /// @details For example, have shifts that varied lepton energy and hadron energy separately
   ///          in a subclass implementation of this method you may add the shifted quantities
   ///          together to build a shifted neutrino energy estimator
-  virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
+  virtual void FinaliseShifts([[maybe_unused]] const int iEvent) {};
   // ----- end Functional Parameters -----
-
 
   /// @brief DB Function which determines if an event is selected based on @ref KinematicCut
   bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
@@ -329,20 +329,21 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(const int iEvent) {return; (void)iEvent;};
+  virtual void CalcWeightFunc([[maybe_unused]] const int iEvent) {return;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
   double ReturnKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
     return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
+  /// @brief Return the value of an associated kinematic parameter for an event
   virtual double ReturnKinematicParameter(const int KinematicVariable, const int iEvent) const = 0;
 
   // === JM declare the same functions for kinematic vectors ===
   std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, const int iEvent) const {
     return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter), iEvent);
   }
-  virtual std::vector<double> ReturnKinematicVector(const int KinematicVariable, const int iEvent) const {
-    return {}; (void)KinematicVariable; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector([[maybe_unused]] const int KinematicVariable,
+                                                    [[maybe_unused]] const int iEvent) const {return {};};
   // ===========================================================
 
   /// @copydoc SampleHandlerInterface::ReturnKinematicParameterBinning
@@ -412,17 +413,13 @@ class SampleHandlerBase :  public SampleHandlerInterface
   ParameterHandlerGeneric *ParHandler = nullptr;
 
   //===============================================================================
-  /// @brief A unique ID for each sample based on which we can define what systematic should be applied
+  /// @brief Identifier of this Sample Handler, mostly used for fancy printing in FitterBase
   std::string SampleHandlerName;
 
   //===========================================================================
-  //DB Vectors to store which kinematic cuts we apply
-  //like in XsecNorms but for events in sample. Read in from sample yaml file
-  //What gets used in IsEventSelected, which gets set equal to user input plus
-  //all the vectors in StoreSelection
-
-  /// @brief What gets pulled from config options, these are constant after loading in
-  /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
+  /// @brief DB Vectors to store which kinematic cuts we apply.
+  /// Gets used in IsEventSelected
+  /// Read in from sample yaml file
   std::vector< std::vector< KinematicCut > > StoredSelection;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
