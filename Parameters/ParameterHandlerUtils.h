@@ -60,6 +60,18 @@ inline bool RegexMatch(std::string Text, std::string Pattern) {
   }
 }
 
+/// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
+/// @param Text    Input string to test.
+/// @param Patterns Collection wildcard patterns to match against.
+inline bool RegexMatch(std::string Text, const std::vector<std::string>& Patterns) {
+  for (size_t i = 0; i < Patterns.size(); i++) {
+    if (M3::RegexMatch(Text, Patterns[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /// @brief CW: Multi-threaded matrix multiplication
 inline double* MatrixMult(double *A, double *B, int n) {
   //CW: First transpose to increse cache hits

@@ -1008,12 +1008,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   // Build a list of skip flags
   param_skip_adapt_flags.resize(_fNumPar, false);
   for (int i = 0; i <_fNumPar; ++i) {
-    for (const auto& name : params_to_skip) {
-      if(M3::RegexMatch(_fFancyNames[i], name)) {
-        param_skip_adapt_flags[i] = true;
-        break;
-      }
-    }
+    param_skip_adapt_flags[i] = M3::RegexMatch(_fFancyNames[i], params_to_skip);
   }
 
   // Now we read the general settings [these SHOULD be common across all matrices!]

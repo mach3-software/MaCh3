@@ -546,15 +546,7 @@ bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::st
     MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-
-  bool Applies = false;
-  for (size_t i = 0; i < _fSampleNames[SystIndex].size(); i++) {
-    if (M3::RegexMatch(SampleName, _fSampleNames[SystIndex][i])) {
-      Applies = true;
-      break;
-    }
-  }
-  return Applies;
+  return M3::RegexMatch(SampleName, _fSampleNames[SystIndex]);
 }
 
 // ********************************************
