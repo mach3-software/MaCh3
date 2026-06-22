@@ -42,7 +42,7 @@ namespace M3
 /// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
 /// @param Text    Input string to test.
 /// @param Pattern Wildcard pattern to match against.
-inline bool RegexMatch(std::string Text, std::string Pattern) {
+inline bool CaseInsentiveMatch(std::string Text, std::string Pattern) {
   // Make a copy and to lower case to not be case sensitive
   std::transform(Text.begin(), Text.end(), Text.begin(), ::tolower);
 
@@ -63,9 +63,9 @@ inline bool RegexMatch(std::string Text, std::string Pattern) {
 /// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
 /// @param Text    Input string to test.
 /// @param Patterns Collection wildcard patterns to match against.
-inline bool RegexMatch(std::string Text, const std::vector<std::string>& Patterns) {
+inline bool CaseInsensitiveMatchAny(std::string Text, const std::vector<std::string>& Patterns) {
   for (size_t i = 0; i < Patterns.size(); i++) {
-    if (M3::RegexMatch(Text, Patterns[i])) {
+    if (M3::CaseInsentiveMatch(Text, Patterns[i])) {
       return true;
     }
   }

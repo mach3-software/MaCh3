@@ -539,7 +539,7 @@ bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRa
 // *************************
 bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const {
 // *************************
-  return M3::RegexMatch(ParamName, SkipVector);
+  return M3::CaseInsensitiveMatchAny(ParamName, SkipVector);
 }
 
 
