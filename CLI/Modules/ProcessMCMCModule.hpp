@@ -13,7 +13,7 @@
 namespace M3{
 
 /**
- * @file ProcessMCMC.cpp
+ * @file ProcessMCMCModule.hpp
  * @brief Main executable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implementation of methods is in MCMCProcessor
  * @ingroup MaCh3DiagnosticProcessing
  *

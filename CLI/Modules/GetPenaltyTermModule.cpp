@@ -1,17 +1,3 @@
-/**
- * @file GetPenaltyTerm.cpp
- * @brief Implementation of penalty term extraction from systematic chains
- *
- * This script is designed to retrieve penalty terms from various sources,
- * such as flux and cross-section systematic chains. Since flux and cross-section
- * uncertainties are handled systematically, the penalty term cannot be taken
- * directly from the chain.
- *
- * @todo This should really be moved to MCMC Processor
- * @ingroup MaCh3DiagnosticProcessing
- * @author Kamil Skwarczynski
- */
-
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
