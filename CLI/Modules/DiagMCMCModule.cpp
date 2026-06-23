@@ -27,7 +27,7 @@ namespace M3{
     return m_parser;
   }
 
-  int DiagMCMCModule::run() {
+  int DiagMCMCModule::Run() {
     SetMaCh3LoggerFormat();
     MACH3LOG_INFO("Producing single fit output");
     std::string inputFile = m_parser->get<std::string>("mcmc-output");

@@ -33,8 +33,8 @@ namespace M3{
              * @brief Run the plugin's main functionality
              * @return Exit code from the plugin
              */
-            int run() {
-                return m_plugin->run();
+            int Run() {
+                return m_plugin->Run();
             }
 
             /**

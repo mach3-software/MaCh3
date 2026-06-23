@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     // }
 
     try{
-        program.run();
+        program.Run();
     }
     catch(...){
         return 3;

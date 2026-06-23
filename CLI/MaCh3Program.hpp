@@ -67,7 +67,7 @@ namespace M3{
              * @brief Run the selected subcommand
              * @return Exit code from the executed module
              */
-            int run();
+            int Run();
 
         private:
             /**

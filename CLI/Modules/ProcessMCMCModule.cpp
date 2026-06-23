@@ -64,7 +64,7 @@ namespace M3{
   }
 
 
-  int ProcessMCMCModule::run() {
+  int ProcessMCMCModule::Run() {
     SetMaCh3LoggerFormat();
     nFiles = 0;
     config = m_parser->get<std::string>("config");
