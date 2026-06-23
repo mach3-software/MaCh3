@@ -50,7 +50,7 @@ namespace M3{
        * @brief Execute the MCMC processing
        * @return Exit code (0 on success)
        */
-      int run() override;
+      int Run() override;
 
 
     private:

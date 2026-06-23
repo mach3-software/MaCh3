@@ -24,7 +24,7 @@ namespace M3 {
              * @brief Execute the plugin's main functionality
              * @return Exit code (0 on success, non-zero on error)
              */
-            virtual int run() = 0;
+            virtual int Run() = 0;
 
             /**
              * @brief Get the argument parser for this plugin
