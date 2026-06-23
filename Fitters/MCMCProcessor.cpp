@@ -223,6 +223,107 @@ void MCMCProcessor::MakeOutputFile() {
   OutputFile->cd();
 }
 
+// ***************
+void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* PostHistDir) {
+// ***************
+  TString Title = "";
+  double Prior = 1.0, PriorError = 1.0;
+  GetNthParameter(i, Prior, PriorError, Title);
+
+  ParameterEnum ParType = ParamType[i];
+  int ParamTemp = i - ParamTypeStartPos[ParType];
+  bool isFlat = ParamFlat[ParType][ParamTemp];
+
+  if(ApplySmoothing) hpost[i]->Smooth();
+
+  (*Central_Value)(i) = Prior;
+
+  double Mean, Err, Err_p, Err_m;
+  GetArithmetic(hpost[i], Mean, Err);
+  (*Means)(i) = Mean;
+  (*Errors)(i) = Err;
+
+  GetGaussian(hpost[i], Gauss.get(), Mean, Err);
+  (*Means_Gauss)(i) = Mean;
+  (*Errors_Gauss)(i) = Err;
+
+  GetHPD(hpost[i], Mean, Err, Err_p, Err_m);
+  (*Means_HPD)(i) = Mean;
+  (*Errors_HPD)(i) = Err;
+  (*Errors_HPD_Positive)(i) = Err_p;
+  (*Errors_HPD_Negative)(i) = Err_m;
+
+  // Write the results from the projection into the TVectors and TMatrices
+  (*Covariance)(i,i) = (*Errors)(i)*(*Errors)(i);
+  (*Correlation)(i,i) = 1.0;
+
+  //KS: This need to be before SetMaximum(), this way plot is nicer as line end at the maximum
+  auto hpd = std::make_unique<TLine>((*Means_HPD)(i), hpost[i]->GetMinimum(), (*Means_HPD)(i), hpost[i]->GetMaximum());
+  SetTLineStyle(hpd.get(), kBlack, 2, kSolid);
+
+  hpost[i]->SetLineWidth(2);
+  hpost[i]->SetLineColor(kBlue-1);
+  hpost[i]->SetMaximum(hpost[i]->GetMaximum()*DrawRange);
+  hpost[i]->SetTitle(Title);
+  hpost[i]->GetXaxis()->SetTitle(hpost[i]->GetTitle());
+
+  // Now make the TLine for the Asimov
+  auto Asimov = std::make_unique<TLine>(Prior, hpost[i]->GetMinimum(), Prior, hpost[i]->GetMaximum());
+  SetTLineStyle(Asimov.get(), kRed-3, 2, kDashed);
+
+  auto leg = std::make_unique<TLegend>(0.15, 0.6, 0.6, 0.95);
+  SetLegendStyle(leg.get(), 0.04);
+  leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
+  leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
+  leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
+  if(isFlat && !PlotFlatPrior) leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f}", Prior), "l");
+  else                         leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
+
+  // Write to file
+  Posterior->SetName(Title);
+  Posterior->SetTitle(Title);
+
+  //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
+  if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange)
+  {
+    MACH3LOG_WARN("Found fixed parameter: {} ({}), moving on", Title, i);
+    ParamVaried[i] = false;
+    //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
+    (*Means_HPD)(i)  = Prior;
+    (*Errors_HPD)(i) = PriorError;
+    (*Errors_HPD_Positive)(i)  = PriorError;
+    (*Errors_HPD_Negative)(i) = PriorError;
+
+    (*Means_Gauss)(i)  = Prior;
+    (*Errors_Gauss)(i) = PriorError;
+
+    (*Means)(i)  = Prior;
+    (*Errors)(i) = PriorError;
+    return;
+  }
+
+  // Store that this parameter is indeed being varied
+  ParamVaried[i] = true;
+
+  // Draw onto the TCanvas
+  hpost[i]->Draw();
+  hpd->Draw("same");
+  Asimov->Draw("same");
+  leg->Draw("same");
+
+  if(printToPDF) Posterior->Print(CanvasName);
+
+  // cd into params directory in root file
+  PostDir->cd();
+  Posterior->Write();
+
+  hpost[i]->SetName(Title);
+  hpost[i]->SetTitle(Title);
+  PostHistDir->cd();
+  hpost[i]->Write();
+}
+
+
 // ****************************
 //CW: Function to make the post-fit
 void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges) {
@@ -266,10 +367,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
 
-    ParameterEnum ParType = ParamType[i];
-    int ParamTemp = i - ParamTypeStartPos[ParType];
-    bool isFlat = ParamFlat[ParType][ParamTemp];
-
     // Get bin edges for histograms
     double maxi, mini = M3::_BAD_DOUBLE_;
     if (Edges.find(Title.Data()) != Edges.end()) {
@@ -291,93 +388,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     // Project BranchNames[i] onto hpost, applying stepcut
     Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
 
-    if(ApplySmoothing) hpost[i]->Smooth();
-
-    (*Central_Value)(i) = Prior;
-
-    double Mean, Err, Err_p, Err_m;
-    GetArithmetic(hpost[i], Mean, Err);
-    (*Means)(i) = Mean;
-    (*Errors)(i) = Err;
-
-    GetGaussian(hpost[i], Gauss.get(), Mean, Err);
-    (*Means_Gauss)(i) = Mean;
-    (*Errors_Gauss)(i) = Err;
-
-    GetHPD(hpost[i], Mean, Err, Err_p, Err_m);
-    (*Means_HPD)(i) = Mean;
-    (*Errors_HPD)(i) = Err;
-    (*Errors_HPD_Positive)(i) = Err_p;
-    (*Errors_HPD_Negative)(i) = Err_m;
-
-    // Write the results from the projection into the TVectors and TMatrices
-    (*Covariance)(i,i) = (*Errors)(i)*(*Errors)(i);
-    (*Correlation)(i,i) = 1.0;
-
-    //KS: This need to be before SetMaximum(), this way plot is nicer as line end at the maximum
-    auto hpd = std::make_unique<TLine>((*Means_HPD)(i), hpost[i]->GetMinimum(), (*Means_HPD)(i), hpost[i]->GetMaximum());
-    SetTLineStyle(hpd.get(), kBlack, 2, kSolid);
-    
-    hpost[i]->SetLineWidth(2);
-    hpost[i]->SetLineColor(kBlue-1);
-    hpost[i]->SetMaximum(hpost[i]->GetMaximum()*DrawRange);
-    hpost[i]->SetTitle(Title);
-    hpost[i]->GetXaxis()->SetTitle(hpost[i]->GetTitle());
-    
-    // Now make the TLine for the Asimov
-    auto Asimov = std::make_unique<TLine>(Prior, hpost[i]->GetMinimum(), Prior, hpost[i]->GetMaximum());
-    SetTLineStyle(Asimov.get(), kRed-3, 2, kDashed);
-
-    auto leg = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
-    SetLegendStyle(leg.get(), 0.04);
-    leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
-    leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
-    leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
-    if(isFlat && !PlotFlatPrior) leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f}", Prior), "l");
-    else                         leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
-
-    // Write to file
-    Posterior->SetName(Title);
-    Posterior->SetTitle(Title);
-
-    //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
-    {
-      MACH3LOG_WARN("Found fixed parameter: {} ({}), moving on", Title, i);
-      ParamVaried[i] = false;
-      //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
-      (*Means_HPD)(i)  = Prior;
-      (*Errors_HPD)(i) = PriorError;
-      (*Errors_HPD_Positive)(i)  = PriorError;
-      (*Errors_HPD_Negative)(i) = PriorError;
-
-      (*Means_Gauss)(i)  = Prior;
-      (*Errors_Gauss)(i) = PriorError;
-
-      (*Means)(i)  = Prior;
-      (*Errors)(i) = PriorError;
-      continue;
-    }
-
-    // Store that this parameter is indeed being varied
-    ParamVaried[i] = true;
-
-    // Draw onto the TCanvas
-    hpost[i]->Draw();
-    hpd->Draw("same");
-    Asimov->Draw("same");
-    leg->Draw("same");  
-    
-    if(printToPDF) Posterior->Print(CanvasName);
-        
-    // cd into params directory in root file
-    PostDir->cd();
-    Posterior->Write();
-    
-    hpost[i]->SetName(Title);
-    hpost[i]->SetTitle(Title);
-    PostHistDir->cd();
-    hpost[i]->Write();
+    DrawPosterior(i, PostDir, PostHistDir);
   } // end the for loop over nDraw
 
   OutputFile->cd();
@@ -386,7 +397,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
   SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
-  
+
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
 
@@ -480,7 +491,7 @@ void MCMCProcessor::DrawPostfit() {
   // Set labels and data
   for (int i = 0; i < nDraw; ++i)
   {
-    //Those keep which parameter type we run currently and realtive number  
+    //Those keep which parameter type we run currently and relative number
     int ParamEnu = ParamType[i];
     int ParamNo = i - ParamTypeStartPos[ParameterEnum(ParamEnu)];
 
@@ -726,7 +737,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
     hpost_copy[i]->Scale(1. / hpost_copy[i]->Integral());
     for (int j = 0; j < nCredible; ++j)
     {
-      // Scale the histograms before gettindg credible intervals
+      // Scale the histograms before getting credible intervals
       hpost_cl[i][j]->Scale(1. / hpost_cl[i][j]->Integral());
       GetCredibleIntervalSig(hpost_copy[i], hpost_cl[i][j], CredibleInSigmas, CredibleIntervals[j]);
 
@@ -863,7 +874,7 @@ void MCMCProcessor::MakeViolin() {
       //Only used for Suboptimatlity
       if(StepNumber[k] > UpperCut) continue;
 
-      //KS: We know exactly which x bin we will end up, find y bin. This allow to avoid coslty Fill() and enable multithreading becasue I am master of faster
+      //KS: We know exactly which x bin we will end up, find y bin. This allow to avoid costly Fill() and enable multithreading because I am master of faster
       const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
       hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
     }
@@ -3168,25 +3179,27 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   post->Write("posteriors", TObject::kOverwrite);
 
   // KS: Save reweight metadeta
-  std::ostringstream yaml_stream;
-  yaml_stream << "Weight:\n";
-  yaml_stream << "  ReweightDim: 1\n";
-  yaml_stream << "  ReweightType: \"Gaussian\"\n";
-  yaml_stream << "  ReweightVar: [";
-  for (size_t k = 0; k < Names.size(); ++k) {
-    yaml_stream << "\"" << Names[k] << "\"";
-    if (k < Names.size() - 1) yaml_stream << ", ";
+  YAML::Node yaml_stream;
+  yaml_stream["Weight"]["ReweightDim"] = 1;
+  yaml_stream["Weight"]["ReweightType"] = "Gaussian";
+
+  YAML::Node ReweightVar;
+  ReweightVar.SetStyle(YAML::EmitterStyle::Flow);
+  for (const auto& name : Names) {
+    ReweightVar.push_back(name);
   }
-  yaml_stream << "]\n";
-  yaml_stream << "  ReweightPrior: [";
+  yaml_stream["Weight"]["ReweightVar"] = ReweightVar;
+  YAML::Node ReweightPrior;
+  ReweightPrior.SetStyle(YAML::EmitterStyle::Flow);
   for (size_t k = 0; k < Names.size(); ++k) {
-    yaml_stream << "[" << NewCentral[k] << ", " << NewError[k] << "]";
-    if (k < Names.size() - 1) yaml_stream << ", ";
+    YAML::Node PriorPair;
+    PriorPair.push_back(NewCentral[k]);
+    PriorPair.push_back(NewError[k]);
+    ReweightPrior.push_back(PriorPair);
   }
-  yaml_stream << "]\n";
-  std::string yaml_string = yaml_stream.str();
-  YAML::Node root = STRINGtoYAML(yaml_string);
-  TMacro ConfigSave = YAMLtoTMacro(root, "Reweight_Config");
+  yaml_stream["Weight"]["ReweightPrior"] = ReweightPrior;
+
+  TMacro ConfigSave = YAMLtoTMacro(yaml_stream, "Reweight_Config");
   ConfigSave.Write();
 
   OutputChain->Close();

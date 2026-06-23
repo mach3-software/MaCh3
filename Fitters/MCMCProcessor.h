@@ -330,7 +330,9 @@ class MCMCProcessor {
 
   protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
-      std::unique_ptr<TH1D> MakePrefit();
+    std::unique_ptr<TH1D> MakePrefit();
+    /// @brief Perform plot of 1d marginalised posterior with HPD etc.
+    void DrawPosterior(const int i, TDirectory* PostDir, TDirectory* PostHistDir);
     /// @brief prepare output root file and canvas to which we will save EVERYTHING
     void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix

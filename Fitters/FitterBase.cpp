@@ -136,7 +136,7 @@ void FitterBase::SaveSettings() {
   for(unsigned int i = 0; i < samples.size(); ++i) {
     MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNSamples());
     for(int iSam = 0; iSam < samples[i]->GetNSamples(); ++iSam) {
-      MACH3LOG_INFO("   {}: Sample name: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
+      MACH3LOG_INFO("   {}: Sample title: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
     }
   }
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
