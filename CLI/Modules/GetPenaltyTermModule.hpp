@@ -1,6 +1,15 @@
 /**
  * @file GetPenaltyTermModule.hpp
  * @brief Module for extracting penalty terms from systematic chains
+ *
+ * This module is designed to retrieve penalty terms from various sources,
+ * such as flux and cross-section systematic chains. Since flux and cross-section
+ * uncertainties are handled systematically, the penalty term cannot be taken
+ * directly from the chain.
+ *
+ * @todo This should really be moved to MCMC Processor
+ * @ingroup MaCh3DiagnosticProcessing
+ * @author Kamil Skwarczynski
  */
 
 #pragma once
