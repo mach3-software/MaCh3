@@ -58,7 +58,7 @@ namespace M3{
     return m_parser;
   }
 
-  int GetPenaltyTermModule::run()//int argc, char *argv[])
+  int GetPenaltyTermModule::Run()//int argc, char *argv[])
   {
     SetMaCh3LoggerFormat();
     M3::Utils::MaCh3Welcome();

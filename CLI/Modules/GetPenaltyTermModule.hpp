@@ -35,7 +35,7 @@ namespace M3{
        * @brief Execute the penalty term extraction
        * @return Exit code (0 on success)
        */
-      int run() override;
+      int Run() override;
 
     private:
       /**

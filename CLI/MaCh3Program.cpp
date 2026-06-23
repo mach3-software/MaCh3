@@ -206,18 +206,18 @@ namespace M3{
      *
      * @return Exit code from the executed module (0 on success)
      */
-    int MaCh3Program::run(){
+    int MaCh3Program::Run(){
         
         const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
         
         if (sub_parser){
             auto plugin_itr = m_module_map.find(&sub_parser);
             if (plugin_itr != m_module_map.end()){
-                return plugin_itr->second->run();
+                return plugin_itr->second->Run();
             }
             auto dplugin_itr = m_dynamic_plugin_map.find(&sub_parser);
             if (dplugin_itr != m_dynamic_plugin_map.end()){
-                return dplugin_itr->second->run();
+                return dplugin_itr->second->Run();
             }
         }
         return 0;        
