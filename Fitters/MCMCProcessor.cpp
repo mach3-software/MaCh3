@@ -323,6 +323,14 @@ void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* 
   hpost[i]->Write();
 }
 
+// ****************************
+std::pair<double, double> MCMCProcessor::GetHistRange(const int iParam) const {
+// ****************************
+  return {
+    hpost[iParam]->GetXaxis()->GetXmin(),
+    hpost[iParam]->GetXaxis()->GetXmax()
+  };
+}
 
 // ****************************
 //CW: Function to make the post-fit
@@ -335,7 +343,9 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   // Check if the output file is ready
   if (OutputFile == nullptr) MakeOutputFile();
   
-  MACH3LOG_INFO("MCMCProcessor is making post-fit plots...");
+  MACH3LOG_INFO("Starting {}", __func__);
+  TStopwatch clock;
+  clock.Start();
 
   int originalErrorLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
@@ -428,6 +438,9 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   delete PostDir;
   PostHistDir->Close();
   delete PostHistDir;
+
+  clock.Stop();
+  MACH3LOG_INFO("{} took {:.2f}s to", __func__, clock.RealTime());
 
   // restore original warning setting
   gErrorIgnoreLevel = originalErrorLevel;
@@ -810,19 +823,14 @@ void MCMCProcessor::MakeViolin() {
   if(!CacheMCMC) CacheSteps();
   MACH3LOG_INFO("Starting {}", __func__);
 
-  // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
-  double tempVal = 0.0;
   //KS: Find min and max to make histogram in range
   double maxi_y = -9999;
   double mini_y = +9999;
   for (int i = 0; i < nDraw; ++i)
   {
-    Chain->SetBranchAddress(BranchNames[i].Data(), &tempVal);
-    const double max_val = Chain->GetMaximum(BranchNames[i]);
-    const double min_val = Chain->GetMinimum(BranchNames[i]);
-  
-    maxi_y = std::max(maxi_y, max_val);
-    mini_y = std::min(mini_y, min_val);
+    auto range = GetHistRange(i);
+    mini_y = std::min(mini_y, range.first);
+    maxi_y = std::max(maxi_y, range.second);
   }
 
   const int vBins = (maxi_y-mini_y)*25;
@@ -870,9 +878,6 @@ void MCMCProcessor::MakeViolin() {
     {
       //KS: Burn in cut
       if(StepNumber[k] < BurnInCut) continue;
-
-      //Only used for Suboptimatlity
-      if(StepNumber[k] > UpperCut) continue;
 
       //KS: We know exactly which x bin we will end up, find y bin. This allow to avoid costly Fill() and enable multithreading because I am master of faster
       const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
@@ -933,7 +938,7 @@ void MCMCProcessor::MakeViolin() {
   for (int i = 0; i < NIntervals+1; ++i)
   {
     int RangeMin = i*IntervalsSize;
-    int RangeMax =RangeMin + IntervalsSize;
+    int RangeMax = RangeMin + IntervalsSize;
     if(i == NIntervals+1) {
       RangeMin = i*IntervalsSize;
       RangeMax = nDraw;
@@ -1149,17 +1154,6 @@ void MCMCProcessor::CacheSteps() {
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
 
-  // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
-  double tempVal = 0.0;
-  std::vector<double> Min_Chain(nDraw);
-  std::vector<double> Max_Chain(nDraw);
-  for (int i = 0; i < nDraw; ++i)
-  {
-    Chain->SetBranchAddress(BranchNames[i].Data(), &tempVal);
-    Min_Chain[i] = Chain->GetMinimum(BranchNames[i]);
-    Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
-  }
-
   // Calculate the total number of TH2D objects
   size_t nHistograms = nDraw * (nDraw + 1) / 2;
   MACH3LOG_INFO("Caching 2D posterior histograms...");
@@ -1178,10 +1172,12 @@ void MCMCProcessor::CacheSteps() {
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
 
+      auto range_x = GetHistRange(i);
+      auto range_y = GetHistRange(j);
       // TH2D to hold the Correlation
       hpost2D[i][j] = new TH2D((Title_i + "_" + Title_j).Data(), (Title_i + "_" + Title_j).Data(),
-                               nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
-                               nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
+                               nBins, range_x.first, range_x.second,
+                               nBins, range_y.first, range_y.second);
       hpost2D[i][j]->SetMinimum(0);
       hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
       hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
@@ -3178,7 +3174,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   OutputChain->cd();
   post->Write("posteriors", TObject::kOverwrite);
 
-  // KS: Save reweight metadeta
+  // KS: Save reweight metadata
   YAML::Node yaml_stream;
   yaml_stream["Weight"]["ReweightDim"] = 1;
   yaml_stream["Weight"]["ReweightType"] = "Gaussian";
@@ -3289,15 +3285,20 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
   OutputChain->cd();
   treeNew->Write("posteriors", TObject::kOverwrite);
 
-  // KS: Save reweight metadeta
-  std::ostringstream yaml_stream;
-  yaml_stream << "Smearing:\n";
+  // KS: Save smearing metadata
+  YAML::Node yaml_node;
+  yaml_node["Smearing"].SetStyle(YAML::EmitterStyle::Block);
+
   for (size_t k = 0; k < Names.size(); ++k) {
-    yaml_stream << "    " << Names[k] << ": [" << Error[k] << ", " << "Gauss" << "]\n";
+    YAML::Node entry;
+    entry.SetStyle(YAML::EmitterStyle::Flow);
+
+    entry.push_back(Error[k]);
+    entry.push_back("Gauss");
+
+    yaml_node["Smearing"][Names[k]] = entry;
   }
-  std::string yaml_string = yaml_stream.str();
-  YAML::Node root = STRINGtoYAML(yaml_string);
-  TMacro ConfigSave = YAMLtoTMacro(root, "Smearing_Config");
+  TMacro ConfigSave = YAMLtoTMacro(yaml_node, "Smearing_Config");
   ConfigSave.Write();
 
   OutputChain->Close();

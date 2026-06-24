@@ -423,6 +423,8 @@ class MCMCProcessor {
     /// @param Legend Pointer to the TLegend object to modify
     /// @param size The text size to set for the legend
     void SetLegendStyle(TLegend* Legend, const double size) const;
+    /// @brief Get Min/Max ranges for single parameter
+    std::pair<double, double> GetHistRange(const int iParam) const;
 
     /// Name of MCMC file
     std::string MCMCFile;
