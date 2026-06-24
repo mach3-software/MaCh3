@@ -39,6 +39,39 @@ _MaCh3_Safe_Include_End_ //}
 
 namespace M3
 {
+/// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
+/// @param Text    Input string to test.
+/// @param Pattern Wildcard pattern to match against.
+inline bool CaseInsentiveMatch(std::string Text, std::string Pattern) {
+  // Make a copy and to lower case to not be case sensitive
+  std::transform(Text.begin(), Text.end(), Text.begin(), ::tolower);
+
+  // Convert to low case to not be case sensitive
+  std::transform(Pattern.begin(), Pattern.end(), Pattern.begin(), ::tolower);
+  try {
+    // Replace '*' in the Pattern with '.*' for regex matching
+    std::string RegexPattern = "^" + std::regex_replace(Pattern, std::regex("\\*"), ".*") + "$";
+    std::regex Regex(RegexPattern);
+    return std::regex_match(Text, Regex);
+  }
+  catch (const std::regex_error& e) {
+    MACH3LOG_ERROR("Regex error: {}", e.what());
+    return false;
+  }
+}
+
+/// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
+/// @param Text    Input string to test.
+/// @param Patterns Collection wildcard patterns to match against.
+inline bool CaseInsensitiveMatchAny(std::string Text, const std::vector<std::string>& Patterns) {
+  for (size_t i = 0; i < Patterns.size(); i++) {
+    if (M3::CaseInsentiveMatch(Text, Patterns[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /// @brief CW: Multi-threaded matrix multiplication
 inline double* MatrixMult(double *A, double *B, int n) {
   //CW: First transpose to increse cache hits
