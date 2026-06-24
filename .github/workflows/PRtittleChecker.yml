@@ -1,4 +1,4 @@
-# This workflow make sure PR tittles obeys Contributing guide
+# This workflow make sure PR titles obeys Contributing guide
 name: "PR Title Checker"
 on:
   pull_request_target:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: thehanimo/pr-title-checker@v1.4.3
         with:

@@ -10,6 +10,7 @@ set(MaCh3_DEBUG_ENABLED @MaCh3_DEBUG_ENABLED@)
 set(MaCh3_MULTITHREAD_ENABLED @MaCh3_MULTITHREAD_ENABLED@)
 set(MaCh3_GPU_ENABLED @MaCh3_GPU_ENABLED@)
 set(MaCh3_PYTHON_ENABLED @MaCh3_PYTHON_ENABLED@)
+set(MaCh3_NUDOCK_ENABLED @MaCh3_NUDOCK_ENABLED@)
 set(MaCh3_MINUIT2_ENABLED @MaCh3_MINUIT2_ENABLED@)
 set(MACH3_CXX_STANDARD @MACH3_CXX_STANDARD@)
 set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
@@ -25,7 +26,7 @@ set(MaCh3_FOUND TRUE)
 
 include(MaCh3Utils)
 
-find_package(ROOT 6.18 REQUIRED)
+find_package(ROOT 6.20 REQUIRED)
 
 #Fancy NuOscillator
 find_package(NuOscillator @NUOSCILLATOR_VERSION@ REQUIRED)
@@ -35,6 +36,10 @@ find_package(spdlog @spdlog_VERSION@ REQUIRED)
 
 if(NOT TARGET spdlog::spdlog)
   cmessage(FATAL_ERROR "Didn't set up spdlog::spdlog")
+endif()
+
+if(MaCh3_NUDOCK_ENABLED)
+  find_package(NuDock REQUIRED)
 endif()
 
 if(MaCh3_GPU_ENABLED)
@@ -55,12 +60,12 @@ get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 
 find_path(MaCh3_INCLUDE_DIR
-  NAMES mcmc/FitterBase.h
+  NAMES Fitters/FitterBase.h
   PATHS ${MaCh3_CMAKE_DIR}/include/
 )
 
 find_path(MaCh3_LIB_DIR
-  NAMES libMCMC.so
+  NAMES libFitters.so
   PATHS ${MaCh3_CMAKE_DIR}/lib/
 )
 

@@ -1,0 +1,31 @@
+---
+name: MaCh3 Validations
+description: Clone, configure, and build MaCh3 Validations
+
+inputs:
+  mach3_branch:
+    description: The MaCh3 branch to use for validations
+    required: true
+  compilation_flags:
+    description: Additional compilation flags for CMake
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Get MaCh3 Validations
+      shell: bash
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+        cd MaCh3Validations
+        mkdir build
+        cd build
+        cmake ../ -DMaCh3_Branch="${{ inputs.mach3_branch }}" ${{ inputs.compilation_flags }}
+
+    - name: Build MaCh3 Validations
+      shell: bash
+      run: |
+        cd /opt/MaCh3Validations/build
+        make -j4 install

@@ -5,10 +5,10 @@ pybind11_add_module(
   _pyMaCh3 MODULE
   pyMaCh3.cpp
   plotting.cpp
-  fitter.cpp
-  samplePDF.cpp
+  fitters.cpp
+  samples.cpp
   manager.cpp
-  covariance.cpp
+  parameters.cpp
   splines.cpp
 )
 ## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower

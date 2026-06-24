@@ -12,7 +12,7 @@ Summary of currently implemented bots
 * Checks compilation on several resources
 
 ## CIPythonValidations
-* Testin of pyMaCh3
+* Testing of pyMaCh3
 
 ## CIValidations
 * Unit and integration test of MaCh3
@@ -30,7 +30,7 @@ Summary of currently implemented bots
 * Lint code base (currently C++ turned off)
 
 ## MakeRelase
-* Make realse after tag is made
+* Make release after tag is made
 
 ## Meme
 * Nothing to add, cool meme for PR
@@ -38,7 +38,7 @@ Summary of currently implemented bots
 ## Newsletter
 * Make weekly summary of
 
-## PRtittleChecker
+## PRtitleChecker
 * Ensures each PR starts with suffix like tidy: for example
 
 ## Stale
@@ -49,3 +49,16 @@ Summary of currently implemented bots
 
 ## Telemetry
 * Add telemetry like RAM and CPU usage for each PR
+
+## WeeklyValgrind
+* Runs Valgrind over tutorial weekly so we always have up to date info about memory leaks etc.
+
+## TaskChecker
+* We require every user before merging PR to tick that they have read contributing. This simply ensures people actually ticked it. We can't check people actually read it, for now ;)
+
+## TagDoxygen
+* Tag Doxygen Documentation when MaCh3 tag is produced
+
+## Squash
+* Some branches, such as the gh-pages (used for soring doxygen) branch, do not require their full commit history to be preserved. For these branches, the bot squashes commits to keep the repository smaller and cleaner.
+
