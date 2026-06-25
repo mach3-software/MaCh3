@@ -1,8 +1,9 @@
-/**
- * @file DiagMCMCModule.cpp
- * @brief Implementation of the DiagMCMCModule class
- */
-
+/// @file DiagMCMCModule.cpp
+/// @ingroup MaCh3DiagnosticProcessing
+/// @brief Implementation of the DiagMCMCModule class
+///
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
 #include "CLI/Modules/DiagMCMCModule.hpp"
@@ -27,6 +28,10 @@ namespace M3{
     return m_parser;
   }
 
+
+  /// @brief Main function  creating MCMCProcessor and calling MCMC Diagnostic
+  /// @param inputFile MCMC Chain
+  /// @param config Config file with settings
   int DiagMCMCModule::Run() {
     SetMaCh3LoggerFormat();
     MACH3LOG_INFO("Producing single fit output");
