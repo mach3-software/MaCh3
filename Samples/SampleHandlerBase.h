@@ -22,6 +22,12 @@ enum SamplePlotType {
 };
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+///
+/// @details This class manages samples used in the analysis. It supports event-by-event reweighting and allows
+/// kinematic shifts to be applied at the event level, which may cause migration between analysis bins.
+///
+/// The likelihood calculation is performed in binned space.
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 ///
@@ -133,14 +139,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
-  /// @brief Produce 1D projection into X-variable, for a single MaCh3 mode
-  [[deprecated]] std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
-    return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
-  }
-  /// @brief Produce 2D projection into X-variable, and Y-variable for a single MaCh3 mode
-  [[deprecated]] std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
-    return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
-  }
+
   /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
   /// @param TypeEnum Plot type enumerator see @ref SamplePlotType
   /// @param iSample Sample enumerator
@@ -172,6 +171,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
   /// @brief JM: Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr) const;
+
+  /// @brief Return total number of events
+  unsigned int GetNEvents() const {return nEvents;}
 
   /// @brief Return array storing data entries for every bin
   auto GetDataArray() const {
@@ -467,6 +469,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// @brief Helper object for storing/updating information related to functional shift parameters
   M3::detail::Functional functional;
+
+  /// Number of MC events are there
+  unsigned int nEvents;
 };
 
 //template implementation details live here

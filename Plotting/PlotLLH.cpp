@@ -433,7 +433,11 @@ int PlotLLH() {
   if (PlotMan->getSplitBySample())
     canv->SaveAs((PlotMan->getOutputName("_bySample") + "[").c_str());
 
-  for( std::string par: PlotMan->getOption<std::vector<std::string>>("parameterTags")) std::cout << par << ", ";
+  std::string params;
+  for (const std::string& par : PlotMan->getOption<std::vector<std::string>>("parameterTags")){
+    params += par + ", ";
+  }
+  MACH3LOG_INFO("Parameters: {}", params);
   // loop over the spline parameters
   for (std::string paramName : PlotMan->input().getTaggedParameters(PlotMan->getOption<std::vector<std::string>>("parameterTags")))
   {

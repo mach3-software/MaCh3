@@ -20,8 +20,8 @@ SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandle
     MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
   ParHandler = _ParHandler;
-
-  nSamples = 1;
+  nEvents = 0;
+  nSamples = 0;
 
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerBase object - this will be used for all oscillation channels");
@@ -51,8 +51,9 @@ SampleHandlerBase::~SampleHandlerBase() {
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
-void SampleHandlerBase::ReadConfig()
-{
+// ************************************************
+void SampleHandlerBase::ReadConfig() {
+// ************************************************
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(getenv("MACH3")+std::string("/") + ModeName);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception

@@ -22,6 +22,7 @@ class TDirectory;
 /// @details This class wraps MaCh3 classes like @ref SampleHandlerInterface and @ref ParameterHandlerBase.
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
+///
 /// @ingroup CoreClasses
 class FitterBase {
  public:

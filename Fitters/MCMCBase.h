@@ -15,11 +15,11 @@ class MCMCBase : public FitterBase {
     virtual ~MCMCBase() = default;
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC() override final;
+    void RunMCMC() final;
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
-    void StartFromPreviousFit(const std::string &FitName) override final;
+    void StartFromPreviousFit(const std::string &FitName) final;
 
     /// @brief Set how long chain should be
     /// @param L new chain length
@@ -54,6 +54,7 @@ class MCMCBase : public FitterBase {
     void AdaptiveStep();
 
     /// @brief Print the progress
+    /// @param StepsPrint whether to print info about accepted steps and -LogL
     void PrintProgress(const bool StepsPrint = true);
 
     /// Do we reject based on hitting boundaries in systs

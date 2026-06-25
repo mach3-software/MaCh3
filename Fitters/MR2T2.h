@@ -40,6 +40,3 @@ class MR2T2 : public MCMCBase {
     /// @brief Step acceptance probability
     double AcceptanceProbability() override;
 };
-
-/// For backwards compatibility
-using mcmc  = MR2T2;

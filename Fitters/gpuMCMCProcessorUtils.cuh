@@ -72,7 +72,10 @@ class MCMCProcessorGPU
   float* DenomSum_gpu;
 
   // h_NAME declares HOST constants (live on CPU)
+  /// number of Lags for autocorrelations
   int h_nLag;
+  /// number of parameters
   int h_nDraws;
+  /// number of steps
   int h_nEntries;
 };
