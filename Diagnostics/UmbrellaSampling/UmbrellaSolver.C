@@ -1,3 +1,8 @@
+// g++ -fopenmp -O3 -std=c++17 \
+        $(root-config --cflags --libs) \
+        -lyaml-cpp \
+        -o umbrella_solver_compiled umbrella_solver.C
+
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TGraph.h>
