@@ -55,19 +55,17 @@ namespace M3{
     return 0;
   }
 
-  /**
-   * @brief Read covariance matrix and prior information from ROOT file
-   *
-   * Loads the covariance matrix, inverts it, and extracts parameter priors
-   * and flat prior flags from the MCMC output file.
-   *
-   * @param inputFile Path to the ROOT file containing MCMC output
-   * @param Prior Vector to be filled with prior parameter values
-   * @param isFlat Vector to be filled with flat prior flags
-   * @param ParamNames Vector to be filled with parameter names
-   * @param invCovMatrix 2D vector to be filled with inverted covariance matrix
-   * @param nParams Reference to store the number of parameters
-   */
+  /// @brief Read covariance matrix and prior information from ROOT file
+  ///
+  /// Loads the covariance matrix, inverts it, and extracts parameter priors
+  /// and flat prior flags from the MCMC output file.
+  ///
+  /// @param inputFile Path to the ROOT file containing MCMC output
+  /// @param Prior Vector to be filled with prior parameter values
+  /// @param isFlat Vector to be filled with flat prior flags
+  /// @param ParamNames Vector to be filled with parameter names
+  /// @param invCovMatrix 2D vector to be filled with inverted covariance matrix
+  /// @param nParams Reference to store the number of parameters
   void GetPenaltyTermModule::ReadCovFile(const std::string& inputFile,
                                          std::vector <double>& Prior,
                                          std::vector <bool>& isFlat,
@@ -152,19 +150,17 @@ namespace M3{
     delete TempFile;
   }
 
-  /**
-   * @brief Load penalty term set definitions from YAML configuration
-   *
-   * Parses the configuration to determine which parameters belong to each
-   * penalty term set, based on either inclusion or exclusion patterns.
-   *
-   * @param Settings YAML configuration node
-   * @param SetsNames Vector to be filled with set names
-   * @param FancyTitle Vector to be filled with fancy titles for plotting
-   * @param isRelevantParam 2D vector to be filled with parameter relevance flags
-   * @param ParamNames Vector of all parameter names from the covariance
-   * @param nParams Total number of parameters
-   */
+  /// @brief Load penalty term set definitions from YAML configuration
+  ///
+  /// Parses the configuration to determine which parameters belong to each
+  /// penalty term set, based on either inclusion or exclusion patterns.
+  ///
+  /// @param Settings YAML configuration node
+  /// @param SetsNames Vector to be filled with set names
+  /// @param FancyTitle Vector to be filled with fancy titles for plotting
+  /// @param isRelevantParam 2D vector to be filled with parameter relevance flags
+  /// @param ParamNames Vector of all parameter names from the covariance
+  /// @param nParams Total number of parameters
   void GetPenaltyTermModule::LoadSettings(YAML::Node& Settings,
                                           std::vector<std::string>& SetsNames,
                                           std::vector<std::string>& FancyTitle,
@@ -236,16 +232,14 @@ namespace M3{
     }
   }
 
-  /**
-   * @brief Calculate and plot penalty terms for each parameter set
-   *
-   * Main function that reads the covariance, loads configuration, iterates
-   * through MCMC steps, and calculates penalty terms for each defined set.
-   * Results are saved to ROOT file and PDF plots.
-   *
-   * @param inputFile Path to the MCMC chain ROOT file
-   * @param configFile Path to the YAML configuration file
-   */
+  /// @brief Calculate and plot penalty terms for each parameter set
+  ///
+  /// Main function that reads the covariance, loads configuration, iterates
+  /// through MCMC steps, and calculates penalty terms for each defined set.
+  /// Results are saved to ROOT file and PDF plots.
+  ///
+  /// @param inputFile Path to the MCMC chain ROOT file
+  /// @param configFile Path to the YAML configuration file
   void GetPenaltyTermModule::GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   {
     auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
