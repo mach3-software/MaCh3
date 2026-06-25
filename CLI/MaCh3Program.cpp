@@ -1,7 +1,5 @@
-/**
- * @file MaCh3Program.cpp
- * @brief Implementation of the MaCh3Program class
- */
+/// @file MaCh3Program.cpp
+/// @brief Implementation of the MaCh3Program class
 
 #include <dlfcn.h>
 #include <filesystem>
@@ -110,13 +108,11 @@ namespace M3{
         m_subcommands.push_back(parser->name());
     }
 
-    /**
-     * @brief Load dynamic plugins from paths specified in MACH3_PLUGINS environment variable
-     *
-     * Reads the MACH3_PLUGINS environment variable (colon-separated paths), loads each .so file,
-     * and registers the plugins with the program. Each plugin must export create_plugin and
-     * destroy_plugin functions.
-     */
+    /// @brief Load dynamic plugins from paths specified in MACH3_PLUGINS environment variable
+    ///
+    /// Reads the MACH3_PLUGINS environment variable (colon-separated paths), loads each .so file,
+    /// and registers the plugins with the program. Each plugin must export create_plugin and
+    /// destroy_plugin functions.
     void MaCh3Program::load_dynamic_plugins(){
         const char* env = std::getenv("MACH3_PLUGINS");
         if (!env) {
@@ -187,11 +183,9 @@ namespace M3{
         }
     }
 
-    /**
-     * @brief Unload all dynamic plugins and clean up resources
-     *
-     * Calls the destroy function for each loaded plugin and closes the dynamic library handles.
-     */
+    /// @brief Unload all dynamic plugins and clean up resources
+    ///
+    /// Calls the destroy function for each loaded plugin and closes the dynamic library handles.
     void MaCh3Program::unload_dynamic_plugins(){
         for (auto& [_, plugin] : m_dynamic_plugin_map){
             plugin->destroy();
@@ -199,13 +193,11 @@ namespace M3{
         m_dynamic_plugin_map.clear();
     }
 
-    /**
-     * @brief Execute the selected subcommand
-     *
-     * Determines which subcommand was invoked and runs the corresponding module or plugin.
-     *
-     * @return Exit code from the executed module (0 on success)
-     */
+    /// @brief Execute the selected subcommand
+    ///
+    /// Determines which subcommand was invoked and runs the corresponding module or plugin.
+    ///
+    /// @return Exit code from the executed module (0 on success)
     int MaCh3Program::Run(){
         
         const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
@@ -224,15 +216,13 @@ namespace M3{
     }
 
 
-    /**
-     * @brief Expand a plugin path to a list of shared library files
-     *
-     * If the path is a file, returns it directly. If it's a directory,
-     * returns all .so files found in that directory.
-     *
-     * @param path Path to a plugin file or directory
-     * @return Vector of absolute paths to .so files
-     */
+    /// @brief Expand a plugin path to a list of shared library files
+    ///
+    /// If the path is a file, returns it directly. If it's a directory,
+    /// returns all .so files found in that directory.
+    ///
+    /// @param path Path to a plugin file or directory
+    /// @return Vector of absolute paths to .so files
     std::vector<std::string> MaCh3Program::expand_plugin_path(const std::string& path) const {
         std::vector<std::string> result;
 

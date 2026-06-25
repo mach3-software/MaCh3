@@ -1,7 +1,5 @@
-/**
- * @file ProcessMCMCModule.cpp
- * @brief Implementation of the ProcessMCMCModule class
- */
+/// @file ProcessMCMCModule.cpp
+/// @brief Implementation of the ProcessMCMCModule class
 
 //MaCh3 includes
 #include "Fitters/OscProcessor.h"
@@ -152,15 +150,13 @@ namespace M3{
     return CustomBinning;
   }
 
-  /**
-   * @brief Process a single MCMC chain file
-   *
-   * Loads the MCMC chain, applies configuration settings, and produces
-   * various diagnostic plots and analyses including posteriors, correlations,
-   * credible intervals, and Bayes factors.
-   *
-   * @param inputFile Path to the MCMC chain ROOT file
-   */
+  /// @brief Process a single MCMC chain file
+  ///
+  /// Loads the MCMC chain, applies configuration settings, and produces
+  /// various diagnostic plots and analyses including posteriors, correlations,
+  /// credible intervals, and Bayes factors.
+  ///
+  /// @param inputFile Path to the MCMC chain ROOT file
   void ProcessMCMCModule::ProcessMCMC(const std::string& inputFile)
   {
     MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
@@ -258,13 +254,11 @@ namespace M3{
     if(GetFromManager<bool>(Settings["MakePiePlot"], true))      Processor->MakePiePlot();
   }
 
-  /**
-   * @brief Compare multiple MCMC chains
-   *
-   * Processes multiple MCMC chains simultaneously, compares their posterior
-   * distributions, and performs Kolmogorov-Smirnov tests to check if posteriors
-   * are consistent across chains.
-   */
+  /// @brief Compare multiple MCMC chains
+  ///
+  /// Processes multiple MCMC chains simultaneously, compares their posterior
+  /// distributions, and performs Kolmogorov-Smirnov tests to check if posteriors
+  /// are consistent across chains.
   void ProcessMCMCModule::MultipleProcessMCMC()
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -473,15 +467,13 @@ namespace M3{
     Posterior->Print(canvasname);
   }
 
-  /**
-   * @brief Calculate Bayes factors for hypothesis testing
-   *
-   * Computes Bayes factors to compare different models or hypotheses,
-   * particularly useful for oscillation parameters and switch parameters.
-   * Configuration is read from the YAML file under BayesFactor section.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   */
+  /// @brief Calculate Bayes factors for hypothesis testing
+  ///
+  /// Computes Bayes factors to compare different models or hypotheses,
+  /// particularly useful for oscillation parameters and switch parameters.
+  /// Configuration is read from the YAML file under BayesFactor section.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
   void ProcessMCMCModule::CalcBayesFactor(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -502,15 +494,13 @@ namespace M3{
     Processor->GetBayesFactor(ParNames, Model1Bounds, Model2Bounds, ModelNames);
   }
 
-  /**
-   * @brief Calculate Savage-Dickey ratios
-   *
-   * Computes Savage-Dickey ratios for Bayes factor estimation at specific
-   * parameter values. Configuration is read from the YAML file under
-   * SavageDickey section.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   */
+  /// @brief Calculate Savage-Dickey ratios
+  ///
+  /// Computes Savage-Dickey ratios for Bayes factor estimation at specific
+  /// parameter values. Configuration is read from the YAML file under
+  /// SavageDickey section.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
   void ProcessMCMCModule::CalcSavageDickey(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -529,15 +519,13 @@ namespace M3{
     Processor->GetSavageDickey(ParNames, EvaluationPoint, Bounds);
   }
 
-  /**
-   * @brief Calculate parameter evolution over MCMC steps
-   *
-   * Tracks how parameters evolve during the MCMC chain, useful for
-   * diagnosing convergence and burn-in. Configuration is read from
-   * the YAML file under ParameterEvolution section.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   */
+  /// @brief Calculate parameter evolution over MCMC steps
+  ///
+  /// Tracks how parameters evolve during the MCMC chain, useful for
+  /// diagnosing convergence and burn-in. Configuration is read from
+  /// the YAML file under ParameterEvolution section.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
   void ProcessMCMCModule::CalcParameterEvolution(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -553,15 +541,13 @@ namespace M3{
     Processor->ParameterEvolution(ParNames, Intervals);
   }
 
-  /**
-   * @brief Create bipolar plots for parameter visualization
-   *
-   * Generates bipolar plots to visualize parameter distributions in a
-   * circular representation. Configuration is read from the YAML file
-   * under BipolarPlot section.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   */
+  /// @brief Create bipolar plots for parameter visualization
+  ///
+  /// Generates bipolar plots to visualize parameter distributions in a
+  /// circular representation. Configuration is read from the YAML file
+  /// under BipolarPlot section.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
   void ProcessMCMCModule::CalcBipolarPlot(MCMCProcessor* Processor)
   {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -575,15 +561,13 @@ namespace M3{
     Processor->GetPolarPlot(ParNames);
   }
 
-  /**
-   * @brief Generate triangle plots showing parameter correlations
-   *
-   * Creates triangle plots displaying 1D and 2D posterior distributions
-   * for sets of correlated parameters. Configuration is read from the
-   * YAML file under TrianglePlot section.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   */
+  /// @brief Generate triangle plots showing parameter correlations
+  ///
+  /// Creates triangle plots displaying 1D and 2D posterior distributions
+  /// for sets of correlated parameters. Configuration is read from the
+  /// YAML file under TrianglePlot section.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
   void ProcessMCMCModule::GetTrianglePlot(MCMCProcessor* Processor) {
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -603,16 +587,14 @@ namespace M3{
     }
   }
 
-  /**
-   * @brief Diagnose covariance matrix stability
-   *
-   * Validates the stability of the posterior covariance matrix by computing
-   * it at different burn-in cuts and comparing successive matrices. This helps
-   * determine when the matrix becomes stable and the appropriate burn-in length.
-   *
-   * @param Processor Pointer to the MCMCProcessor instance
-   * @param inputFile Path to the input file for naming output files
-   */
+  /// @brief Diagnose covariance matrix stability
+  ///
+  /// Validates the stability of the posterior covariance matrix by computing
+  /// it at different burn-in cuts and comparing successive matrices. This helps
+  /// determine when the matrix becomes stable and the appropriate burn-in length.
+  ///
+  /// @param Processor Pointer to the MCMCProcessor instance
+  /// @param inputFile Path to the input file for naming output files
   void ProcessMCMCModule::DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
   {
     //Turn of plots from Processor
@@ -788,16 +770,14 @@ namespace M3{
     if(CorrelationHist != nullptr)         delete CorrelationHist;
   }
 
-  /**
-   * @brief Convert TMatrixDSym to TH2D histogram
-   *
-   * Converts a ROOT symmetric matrix to a 2D histogram for visualization
-   * and easier manipulation with ROOT plotting tools.
-   *
-   * @param Matrix Pointer to the symmetric matrix
-   * @param title Title for the resulting histogram
-   * @return Pointer to the newly created TH2D histogram
-   */
+  /// @brief Convert TMatrixDSym to TH2D histogram
+  ///
+  /// Converts a ROOT symmetric matrix to a 2D histogram for visualization
+  /// and easier manipulation with ROOT plotting tools.
+  ///
+  /// @param Matrix Pointer to the symmetric matrix
+  /// @param title Title for the resulting histogram
+  /// @return Pointer to the newly created TH2D histogram
   TH2D* ProcessMCMCModule::TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
   {
     TH2D* hMatrix = new TH2D(title.c_str(), title.c_str(), Matrix->GetNrows(), 0.0, Matrix->GetNrows(), Matrix->GetNcols(), 0.0, Matrix->GetNcols());
@@ -812,17 +792,15 @@ namespace M3{
     return hMatrix;
   }
 
-  /**
-   * @brief Perform Kolmogorov-Smirnov test between posterior distributions
-   *
-   * Tests whether posterior distributions from different MCMC chains are
-   * consistent by computing the KS test statistic for each parameter.
-   * Results are visualized showing cumulative distributions and D-statistic.
-   *
-   * @param Processor Vector of MCMCProcessor instances (one per chain)
-   * @param Posterior Canvas for drawing the comparison plots
-   * @param canvasname Name for the output PDF file
-   */
+  /// @brief Perform Kolmogorov-Smirnov test between posterior distributions
+  ///
+  /// Tests whether posterior distributions from different MCMC chains are
+  /// consistent by computing the KS test statistic for each parameter.
+  /// Results are visualized showing cumulative distributions and D-statistic.
+  ///
+  /// @param Processor Vector of MCMCProcessor instances (one per chain)
+  /// @param Posterior Canvas for drawing the comparison plots
+  /// @param canvasname Name for the output PDF file
   void ProcessMCMCModule::KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                                           const std::unique_ptr<TCanvas>& Posterior,
                                           const TString& canvasname)
