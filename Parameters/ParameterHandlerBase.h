@@ -7,7 +7,18 @@
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
 
-/// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
+/// @brief Base class for handling systematic uncertainty parameters.
+///
+/// @details Provides core functionality for managing systematic parameters,
+/// including likelihood evaluation and covariance handling.
+///
+/// How parameters are loaded (e.g. from configuration files or ROOT inputs)
+/// is left to derived classes.
+///
+/// In the context of MCMC, the class may also be responsible for proposing
+/// parameter steps. Proposal strategies may include PCA-based sampling or
+/// adaptive proposal matrices.
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski

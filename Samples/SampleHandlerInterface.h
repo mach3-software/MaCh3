@@ -23,9 +23,13 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 ///
-/// @details It serves as basic interface for fit running, as well as other fucnitonalsities liek llh scan, sigma var or event posterior predictive disturibon.
+/// @details It serves as basic interface for fit running, as well as other functionalities like llh scan, sigma var or even posterior predictive distribution.
 /// Concrete implementations of this interface are responsible for defining
 /// the specific structure of samples, event selections, and histogram filling.
+///
+/// The interface operates in terms of samples and sample histograms, without direct knowledge of
+/// individual events. This abstraction supports event-by-event reweighting and may allow fully
+/// binned reweighting in future implementations.
 ///
 /// @ingroup CoreClasses
 ///
@@ -58,15 +62,13 @@ class SampleHandlerInterface
   MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
   /// @brief main routine modifying MC prediction based on proposed parameter values
   virtual void Reweight()=0;
-  /// @brief Return likelihood (-logL) for all samples
+  /// @brief Return likelihood (-LogL) for all samples
   virtual double GetLikelihood() const = 0;
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
   virtual void PrintRates(const bool DataOnly = false) = 0;
 
-  /// @brief Return total number of events
-  unsigned int GetNEvents() const {return nEvents;}
   /// @brief Get number of oscillation channels for a single sample
   /// @param iSample Sample enumerator
   virtual int GetNOscChannels(const int iSample) const = 0;
@@ -261,9 +263,6 @@ protected:
 
   /// Contains how many samples we've got
   M3::int_t nSamples;
-
-  /// Number of MC events are there
-  unsigned int nEvents;
 
   /// Holds information about used Generator and MaCh3 modes
   std::unique_ptr<MaCh3Modes> Modes;
