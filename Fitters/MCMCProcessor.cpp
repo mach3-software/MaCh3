@@ -229,10 +229,7 @@ void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* 
   TString Title = "";
   double Prior = 1.0, PriorError = 1.0;
   GetNthParameter(i, Prior, PriorError, Title);
-
-  ParameterEnum ParType = ParamType[i];
-  int ParamTemp = i - ParamTypeStartPos[ParType];
-  bool isFlat = ParamFlat[ParType][ParamTemp];
+  bool isFlat = GetParamFlat(i);
 
   if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -858,9 +855,7 @@ void MCMCProcessor::MakeViolin() {
     PriorVec[x] = Prior;
     PriorErrorVec[x] = PriorError;
 
-    ParameterEnum ParType = ParamType[x];
-    int ParamTemp = x - ParamTypeStartPos[ParType];
-    PriorFlatVec[x] = ParamFlat[ParType][ParamTemp];
+    PriorFlatVec[x] = GetParamFlat(x);
   }
 
   TStopwatch clock;
@@ -2967,12 +2962,8 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
-    bool FlatPrior = false;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
-    
-    ParameterEnum ParType = ParamType[ParamNo];
-    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
-    FlatPrior = ParamFlat[ParType][ParamTemp];
+    bool FlatPrior = GetParamFlat(ParamNo);
     
     auto PosteriorHist = M3::Clone<TH1D>(hpost[ParamNo], std::string(Title));
     RemoveFitter(PosteriorHist.get(), "Gauss");
@@ -3078,132 +3069,6 @@ void MCMCProcessor::SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
   Posterior->Print(CanvasName);
   Posterior->Write(Title.c_str());
 }
-
-// **************************
-// KS: Reweight prior of MCMC chain to another
-void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
-                                  const std::vector<double>& NewCentral,
-                                  const std::vector<double>& NewError) {
-// **************************
-  MACH3LOG_INFO("Reweighting Prior");
-
-  if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
-  {
-    MACH3LOG_ERROR("Size of passed vectors doesn't match in {}", __func__);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  std::vector<int> Param;
-  std::vector<double> OldCentral;
-  std::vector<double> OldError;
-  std::vector<bool> FlatPrior;
-
-  //KS: First we need to find parameter number based on name
-  for(unsigned int k = 0; k < Names.size(); ++k)
-  {
-    //KS: First we need to find parameter number based on name
-    int ParamNo = GetParamIndexFromName(Names[k]);
-    if(ParamNo == M3::_BAD_INT_)
-    {
-      MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
-      return;
-    }
-
-    TString Title = "";
-    double Prior = 1.0, PriorError = 1.0;
-    GetNthParameter(ParamNo, Prior, PriorError, Title);
-
-    Param.push_back(ParamNo);
-    OldCentral.push_back(Prior);
-    OldError.push_back(PriorError);
-
-    ParameterEnum ParType = ParamType[ParamNo];
-    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
-
-    FlatPrior.push_back(ParamFlat[ParType][ParamTemp]);
-  }
-  std::vector<double> ParameterPos(Names.size());
-
-  std::string InputFile = MCMCFile+".root";
-  std::string OutputFilename = MCMCFile + "_reweighted.root";
-
-  //KS: Simply create copy of file and add there new branch
-  int ret = system(("cp " + InputFile + " " + OutputFilename).c_str());
-  if (ret != 0)
-    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
-
-  TFile *OutputChain = M3::Open(OutputFilename, "UPDATE", __FILE__, __LINE__);
-  OutputChain->cd();
-  TTree *post = OutputChain->Get<TTree>("posteriors");
-
-  double Weight = 1.;
-
-  post->SetBranchStatus("*",false);
-  // Set the branch addresses for params
-  for (unsigned int j = 0; j < Names.size(); ++j) {
-    post->SetBranchStatus(BranchNames[Param[j]].Data(), true);
-    post->SetBranchAddress(BranchNames[Param[j]].Data(), &ParameterPos[j]);
-  }
-  TBranch *bpt = post->Branch("Weight", &Weight, "Weight/D");
-  post->SetBranchStatus("Weight", true);
-
-  for (int i = 0; i < nEntries; ++i)
-  {
-    if(i % (nEntries/10) == 0) M3::Utils::PrintProgressBar(i, nEntries);
-    post->GetEntry(i);
-    Weight = 1.;
-
-    //KS: Calculate reweight weight. Weights are multiplicative so we can do several reweights at once. FIXME Big limitation is that code only works for uncorrelated parameters :(
-    for (unsigned int j = 0; j < Names.size(); ++j)
-    {
-      double new_chi = (ParameterPos[j] - NewCentral[j])/NewError[j];
-      double new_prior = std::exp(-0.5 * new_chi * new_chi);
-
-      double old_chi = -1;
-      double old_prior = -1;
-      if(FlatPrior[j]) {
-        old_prior = 1.0;
-      } else {
-        old_chi = (ParameterPos[j] - OldCentral[j])/OldError[j];
-        old_prior = std::exp(-0.5 * old_chi * old_chi);
-      }
-      Weight *= new_prior/old_prior;
-    }
-    bpt->Fill();
-  }
-  post->SetBranchStatus("*",true);
-  OutputChain->cd();
-  post->Write("posteriors", TObject::kOverwrite);
-
-  // KS: Save reweight metadata
-  YAML::Node yaml_stream;
-  yaml_stream["Weight"]["ReweightDim"] = 1;
-  yaml_stream["Weight"]["ReweightType"] = "Gaussian";
-
-  YAML::Node ReweightVar;
-  ReweightVar.SetStyle(YAML::EmitterStyle::Flow);
-  for (const auto& name : Names) {
-    ReweightVar.push_back(name);
-  }
-  yaml_stream["Weight"]["ReweightVar"] = ReweightVar;
-  YAML::Node ReweightPrior;
-  ReweightPrior.SetStyle(YAML::EmitterStyle::Flow);
-  for (size_t k = 0; k < Names.size(); ++k) {
-    YAML::Node PriorPair;
-    PriorPair.push_back(NewCentral[k]);
-    PriorPair.push_back(NewError[k]);
-    ReweightPrior.push_back(PriorPair);
-  }
-  yaml_stream["Weight"]["ReweightPrior"] = ReweightPrior;
-
-  TMacro ConfigSave = YAMLtoTMacro(yaml_stream, "Reweight_Config");
-  ConfigSave.Write();
-
-  OutputChain->Close();
-  delete OutputChain;
-
-  OutputFile->cd();
-}
-
 
 // **************************
 // KS: Smear contours
@@ -4696,4 +4561,12 @@ void MCMCProcessor::SetLegendStyle(TLegend* Legend, const double size) const {
   Legend->SetFillColor(0);
   Legend->SetFillStyle(0);
   Legend->SetBorderSize(0);
+}
+
+// **************************
+bool MCMCProcessor::GetParamFlat(const int iParam) const {
+// **************************
+  ParameterEnum ParType = ParamType[iParam];
+  int ParamTemp = iParam - ParamTypeStartPos[ParType];
+  return ParamFlat[ParType][ParamTemp];
 }
