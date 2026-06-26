@@ -16,6 +16,7 @@ output_file: "gen_gaussian_dcpzero_finer.root"
 # Variable of interest (branch name)
 variable_of_interest: "delta_cp"
 
+# Manual window configuration (if dynamic_files is false)
 windows:
   - name: "window_0"
     center: 0.0
