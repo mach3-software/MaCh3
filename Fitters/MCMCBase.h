@@ -21,18 +21,6 @@ class MCMCBase : public FitterBase {
     /// @param FitName Name of previous chain
     void StartFromPreviousFit(const std::string &FitName) override;
 
-    /// @brief Get the multicanonical weight for a given delta_cp value from a set of Gaussians
-    double GetMulticanonicalWeightGaussian(double kDeltacp);
-
-    /// @brief Get the multicanonical weight for a given delta_cp value from a spline
-    double GetMulticanonicalWeightSpline(double kDeltacp, TSpline3 *dcp_spline);
-
-    /// @brief Get the multicanonical weight for a given delta_cp value from two different splines, one for IO and one for NO
-    double GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23);
-
-    /// @brief Get the multicanonical weight for a given delta_cp value from a separate Gaussian for each chain
-    double GetMulticanonicalWeightSeparate(double deltacp, double mean, double sigma);
-
     /// @brief Set how long chain should be
     /// @param L new chain length
     inline void setChainLength(unsigned int L) { chainLength = L; };
