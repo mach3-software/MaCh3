@@ -562,13 +562,13 @@ void PredictiveThrower::ProduceToys() {
     PosteriorFile->Add(PosteriorFileName.c_str());
 
     PosteriorFile->SetBranchAddress("step", &Step);
-    std::vector<double> ReweightWeight(ReweightNames.size(), 1.0);
+    std::vector<double> reweight_weight(ReweightNames.size(), 1.0);
     bool doReweight = true;
     for (size_t i = 0; i < ReweightNames.size(); ++i) {
       const auto& name = ReweightNames[i];
       if (PosteriorFile->GetBranch(name.c_str())) {
         PosteriorFile->SetBranchStatus(name.c_str(), true);
-        PosteriorFile->SetBranchAddress(name.c_str(), &ReweightWeight[i]);
+        PosteriorFile->SetBranchAddress(name.c_str(), &reweight_weight[i]);
       } else {
         MACH3LOG_WARN("Missing reweight branch '{}' -> disabling ALL reweighting", name);
         doReweight = false;
@@ -650,8 +650,8 @@ void PredictiveThrower::ProduceToys() {
     PenaltyTerm[i] = Penalty;
     Weight = 1.;
     if(doReweight) {
-      for (size_t i = 0; i < ReweightWeight.size(); ++i) {
-        Weight *= ReweightWeight[i];
+      for (size_t i = 0; i < reweight_weight.size(); ++i) {
+        Weight *= reweight_weight[i];
       }
     }
     ReweightWeight[i] = Weight;
