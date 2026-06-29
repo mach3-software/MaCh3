@@ -19,7 +19,7 @@
 
 /// @author David Riley
 
-void umbrella_plotting() {
+void UmbrellaPlotting() {
     // ============================================
     // Configuration: Number of bins for each variable
     // ============================================

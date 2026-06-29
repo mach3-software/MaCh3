@@ -1,7 +1,7 @@
 // g++ -fopenmp -O3 -std=c++17 \
         $(root-config --cflags --libs) \
         -lyaml-cpp \
-        -o umbrella_solver_compiled umbrella_solver.C
+        -o UmbrellaSolver UmbrellaSolver.C
 
 /// @author David Riley
 
@@ -614,7 +614,7 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
 }
 
 // Main function to run the umbrella sampling solver
-void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
+void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
   std::cout << "=== Umbrella Sampling Z-Factor Solver ===" << std::endl;
 
@@ -1267,7 +1267,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Running compiled version with OpenMP support" << std::endl;
 
   try {
-    umbrella_solver(config_file);
+    UmbrellaSolver(config_file);
   } catch (const std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
