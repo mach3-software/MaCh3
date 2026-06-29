@@ -2,6 +2,11 @@
 #include "Fitters/StatisticalUtils.h"
 #include <numeric>
 
+_MaCh3_Safe_Include_Start_ //{
+// ROOT includes
+#include "Math/QuantFuncMathCore.h"
+_MaCh3_Safe_Include_End_ //}
+
 // **************************
 std::string GetJeffreysScale(const double BayesFactor){
 // **************************
@@ -711,4 +716,76 @@ void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {
       RatioHist->SetBinError(j, dx);
     }
   }
+}
+
+
+// ****************
+std::unique_ptr<TGraphAsymmErrors> PoissonGraph(const TH1D* hist, double cl) {
+// ****************
+  auto graph = std::make_unique<TGraphAsymmErrors>();
+
+  const double alpha = 1.0 - cl;
+  const double half = alpha / 2.0;
+
+  for (int i = 1; i <= hist->GetNbinsX(); i++)
+  {
+    double N  = hist->GetBinContent(i);
+    double x  = hist->GetBinCenter(i);
+    double ex = hist->GetBinWidth(i) / 2.0;
+
+    double low = 0.0;
+    double high = 0.0;
+
+    if (N > 0) {
+      low  = N - ROOT::Math::gamma_quantile(half, N, 1.0);
+      high = ROOT::Math::gamma_quantile_c(half, N + 1, 1.0) - N;
+    } else {
+      low = 0.0;
+      high = ROOT::Math::gamma_quantile_c(half, 1, 1.0);
+    }
+
+    int p = graph->GetN();
+    graph->SetPoint(p, x, N);
+    graph->SetPointError(p, ex, ex, low, high);
+  }
+  return graph;
+}
+
+
+// ***************************************************************************
+std::unique_ptr<TGraphAsymmErrors> PoissonGraphScaled(const TH1D* hist, double scale, double cl) {
+// ***************************************************************************
+  auto graph = std::make_unique<TGraphAsymmErrors>();
+
+  const double alpha = 1.0 - cl;
+  const double half = alpha / 2.0;
+
+  for (int i = 1; i <= hist->GetNbinsX(); i++) {
+    double N = hist->GetBinContent(i);  // Raw count
+    double x = hist->GetBinCenter(i);
+    double ex = hist->GetBinWidth(i) / 2.0;
+    double binWidth = hist->GetBinWidth(i);
+
+    double low = 0.0;
+    double high = 0.0;
+
+    if (N > 0) {
+      low = N - ROOT::Math::gamma_quantile(half, N, 1.0);
+      high = ROOT::Math::gamma_quantile_c(half, N + 1, 1.0) - N;
+    } else {
+      low = 0.0;
+      high = ROOT::Math::gamma_quantile_c(half, 1, 1.0);
+    }
+
+    // Scale the y-value and y-errors by (scale / binWidth)
+    double scaleFactor = scale / binWidth;
+    double y = N * scaleFactor;
+    double low_scaled = low * scaleFactor;
+    double high_scaled = high * scaleFactor;
+
+    int p = graph->GetN();
+    graph->SetPoint(p, x, y);
+    graph->SetPointError(p, ex, ex, low_scaled, high_scaled);
+  }
+  return graph;
 }

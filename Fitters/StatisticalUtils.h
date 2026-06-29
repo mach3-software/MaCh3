@@ -18,12 +18,14 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLine.h"
 #include "TROOT.h"
 #include "TStyle.h"
+#include "TGraphAsymmErrors.h"
 _MaCh3_Safe_Include_End_ //}
+
+class TGraphAsymmErrors;
 
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3
 /// @author Kamil Skwarczynski
-
 
 namespace M3 {
   /// @brief KS: Different Information Criterion tests mostly based Gelman paper
@@ -223,5 +225,17 @@ double GetModeError(TH1D* hpost);
 /// @warning The canvas is saved to the current ROOT file using `TempCanvas->Write()`.
 void Get2DBayesianpValue(TH2D *Histogram);
 
-
+/// @brief Propagate numerator uncertainties to a ratio histogram.
 void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist);
+
+/// @brief Create a TGraphAsymmErrors from a histogram using exact Poisson
+///        confidence intervals instead of symmetric sqrt(N) uncertainties.
+/// @author Yashwanth S Prabhu
+std::unique_ptr<TGraphAsymmErrors> PoissonGraph(const TH1D* h, double cl = 0.683);
+
+/// @brief Create a TGraphAsymmErrors from a histogram using exact Poisson
+///        confidence intervals instead of symmetric sqrt(N) uncertainties.
+///        Assume bin width scaling
+/// @author Yashwanth S Prabhu
+std::unique_ptr<TGraphAsymmErrors> PoissonGraphScaled(const TH1D* h, double scale = 1.0, double cl = 0.683);
+

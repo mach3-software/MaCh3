@@ -325,9 +325,11 @@ void OverlayPredicitve(const YAML::Node& Settings,
 
       auto BinWidthScale = PlotMan->style().getBinWidthScale(hist->GetXaxis()->GetTitle());
       std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
+      auto DataPoissonErrors = PoissonGraphScaled(DataHist.get(), BinWidthScale);
       M3::ScaleHistogram(DataHist.get(), BinWidthScale);
+
       DataHist->SetLineColor(kBlack);
+      DataPoissonErrors->SetLineColor(kBlack);
       //KS: +1 for data, we want to get integral before scaling of the histogram
       std::vector<double> Integral(nFiles+1);
       Integral[nFiles] = DataHist->Integral();
@@ -353,14 +355,13 @@ void OverlayPredicitve(const YAML::Node& Settings,
       pad1->cd();
 
       PredHist[0]->Draw("p e2");
-      for(int iFile = 1; iFile < nFiles; iFile++)
-      {
+      for(int iFile = 1; iFile < nFiles; iFile++) {
         PredHist[iFile]->Draw("p e2 same");
       }
-      DataHist->Draw("he same");
+      DataPoissonErrors->Draw("p same");
 
       auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
-      legend->AddEntry(DataHist.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
+      legend->AddEntry(DataPoissonErrors.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
       for(int ig = 0; ig < nFiles; ig++ ) {
         legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
       }
