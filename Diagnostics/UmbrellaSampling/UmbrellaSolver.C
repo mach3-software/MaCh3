@@ -3,6 +3,8 @@
         -lyaml-cpp \
         -o umbrella_solver_compiled umbrella_solver.C
 
+/// @author David Riley
+
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TGraph.h>

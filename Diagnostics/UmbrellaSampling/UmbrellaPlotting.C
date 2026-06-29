@@ -17,6 +17,8 @@
 #include "TSystem.h"
 #include "TTree.h"
 
+/// @author David Riley
+
 void umbrella_plotting() {
     // ============================================
     // Configuration: Number of bins for each variable

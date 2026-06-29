@@ -3,6 +3,8 @@
 #include <ostream>
 #include <stdexcept>
 
+/// @author David Riley
+
 MulticanonicalMCMCHandler::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
   if (biasFunctionName == "gaussian") {
     return MulticanonicalMCMCHandler::BiasFunction::Gaussian;
