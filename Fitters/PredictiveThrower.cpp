@@ -422,7 +422,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
                                         const int iToy) {
 // *************************
-  int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* SampleHandler = samples[iPDF];
@@ -444,7 +443,6 @@ void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
           hist->Write();
         } // end loop over dimension
       } // end loop over mode
-      SampleCounter++;
     } // end loop over sample
   } // end loop over sample handler objects
 }
