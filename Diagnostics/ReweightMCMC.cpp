@@ -34,7 +34,10 @@ struct ReweightConfig {
   std::string type;  ///< "Gaussian", "TGraph2D"
   int dimension;     ///< 1 or 2
   std::vector<std::string> paramNames; ///< Parameter names.
-  std::vector<std::vector<double>> priorValues; ///< Changed to handle multiple [mean, sigma] pairs
+  std::vector<std::vector<double>> newPriorValues; ///< new [mean, sigma] pairs
+  std::vector<std::vector<double>> oldPriorValues; ///< new [mean, sigma] pairs
+  std::vector<bool> flatPrior;
+
   std::string weightBranchName; ///< Output weight branch name.
   bool enabled;
 
@@ -51,23 +54,106 @@ struct ReweightConfig {
   std::unique_ptr<TGraph2D> graph_IO; ///< Inverted Ordering graph.
 };
 
-/// @brief Main executable responsible for reweighting MCMC chains
-/// @param inputFile MCMC Chain file path
-/// @param configFile Config file with reweighting settings
-/// @author David Riley
-/// @author Evan Goodman
-void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
-
-/// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
-
 /// @brief Function to interpolate 2D graph for Normal Ordering
-double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32);
+double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
+{
+  if (!graph) {
+    MACH3LOG_ERROR("Graph pointer is null");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  double xmax = graph->GetXmax();
+  double xmin = graph->GetXmin();
+  double ymin = graph->GetYmin();
+  double ymax = graph->GetYmax();
+
+  double chiSquared, prior;
+
+  if (theta13 < xmax && theta13 > xmin && dm32 < ymax && dm32 > ymin) {
+    chiSquared = graph->Interpolate(theta13, dm32);
+    prior = std::exp(-0.5 * chiSquared);
+  } else {
+    prior = 0.0;
+  }
+
+  return prior;
+}
 
 /// @brief Function to interpolate 2D graph for Inverted Ordering  
-double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32);
+double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
+{
+  if (!graph) {
+    MACH3LOG_ERROR("Graph pointer is null");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  double xmax = graph->GetXmax();
+  double xmin = graph->GetXmin();
+  double ymax = graph->GetYmax();
+  double ymin = graph->GetYmin();
+
+  // The dm32 value is positive for in the TGraph2D so we should compare the abs value of the -delM32 values to get the chisq
+  double mod_dm32 = std::abs(dm32);
+  double chiSquared, prior;
+
+  if (theta13 < xmax && theta13 > xmin && mod_dm32 < ymax && mod_dm32 > ymin) {
+    chiSquared = graph->Interpolate(theta13, mod_dm32);
+    prior = std::exp(-0.5 * chiSquared);
+  } else {
+    prior = 0.0;
+  }
+
+  return prior;
+}
 
 /// @brief Function to interpolate 1D graph
-double Graph_interpolate1D(TGraph* graph, double theta13);
+double Graph_interpolate1D(TGraph* graph, double theta13)
+{
+  /// @todo double check implementation of TGraph interpolation for 1D
+  if (!graph) {
+    MACH3LOG_ERROR("Graph pointer is null");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  double xmax = -999999999;
+  double xmin =  999999999;
+
+  for (int i = 0; i < graph->GetN(); i++) {
+    double x = graph->GetX()[i];
+    if (x > xmax) xmax = x;
+    if (x < xmin) xmin = x;
+  }
+
+  double chiSquared, prior;
+
+  if (theta13 < xmax && theta13 > xmin) {
+    chiSquared = graph->Eval(theta13);
+    prior = std::exp(-0.5 * chiSquared);
+  } else {
+    prior = 0.0;
+  }
+
+  return prior;
+}
+
+/// @brief Get parameter information from MCMCProcessor
+bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName,
+                      double& mean, double& sigma, bool& isFlat)
+{
+  // Try to find the parameter index
+  int paramIndex = processor->GetParamIndexFromName(paramName);
+
+  if (paramIndex == M3::_BAD_INT_) { // This indicate parameter not found
+    return false;
+  }
+
+  // Get parameter information
+  TString title;
+  processor->GetNthParameter(paramIndex, mean, sigma, title);
+  isFlat = processor->GetParamFlat(paramIndex);
+
+  return true;
+}
 
 /// @brief Load reweighting setting like 1D or 2D from YAML config
 void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings) {
@@ -91,12 +177,15 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
     reweightConfig.weightBranchName = "Weight";
     reweightConfig.enabled = true;
 
+    auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
+    reweightConfig.paramNames = paramNames;
+    reweightConfig.oldPriorValues.resize(paramNames.size());
+    reweightConfig.flatPrior.resize(paramNames.size());
+
     // Handle different reweight types as they fill different members
     if (reweightConfig.dimension == 1) {
       if (reweightConfig.type == "Gaussian") {
         // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
-        auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
-
         // Get prior values - handle both single [mean, sigma] pair and list of pairs for safety
         auto priorNode = reweightConfigNode["ReweightPrior"];
         std::vector<std::vector<double>> allPriorValues;
@@ -105,23 +194,22 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
           // Check if first element is a number (single [mean, sigma] pair) or sequence (list of pairs)
           if (priorNode[0].IsScalar()) {
             // Single [mean, sigma] pair - convert to list format
-            auto priorValues = GetFromManager<std::vector<double>>(priorNode, {}, __FILE__ , __LINE__);
-            if (priorValues.size() == 2) {
-              allPriorValues.push_back(priorValues);
+            auto newPriorValues = GetFromManager<std::vector<double>>(priorNode, {}, __FILE__ , __LINE__);
+            if (newPriorValues.size() == 2) {
+              allPriorValues.push_back(newPriorValues);
             }
           } else {
             // List of [mean, sigma] pairs
             for (const auto& priorPair : priorNode) {
-              auto priorValues = GetFromManager<std::vector<double>>(priorPair, {}, __FILE__ , __LINE__);
-              if (priorValues.size() == 2) {
-                allPriorValues.push_back(priorValues);
+              auto newPriorValues = GetFromManager<std::vector<double>>(priorPair, {}, __FILE__ , __LINE__);
+              if (newPriorValues.size() == 2) {
+                allPriorValues.push_back(newPriorValues);
               }
             }
           }
         }
 
-        reweightConfig.paramNames = paramNames;
-        reweightConfig.priorValues = allPriorValues;
+        reweightConfig.newPriorValues = allPriorValues;
 
         if (paramNames.empty() || allPriorValues.empty() || paramNames.size() != allPriorValues.size()) {
           MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}: {} parameters, {} prior pairs",
@@ -130,10 +218,8 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         }
       } else if (reweightConfig.type == "TGraph") {
         // For TGraph reweights, we need the parameter name and the TGraph file and name
-        auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
-        std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "", __FILE__ , __LINE__);
-        std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "", __FILE__ , __LINE__);
-        reweightConfig.paramNames = paramNames;
+        auto fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "", __FILE__ , __LINE__);
+        auto graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "", __FILE__ , __LINE__);
         reweightConfig.fileName = fileName;
         reweightConfig.graphName = graphName;
 
@@ -166,15 +252,12 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     } else if (reweightConfig.dimension == 2) {
-        auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
-
         // 2D reweights need 2 parameter names
         if (paramNames.size() != 2) {
           MACH3LOG_ERROR("2D reweighting requires exactly 2 parameter names for {}", reweightKey);
           continue;
         }
 
-        reweightConfig.paramNames = paramNames;
         if (reweightConfig.type == "TGraph2D") {
           auto priorConfig = reweightConfigNode["ReweightPrior"];
           reweightConfig.fileName = GetFromManager<std::string>(priorConfig["file"], "", __FILE__ , __LINE__);
@@ -251,16 +334,42 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
   }
 }
 
+/// @brief Calculate 1D weight
 [[nodiscard]] double Get1DWeight(const ReweightConfig& rwConfig,
                                  const std::map<std::string, double>& paramValues) {
   double weight = 1.;
-  if(rwConfig.type != "Gaussian") {
-    if (rwConfig.type == "TGraph") {
-      double paramValue = paramValues.at(rwConfig.paramNames.at(0));
-      weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
-    } else {
-      MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
+  if(rwConfig.type == "Gaussian") {
+    auto& paramNames = rwConfig.paramNames;
+    //KS: Calculate reweight weight. Weights are multiplicative so we can do several reweights at once.
+    /// @warning Big limitation is that code only works for uncorrelated parameters :(
+    for (unsigned int j = 0; j < paramNames.size(); ++j)
+    {
+      auto name = rwConfig.paramNames.at(j);
+      // Extract means and sigmas from the prior pairs
+      auto newPriorPair = rwConfig.newPriorValues[j];
+      double NewCentral = newPriorPair[0]; // mean
+      double NewError  = newPriorPair[1];   // sigma
+
+      double new_chi = (paramValues.at(name) - NewCentral)/NewError;
+      double new_prior = std::exp(-0.5 * new_chi * new_chi);
+
+      double old_chi = -1;
+      double old_prior = -1;
+      if(rwConfig.flatPrior[j]) {
+        old_prior = 1.0;
+      } else {
+        auto oldPriorPair = rwConfig.oldPriorValues[j];
+        double OldCentral = newPriorPair[0]; // mean
+        double OldError  = newPriorPair[1];   // sigma
+
+        old_chi = (paramValues.at(name) - OldCentral)/OldError;
+        old_prior = std::exp(-0.5 * old_chi * old_chi);
+      }
+      weight *= new_prior/old_prior;
     }
+  } else if (rwConfig.type == "TGraph") {
+    double paramValue = paramValues.at(rwConfig.paramNames.at(0));
+    weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
   } else {
     MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -268,6 +377,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
   return weight;
 }
 
+/// @brief Calculate 2D weight
 [[nodiscard]] double Get2DWeight(const ReweightConfig& rwConfig,
                                  const std::map<std::string, double>& paramValues) {
   double weight = 1.;
@@ -295,6 +405,12 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
   return weight;
 }
 
+/// @brief Main executable responsible for reweighting MCMC chains
+/// @param inputFile MCMC Chain file path
+/// @param configFile Config file with reweighting settings
+/// @author David Riley
+/// @author Evan Goodman
+/// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
 void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
 {
   MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
@@ -313,14 +429,22 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
 
   // Validate that all required parameters exist in the chain
   /// @todo Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR
-  for (const auto& rwConfig : reweightConfigs) {
-    for (const auto& paramName : rwConfig.paramNames) {
+  for (auto& rwConfig : reweightConfigs) {
+    for (size_t i = 0; i < rwConfig.paramNames.size(); ++i) {
+      const auto& paramName = rwConfig.paramNames[i];
       int paramIndex = processor->GetParamIndexFromName(paramName);
       if (paramIndex == M3::_BAD_INT_) {
         MACH3LOG_ERROR("Parameter {} not found in MCMC chain", paramName);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       MACH3LOG_INFO("Parameter {} found in chain", paramName);
+
+      double mean, sigma;
+      bool isFlat;
+      GetParameterInfo(processor.get(), paramName, mean, sigma, isFlat);
+
+      rwConfig.oldPriorValues[i] = {mean, sigma};
+      rwConfig.flatPrior[i] = isFlat;
     }
   }
 
@@ -425,58 +549,30 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
   }
 
-  bool processMCMCreweighted = false;
-
-  // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
-  for (const auto& rwConfig : reweightConfigs){
-    if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
-      // Extract the parameter names and convert priorValues to the format processor needs
-      const std::vector<std::string>& paramNames = rwConfig.paramNames;
-      std::vector<double> priorCentral;
-      std::vector<double> priorSigma;
-
-      // Extract means and sigmas from the prior pairs
-      for (const auto& priorPair : rwConfig.priorValues) {
-        priorCentral.push_back(priorPair[0]); // mean
-        priorSigma.push_back(priorPair[1]);   // sigma
-      }
-
-      processor->ReweightPrior(paramNames, priorCentral, priorSigma);
-      MACH3LOG_INFO("Applied Gaussian reweighting for {} parameters", paramNames.size());
-      for (size_t i = 0; i < paramNames.size(); ++i) {
-        MACH3LOG_INFO("  {}: mean={}, sigma={}", paramNames[i], priorCentral[i], priorSigma[i]);
-      }
-      processMCMCreweighted=true;
-    }
-  }
   // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
   // Process all entries
   Long64_t nEntries = inTree->GetEntries();
   MACH3LOG_INFO("Processing {} entries", nEntries);
 
   /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
-  if (processMCMCreweighted) {
-    MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
-  } else {
-    for (Long64_t i = 0; i < nEntries; ++i) {
-      if(i % (nEntries/20) == 0) M3::Utils::PrintProgressBar(i, nEntries);
+  for (Long64_t i = 0; i < nEntries; ++i) {
+    if(i % (nEntries/20) == 0) M3::Utils::PrintProgressBar(i, nEntries);
 
-      inTree->GetEntry(i);
+    inTree->GetEntry(i);
 
-      // Calculate weights for all configurations
-      for (const auto& rwConfig : reweightConfigs) {
-        double weight = 1.0;
-        if (rwConfig.dimension == 1) {
-          weight = Get1DWeight(rwConfig, paramValues);
-        } else if (rwConfig.dimension == 2) {
-          weight = Get2DWeight(rwConfig, paramValues);
-        }
-        weights[rwConfig.weightBranchName] = weight;
+    // Calculate weights for all configurations
+    for (const auto& rwConfig : reweightConfigs) {
+      double weight = 1.0;
+      if (rwConfig.dimension == 1) {
+        weight = Get1DWeight(rwConfig, paramValues);
+      } else if (rwConfig.dimension == 2) {
+        weight = Get2DWeight(rwConfig, paramValues);
       }
-      // Fill the output tree
-      outTree->Fill();
-    } // end loop over entries
-  }
+      weights[rwConfig.weightBranchName] = weight;
+    }
+    // Fill the output tree
+    outTree->Fill();
+  } // end loop over entries
 
   // Write and close
   outFile->cd();
@@ -491,119 +587,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
   reweightMacro.AddLine(ss.str().c_str());
   reweightMacro.Write();
 
-  if (processMCMCreweighted){
-    MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
-    // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
-    outTree.reset(); // Release TTree before closing TFile
-    outFile->Close();
-    outFile.reset();
-
-    if (std::remove(outputFile.c_str()) != 0) {
-      MACH3LOG_ERROR("Error deleting temporary file: {}", outputFile);
-    } else {
-      MACH3LOG_INFO("Deleted temporary file: {}", outputFile);
-    }
-  } else {
-    MACH3LOG_INFO("Reweighting completed successfully!");
-    MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
-  }
-}
-
-double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
-{
-  if (!graph) {
-    MACH3LOG_ERROR("Graph pointer is null");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  double xmax = graph->GetXmax();
-  double xmin = graph->GetXmin();
-  double ymin = graph->GetYmin();
-  double ymax = graph->GetYmax();
-
-  double chiSquared, prior;
-
-  if (theta13 < xmax && theta13 > xmin && dm32 < ymax && dm32 > ymin) {
-    chiSquared = graph->Interpolate(theta13, dm32);
-    prior = std::exp(-0.5 * chiSquared);
-  } else {
-    prior = 0.0;
-  }
-
-  return prior;
-}
-
-double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
-{
-  if (!graph) {
-    MACH3LOG_ERROR("Graph pointer is null");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  double xmax = graph->GetXmax();
-  double xmin = graph->GetXmin();
-  double ymax = graph->GetYmax();
-  double ymin = graph->GetYmin();
-
-  // The dm32 value is positive for in the TGraph2D so we should compare the abs value of the -delM32 values to get the chisq
-  double mod_dm32 = std::abs(dm32);
-  double chiSquared, prior;
-
-  if (theta13 < xmax && theta13 > xmin && mod_dm32 < ymax && mod_dm32 > ymin) {
-    chiSquared = graph->Interpolate(theta13, mod_dm32);
-    prior = std::exp(-0.5 * chiSquared);
-  } else {
-    prior = 0.0;
-  }
-
-  return prior;
-}
-
-double Graph_interpolate1D(TGraph* graph, double theta13)
-{
-  /// @todo double check implementation of TGraph interpolation for 1D
-  if (!graph) {
-    MACH3LOG_ERROR("Graph pointer is null");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  double xmax = -999999999;
-  double xmin =  999999999;
-
-  for (int i = 0; i < graph->GetN(); i++) {
-    double x = graph->GetX()[i];
-    if (x > xmax) xmax = x;
-    if (x < xmin) xmin = x;
-  }
-    
-  double chiSquared, prior;
-
-  if (theta13 < xmax && theta13 > xmin) {
-    chiSquared = graph->Eval(theta13);
-    prior = std::exp(-0.5 * chiSquared);
-  } else {
-    prior = 0.0;
-  }
-    
-  return prior;
-}
-
-/// @brief Get parameter information from MCMCProcessor
-bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName, 
-                     double& mean, double& sigma)
-{
-  // Try to find the parameter index
-  int paramIndex = processor->GetParamIndexFromName(paramName);
-
-  if (paramIndex == M3::_BAD_INT_) { // This indicate parameter not found
-    return false;
-  }
-
-  // Get parameter information
-  TString title;
-  processor->GetNthParameter(paramIndex, mean, sigma, title);
-
-  return true;
+  MACH3LOG_INFO("Reweighting completed successfully!");
+  MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
 }
 
 /// @brief Main function

@@ -182,15 +182,6 @@ class MCMCProcessor {
     /// @brief Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
     void ProduceChi2(const std::string& GroupName) const;
 
-    /// @brief Reweight Prior by giving new central value and new error
-    /// @param Names Parameter names for which we do reweighting
-    /// @param NewCentral New central value for which we reweight
-    /// @param NewError New error used for calculating weight
-    void ReweightPrior(const std::vector<std::string>& Names,
-                       const std::vector<double>& NewCentral,
-                       const std::vector<double>& NewError);
-    
-
     /// @brief Smear chain contours
     /// @param Names Parameter names for which we do smearing
     /// @param Error Error based on which we smear
@@ -259,6 +250,8 @@ class MCMCProcessor {
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string& Name) const;
+    /// @brief Get whether param has flat prior or not
+    bool GetParamFlat(const int iParam) const;
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
     Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries

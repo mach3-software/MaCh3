@@ -147,13 +147,14 @@ void OscProcessor::Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_N
     // Print the reweight configuration for user info
     YAML::Node Settings = TMacroToYAML(*Config);
     // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
-    if(CheckNodeExists(Settings, "ReweightMCMC")) {
-      YAML::Node firstReweight = Settings["ReweightMCMC"].begin()->second;
-      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1, __FILE__ , __LINE__);
-      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "", __FILE__ , __LINE__);
-      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {}, __FILE__ , __LINE__);
+    if(CheckNodeExists(Settings, "Weight")) {
+      YAML::Node firstReweight = Settings["Weight"];
+      int dimension = Get<int>(firstReweight["ReweightDim"], __FILE__ , __LINE__);
+      std::string reweightType = Get<std::string>(firstReweight["ReweightType"],__FILE__ , __LINE__);
+      auto paramNames = Get<std::vector<std::string>>(firstReweight["ReweightVar"], __FILE__ , __LINE__);
       if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
-        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"],__FILE__,__LINE__);
+         auto Priors = Get<std::vector<std::pair<double, double>>>(firstReweight["ReweightPrior"], __FILE__,__LINE__);
+         Sin13_NewPrior = Priors[0];
         DoReweight = true;
       } else {
         MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
