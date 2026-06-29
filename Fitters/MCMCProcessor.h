@@ -280,6 +280,8 @@ class MCMCProcessor {
       MACH3LOG_WARN("This may behave not as expected when using merged multiple chains");
       nEntries = NewEntries;
     }
+    /// @brief Set reweight branch names
+    void SetReweightNames(std::vector<std::string> NewName) { ReweightNames = NewName; }
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
     void SetStepCut(const std::string& Cuts);
@@ -593,7 +595,7 @@ class MCMCProcessor {
     /// Whether to apply reweighting weight or not
     bool ReweightPosterior;
     /// Name of branch used for chain reweighting
-    std::string ReweightName;
+    std::vector<std::string> ReweightNames;
     /// Stores value of weight for each step
     double* WeightValue;
 

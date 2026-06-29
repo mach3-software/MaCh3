@@ -82,6 +82,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   CovNamePos.resize(kNParameterEnum);
   CovConfig.resize(kNParameterEnum);
 
+  ReweightNames = {"Weight"};
   for(int i = 0; i < kNParameterEnum; i++)
   {
     ParamTypeStartPos[i] = 0;
@@ -359,7 +360,9 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
 
   // Apply reweighting
   if (ReweightPosterior) {
-    CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
+    for (const auto& name : ReweightNames) {
+      CutPosterior1D = "(" + CutPosterior1D + ")*(" + name + ")";
+    }
   }
   MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
   
@@ -1024,7 +1027,9 @@ void MCMCProcessor::MakeCovariance() {
 
       std::string SelectionStr = StepCut;
       if (ReweightPosterior) {
-        SelectionStr = "(" + StepCut + ")*(" + ReweightName + ")";
+        for (const auto& name : ReweightNames) {
+          SelectionStr = "(" + StepCut + ")*(" + name + ")";
+        }
       }
       // The draw command we want, i.e. draw param j vs param i
       Chain->Project(DrawMe, DrawMe, SelectionStr.c_str());
@@ -1116,12 +1121,14 @@ void MCMCProcessor::CacheSteps() {
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &stepBranch);
 
-  double ReweightWeight = 1.;
-  if(ReweightPosterior)
+  std::vector<double> ReweightWeight(ReweightNames.size(), 1.0);
+  if (ReweightPosterior)
   {
     WeightValue = new double[nEntries]();
-    Chain->SetBranchStatus(ReweightName.c_str(), true);
-    Chain->SetBranchAddress(ReweightName.c_str(), &ReweightWeight);
+    for (size_t i = 0; i < ReweightNames.size(); ++i) {
+      Chain->SetBranchStatus(ReweightNames[i].c_str(), true);
+      Chain->SetBranchAddress(ReweightNames[i].c_str(), &ReweightWeight[i]);
+    }
   }
 
   const Long64_t countwidth = nEntries/10;
@@ -1141,9 +1148,11 @@ void MCMCProcessor::CacheSteps() {
     for (int i = 0; i < nDraw; ++i) {
       ParStep[i][j] = ParValBranch[i];
     }
-
-    if(ReweightPosterior){
-      WeightValue[j] = ReweightWeight;
+    if (ReweightPosterior) {
+      WeightValue[j] = 1.0;
+      for (size_t i = 0; i < ReweightWeight.size(); ++i) {
+        WeightValue[j] *= ReweightWeight[i];
+      }
     }
   }
   // Set all the branches to on
@@ -2529,14 +2538,18 @@ void MCMCProcessor::FindInputFiles() {
 
   TMacro *ReweightConfig = TempFile->Get<TMacro>("Reweight_Config");
   if (ReweightConfig != nullptr) {
+    ReweightPosterior = true;
     YAML::Node ReweightSettings = TMacroToYAML(*ReweightConfig);
-
-    if (ReweightSettings["Weight"]) {
-      ReweightName = "Weight";
-      ReweightPosterior = true;
-      MACH3LOG_INFO("Enabling reweighting with following Config");
-    } else {
-      MACH3LOG_WARN("Found reweight config but without field ''Weight''");
+    for (size_t i = 0; i < ReweightNames.size(); ++i) {
+      if (ReweightSettings[ReweightNames[i]]) {
+        MACH3LOG_INFO("Found reweight config for {}", ReweightNames[i]);
+      } else {
+        MACH3LOG_WARN("Found reweight config but without field for {}", ReweightNames[i]);
+        ReweightPosterior = false;
+      }
+    }
+    if (ReweightPosterior) {
+      MACH3LOG_INFO("Enabling reweighting with configured weights.");
     }
     M3::Utils::PrintConfig(ReweightSettings);
   }
@@ -3221,7 +3234,9 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
       // Apply reweighting if requested
       if (ReweightPosterior) {
-        CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
+        for (const auto& name : ReweightNames) {
+          CutPosterior1D = "(" + CutPosterior1D + ")*(" + name + ")";
+        }
       }
 
       std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);

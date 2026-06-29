@@ -135,20 +135,24 @@ double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique
 // ***************
 void OscProcessor::Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_NewPrior, bool& DoReweight) const {
 // ***************
+  if(ReweightNames.size() != 1){
+    MACH3LOG_INFO("Found more than 1 weight for Jarlskog analysis");
+    return;
+  }
   // Now read the MCMC file
   TFile *TempFile = M3::Open((MCMCFile + ".root"), "open", __FILE__, __LINE__);
 
   // Get the settings for the MCMC
   TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");
 
+  DoReweight = false;
   if (Config != nullptr) {
     MACH3LOG_INFO("Found Reweight_Config in chain");
-
     // Print the reweight configuration for user info
     YAML::Node Settings = TMacroToYAML(*Config);
     // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
-    if(CheckNodeExists(Settings, "Weight")) {
-      YAML::Node firstReweight = Settings["Weight"];
+    if(CheckNodeExists(Settings, ReweightNames.back())) {
+      YAML::Node firstReweight = Settings[ReweightNames.back()];
       int dimension = Get<int>(firstReweight["ReweightDim"], __FILE__ , __LINE__);
       std::string reweightType = Get<std::string>(firstReweight["ReweightType"],__FILE__ , __LINE__);
       auto paramNames = Get<std::vector<std::string>>(firstReweight["ReweightVar"], __FILE__ , __LINE__);
@@ -216,8 +220,8 @@ void OscProcessor::PerformJarlskogAnalysis() {
   Chain->SetBranchAddress("step", &step);
 
   if(DoReweight) {
-    Chain->SetBranchStatus("Weight", true);
-    Chain->SetBranchAddress("Weight", &weight);
+    Chain->SetBranchStatus(ReweightNames.back().c_str(), true);
+    Chain->SetBranchAddress(ReweightNames.back().c_str(), &weight);
   } else {
     MACH3LOG_WARN("Not applying reweighting weight");
     weight = 1.0;
@@ -916,7 +920,7 @@ void OscProcessor::ProducePMNSElements() {
   MACH3LOG_INFO("Starting {}", __func__);
 
   double s2th13, s2th23, s2th12, dcp = M3::_BAD_DOUBLE_;
-  double weight = 1.0;
+
 
   TDirectory *PMNSElementsDir = OutputFile->mkdir("PMNSElements");
   PMNSElementsDir->cd();
@@ -939,12 +943,21 @@ void OscProcessor::ProducePMNSElements() {
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &step);
 
-  if (Chain->GetBranch("Weight")) {
-    Chain->SetBranchStatus("Weight", true);
-    Chain->SetBranchAddress("Weight", &weight);
-  } else {
-    MACH3LOG_WARN("No Weight branch found — defaulting to 1.0");
-    weight = 1.0;
+  double weight = 1.0;
+  std::vector<double> reweights(ReweightNames.size(), 1.0);
+  bool anyMissing = false;
+  for (size_t i = 0; i < ReweightNames.size(); ++i) {
+    const auto& name = ReweightNames[i];
+    if (Chain->GetBranch(name.c_str())) {
+      Chain->SetBranchStatus(name.c_str(), true);
+      Chain->SetBranchAddress(name.c_str(), &reweights[i]);
+    } else {
+      anyMissing = true;
+    }
+  }
+  if (anyMissing) {
+    MACH3LOG_WARN("Some reweight branches were missing — using partial weight");
+    reweights.clear();
   }
   constexpr int n_bins = 1000;
 
@@ -1066,7 +1079,11 @@ void OscProcessor::ProducePMNSElements() {
     if(step < BurnInCut) continue; // burn-in cut
 
     const std::array<std::array<TComplex, 3>, 3> U = CalculatePMNSElements(s2th13, s2th23, s2th12, dcp);
-    
+    // KS: Calculate total weight
+    weight = 1.0;
+    for (const auto& w : reweights) {
+      weight *= w;
+    }
     for(int iU = 0; iU < 3; iU++){
       h_ue[iU]->Fill(TComplex::Abs(U[0][iU]), weight);
       h_umu[iU]->Fill(TComplex::Abs(U[1][iU]), weight);
@@ -1169,7 +1186,6 @@ void OscProcessor::ProduceUnitarityTriangles() {
   MACH3LOG_INFO("Starting {}", __func__);
 
   double s2th13, s2th23, s2th12, dcp = M3::_BAD_DOUBLE_;
-  double weight = 1.0;
 
   TComplex tr_emu_num, tr_etau_num, tr_mutau_num, tr_12_num, tr_13_num, tr_23_num;
   TComplex tr_emu_denom, tr_etau_denom, tr_mutau_denom, tr_12_denom, tr_13_denom, tr_23_denom;
@@ -1196,12 +1212,21 @@ void OscProcessor::ProduceUnitarityTriangles() {
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &step);
 
-  if (Chain->GetBranch("Weight")) {
-    Chain->SetBranchStatus("Weight", true);
-    Chain->SetBranchAddress("Weight", &weight);
-  } else {
-    MACH3LOG_WARN("No Weight branch found — defaulting to 1.0");
-    weight = 1.0;
+  double weight = 1.0;
+  std::vector<double> reweights(ReweightNames.size(), 1.0);
+  bool anyMissing = false;
+  for (size_t i = 0; i < ReweightNames.size(); ++i) {
+    const auto& name = ReweightNames[i];
+    if (Chain->GetBranch(name.c_str())) {
+      Chain->SetBranchStatus(name.c_str(), true);
+      Chain->SetBranchAddress(name.c_str(), &reweights[i]);
+    } else {
+      anyMissing = true;
+    }
+  }
+  if (anyMissing) {
+    MACH3LOG_WARN("Some reweight branches were missing — using partial weight");
+    reweights.clear();
   }
   constexpr int n_bins = 1000;
 
@@ -1237,6 +1262,12 @@ void OscProcessor::ProduceUnitarityTriangles() {
     }
 
     if(step < BurnInCut) continue; // burn-in cut
+
+    // KS: Calculate total weight
+    weight = 1.0;
+    for (const auto& w : reweights) {
+      weight *= w;
+    }
 
     const std::array<std::array<TComplex, 3>, 3> U = CalculatePMNSElements(s2th13, s2th23, s2th12, dcp);
 
