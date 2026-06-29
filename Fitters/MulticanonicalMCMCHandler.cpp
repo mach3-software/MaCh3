@@ -241,7 +241,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<Param
         syst->PrintNominalCurrProp();
         syst->SetParCurrProp(multicanonicalVar, umbrellaMean);
         MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", umbrellaMean);
-        // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE
+        // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE: UNTESTED
         // if (flipWindow) {
         //  auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
         //  if (oscCov) {
@@ -307,8 +307,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp
 
 double MulticanonicalMCMCHandler::generalisedGaussian2(double x, double mean, double width) {
   constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2 for now due to normalisation
-  const double normFactor = 1 / ((0.906402477055) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions),
-                                                                               // im just going to hardcode them for now
+  const double normFactor = 1 / ((0.906402477055) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions), im just going to hardcode them for now
   double likelihood = normFactor * std::exp(-std::pow((std::pow(x - mean, 2) / (2 * std::pow(width, 2))), n));
   return likelihood;
 }
@@ -318,7 +317,6 @@ double MulticanonicalMCMCHandler::circularDistance(double x, double mean) { retu
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double deltacp) {
   // implemenetation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
-
   double g0 = generalisedGaussian2(deltacp, umbrellaMean, umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
   double g1 = generalisedGaussian2(deltacp, umbrellaMean - 2 * TMath::Pi(), umbrellaWidth);
   double g2 = generalisedGaussian2(deltacp, umbrellaMean + 2 * TMath::Pi(), umbrellaWidth);

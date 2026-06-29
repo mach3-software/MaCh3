@@ -31,15 +31,18 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
 // Run the Markov chain with all the systematic objects added
 void MCMCBase::RunMCMC() {
 // *******************
-    // Multicanonical method toggle from spline
+    // Multicanonical method toggle from yaml config
     multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"], false);
     MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
     if (multicanonical) {
+        // Initialize the multicanonical handler with the systematics
+        multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
+        AlgorithmName += "_UmbrellaSampling"; // Append to the algorithm name
 #ifdef DEBUG
+    // Enable debug output stream for multicanonical handler if debug is enabled
     multicanonicalHandler->setDebugStream(&debugFile, debug);
 #endif
-    multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
     }
 
     // Save the settings into the output file
@@ -59,8 +62,11 @@ void MCMCBase::RunMCMC() {
         // Reconfigure the samples, systematics and oscillation for first weight
         // ProposeStep sets logLProp
         ProposeStep();
-        multicanonicalHandler->InitializeMulticanonicalParams(systematics);
 
+        // Initialise the value of the multicanonical parameter to the centres of the umbrellas
+        if (multicanonical){
+            multicanonicalHandler->InitializeMulticanonicalParams(systematics);
+        }
         // Set the current logL to the proposed logL for the 0th step
         // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
         logLCurr = logLProp;

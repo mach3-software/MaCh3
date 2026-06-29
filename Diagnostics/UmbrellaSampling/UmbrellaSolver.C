@@ -50,6 +50,7 @@ bool debug_mode = false;
 enum class BiasFunction { Gaussian, VonMises, GeneralisedGaussian };
 
 // Structure to hold each window configuration
+// These are individual window settings, function type & params plus filename
 struct WindowConfig {
   std::string name;
   BiasFunction umbrellaBiasFunction;
@@ -60,6 +61,7 @@ struct WindowConfig {
 };
 
 // Structure to hold umbrella configuration
+// This is the global settings of the umbrella fit eg number of windows and solve settings
 struct UmbrellaConfig {
   std::vector<WindowConfig> windows;
   std::string output_file;
@@ -180,6 +182,7 @@ double vonMisesWindow(double x, double center, double kappa) {
   }
 }
 
+// Generalised Gaussian window allows harsher constraints on the tails of the distribution, better for controlling windows in highly disfavoured regions
 double generalisedGaussian2(double x, double mean, double width) {
   constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2
                        // for now due to normalisation
@@ -189,17 +192,19 @@ double generalisedGaussian2(double x, double mean, double width) {
   return likelihood;
 }
 
+// TODO modify this to instead use atan2 implementation for wrapping
 double GetMulticanonicalWeightGenGaussian(double deltacp, double mean, double width) {
   // implemenetation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
 
   double g0 = generalisedGaussian2(deltacp, mean, width);
-  double g1 = generalisedGaussian2(deltacp, mean - 2 * TMath::Pi(),width); // these two repeats are required for wrapping the
+  double g1 = generalisedGaussian2(deltacp, mean - 2 * TMath::Pi(),width); // these two repeats are required for wrapping the gaussian around -+pi
   double g2 = generalisedGaussian2(deltacp, mean + 2 * TMath::Pi(), width);
   double multicanonicalBeta = 1.0;
   return (g0 + g1 + g2) * (multicanonicalBeta);
 }
 
+// A sub calculation for the overlap matrix
 // Sum of all windows weighted by z values
 double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows, const std::vector<double> &z_values) {
   double sum = 0.0;
@@ -221,8 +226,8 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
 
 // Precompute all window evaluations once: cache[i][j][s] = window_j evaluated
 // at samples[i][s]
-std::vector<std::vector<std::vector<double>>>
-buildWindowCache(const std::vector<WindowConfig> &windows, const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
+// Memory heavy depending on number of steps/cores/windows
+std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector<WindowConfig> &windows, const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
 
   int n_windows = windows.size();
   std::vector<std::vector<std::vector<double>>> cache(n_windows);
@@ -320,10 +325,8 @@ buildWindowCache(const std::vector<WindowConfig> &windows, const std::vector<std
   return cache;
 }
 
-// function to calculate the F matrix from a given set of samples plus weights
-
-std::vector<std::vector<double>>
-calcFmatrix(std::vector<double> &z_current,
+// Main function to calculate the F matrix from a given set of samples plus weights
+std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             const std::vector<WindowConfig> &windows,
             const std::vector<std::vector<double>> &samples,
             const std::vector<std::vector<std::vector<double>>> &window_cache,
@@ -430,9 +433,8 @@ calcFmatrix(std::vector<double> &z_current,
   return F;
 }
 
-// Z-solver function implementing the matrix algorithm
-std::vector<double>
-zSolver(const std::vector<double> &z_current,
+// Z-solver function implementing the fixed point matrix iteration algorithm
+std::vector<double> zSolver(const std::vector<double> &z_current,
         const std::vector<WindowConfig> &windows,
         const std::vector<std::vector<double>> &samples,
         const std::vector<std::vector<std::vector<double>>> &window_cache,
@@ -467,6 +469,7 @@ zSolver(const std::vector<double> &z_current,
   // }
 
   // Compute z_new = z_current * F
+  // could do faster matrix multiplication here?
   std::vector<double> z_new(n_windows, 0.0);
   for (int i = 0; i < n_windows; i++) {
     for (int j = 0; j < n_windows; j++) {
@@ -503,9 +506,10 @@ zSolver(const std::vector<double> &z_current,
   return z_new;
 }
 
+/// A few differnt convergence checks
+
 // Check convergence
-bool checkConvergence(const std::vector<double> &z_current,
-                      const std::vector<double> &z_prev, double tolerance) {
+bool checkConvergence(const std::vector<double> &z_current, const std::vector<double> &z_prev, double tolerance) {
   double sum_diffs = 0.0;
   for (size_t i = 0; i < z_current.size(); i++) {
     // if (std::abs(z_current[i] - z_prev[i]) > tolerance *
@@ -535,6 +539,7 @@ std::vector<double> getZDiffs(const std::vector<double> &z_current, const std::v
   return diffs;
 }
 
+// This implements a check on stalling of the evolution of the window weights. Seems to be a better definition for convergence that above
 // moving-average stalled-convergence check on z values
 bool checkConvergenceStalled(const std::vector<double> &z_current, const std::vector<double> &z_prev, double tolerance) {
   (void)z_prev;
@@ -606,6 +611,7 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
   return stagnant_iterations >= stagnant_required;
 }
 
+// Main function to run the umbrella sampling solver
 void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
 
   std::cout << "=== Umbrella Sampling Z-Factor Solver ===" << std::endl;
@@ -689,7 +695,7 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
     }
   } else {
     std::cout << "Dynamic file loading enabled. Searching for files in directory: " << config.dynamic_pattern << std::endl;
-    // Use ROOT's TSystem to find files in the directory
+    // Use ROOT's TSystem to find all files in the directory
     TSystemDirectory dir("", config.dynamic_pattern.c_str());
     TList *files = dir.GetListOfFiles();
     int file_count = 0;
@@ -848,8 +854,9 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
   // Initialize z values
   std::vector<double> z_current(config.windows.size(), 1.0);
   std::vector<double> z_prev(config.windows.size(), 1.0);
-  bool hacky_start = false; // Set to true to use the hardcoded starting vector,
-                            // false to start with all ones
+
+  // this should be used to pick up a solve that failed partway through due to reaching iteration max or job cancellation
+  bool hacky_start = false; // Set to true to use the hardcoded starting vector, false to start with all ones
   if (hacky_start) {
     // z_current = {   0.02593,    0.02676,    0.02764,    0.03305,    0.03527,
     // 0.04275,    0.05171,    0.04808,    0.04978,    0.04560,    0.04627,
@@ -880,7 +887,7 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
 
   std::cout << "\nStarting iterative z-solver..." << std::endl;
 
-  // Test OpenMP functionality once before the main loop
+  // Test OpenMP functionality once before the main loop this can probably be wrapped in debug TODO
   bool openmp_works = false;
   if (config.use_openmp) {
     std::cout << "Testing OpenMP parallelization..." << std::endl;
@@ -1003,21 +1010,18 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
     // behaviour and debug if needed should be a root file with Th2D for easy
     // plotting in root, with axes of iteration number and window index, and the
     // value being the F matrix element
-    if (save_matrix &&
-        (iteration < 15 || iteration % config.print_frequency == 0)) {
+    if (save_matrix && (iteration < 15 || iteration % config.print_frequency == 0)) {
       std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache, openmp_works);
       // convert F_matrix to Th2D for saving to root file
       int n_windows = config.windows.size();
       TH2D F_TH2D(Form("F_matrix_iter_%02d", iteration),Form("F matrix at iteration %02d;Window j;Window i", iteration), n_windows, 0, n_windows, n_windows, 0, n_windows);
       for (int i = 0; i < n_windows; i++) {
         for (int j = 0; j < n_windows; j++) {
-          F_TH2D.SetBinContent(j + 1, i + 1, F_matrix[i][j]); // Note the order of i and j for
-                                                // correct axis labeling
+          F_TH2D.SetBinContent(j + 1, i + 1, F_matrix[i][j]); // Note the order of i and j for correct axis labeling
         }
       }
       // for the purposes of picking back up a solve after it has been
-      // interrrupted also save the std::vector of z_current
-
+      // interrrupted also save the std::vector of z_current. You can put this into hacky start to pick up
       TTree *z_tree = new TTree(Form("z_saved_iter_%02d", iteration), Form("Z vector at iteration %02d", iteration));
       z_tree->Branch("z_saved", &z_current);
       z_tree->Fill();
@@ -1106,7 +1110,6 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
   int window_id;
 
   // TODO: MAJOR make this generic so that we can use systematics aswell
-
   // Set up branches
   combined_tree->Branch("sin2th_12", &sin2th_12, "sin2th_12/D");
   combined_tree->Branch("sin2th_23", &sin2th_23, "sin2th_23/D");
@@ -1159,29 +1162,14 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
       tree->GetEntry(entry);
 
       if (z_current[i] == 0) {
-        umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set
-                 // it to 0 (competely downweight this window's contribution)
+        umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set it to 0 (competely downweight this window's contribution)
       } else {
         // Calculate umbrella weight for this event
-        // The umbrella weight corrects for the bias introduced by the window
-        // function Weight is 1 / sum of all window contributions (equation 4
-        // from paper) double denominator = 1 / summedWindowsWeighted(delta_cp,
-        // config.windows, z_current); // This is the correct form based on the
-        // paper - the z_current[i] factor is already included in the
-        // summedWindowsWeighted function
+        // The umbrella weight corrects for the bias introduced by the window function Weight is 1 / sum of all window contributions (equation 4 from paper) 
         double denominator = 1 / summedWindowsWeighted(delta_cp, config.windows, z_current);
 
-        // umbrella_weight = z_current[i] / denominator; // with or without
-        // z_current[i] / denominator? why did I have this originally
-        umbrella_weight = denominator; // This is the correct form based on the paper - the
-                         // z_current[i] factor is already included in the
-                         // summedWindowsWeighted function
-
-        //if (LogL > 500.0) {
-        //  std::cout << " WARNING: Skipping entry with LogL > 500: " << LogL
-        //            << std::endl;
-        //  continue;
-        //}
+        // umbrella_weight = z_current[i] / denominator; // with or without z_current[i] / denominator? why did I have this originally
+        umbrella_weight = denominator; // This is the correct form based on the paper - the z_current[i] factor is already included in the summedWindowsWeighted function
 
         if (combined_tree->Fill() < 0) {
           throw std::runtime_error("Failed writing output tree. Check disk quota/space and write permissions for: " + config.output_file);
@@ -1242,10 +1230,8 @@ void umbrella_solver(const std::string &config_file = "umbrella_config.yaml") {
   combined_tree->Write();
 
   // Create summary histogram of delta_cp distribution
-  TH1D *h_delta_cp =
-      new TH1D("h_delta_cp_weighted", "Weighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
-  TH1D *h_delta_cp_unweighted =
-      new TH1D("h_delta_cp_unweighted", "Unweighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
+  TH1D *h_delta_cp = new TH1D("h_delta_cp_weighted", "Weighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
+  TH1D *h_delta_cp_unweighted = new TH1D("h_delta_cp_unweighted", "Unweighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
 
   combined_tree->Draw("delta_cp>>h_delta_cp_weighted", "umbrella_weight", "goff");
   combined_tree->Draw("delta_cp>>h_delta_cp_unweighted", "", "goff");

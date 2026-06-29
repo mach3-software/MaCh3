@@ -447,7 +447,7 @@ void umbrella_plotting() {
     TH2F *h2d = new TH2F("h2d", "#Delta m_{23}^{2} vs #delta_{CP};#delta_{CP};#Delta m_{23}^{2} (eV^{2})", 
                          nBins_dcp, -3.14159, 3.14159, 
                          nBins_delm23, delm23_io_min, delm23_no_max);
-    // Draw from tree (note: y:x format)
+    // Draw from tree 
     tree->Draw("delm2_23:delta_cp>>h2d", "", "COLZ");
     normalizeHist(h2d);
     h2d->Draw("COLZ");
@@ -457,7 +457,6 @@ void umbrella_plotting() {
     h2d->GetYaxis()->SetTitle("#Delta m_{23}^{2} (eV^{2})");
     h2d->GetZaxis()->SetTitle("Normalized Entries");
     //gPad->SetLogz();  // Optional: log scale on z-axis for better visibility
-    // Update canvas
     c1->Update();
     // draw Asimov marker and Save plot
     drawAsimovMarkerWithLegend(asimovDcp, asimovDelm23, nullptr);
@@ -480,11 +479,11 @@ void umbrella_plotting() {
     // Left pad: IO
     c2->cd(1);
     gPad->SetRightMargin(0.15);
-    // Create 2D histogram: dcp vs delm23 (swapped axes)
+    // Create 2D histogram: dcp vs delm23 
     TH2F *h2d_IO = new TH2F("h2d_IO", "Inverted Ordering;#Delta m_{23}^{2} (eV^{2});#delta_{CP}", 
                              nBins_delm23, delm23_io_min, delm23_io_max,  // X-axis: delm23 (IO range)
                              nBins_dcp, -3.1415, 3.1415);               // Y-axis: dcp
-    // Draw from tree (note: y:x format means dcp:delm23 now)
+    // Draw from tree 
     tree->Draw("delta_cp:delm2_23>>h2d_IO", "delm2_23 < 0", "COLZ");
     normalizeHist(h2d_IO);
     h2d_IO->Draw("COLZ");
@@ -498,11 +497,11 @@ void umbrella_plotting() {
     // Right pad: NO
     c2->cd(2);
     gPad->SetRightMargin(0.15);
-    // Create 2D histogram: dcp vs delm23 (swapped axes)
+    // Create 2D histogram: dcp vs delm23 
     TH2F *h2d_NO = new TH2F("h2d_NO", "Normal Ordering;#Delta m_{23}^{2} (eV^{2});#delta_{CP}", 
                              nBins_delm23, delm23_no_min, delm23_no_max,   // X-axis: delm23 (NO range)
                              nBins_dcp, -3.1415, 3.1415);               // Y-axis: dcp
-    // Draw from tree (note: y:x format means dcp:delm23 now)
+    // Draw from tree 
     tree->Draw("delta_cp:delm2_23>>h2d_NO", "delm2_23 > 0", "COLZ");
     normalizeHist(h2d_NO);
     h2d_NO->Draw("COLZ");
@@ -817,7 +816,7 @@ void umbrella_plotting() {
     TH2F *h2d_delta_cp = new TH2F("h2d_delta_cp", "#delta_{CP} vs sin^{2}(#theta_{23});#delta_{CP};sin^{2}(#theta_{23})",
                                   nBins_dcp, -3.1415, 3.1415, 
                                   nBins_sin2th23, sin2th23_min, sin2th23_max);
-    // Draw from tree (note: y:x format)
+    // Draw from tree 
     tree->Draw("sin2th_23:delta_cp>>h2d_delta_cp", "", "COLZ");
     normalizeHist(h2d_delta_cp);
     h2d_delta_cp->Draw("COLZ");
@@ -848,7 +847,7 @@ void umbrella_plotting() {
     TH2F *h2d_delta_cp_13 = new TH2F("h2d_delta_cp_13", "#delta_{CP} vs sin^{2}(#theta_{13});#delta_{CP};sin^{2}(#theta_{13})",
                                   nBins_dcp, -3.1415, 3.1415, 
                                   nBins_sin2th13, sin2th13_min, sin2th13_max);
-    // Draw from tree (note: y:x format)
+    // Draw from tree 
     tree->Draw("sin2th_13:delta_cp>>h2d_delta_cp_13", "", "COLZ");
     normalizeHist(h2d_delta_cp_13);
     h2d_delta_cp_13->Draw("COLZ");
