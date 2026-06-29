@@ -810,14 +810,12 @@ inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::
   ReducedVector.reserve(MasterSpline.size());
 
   // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Make the temp vector
     std::vector<TSpline3_red*> TempVector;
     TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
     // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {
       // Here's our delicious TSpline3 object
       TSpline3 *spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer
@@ -848,14 +846,12 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   ReducedVector.reserve(MasterSpline.size());
 
   // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Make the temp vector
     std::vector<TF1_red*> TempVector;
     TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
     // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {
       // Here's our delicious TSpline3 object
       TF1* spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer (which deleted TSpline3)
