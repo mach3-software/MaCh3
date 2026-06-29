@@ -544,9 +544,10 @@ void PredictiveThrower::ProduceToys() {
   auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
   TDirectory* ByModeDirectory = nullptr;
   if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
-
   auto ReweightNames = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ReweightNames"],
                                                                 {"Weight"}, __FILE__, __LINE__);
+  bool doReweight = false;
+  std::vector<double> reweight_weight(ReweightNames.size(), 1.0);
 
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
@@ -562,8 +563,7 @@ void PredictiveThrower::ProduceToys() {
     PosteriorFile->Add(PosteriorFileName.c_str());
 
     PosteriorFile->SetBranchAddress("step", &Step);
-    std::vector<double> reweight_weight(ReweightNames.size(), 1.0);
-    bool doReweight = true;
+    doReweight = true;
     for (size_t i = 0; i < ReweightNames.size(); ++i) {
       const auto& name = ReweightNames[i];
       if (PosteriorFile->GetBranch(name.c_str())) {
@@ -650,8 +650,8 @@ void PredictiveThrower::ProduceToys() {
     PenaltyTerm[i] = Penalty;
     Weight = 1.;
     if(doReweight) {
-      for (size_t i = 0; i < reweight_weight.size(); ++i) {
-        Weight *= reweight_weight[i];
+      for (size_t iWeight = 0; iWeight < reweight_weight.size(); ++iWeight) {
+        Weight *= reweight_weight[iWeight];
       }
     }
     ReweightWeight[i] = Weight;
