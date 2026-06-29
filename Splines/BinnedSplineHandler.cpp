@@ -141,14 +141,12 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
       if (counts.second > 1)
       {
         MACH3LOG_DEBUG(
-          "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
+          "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var {} => Value: {}",
           SampleTitles[iSample],
           entry.iOscChan,
           SplineFileParPrefixNames[iSample][iSyst],
           modeSuffix,
-          entry.iVar1,
-          entry.iVar2,
-          entry.iVar3,
+          fmt::join(entry.iVar, " "),
           entry.value
         );
       }
@@ -288,7 +286,7 @@ void BinnedSplineHandler::CalcSplineWeights() {
     const M3::float_t c = manycoeff_arr[coeffOffset+kCoeffC];
     const M3::float_t d = manycoeff_arr[coeffOffset+kCoeffD];
 
-    // Get the variation for this reconfigure for the ith parameter
+    // Get the variation for this reconfigure for the i-th parameter
     /// @todo KS: Once could use "ParamValues" but this will result in tiny bit different results due to floating point precision
     const M3::float_t xvar = (*SplineInfoArray[uniqueIndex].splineParsPointer);
     // The Delta(x) = xvar - x
@@ -331,9 +329,7 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
               entry.iOscChan = iOscChan;
               entry.iSyst    = iSyst;
               entry.iMode    = iMode;
-              entry.iVar1    = iVar1;
-              entry.iVar2    = iVar2;
-              entry.iVar3    = iVar3;
+              entry.iVar = {iVar1, iVar2, iVar3};
               IndexVect.push_back(entry);
               IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3)] = static_cast<int>(IndexVect.size() - 1);
             }
@@ -405,13 +401,11 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
   if (isHist3D)
   {
     Hist3D = File->Get<TH3F>((TemplateName.c_str()));
-
     if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
     {
       MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    Hist3D = File->Get<TH3F>(TemplateName.c_str());
   }
 
   std::vector<TAxis*> ReturnVec;
@@ -450,7 +444,7 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
 const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables) const {
 //****************************************
   int Index = IndexVectMap.at(std::make_tuple(Variables.iSample, Variables.iOscChan, Variables.iSyst,
-                                              Variables.iMode, Variables.iVar1, Variables.iVar2, Variables.iVar3));
+                                              Variables.iMode, Variables.iVar[0], Variables.iVar[1], Variables.iVar[2]));
   return &weightvec_Monolith[IndexVect[Index].value];
 }
 
@@ -472,8 +466,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
     std::string SampleTitle = SampleTitles[iSample];
 
     if (!isValidSplineIndex(SampleTitle, entry.iOscChan, entry.iSyst,
-         entry.iMode, entry.iVar1,
-         entry.iVar2, entry.iVar3)) {
+         entry.iMode, entry.iVar)) {
       continue;
     }
     SampleAll[iSample]++;
@@ -678,11 +671,11 @@ void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTitle) cons
 
 //****************************************
 bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int iOscChan,
-                                             int iSyst, int iMode, int iVar1, int iVar2, int iVar3) const {
+                                             int iSyst, int iMode, const std::vector<int>& iVar) const {
 //****************************************
   int iSample = GetSampleIndex(SampleTitle);
 
-  bool found = IndexVectMap.find(std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3)) != IndexVectMap.end();
+  bool found = IndexVectMap.find(std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar[0], iVar[1], iVar[2])) != IndexVectMap.end();
 
   if (!found)
   {
@@ -690,9 +683,9 @@ bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int
     MACH3LOG_ERROR("Given iOscChan: {}", iOscChan);
     MACH3LOG_ERROR("Given iSyst: {}", iSyst);
     MACH3LOG_ERROR("Given iMode: {}", iMode);
-    MACH3LOG_ERROR("Given iVar1: {}", iVar1);
-    MACH3LOG_ERROR("Given iVar2: {}", iVar2);
-    MACH3LOG_ERROR("Given iVar3: {}", iVar3);
+    for (size_t i = 0; i < iVar.size(); ++i) {
+      MACH3LOG_ERROR("Given iVar{}: {}", i, iVar[i]);
+    }
     MACH3LOG_ERROR("Come visit me at : {} : {}", __FILE__, __LINE__);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -731,16 +724,15 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
     return ReturnVec;
   }
 
-  std::vector<int> bins;
+  std::vector<int> var_bins;
   std::vector<double> vars = {Var1Val, Var2Val, Var3Val};
   for (size_t i = 0; i < vars.size(); ++i) {
     int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(vars[i]) - 1;
     if (bin < 0 || bin >= SplineBinning[SampleIndex][iOscChan][i]->GetNbins()) {
       return ReturnVec;
     }
-    bins.push_back(bin);
+    var_bins.push_back(bin);
   }
-  int Var1Bin = bins[0]; int Var2Bin = bins[1]; int Var3Bin = bins[2];
 
   for(int iSyst=0; iSyst < nSplineParams[SampleIndex]; iSyst++){
     std::vector<int> spline_modes = SplineModeVecs[SampleIndex][iSyst];
@@ -750,7 +742,8 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
     for(int iMode = 0; iMode<nSampleModes; iMode++) {
       //Only consider if the event mode (Mode) matches ones of the spline modes
       if (Mode == spline_modes[iMode]) {
-        int index = IndexVectMap.at(std::make_tuple(SampleIndex, iOscChan, iSyst, iMode, Var1Bin, Var2Bin, Var3Bin));
+        int index = IndexVectMap.at(std::make_tuple(SampleIndex, iOscChan, iSyst, iMode,
+                                                    var_bins[0], var_bins[1], var_bins[2]));
         int splineID = IndexVect[index].value;
         //Also check that the spline isn't flat
         if(!isflatarray[splineID]) {
@@ -759,10 +752,7 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
           idx.iOscChan = iOscChan;
           idx.iSyst    = iSyst;
           idx.iMode    = iMode;
-          idx.iVar1    = Var1Bin;
-          idx.iVar2    = Var2Bin;
-          idx.iVar3    = Var3Bin;
-
+          idx.iVar     = var_bins;
           ReturnVec.push_back(idx);
         }
       }
@@ -818,13 +808,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
     MACH3LOG_INFO("Processing: {}", OscChanFileNames[iOscChan]);
     TSpline3* mySpline = nullptr;
     TSpline3_red* Spline = nullptr;
-    TString Syst, Mode;
-    int nKnots, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin = M3::_BAD_INT_;
-    double x,y = M3::_BAD_DOUBLE_;
-    bool isFlat = true;
 
     std::set<std::string> SplineFileNames;
-
     auto File = std::unique_ptr<TFile>(TFile::Open(OscChanFileNames[iOscChan].c_str()));
 
     if (!File || File->IsZombie()) {
@@ -856,13 +841,13 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       
-      Syst = Tokens[kSystToken];
-      Mode = Tokens[kModeToken];
-      Var1Bin = std::stoi(Tokens[kVar1BinToken]);
-      Var2Bin = std::stoi(Tokens[kVar2BinToken]);
-      Var3Bin = std::stoi(Tokens[kVar3BinToken]);
+      TString Syst = Tokens[kSystToken];
+      TString Mode = Tokens[kModeToken];
+      int Var1Bin = std::stoi(Tokens[kVar1BinToken]);
+      int Var2Bin = std::stoi(Tokens[kVar2BinToken]);
+      int Var3Bin = std::stoi(Tokens[kVar3BinToken]);
 
-      SystNum = -1;
+      int SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
         if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
           SystNum = iSyst;
@@ -872,12 +857,11 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
 
       // If the syst doesn't match any of the spline names then skip it
       if (SystNum == -1){
-        MACH3LOG_DEBUG("Couldn't match!!");
         MACH3LOG_DEBUG("Couldn't Match any systematic name in ParameterHandler with spline name: {}" , FullSplineName);
         continue;
       }
 
-      ModeNum = -1;
+      int ModeNum = -1;
       for (unsigned int iMode = 0; iMode < SplineModeVecs[iSample][SystNum].size(); iMode++) {
         if (Mode == Modes->GetSplineSuffixFromMaCh3Mode(SplineModeVecs[iSample][SystNum][iMode])) {
           ModeNum = iMode;
@@ -894,12 +878,13 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
 
       mySpline = Key->ReadObject<TSpline3>();
       // loop over all the spline knots and check their value
-      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) {
+      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, {Var1Bin, Var2Bin, Var3Bin})) {
         MACH3LOG_TRACE("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
-        nKnots = mySpline->GetNp();
-        isFlat = true;
+        int nKnots = mySpline->GetNp();
+        bool isFlat = true;
         for (int iKnot = 0; iKnot < nKnots; iKnot++) {
+          double x, y = M3::_BAD_DOUBLE_;
           mySpline->GetKnot(iKnot, x, y);
           if (y < 0.99999 || y > 1.00001)
           {
@@ -1079,8 +1064,8 @@ void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
     IndexVect[iEntry] = *IndexTemp;
 
     auto key = std::make_tuple(IndexTemp->iSample, IndexTemp->iOscChan, IndexTemp->iSyst,
-                               IndexTemp->iMode, IndexTemp->iVar1, IndexTemp->iVar2, 
-                               IndexTemp->iVar3);
+                               IndexTemp->iMode, IndexTemp->iVar[0], IndexTemp->iVar[1],
+                               IndexTemp->iVar[2]);
     IndexVectMap[key] = static_cast<int>(iEntry);
   }
 

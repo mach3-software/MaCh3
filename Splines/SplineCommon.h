@@ -45,12 +45,8 @@ struct SplineIndex {
   int iSyst    = 0;
   /// Mode index within a systematic
   int iMode    = 0;
-  /// First kinematic bin index
-  int iVar1    = 0;
-  /// Second kinematic bin index
-  int iVar2    = 0;
-  /// Third kinematic bin index
-  int iVar3    = 0;
+  /// Kinematic bins index, assumed to be size of 3 for now
+  std::vector<int> iVar{0, 0, 0};
 
   #ifndef __CUDACC__
   // Include ClassDef macro for ROOT dictionary generation, but only in C++ code
