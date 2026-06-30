@@ -24,6 +24,10 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
         anneal = true;
     }
+
+    /// Initialise the multicanonical handler
+    multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
+    
 }
 
 

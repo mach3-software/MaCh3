@@ -57,8 +57,8 @@ class MCMCBase : public FitterBase {
     /// @param StepsPrint whether to print info about accepted steps and -LogL
     void PrintProgress(const bool StepsPrint = true);
 
-    /// initialise the multicanonical handler
-    std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
+    /// multicanonical handler for umbrella sampling    
+    std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler;
 
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;
@@ -76,10 +76,4 @@ class MCMCBase : public FitterBase {
 
     /// multi-canonical method toggle on/off
     bool multicanonical;
-    /// multi-canonical penalty
-    double multicanonical_penalty;
-    /// delta_cp parameter value
-    double delta_cp_value;
-    /// dm23 parameter value
-    double delm23_value;
 };

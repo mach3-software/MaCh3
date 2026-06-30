@@ -54,7 +54,8 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
   UmbrellaConfig config;
 
   try {
-    YAML::Node yaml_config = YAML::LoadFile(filename);
+    YAML::Node yaml_diag_config = YAML::LoadFile(filename);
+    YAML::Node yaml_config = yaml_diag_config["UmbrellaSolver"];
 
     // Parse other configuration
     if (yaml_config["output_file"]) {

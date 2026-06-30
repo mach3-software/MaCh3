@@ -26,6 +26,8 @@ namespace M3 {
 /// stored in the chains saved yaml configuration file.
 ///
 /// @author David Riley
+/// @cite Matthews2018umbrella
+
 class MulticanonicalMCMCHandler {
 public:
   /// @brief Constructor

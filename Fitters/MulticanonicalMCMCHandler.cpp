@@ -18,7 +18,7 @@ M3::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
     return M3::BiasFunction::kGeneralisedGaussian;
   }
 
-  throw std::runtime_error("Unknown multicanonical bias function: " + biasFunctionName);
+  throw MaCh3Exception(__FILE__, __LINE__, "Unknown multicanonical bias function: " + biasFunctionName);
 }
 
 MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
@@ -64,50 +64,35 @@ void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<ParameterHand
   bool foundDelm23 = false;
 
   // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
-  MACH3LOG_INFO("Looping over systematics to find osc_cov systematic and delta_cp parameter");
+  MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
   MACH3LOG_INFO("Number of systematics: {}", systematics.size());
-  for (size_t s = 0; s < systematics.size(); s++) {
-
-    auto* syst = systematics[static_cast<int>(s)];
-
-    MACH3LOG_INFO("Systematic: {}", syst->GetName());
-
-    // if we find the covariance object
-    if (syst->GetName() == "osc_cov" || systematics.size() == 1) { // hacky, move to the new unified cov obj structure properly
-      oscCovVar = static_cast<int>(s);
-      MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
-
-      for (int i = 0; i < syst->GetNumParams(); i++) {
-        MACH3LOG_INFO("Parameter: {}", syst->GetParName(i));
-
-        // check for params of interest
-        if (syst->GetParName(i) == "delta_cp") {
-          multicanonicalVar = i;
-          MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}", i);
-          foundDeltaCP = true;
-        }
-        if (syst->GetParName(i) == "delm2_23") {
-          multicanonicalVar_dm23 = i;
-          MACH3LOG_INFO("Setting delm2_23 parameter int {}", i);
-          foundDelm23 = true;
-        }
+ 
+  for (size_t iCov = 0; iCov < systematics.size(); iCov++){
+    auto* syst = systematics[static_cast<int>(iCov)];
+    for (int i = 0; i < syst->GetNumParams(); i++) {
+      if (syst->GetParName(i) == "delta_cp") {
+        MACH3LOG_INFO("Found delta_cp parameter in systematic {} at index {}", syst->GetName(), i);
+        oscCovVar = static_cast<int>(iCov);
+        multicanonicalVar = i;
+        foundDeltaCP = true;
       }
-    } else {
-      MACH3LOG_INFO("Systematic {} is not osc_cov, skipping", syst->GetName());
-    }
+      if (syst->GetParName(i) == "delm2_23") {
+        MACH3LOG_INFO("Found delm2_23 parameter in systematic {} at index {}", syst->GetName(), i);
+        multicanonicalVar_dm23 = i;
+        foundDelm23 = true;
+      }
+    }  
   }
 
   // if we didn't find both parameters we need to throw
   if (!foundDeltaCP) {
     MACH3LOG_ERROR("Could not find delta_cp parameter in osc_cov systematic");
-    throw std::runtime_error("Could not find delta_cp parameter in osc_cov systematic");
+    throw MaCh3Exception(__FILE__, __LINE__, "Could not find delta_cp parameter in osc_cov systematic");
   }
   if (!foundDelm23) {
     MACH3LOG_ERROR("Could not find delm2_23 parameter in osc_cov systematic");
-    throw std::runtime_error("Could not find delm2_23 parameter in osc_cov systematic");
+    throw MaCh3Exception(__FILE__, __LINE__, "Could not find delm2_23 parameter in osc_cov systematic");
   }
-
-  return;
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* fitMan, std::vector<ParameterHandlerBase*>& systematics) {
@@ -121,7 +106,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
   MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 
-  // TODO DR: I realised this will fail if you set spline to true but don't
+  /// @todo DR: I realised this will fail if you set spline to true but don't
   // delete the umbrella section, thats not ideal
   multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"], false);
 
@@ -131,13 +116,13 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   // Spline and umbrella modes are mutually exclusive
   if (multicanonicalSpline && hasBiasFunction) {
     MACH3LOG_ERROR("Cannot use multicanonical spline together with umbrella bias function selection.");
-    throw std::runtime_error("Cannot use multicanonical spline together with umbrella bias function selection.");
+    throw MaCh3Exception(__FILE__, __LINE__, "Cannot use multicanonical spline together with umbrella bias function selection.");
   }
 
   // Umbrella mode requires an explicit bias function selection
   if (!multicanonicalSpline && !hasBiasFunction) {
     MACH3LOG_ERROR("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set (gaussian, vonMises, or generalisedGaussian).");
-    throw std::runtime_error("Multicanonical umbrella mode requires UmbrellaBiasFunction to be set.");
+    throw MaCh3Exception(__FILE__, __LINE__, "Multicanonical umbrella mode requires UmbrellaBiasFunction to be set.");
   }
 
   // Parse and set the umbrella bias function enum
@@ -150,24 +135,25 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   // setup for spline bias mode
   if (multicanonicalSpline) {
 
-    std::string splineFile = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], "nofile");
+    std::string splineFileName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], "nofile");
 
-    TFile* file = new TFile(splineFile.c_str(), "READ");
-    if (!file || file->IsZombie()) {
-      MACH3LOG_ERROR("Could not open multicanonical spline file: {}", splineFile);
-      throw std::runtime_error("Could not open multicanonical spline file");
-    }
+    TFile* splineFile = M3::Open(splineFileName.c_str(), "READ",__FILE__, __LINE__);
 
     // grab the splines and do a quick check that they are evaluatable
-    dcp_spline_IO = static_cast<TSpline3*>(file->Get("dcp_spline_IO"));
-    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+    TSpline3* dcp_spline_IO_fromfile = static_cast<TSpline3*>(splineFile->Get("dcp_spline_IO"));
+    dcp_spline_IO = static_cast<TSpline3*>(dcp_spline_IO_fromfile->Clone("dcp_spline_IO"));
+    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFileName);
     dcp_spline_IO->Eval(0.0); // check that the spline is valid
     MACH3LOG_INFO("Spline evaluated at 0.0 gives value: {}", dcp_spline_IO->Eval(0.0));
 
-    dcp_spline_NO = static_cast<TSpline3*>(file->Get("dcp_spline_NO"));
-    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+    TSpline3* dcp_spline_NO_fromfile = static_cast<TSpline3*>(splineFile->Get("dcp_spline_NO"));
+    dcp_spline_NO = static_cast<TSpline3*>(dcp_spline_NO_fromfile->Clone("dcp_spline_NO"));
+    MACH3LOG_INFO("Using multicanonical spline from file {}", splineFileName);
     dcp_spline_NO->Eval(0.0); // check that the spline is valid
     MACH3LOG_INFO("Spline evaluated at 0.0 gives value {}", dcp_spline_NO->Eval(0.0));
+
+    splineFile->Close();
+    splineFile = nullptr;
 
   } else {
     // Umbrella mode with explicit bias function selection
@@ -226,12 +212,8 @@ void MulticanonicalMCMCHandler::AdjustUmbrellaStepScale(const std::vector<Parame
     MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
     double stepScale = (umbrellaWidth * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
     MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
-    for (auto& syst : systematics) {
-      if (syst->GetName() == "osc_cov") {
-        syst->SetIndivStepScale(multicanonicalVar, stepScale);
-        MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
-      }
-    }
+    systematics[oscCovVar]->SetIndivStepScale(multicanonicalVar, stepScale);
+    MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
   } else {
     MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
   }
@@ -240,23 +222,19 @@ void MulticanonicalMCMCHandler::AdjustUmbrellaStepScale(const std::vector<Parame
 void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<ParameterHandlerBase*>& systematics) {
   // Set starting point of chain to umbrella center for non-spline umbrella modes
   if (!multicanonicalSpline) {
-    for (auto& syst : systematics) {
-      if (syst->GetName() == "osc_cov") {
-        syst->PrintPreFitCurrPropValues();
-        syst->SetParCurrProp(multicanonicalVar, umbrellaMean);
-        MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", umbrellaMean);
-        // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE: UNTESTED
-        // if (flipWindow) {
-        //  auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
-        //  if (oscCov) {
-        //    oscCov->setFlipWindow(flipWindow);
-        //    oscCov->setMulticanonicalSeparateMean(umbrellaMean);
-        //  }
-        //}
-        syst->PrintPreFitCurrPropValues();
-        MACH3LOG_INFO("Setting starting point of chain to umbrella center: {}", umbrellaMean);
-      }
-    }
+    systematics[oscCovVar]->PrintPreFitCurrPropValues();
+    systematics[oscCovVar]->SetParCurrProp(multicanonicalVar, umbrellaMean);
+    MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", umbrellaMean);
+    // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE: UNTESTED
+    // if (flipWindow) {
+    //  auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
+    //  if (oscCov) {
+    //    oscCov->setFlipWindow(flipWindow);
+    //    oscCov->setMulticanonicalSeparateMean(umbrellaMean);
+    //  }
+    //}
+    systematics[oscCovVar]->PrintPreFitCurrPropValues();
+    MACH3LOG_INFO("Setting starting point of chain to umbrella center: {}", umbrellaMean);
   }
 }
 
@@ -302,15 +280,15 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
 }
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp) {
-  constexpr double inv_sqrt_2pi = 0.3989422804014337;
+  constexpr double inv_sqrt_2pi = 1 / std::sqrt(2 * TMath::Pi());
   const double neg_half_sigma_sq = -1 / (2 * umbrellaWidth * umbrellaWidth);
   // return the log likelihood, ie the log of the normalised gaussian
-  return (-std::log(inv_sqrt_2pi * (1 / umbrellaWidth) * std::exp(neg_half_sigma_sq * (deltacp - umbrellaMean) * (deltacp - umbrellaMean)))) *
-         (multicanonicalBeta);
+  return (-std::log(inv_sqrt_2pi * (1 / umbrellaWidth) * std::exp(neg_half_sigma_sq * (deltacp - umbrellaMean) * (deltacp - umbrellaMean)))) * (multicanonicalBeta);
 }
 
 double MulticanonicalMCMCHandler::generalisedGaussian2(double x, double mean, double width) {
   constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2 for now due to normalisation
+  // 1/4 * Gamma(1/4) = 0.906402477055 (this factor from 2n/Gamma(1/2n) for n=2)
   const double normFactor = 1 / ((0.906402477055) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions), im just going to hardcode them for now
   double likelihood = normFactor * std::exp(-std::pow((std::pow(x - mean, 2) / (2 * std::pow(width, 2))), n));
   return likelihood;
