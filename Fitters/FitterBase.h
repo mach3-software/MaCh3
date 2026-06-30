@@ -23,6 +23,8 @@ class TDirectory;
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
 ///
+/// @author Asher Kaboth
+/// @author Kamil Skwarczynski
 /// @ingroup CoreClasses
 class FitterBase {
  public:
