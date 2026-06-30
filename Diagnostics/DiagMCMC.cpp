@@ -1,5 +1,4 @@
 #include "Fitters/MCMCProcessor.h"
-
 #include "Manager/Manager.h"
 
 /// @file DiagMCMC.cpp

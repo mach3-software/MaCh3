@@ -1,24 +1,33 @@
 #pragma once
-
-#include "TSpline.h"
-#include "Parameters/ParameterHandlerBase.h"
-#include "Manager/Manager.h"
 #include <ostream>
 #include <string>
 #include <vector>
 
-/// @author David Riley
+#include "Parameters/ParameterHandlerBase.h"
+#include "Manager/Manager.h"
+
+_MaCh3_Safe_Include_Start_ //{
+#include "TSpline.h"
+_MaCh3_Safe_Include_End_ //}
+
+
+namespace M3 {
+  enum class BiasFunction {
+    kGaussian,
+    kVonMises,
+    kGeneralisedGaussian
+  };
+}
 
 /// @brief Helper class for configuring and evaluating multicanonical umbrella weights.
 /// @details this method is used to bias the MCMC sampling of chains to particular regions of the parameter space
 /// The method relies on a bias function defined via a yaml configuration file in experimental specific code
 /// With a bias function defined chains run as normal and are combined after the fact using the information
 /// stored in the chains saved yaml configuration file.
-
+///
+/// @author David Riley
 class MulticanonicalMCMCHandler {
 public:
-  enum class BiasFunction { Gaussian, VonMises, GeneralisedGaussian };
-
   /// @brief Constructor
   MulticanonicalMCMCHandler();
   /// @brief Destructor
@@ -89,7 +98,7 @@ public:
   int multicanonicalVar_dm23;
 
   /// @brief Selected bias function for multicanonical weights.
-  BiasFunction umbrellaBiasFunction;
+  M3::BiasFunction umbrellaBiasFunction;
 
   /// @brief Configured bias function name for logging.
   std::string umbrellaBiasFunctionName;

@@ -1,23 +1,25 @@
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <limits>
-#include <algorithm>
-#include <cmath>
+#include "Fitters/MCMCProcessor.h"
+#include "Manager/Manager.h"
+#include "Fitters/MulticanonicalMCMCHandler.h"
 
-#include "yaml-cpp/yaml.h"
-#include "TCanvas.h"
-#include "TFile.h"
-#include "TH1.h"
-#include "TH2F.h"
-#include "TLegend.h"
-#include "TMath.h"
-#include "TLine.h"
-#include "TMacro.h"
+_MaCh3_Safe_Include_Start_ //{
 #include "TSystem.h"
-#include "TTree.h"
+#include "TChain.h"
+#include "TSystemDirectory.h"
+_MaCh3_Safe_Include_End_ //}
 
+/// @file UmbrellaPlotting.cpp
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author David Riley
+
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wconversion"
 
 void UmbrellaPlotting() {
     // ============================================
@@ -1172,7 +1174,7 @@ void UmbrellaPlotting() {
         hRefOverlay->SetFillStyle(0);
         hRefOverlay->Draw("HIST SAME");
 
-        TLegend *legRef = new TLegend(0.15, 0.74, 0.48, 0.88);
+        legRef = new TLegend(0.15, 0.74, 0.48, 0.88);
         legRef->SetBorderSize(0);
         legRef->SetFillStyle(0);
         legRef->AddEntry(h1d_delta_cp, "Umbrella weighted", "l");
@@ -1249,7 +1251,7 @@ void UmbrellaPlotting() {
         hRefDelm23AllOverlay->SetFillStyle(0);
         hRefDelm23AllOverlay->Draw("HIST SAME");
 
-        TLegend *legRefDelm23All = new TLegend(0.50, 0.74, 0.88, 0.88);
+        legRefDelm23All = new TLegend(0.50, 0.74, 0.88, 0.88);
         legRefDelm23All->SetBorderSize(0);
         legRefDelm23All->SetFillStyle(0);
         legRefDelm23All->AddEntry(h1d_delm23_all, "Umbrella weighted", "l");
@@ -1277,7 +1279,7 @@ void UmbrellaPlotting() {
         hRefDelm23IOOverlay->SetFillStyle(0);
         hRefDelm23IOOverlay->Draw("HIST SAME");
 
-        TLegend *legRefDelm23IO = new TLegend(0.50, 0.74, 0.88, 0.88);
+        legRefDelm23IO = new TLegend(0.50, 0.74, 0.88, 0.88);
         legRefDelm23IO->SetBorderSize(0);
         legRefDelm23IO->SetFillStyle(0);
         legRefDelm23IO->AddEntry(h1d_delm23, "Umbrella weighted", "l");
@@ -1306,7 +1308,7 @@ void UmbrellaPlotting() {
         hRefDelm23NOOverlay->SetFillStyle(0);
         hRefDelm23NOOverlay->Draw("HIST SAME");
 
-        TLegend *legRefDelm23NO = new TLegend(0.50, 0.74, 0.88, 0.88);
+        legRefDelm23NO = new TLegend(0.50, 0.74, 0.88, 0.88);
         legRefDelm23NO->SetBorderSize(0);
         legRefDelm23NO->SetFillStyle(0);
         legRefDelm23NO->AddEntry(h1d_delm23_NO, "Umbrella weighted", "l");
@@ -1366,7 +1368,7 @@ void UmbrellaPlotting() {
         hRefSinOverlay->SetFillStyle(0);
         hRefSinOverlay->Draw("HIST SAME");
 
-        TLegend *legRefSin = new TLegend(0.50, 0.74, 0.88, 0.88);
+        legRefSin = new TLegend(0.50, 0.74, 0.88, 0.88);
         legRefSin->SetBorderSize(0);
         legRefSin->SetFillStyle(0);
         legRefSin->AddEntry(h1d_sinth23, "Umbrella weighted", "l");
@@ -1495,7 +1497,7 @@ void UmbrellaPlotting() {
         hRefOverlayLog->SetFillStyle(0);
         hRefOverlayLog->Draw("HIST SAME");
 
-        TLegend *legRefLog = new TLegend(0.50, 0.74, 0.88, 0.88);
+        legRefLog = new TLegend(0.50, 0.74, 0.88, 0.88);
         legRefLog->SetBorderSize(0);
         legRefLog->SetFillStyle(0);
         legRefLog->AddEntry(h1d_delta_cp_log, "Umbrella weighted", "l");
@@ -1725,7 +1727,7 @@ void UmbrellaPlotting() {
             }
         }
         // draw lines on current pad
-        double ymax = hist->GetMaximum();
+        double hist_ymax = hist->GetMaximum();
         // colors: 1sigma yellow-orangey, 3sigma turquoise/darker blue, 5sigma purple
         int colors[3] = {kOrange+1, kAzure+2, kMagenta+2};
         for (int t = 0; t < 3; ++t) {
@@ -1733,10 +1735,10 @@ void UmbrellaPlotting() {
             TLine *line = nullptr;
             if (integrateLeftToRight) {
                 // region is [xmin, outBounds[t]] -> draw vertical at outBounds[t]
-                line = new TLine(outBounds[t], 0, outBounds[t], ymax);
+                line = new TLine(outBounds[t], 0, outBounds[t], hist_ymax);
             } else {
                 // region is [outBounds[t], xmax] -> draw vertical at outBounds[t]
-                line = new TLine(outBounds[t], 0, outBounds[t], ymax);
+                line = new TLine(outBounds[t], 0, outBounds[t], hist_ymax);
             }
             line->SetLineColor(colors[t]);
             line->SetLineStyle(2);
@@ -1811,9 +1813,9 @@ void UmbrellaPlotting() {
     // Draw previously computed one-sided bounds on the log canvas as well
     for (int t = 0; t < 3; ++t) {
         if (!std::isfinite(bounds[t])) continue;
-        double ymax = h1d_jarlskog_weighted_log->GetMaximum();
+        double hist_ymax = h1d_jarlskog_weighted_log->GetMaximum();
         int colors_log[3] = {kOrange+1, kAzure+2, kMagenta+2};
-        TLine *line = new TLine(bounds[t], 0, bounds[t], ymax);
+        TLine *line = new TLine(bounds[t], 0, bounds[t], hist_ymax);
         line->SetLineColor(colors_log[t]);
         line->SetLineStyle(2);
         line->SetLineWidth(2);

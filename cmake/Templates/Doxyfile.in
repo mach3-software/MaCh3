@@ -865,6 +865,7 @@ INPUT                  = . \
                          NuDock \
                          Fitters \
                          Diagnostics \
+                         Diagnostics/UmbrellaSampling \
                          Plotting \
                          Plotting/plottingUtils \
                          Parameters \

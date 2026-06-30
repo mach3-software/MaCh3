@@ -1,19 +1,21 @@
-#include "Fitters/MulticanonicalMCMCHandler.h"
-#include "Parameters/ParameterHandlerBase.h"
 #include <ostream>
 #include <stdexcept>
+#include "Fitters/MulticanonicalMCMCHandler.h"
+#include "Parameters/ParameterHandlerBase.h"
 
+/// @file MulticanonicalMCMCHandler.cpp
+///
 /// @author David Riley
 
-MulticanonicalMCMCHandler::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
+M3::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
   if (biasFunctionName == "gaussian") {
-    return MulticanonicalMCMCHandler::BiasFunction::Gaussian;
+    return M3::BiasFunction::kGaussian;
   }
   if (biasFunctionName == "vonMises") {
-    return MulticanonicalMCMCHandler::BiasFunction::VonMises;
+    return M3::BiasFunction::kVonMises;
   }
   if (biasFunctionName == "generalisedGaussian") {
-    return MulticanonicalMCMCHandler::BiasFunction::GeneralisedGaussian;
+    return M3::BiasFunction::kGeneralisedGaussian;
   }
 
   throw std::runtime_error("Unknown multicanonical bias function: " + biasFunctionName);
@@ -41,7 +43,7 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
 
   vonMises_kappa = -1.0;
   vonMises_I0_kappa = -1.0;
-  umbrellaBiasFunction = BiasFunction::Gaussian;
+  umbrellaBiasFunction = M3::BiasFunction::kGaussian;
   umbrellaBiasFunctionName = "gaussian";
 }
 
@@ -205,7 +207,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   }
 
   // initialize von Mises parameters
-  if (umbrellaBiasFunction == BiasFunction::VonMises) {
+  if (umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
     double temp_vonMises_sigma;
     temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
     vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
@@ -213,7 +215,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
     MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
   }
 
-  if (umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+  if (umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
     MACH3LOG_INFO("Using generalised Gaussian with mean {} and width {}", umbrellaMean, umbrellaWidth);
   }
 }
@@ -273,11 +275,11 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeight(double deltacp, double
   }
 
   switch (umbrellaBiasFunction) {
-  case BiasFunction::Gaussian:
+  case M3::BiasFunction::kGaussian:
     return GetMulticanonicalWeightGaussian(deltacp);
-  case BiasFunction::VonMises:
+  case M3::BiasFunction::kVonMises:
     return GetMulticanonicalWeightVonMises(deltacp);
-  case BiasFunction::GeneralisedGaussian:
+  case M3::BiasFunction::kGeneralisedGaussian:
     return GetMulticanonicalWeightGenGaussian(deltacp);
   }
 

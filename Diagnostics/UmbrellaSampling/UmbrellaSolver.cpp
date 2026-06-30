@@ -1,61 +1,33 @@
-// g++ -fopenmp -O3 -std=c++17 \
-        $(root-config --cflags --libs) \
-        -lyaml-cpp \
-        -o UmbrellaSolver UmbrellaSolver.C
-
+/// @file UmbrellaSolver.cpp
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author David Riley
 
-#include <TCanvas.h>
-#include <TFile.h>
-#include <TGraph.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TLegend.h>
-#include <TList.h>
-#include <TMacro.h>
-#include <TMath.h>
-#include <TObjString.h>
-#include <TStyle.h>
-#include <TSystem.h>
-#include <TSystemDirectory.h>
-#include <TSystemFile.h>
-#include <TTree.h>
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <deque>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "Fitters/MCMCProcessor.h"
+#include "Manager/Manager.h"
+#include "Fitters/MulticanonicalMCMCHandler.h"
 
-// For YAML parsing - requires yaml-cpp library
-#ifdef __CLING__
-R__ADD_INCLUDE_PATH($CONDA_PREFIX / include)
-R__ADD_LIBRARY_PATH($CONDA_PREFIX / lib)
-R__LOAD_LIBRARY(libyaml - cpp)
-// Load OpenMP library for CLING
-#pragma cling load("$CONDA_PREFIX/lib/libomp.so")
-// Define _OPENMP manually if CLING doesn't set it
-#ifndef _OPENMP
-#define _OPENMP 201511 // OpenMP 4.5
-#endif
-#endif
+_MaCh3_Safe_Include_Start_ //{
+#include "TSystem.h"
+#include "TChain.h"
+#include "TSystemDirectory.h"
+_MaCh3_Safe_Include_End_ //}
 
-#include <omp.h>
-#include <yaml-cpp/yaml.h>
+//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wconversion"
 
 bool debug_mode = false;
-
-enum class BiasFunction { Gaussian, VonMises, GeneralisedGaussian };
 
 // Structure to hold each window configuration
 // These are individual window settings, function type & params plus filename
 struct WindowConfig {
   std::string name;
-  BiasFunction umbrellaBiasFunction;
+  M3::BiasFunction umbrellaBiasFunction;
   double center;
   double width;
   std::string input_file;
@@ -212,11 +184,11 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
   double sum = 0.0;
   for (size_t k = 0; k < windows.size(); k++) {
     double window_val;
-    if (windows[k].umbrellaBiasFunction == BiasFunction::VonMises) {
+    if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
       window_val = vonMisesWindow(x, windows[k].center, windows[k].vonMises_kappa);
-    } else if (windows[k].umbrellaBiasFunction == BiasFunction::Gaussian) {
+    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
       window_val = gaussianWindow(x, windows[k].center, windows[k].width);
-    } else if (windows[k].umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
       window_val = GetMulticanonicalWeightGenGaussian(x, windows[k].center, windows[k].width);
     } else {
       std::cout << "Unrecognised BiasFunction!!" << std::endl;
@@ -242,15 +214,17 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
   }
 
   if (use_openmp) {
-#pragma omp parallel for collapse(2) schedule(dynamic)
+    #ifdef MULTITHREAD
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    #endif
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == BiasFunction::VonMises) { 
+          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
             cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == BiasFunction::Gaussian) {
+          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
             cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
             cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
           } else {
             std::cout << "Unrecognised function!!!!!" << std::endl;
@@ -262,11 +236,11 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == BiasFunction::VonMises) {
+          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
             cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == BiasFunction::Gaussian) {
+          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
             cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == BiasFunction::GeneralisedGaussian) {
+          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
             cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
           } else {
             std::cout << "Unrecognised function!!!!!" << std::endl;
@@ -338,7 +312,7 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
   std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
 
   std::vector<double> z_inv = z_current; // make a copy to avoid modifying the original z_current
-  for (int i = 0; i < z_current.size(); i++) {
+  for (size_t i = 0; i < z_current.size(); i++) {
     if (z_current[i] > 0) {
       z_inv[i] = 1.0 / z_current[i];
     } else {
@@ -350,7 +324,9 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
   }
 
   if (use_openmp) {
-#pragma omp parallel for schedule(dynamic)
+    #ifdef MULTITHREAD
+    #pragma omp parallel for schedule(dynamic)
+    #endif
     for (int i = 0; i < n_windows; i++) {
       std::vector<double> denominator_cache(samples[i].size(), 0.0);
       for (size_t s = 0; s < samples[i].size(); s++) {
@@ -508,7 +484,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
   return z_new;
 }
 
-/// A few differnt convergence checks
+/// A few different convergence checks
 
 // Check convergence
 bool checkConvergence(const std::vector<double> &z_current, const std::vector<double> &z_prev, double tolerance) {
@@ -621,7 +597,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   // Debug OpenMP status first
   std::cout << "Debugging OpenMP availability..." << std::endl;
 
-#ifdef _OPENMP
+#ifdef MULTITHREAD
   std::cout << "_OPENMP is defined with value: " << _OPENMP << std::endl;
   std::cout << "OpenMP version: " << _OPENMP << std::endl;
   std::cout << "Max threads available: " << omp_get_max_threads() << std::endl;
@@ -643,7 +619,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   std::cout << "Output file: " << config.output_file << std::endl;
 
 // Check OpenMP status with detailed debugging
-#ifdef _OPENMP
+#ifdef MULTITHREAD
   bool openmp_available = true;
   std::cout << "OpenMP: AVAILABLE" << std::endl;
 #else
@@ -772,22 +748,22 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
         // Check if using von Mises distribution
         std::string biasString = umbrellaConfig["Umbrella"]["UmbrellaBiasFunction"].as<std::string>();
-        BiasFunction biasMode;
+        M3::BiasFunction biasMode;
         if (biasString == "gaussian") {
-          biasMode = BiasFunction::Gaussian;
+          biasMode = M3::BiasFunction::kGaussian;
           std::cout << "Window wieghted with gaussian" << std::endl;
         } else if (biasString == "generalisedGaussian") {
-          biasMode = BiasFunction::GeneralisedGaussian;
+          biasMode = M3::BiasFunction::kGeneralisedGaussian;
           std::cout << "Window weighted with generalised gaussian" << std::endl;
         } else if (biasString == "vonMises") {
-          biasMode = BiasFunction::VonMises;
+          biasMode = M3::BiasFunction::kVonMises;
           std::cout << "Window weighted with vonMises" << std::endl;
         } else {
           std::cout << "Unrecognised Bias" << std::endl;
         }
         config.windows[i].umbrellaBiasFunction = biasMode;
 
-        if (config.windows[i].umbrellaBiasFunction == BiasFunction::VonMises) {
+        if (config.windows[i].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
           // Extract von Mises sigma and compute kappa
           double vonMises_sigma = umbrellaConfig["Umbrella"]["UmbrellaWidth"].as<double>();
           config.windows[i].vonMises_kappa = 1.0 / (vonMises_sigma * vonMises_sigma);
@@ -832,8 +808,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   // Sort by window center and keep all per-window containers aligned.
   // The final weighting stage loops over input_trees by index, so those indices
   // must track the same sorted window order used by z_current.
-  for (int i = 0; i < config.windows.size(); i++) {
-    for (int j = i + 1; j < config.windows.size(); j++) {
+  for (size_t i = 0; i < config.windows.size(); i++) {
+    for (size_t j = i + 1; j < config.windows.size(); j++) {
       if (config.windows[i].center > config.windows[j].center) {
         std::swap(config.windows[i], config.windows[j]);
         std::swap(samples[i], samples[j]);
@@ -848,7 +824,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   for (size_t i = 0; i < config.windows.size(); i++) {
     std::cout << "Window " << i << ": center = " << config.windows[i].center 
               << ", width = " << config.windows[i].width 
-              << ", vonMises_mode = " << (config.windows[i].umbrellaBiasFunction == BiasFunction::VonMises ? "Yes" : "No")
+              << ", vonMises_mode = " << (config.windows[i].umbrellaBiasFunction == M3::BiasFunction::kVonMises ? "Yes" : "No")
               << ", vonMises_kappa = " << config.windows[i].vonMises_kappa
               << ", samples = " << samples[i].size() << std::endl;
   }
@@ -898,9 +874,13 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
     // Test parallel region
     int actual_threads = 1;
-#pragma omp parallel
+    #ifdef MULTITHREAD
+    #pragma omp parallel
+    #endif
     {
-#pragma omp master
+      #ifdef MULTITHREAD
+      #pragma omp master
+      #endif
       {
         actual_threads = omp_get_num_threads();
         std::cout << "Actual threads in parallel region: " << actual_threads << std::endl;
@@ -1183,7 +1163,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   // Save diagnostics
   TCanvas *c1 = new TCanvas("c1", "Z Evolution", 800, 600);
 
-  TGraph *z_graphs[config.windows.size()];
+  std::vector<TGraph*> z_graphs(config.windows.size());
   TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
 
   double ymax = 0.0;
@@ -1257,7 +1237,6 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 }
 
 // Main function for compiled version
-#ifndef __CLING__
 int main(int argc, char *argv[]) {
   std::string config_file = "umbrella_config.yaml";
   if (argc > 1) {
@@ -1273,11 +1252,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-// Ensure all OpenMP threads are properly terminated
-#ifdef _OPENMP
-#pragma omp barrier
-#endif
+  // Ensure all OpenMP threads are properly terminated
+  #ifdef MULTITHREAD
+  #pragma omp barrier
+  #endif
 
   return 0;
 }
-#endif
