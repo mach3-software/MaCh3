@@ -27,6 +27,19 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
+Some BibTeX styles abbreviate the author name `The MaCh3 Collaboration` as `T. M. Collaboration`. To prevent this, wrap the collaboration name in an extra pair of braces so that BibTeX treats it as a single entity.
+
+Use:
+
+```bibtex
+author = "{The MaCh3 Collaboration}",
+```
+
+instead of:
+
+```bibtex
+author = {The MaCh3 Collaboration},
+```
 
 ## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
@@ -78,25 +91,15 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 ## Python 🐍
 
-MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
-
-You can tell the build system to set up the pyMaCh3 interface by specifying
+MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface. The recommended way of building the pyMaCh3 module is using pip. After checking out the MaCh3 repository, from the root directory (the one containing pyproject.toml) simply run:
 
 ```bash
-cmake ../ -DMaCh3_PYTHON_ENABLED=ON
-make && make install
+pip install .
 ```
 
-when building
+This will give you a pyMaCh3 module with all functionality of core MaCh3. You can implement any experiment specific code by extending the base classes purely in python. MaCh3 also provides functionality to bind your c++ based experiment specific code so you can maintain all the speed benifits of c++ with the ease of use of python. Details on how to do this are given in the wiki [here](https://github.com/mach3-software/MaCh3/wiki/Python-Binding).
 
-### Building with Pip
-
-Additionally, you can build just the Python module by doing:
-
-```bash
-pip install -t <install location> .
-```
-The (optional) -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
+You can also find documentation for the pyMaCh3 module [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html).
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
@@ -123,9 +126,12 @@ Following neutrino oscillation calculators are available:
 | ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
 | Prob3++Linear    | CPU        | Beam       |            |
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
+| NuFastEarth      | CPU        | ATM        | [Ref](https://arxiv.org/abs/2511.04735)                 |
 | OscProb          | CPU        | Beam/Atm   | [Ref](https://doi.org/10.5281/zenodo.6347002)           |
 | NuSQUIDSLinear   | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2022.108346)        |
 | GLoBESLinear     | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003)        |
+| CHICLinear       | CPU        | Beam       | [Ref](https://arxiv.org/pdf/2512.16427)                 |
+| OscLib           | CPU        | Beam       | [Ref](https://github.com/cafana/OscLib)                 |
 
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
@@ -176,7 +182,7 @@ You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cm
 MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https://cmake.org), and [ROOT](https://root.cern/). Based on several tests, recommended versions are:
 ```bash
   GCC:   >= 8.5   [lower versions may work]
-  C++:   >= 14
+  C++:   >= 17
   CMake: >= 3.14
   ROOT:  >= 6.20
 ```
@@ -214,7 +220,7 @@ are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 | Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
 | Ubuntu25.04 | ✅     |
-| Fedora32    | ✅     |
+| Fedora34    | ✅     |
 | CentOS7     | ❔     |
 | MacOS       | ❔     |
 | Windows     | ❌     |
@@ -243,13 +249,13 @@ The MaCh3 core plotting library code can be found [here](https://github.com/mach
 This is an example how your executable can look like using MaCh3:
 ```cpp
   //Manager is responsible for reading from config
-  std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
+  std::unique_ptr<manager> FitManager = MaCh3ManagerFactory(argc, argv);
 
   std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
   std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
-  MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
+  MakeMaCh3Instance(FitManager.get(), sample, Cov); //Factory like function which initialises everything
 
-  // FitterBase class, can be replaced with other fitting method
+  // FitterBase class has implementation of validation procedures and fitting algorithms
   std::unique_ptr<FitterBase> MarkovChain = MaCh3FitterFactory(FitManager.get());
 
   //Adding samples and covariances to the Fitter class could be in the factory

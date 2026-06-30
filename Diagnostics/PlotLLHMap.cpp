@@ -62,7 +62,7 @@ std::vector<std::string> GetParams(std::vector<std::string> &PoIs, ROOT::RDataFr
 int main(int argc, char *argv[]) {
 // *******************
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
   if(argc < 3)
   {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
   // Open the settings and output file
   YAML::Node Settings = M3OpenConfig(std::string(argv[1]));
-  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root");
+  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root", __FILE__ , __LINE__);
 
   auto OutFile = new TFile(OutFileName.c_str(),"UPDATE");
   OutFile->cd();
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   ROOT::RDataFrame LLHMap("llhmap", inpFileList);
 
   // Process what parameters to plot
-  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{});
+  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{}, __FILE__ , __LINE__);
   std::vector<std::string> ParamsToProfile = GetParams(ParamsOfInterest, LLHMap);
 
   // This now only works for uniform LLHMaps
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     {
       const int count = int(double(hprof1d->GetNbinsX())/double(5));
       if (bidx % count == 0)
-        MaCh3Utils::PrintProgressBar(bidx, hprof1d->GetNbinsX());
+        M3::Utils::PrintProgressBar(bidx, hprof1d->GetNbinsX());
 
       auto b_lo = hprof1d->GetXaxis()->GetBinLowEdge(bidx);
       auto b_hi = b_lo + hprof1d->GetXaxis()->GetBinWidth(bidx);
@@ -199,14 +199,16 @@ int main(int argc, char *argv[]) {
       TH2D* hprof2d = new TH2D(hName.c_str(), hTitle.c_str(), nx, minx, maxx, ny, miny, maxy);
 
       MACH3LOG_INFO("The 2D histogram has {} x-bins from {} to {} and {} y-bins from {} to {}", nx, minx, maxx, ny, miny, maxy);
-
-      for(int bidx = 1; bidx < hprof2d->GetNbinsX() + 1; ++bidx)
+      const Long64_t nBinsX = static_cast<Long64_t>(hprof2d->GetNbinsX());
+      const Long64_t nBinsY = static_cast<Long64_t>(hprof2d->GetNbinsY());
+      const Long64_t TotalBins = nBinsX * nBinsY;
+      for(int bidx = 1; bidx < nBinsX + 1; ++bidx)
       {
-        for(int bidy = 1; bidy < hprof2d->GetNbinsY() + 1; ++bidy)
+        for(int bidy = 1; bidy < nBinsY + 1; ++bidy)
         {
-          const int count = int(double(hprof2d->GetNbinsX()*hprof2d->GetNbinsY())/double(5));
+          const int count = int(double(TotalBins)/double(5));
           if ( ((bidx-1)*hprof2d->GetNbinsY() + bidy) % count == 0)
-            MaCh3Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, hprof2d->GetNbinsX()*hprof2d->GetNbinsY());
+            M3::Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, TotalBins);
 
           auto bx_lo = hprof2d->GetXaxis()->GetBinLowEdge(bidx);
           auto bx_hi = bx_lo + hprof2d->GetXaxis()->GetBinWidth(bidx);

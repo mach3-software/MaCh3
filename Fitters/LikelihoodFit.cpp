@@ -6,7 +6,7 @@ LikelihoodFit::LikelihoodFit(Manager *man) : FitterBase(man) {
 // *******************
   NPars = 0;
   NParsPCA = 0;
-  fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
+  fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false, __FILE__ , __LINE__);
   if(fMirroring) MACH3LOG_INFO("Mirroring enabled");
 }
 
@@ -97,7 +97,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
     //GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood
     syst_llh[stdIt] = (*it)->CalcLikelihood();
     llh += syst_llh[stdIt];
-    #ifdef DEBUG
+    #ifdef MACH3_DEBUG
     if (debug) debugFile << "LLH after " << systematics[stdIt]->GetName() << " " << llh << std::endl;
     #endif
   }
@@ -113,7 +113,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
     // Get the sample likelihoods and add them
     sample_llh[i] = samples[i]->GetLikelihood();
     llh += sample_llh[i];
-    #ifdef DEBUG
+    #ifdef MACH3_DEBUG
     if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
     #endif
   }

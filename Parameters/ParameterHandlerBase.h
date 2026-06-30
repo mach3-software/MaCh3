@@ -7,28 +7,32 @@
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
 
-/// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
+/// @brief Base class for handling systematic uncertainty parameters.
+///
+/// @details Provides core functionality for managing systematic parameters,
+/// including likelihood evaluation and covariance handling.
+///
+/// How parameters are loaded (e.g. from configuration files or ROOT inputs)
+/// is left to derived classes.
+///
+/// In the context of MCMC, the class may also be responsible for proposing
+/// parameter steps. Proposal strategies may include PCA-based sampling or
+/// adaptive proposal matrices.
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
 /// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
-  /// @brief ETA - constructor for a YAML file
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  /// @param name Matrix name
-  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
-  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
-  /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
   ParameterHandlerBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerBase() = default;
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
@@ -54,7 +58,7 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @param val new value which will be set
   void SetParProp(const int i, const double val) {
-    _fPropVal[i] = val;
+    _fPropVal[i] = static_cast<M3::float_t>(val);
     if (pca) PCAObj->TransferToPCA();
   }
   /// @brief Set parameter values using vector, it has to have same size as covariance class
@@ -90,7 +94,7 @@ class ParameterHandlerBase {
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
-  inline void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
+  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -146,15 +150,13 @@ class ParameterHandlerBase {
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   std::string GetParFancyName(const int i) const {return _fFancyNames[i];}
-  /// @brief Get name of input file
-  std::string GetInputFile() const { return inputFile; }
 
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
-  inline double GetDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
+  double GetDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
   /// @brief Get the error for the ith parameter
   /// @param i Parameter index
-  inline double GetError(const int i) const {return _fError[i];}
+  double GetError(const int i) const {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
@@ -172,18 +174,18 @@ class ParameterHandlerBase {
   /// @brief Do we adapt or not
   bool GetDoAdaption() const {return use_adaptive;}
   /// @brief Use new throw matrix, used in adaptive MCMC
-  void SetThrowMatrix(TMatrixDSym *cov);
+  void SetThrowMatrix(const TMatrixDSym *cov);
   void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
-  inline void SetNumberOfSteps(const int nsteps) {
+  void SetNumberOfSteps(const int nsteps) {
     AdaptiveHandler->SetTotalSteps(nsteps);
     if(AdaptiveHandler->AdaptionUpdate()) ResetIndivStepScale();
   }
 
   /// @brief Get matrix used for step proposal
-  inline TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
+  TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
   /// @brief Get matrix used for step proposal
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
 
@@ -191,7 +193,7 @@ class ParameterHandlerBase {
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
   /// @return A pointer to a TH2D object representing the correlation matrix
-  TH2D* GetCorrelationMatrix();
+  TH2D* GetCorrelationMatrix() const;
 
   /// @brief DB Pointer return to param position
   ///
@@ -202,11 +204,11 @@ class ParameterHandlerBase {
   /// push_back then the pointer is no longer valid... maybe need a better
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
-  inline const double* RetPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
+  const M3::float_t* RetPointer(const int iParam) const {return &(_fPropVal.data()[iParam]);}
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()
-  inline const std::vector<double> &GetParPropVec() {return _fPropVal;}
+  const std::vector<M3::float_t> &GetParPropVec() {return _fPropVal;}
 
   /// @brief Get total number of parameters
   int  GetNumParams() const {return _fNumPar;}
@@ -216,41 +218,38 @@ class ParameterHandlerBase {
   std::vector<double> GetProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
-  double GetParProp(const int i) const { return _fPropVal[i]; }
+  M3::float_t GetParProp(const int i) const { return _fPropVal[i]; }
   /// @brief Get current parameter value
   /// @param i Parameter index
-  inline double GetParCurr(const int i) const { return _fCurrVal[i]; }
+  double GetParCurr(const int i) const { return _fCurrVal[i]; }
   /// @brief Get vector of current parameter values
-  inline const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
+  const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  inline double GetParInit(const int i) const { return _fPreFitValue[i]; }
+  double GetParPreFit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetUpperBound(const int i) const { return _fUpBound[i];}
+  double GetUpperBound(const int i) const { return _fUpBound[i];}
   /// @brief Get lower parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetLowerBound(const int i) const { return _fLowBound[i]; }
+  double GetLowerBound(const int i) const { return _fLowBound[i]; }
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
-  inline double GetIndivStepScale(const int ParameterIndex) const {return _fIndivStepScale.at(ParameterIndex); }
+  double GetIndivStepScale(const int ParameterIndex) const {return _fIndivStepScale.at(ParameterIndex); }
   /// @brief Get global step scale for covariance object
-  inline double GetGlobalStepScale() const {return _fGlobalStepScale; }
+  double GetGlobalStepScale() const {return _fGlobalStepScale; }
 
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
-  inline int GetNParameters() const {
+  int GetNParameters() const {
     if (pca) return PCAObj->GetNumberPCAedParameters();
     else return _fNumPar;
   }
 
   /// @brief Print prior value for every parameter
-  void PrintNominal() const;
+  void PrintPreFitValues() const;
   /// @brief Print prior, current and proposed value for each parameter
-  void PrintNominalCurrProp() const;
-  /// @warning only for backward compatibility
-  /// @todo remove it
-  void PrintParameters() const {PrintNominalCurrProp();};
+  void PrintPreFitCurrPropValues() const;
   /// @brief Print step scale for each parameter
   void PrintIndivStepScale() const;
 
@@ -285,14 +284,6 @@ class ParameterHandlerBase {
   /// @param name Name of the parameter to be treated as free
   void SetFreeParameter(const std::string& name);
 
-  /// @brief Toggle fixing parameters at prior values
-  void ToggleFixAllParameters();
-  /// @brief Toggle fixing parameter at prior values
-  /// @param i Parameter index
-  void ToggleFixParameter(const int i);
-  /// @brief Toggle fixing parameter at prior values
-  /// @param name Name of parameter you want to fix
-  void ToggleFixParameter(const std::string& name);
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
@@ -311,13 +302,13 @@ class ParameterHandlerBase {
   void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
-  inline bool IsPCA() const { return pca; }
+  bool IsPCA() const { return pca; }
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
 
   /// @brief Get pointer for AdaptiveHandler
-  inline adaptive_mcmc::AdaptiveMCMCHandler* GetAdaptiveHandler() const  {
+  AdaptiveMCMCHandler* GetAdaptiveHandler() const  {
     if (!use_adaptive) {
       MACH3LOG_ERROR("Am not running in Adaptive mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -329,7 +320,7 @@ class ParameterHandlerBase {
   void SetTune(const std::string& TuneName);
 
   /// @brief Get pointer for PCAHandler
-  inline PCAHandler* GetPCAHandler() const {
+  PCAHandler* GetPCAHandler() const {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -354,13 +345,9 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
                                 const std::vector<std::string>& FancyNames = {});
-
-protected:
+ protected:
   /// @brief Initialisation of the class using matrix from root file
-  void Init(const std::string& name, const std::string& file);
-  /// @brief Initialisation of the class using config
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  void Init(const std::vector<std::string>& YAMLFile);
+  void InitFromFile(const std::string& name, const std::string& file);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
@@ -377,12 +364,8 @@ protected:
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
-  /// @brief Check if parameter is affecting given sample name
-  /// @param SystIndex number of parameter
-  /// @param SampleName The Sample name used to filter parameters.
-  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
-
+  /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
+  void SanitizeAdaption() const;
   /// @brief KS: Flip parameter around given value, for example mass ordering around 0
   /// @param index parameter index you want to flip
   /// @param FlipPoint Value around which flipping is done
@@ -403,7 +386,7 @@ protected:
   bool doSpecialStepProposal;
 
   /// The input root file we read in
-  const std::string inputFile;
+  std::string inputFile;
 
   /// Name of cov matrix
   std::string matrixName;
@@ -440,7 +423,7 @@ protected:
   /// Current value of the parameter
   std::vector<double> _fCurrVal;
   /// Proposed value of the parameter
-  std::vector<double> _fPropVal;
+  std::vector<M3::float_t> _fPropVal;
   /// Prior error on the parameter
   std::vector<double> _fError;
   /// Lowest physical bound, parameter will not be able to go beyond it
@@ -451,8 +434,6 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
-  /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fSampleNames;
 
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
@@ -476,7 +457,7 @@ protected:
   /// Struct containing information about PCA
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
-  std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
+  std::unique_ptr<AdaptiveMCMCHandler> AdaptiveHandler;
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
@@ -488,4 +469,12 @@ protected:
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
+
+ private:
+  /// @brief Toggle fixing parameter at prior values
+  /// @param i Parameter index
+  void ToggleFixParameter(const int i);
+  /// @brief Toggle fixing parameter at prior values
+  /// @param name Name of parameter you want to fix
+  void ToggleFixParameter(const std::string& name);
 };

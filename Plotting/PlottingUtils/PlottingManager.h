@@ -18,7 +18,8 @@
 #include "InputManager.h"
 #include "StyleManager.h"
 
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 /// @brief The main class to be used in plotting scripts.
 /// @details When it comes to plotting, this guys in charge, the main man, the head honcho, the big
 /// cheese. If it's a plot you need, this is the guy you call. You just call him in your scripts and
@@ -76,7 +77,7 @@ public:
   /// @brief Parse vector of command line arguments.
   /// @details This mainly just exists for the sake of the python binding.
   /// @param argv The arguments to parse.
-  inline void parseInputsVec(std::vector<std::string> argv) {
+  inline void parseInputsVec(const std::vector<std::string>& argv) {
     std::vector<char *> charVec;
     MACH3LOG_DEBUG("Parsing Inputs :: was given vector:");
     for( const std::string &arg : argv ) 
@@ -93,10 +94,10 @@ public:
   void addUserOption();
 
   /// @brief Retrieve a command line option you specified using addOption.
-  std::string getUserOption(std::string option);
+  std::string getUserOption(const std::string& option);
 
   /// @brief Print a usage message for the current executable.
-  void usage();
+  void usage() const;
 
   /// @brief Parse string of labels into a vector of strings.
   /// @param labelString string of labels of the form "label1;label2;...".
@@ -118,7 +119,7 @@ public:
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
   template <typename T> T getOption(const std::string& option) { return _execOptions[option].as<T>(); }
-  YAML::Node getOption(std::string option) { return _execOptions[option]; }
+  YAML::Node getOption(const std::string& option) const { return _execOptions[option]; }
 
   // ############# getters ##############
   /// @name General getters
@@ -132,9 +133,9 @@ public:
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string getOutputName() const { return _outputName; }
+  const std::string getOutputName() { return _outputName; }
 
-  /// @brief Get the output name but can specify a siffix to add to the name, before the file
+  /// @brief Get the output name but can specify a suffix to add to the name, before the file
   /// extension.
   /// @param suffix The suffix to add to the file name.
   /// @return Output file name with suffix added before the extension.
@@ -189,4 +190,5 @@ private:
   std::unique_ptr<StyleManager> _styleMan;
   std::unique_ptr<InputManager> _inputMan;
 };
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

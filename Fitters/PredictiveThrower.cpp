@@ -1,5 +1,4 @@
 #include "PredictiveThrower.h"
-#include "Samples/SampleHandlerFD.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "TH3.h"
 
@@ -37,7 +36,6 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // Destructor:
 PredictiveThrower::~PredictiveThrower() {
 // *************************
-
 }
 
 // *************************
@@ -66,7 +64,7 @@ void PredictiveThrower::SetParamters(std::vector<std::string>& ParameterGroupsNo
     for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
       // KS: If parameter is in map then we are skipping this, otherwise for params that we don't want to vary we simply set it to prior
       if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
-        ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
+        ModelSystematic->SetParProp(i, ModelSystematic->GetParPreFit(i));
       }
     }
   }
@@ -77,7 +75,7 @@ void PredictiveThrower::SetupSampleInformation() {
 // *************************
   TotalNumberOfSamples = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
-    TotalNumberOfSamples += samples[iPDF]->GetNsamples();
+    TotalNumberOfSamples += samples[iPDF]->GetNSamples();
   }
 
   MC_Hist_Toy.resize(TotalNumberOfSamples);
@@ -95,7 +93,7 @@ void PredictiveThrower::SetupSampleInformation() {
   }
   int counter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
-    for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNsamples(); ++SampleIndex) {
+    for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNSamples(); ++SampleIndex) {
       SampleInfo[counter].Name = samples[iPDF]->GetSampleTitle(SampleIndex);
       SampleInfo[counter].LocalId = SampleIndex;
       SampleInfo[counter].SamHandler = samples[iPDF];
@@ -110,7 +108,7 @@ void PredictiveThrower::SetupSampleInformation() {
 // Produce MaCh3 toys:
 void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
                                            std::unordered_set<int>& ParameterOnlyToVary,
-                                           std::vector<const double*>& BoundValuePointer,
+                                           std::vector<const M3::float_t*>& BoundValuePointer,
                                            std::vector<std::pair<double, double>>& ParamBounds) {
 // *************************
   int counter = 0;
@@ -372,16 +370,16 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* SampleHandler = samples[iPDF];
-    for (int iSample = 0; iSample < SampleHandler->GetNsamples(); ++iSample)
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
     {
       ToyDirectory->cd();
 
       auto SampleName = SampleHandler->GetSampleTitle(iSample);
-      TH1* MCHist = SampleHandler->GetMCHist(iSample);
+      const TH1* MCHist = SampleHandler->GetMCHist(iSample);
       MC_Hist_Toy[SampleCounter][iToy] = M3::Clone(MCHist, SampleName + "_mc_" + std::to_string(iToy));
       MC_Hist_Toy[SampleCounter][iToy]->Write();
 
-      TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
+      const TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
       W2_Hist_Toy[SampleCounter][iToy] = M3::Clone(W2Hist, SampleName + "_w2_" + std::to_string(iToy));
       W2_Hist_Toy[SampleCounter][iToy]->Write();
 
@@ -395,7 +393,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
         hist->SetTitle((SampleName + ProjectionSuffix).c_str());
         hist->SetName((SampleName + ProjectionSuffix).c_str());
         hist->Write();
-        delete hist;
       }
 
       Toy_2DDirectory->cd();
@@ -414,7 +411,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
           hist2D->SetTitle((SampleName + suffix2D).c_str());
           hist2D->SetName((SampleName + suffix2D).c_str());
           hist2D->Write();
-          delete hist2D;
         }
       }
       SampleCounter++;
@@ -423,7 +419,36 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
-bool CheckBounds(const std::vector<const double*>& BoundValuePointer,
+void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
+                                        const int iToy) {
+// *************************
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
+  {
+    auto* SampleHandler = samples[iPDF];
+    auto* modes = SampleHandler->GetMaCh3Modes();
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
+    {
+      ByModeDirectory->cd();
+
+      auto SampleName = SampleHandler->GetSampleTitle(iSample);
+      for (int iMode = 0; iMode < modes->GetNModes()+1; ++iMode) {
+        auto ModeName = modes->GetMaCh3ModeName(iMode);
+        for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
+          std::string ProjectionName = SampleHandler->GetKinVarName(iSample, iDim);
+          std::string PlotSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+
+          auto hist = SampleHandler->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          hist->SetTitle((SampleName + PlotSuffix).c_str());
+          hist->SetName((SampleName + PlotSuffix).c_str());
+          hist->Write();
+        } // end loop over dimension
+      } // end loop over mode
+    } // end loop over sample
+  } // end loop over sample handler objects
+}
+
+// *************************
+bool CheckBounds(const std::vector<const M3::float_t*>& BoundValuePointer,
                  const std::vector<std::pair<double,double>>& ParamBounds) {
 // *************************
   for (size_t i = 0; i < BoundValuePointer.size(); ++i) {
@@ -441,9 +466,6 @@ bool CheckBounds(const std::vector<const double*>& BoundValuePointer,
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
-  // Remove not useful stuff
-  SanitiseInputs();
-
   // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
@@ -452,7 +474,7 @@ void PredictiveThrower::ProduceToys() {
   /// KS: Index of parameters that will be varied
   std::unordered_set<int> ParameterOnlyToVary;
   // For study where one would like to apply bounds
-  std::vector<const double*> BoundValuePointer;
+  std::vector<const M3::float_t*> BoundValuePointer;
   std::vector<std::pair<double, double>> ParamBounds;
 
   // Setup useful information for toy generation
@@ -475,7 +497,7 @@ void PredictiveThrower::ProduceToys() {
 
   // KS: define branches so we can keep track of what params we are throwing
   std::vector<double> ParamValues(NModelParams);
-  std::vector<const double*> ParampPointers(NModelParams);
+  std::vector<const M3::float_t*> ParampPointers(NModelParams);
   int ParamCounter = 0;
   for (size_t iSys = 0; iSys < systematics.size(); iSys++)
   {
@@ -497,19 +519,18 @@ void PredictiveThrower::ProduceToys() {
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = samples[iPDF];
-    // auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-    for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
+    for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNSamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
-      TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
+      const TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
       Data_Hist[SampleCounter] = M3::Clone(DataHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
       Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
-      TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
+      const TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
       MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
       MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
-      TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
+      const TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
       W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
       W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
       SampleCounter++;
@@ -518,6 +539,10 @@ void PredictiveThrower::ProduceToys() {
 
   TDirectory* Toy_1DDirectory = outputFile->mkdir("Toys_1DHistVar");
   TDirectory* Toy_2DDirectory = outputFile->mkdir("Toys_2DHistVar");
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
+  TDirectory* ByModeDirectory = nullptr;
+  if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
+
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
@@ -565,7 +590,7 @@ void PredictiveThrower::ProduceToys() {
   for(int i = 0; i < Ntoys; i++)
   {
     if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, Ntoys);
+      M3::Utils::PrintProgressBar(i, Ntoys);
     }
     if(!Is_PriorPredictive){
       int entry = 0;
@@ -620,6 +645,7 @@ void PredictiveThrower::ProduceToys() {
     }
     // Save histograms to file
     WriteToy(ToyDirectory, Toy_1DDirectory, Toy_2DDirectory, i);
+    if(doByMode) WriteByModeToys(ByModeDirectory, i);
 
     // Fill parameter value so we know throw values
     for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
@@ -634,6 +660,10 @@ void PredictiveThrower::ProduceToys() {
   ToyDirectory->Close(); delete ToyDirectory;
   Toy_1DDirectory->Close(); delete Toy_1DDirectory;
   Toy_2DDirectory->Close(); delete Toy_2DDirectory;
+  if(doByMode){
+    ByModeDirectory->Close();
+    delete ByModeDirectory;
+  }
 
   outputFile->cd();
   ToyTree->Write(); delete ToyTree;
@@ -736,9 +766,80 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
 }
 
 // *************************
+void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>& SampleDirectories) const {
+// *************************
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  TDirectory * ogdir = gDirectory;
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+  gErrorIgnoreLevel = originalErrorWarning;
+  TDirectory* ToyDir = file->GetDirectory("Toys_ByMode");
+  // If toys not amiable in posterior file this means they must be in output file
+  if(ToyDir == nullptr) {
+    ToyDir = outputFile->GetDirectory("Toys_ByMode");
+  }
+  /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
+  /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
+  /// so we can reuse this functionality
+  auto* mode = SampleInfo[0].SamHandler->GetMaCh3Modes();
+  auto NModes = mode->GetNModes()+1;
+  // [mode], [sample], [toy], [dim]
+  std::vector<std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>> ProjectionToys(NModes);
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    ProjectionToys[iMode].resize(TotalNumberOfSamples);
+    for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+      ProjectionToys[iMode][sample].resize(Ntoys);
+      const int nDims = SampleInfo[sample].Dimenstion;
+      for (int iToy = 0; iToy < Ntoys; ++iToy) {
+        ProjectionToys[iMode][sample][iToy].resize(nDims);
+      }
+    }
+  }
+
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    if (iToy % 100 == 0) MACH3LOG_INFO("   Loaded Projection toys {}", iToy);
+    for(int iMode = 0; iMode < NModes; iMode++) {
+      auto ModeName = mode->GetMaCh3ModeName(iMode);
+      for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+        const int nDims = SampleInfo[sample].Dimenstion;
+        for(int iDim = 0; iDim < nDims; iDim ++) {
+          std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+          TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleInfo[sample].Name + ProjectionSuffix).c_str()));
+          ProjectionToys[iMode][sample][iToy][iDim] = M3::Clone(MCHist1D);
+        }
+      }
+    } // end loop over samples
+  } // end loop over toys
+
+  // ByMode directory
+  std::vector<TDirectory*> ModeDirectory(TotalNumberOfSamples);
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample] = SampleDirectories[iSample]->mkdir("ByMode");
+  }
+  // Produce By Mode Spectra
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    auto ModeName = mode->GetMaCh3ModeName(iMode);
+    ProduceSpectra(ProjectionToys[iMode], ModeDirectory, ModeName, false);
+  }
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample]->Close();
+    delete ModeDirectory[iSample];
+  }
+  file->Close(); delete file;
+  if(ogdir){ ogdir->cd(); }
+}
+
+// *************************
 void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
                                        const std::vector<TDirectory*>& SampleDirectories,
-                                       const std::string suffix) const {
+                                       const std::string suffix,
+                                       const bool DoSummary) const {
 // *************************
   std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
 
@@ -819,7 +920,7 @@ void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector
     for (long unsigned int dim = 0; dim < Spectra[sample].size(); dim++) {
       Spectra[sample][dim]->Write();
       // For case of 2D make additional histograms
-      if(nDims == 2) {
+      if(nDims == 2 && DoSummary) {
         const std::string name = SampleInfo[sample].Name + "_" + suffix+ "_PostPred_dim" + std::to_string(dim);
         auto Summary = MakeSummaryFromSpectra(Spectra[sample][dim].get(), name);
         Summary->Write();
@@ -1023,14 +1124,14 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   SanitiseInputs();
 
   MACH3LOG_INFO("Starting {}", __func__);
-  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
-  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", M3::Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", M3::Utils::getValue("MemTotal") / 1048576.0);
 
   TStopwatch TempClock;
   TempClock.Start();
 
   auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
-  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
@@ -1043,6 +1144,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 
   // Produce Violin style spectra
   Study1DProjections(SampleDirectories);
+  // Produce Post pred by each mode individually
+  if(doByMode) StudyByMode1DProjections(SampleDirectories);
   // Produce posterior predictive distribution for mc
   auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
   // Produce posterior predictive distribution for w2
@@ -1054,14 +1157,20 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   // Check how number of events changed
   RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
-  // Studying information criterion
-  StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
-
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample]->Close();
     delete SampleDirectories[sample];
   }
+
+  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
+  auto StudyInfoCriterion = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyInformationCriterion"], true, __FILE__, __LINE__);
+  auto StudyCorr = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyCorrelations"], true, __FILE__, __LINE__);
+
+  // Studying information criterion
+  if(StudyInfoCriterion) StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
+  // Study Prior/Posterior correlations between samples etc.
+  if(StudyCorr) StudyCorrelations(PredictiveDir, MC_Hist_Toy, DebugHistograms);
   // Perform beta analysis for mc statical uncertainty
   if(StudyBeta) StudyBetaParameters(PredictiveDir);
 
@@ -1078,7 +1187,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 double PredictiveThrower::CalcLLH(const double data,
                                   const double mc,
                                   const double w2,
-                                  const SampleHandlerBase* SampleHandler) const {
+                                  const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = SampleHandler->GetTestStatLLH(data, mc, w2);
   //KS: do times 2 because banff reports chi2
@@ -1089,7 +1198,7 @@ double PredictiveThrower::CalcLLH(const double data,
 double PredictiveThrower::CalcLLH(const TH1* DatHist,
                                   const TH1* MCHist,
                                   const TH1* W2Hist,
-                                  const SampleHandlerBase* SampleHandler) const {
+                                  const SampleHandlerInterface* SampleHandler) const {
 // *************************
   // 1D case
   if (auto h1 = dynamic_cast<const TH1D*>(DatHist)) {
@@ -1123,7 +1232,7 @@ double PredictiveThrower::CalcLLH(const TH1* DatHist,
 double PredictiveThrower::GetLLH(const TH1D* DatHist,
                                  const TH1D* MCHist,
                                  const TH1D* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
@@ -1141,7 +1250,7 @@ double PredictiveThrower::GetLLH(const TH1D* DatHist,
 double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
                                  const TH2Poly* MCHist,
                                  const TH2Poly* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetNumberOfBins(); ++i)
@@ -1159,7 +1268,7 @@ double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
 double PredictiveThrower::GetLLH(const TH2D* DatHist,
                                  const TH2D* MCHist,
                                  const TH2D* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
 
@@ -1432,10 +1541,113 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   PredictiveDir->cd();
 }
 
+// ****************
+// Study Prior/Posterior correlations between samples etc.
+void PredictiveThrower::StudyCorrelations(TDirectory* PredictiveDir,
+                                          const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                          const bool DebugHistograms) const {
+// ****************
+  MACH3LOG_INFO("Startin {}", __func__);
+
+  // Make a new directory
+  TDirectory *CorrDir = PredictiveDir->mkdir("Correlations");
+  CorrDir->cd();
+
+  std::vector<double> minVals(TotalNumberOfSamples, std::numeric_limits<double>::max());
+  std::vector<double> maxVals(TotalNumberOfSamples, std::numeric_limits<double>::lowest());
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (const auto& toyHist : Toys[i])
+    {
+      const double val = toyHist->Integral();
+      if (val < minVals[i]) minVals[i] = val;
+      if (val > maxVals[i]) maxVals[i] = val;
+    }
+  }
+  auto hSamCorr = std::make_unique<TH2D>("Sample Correlation", "Sample Correlation", TotalNumberOfSamples, 0,
+                                         TotalNumberOfSamples, TotalNumberOfSamples, 0, TotalNumberOfSamples);
+  hSamCorr->SetDirectory(nullptr);
+  hSamCorr->GetZaxis()->SetTitle("Correlation");
+  hSamCorr->SetMinimum(-1);
+  hSamCorr->SetMaximum(1);
+  hSamCorr->GetXaxis()->SetLabelSize(0.015);
+  hSamCorr->GetYaxis()->SetLabelSize(0.015);
+  // Loop over the Covariance matrix entries
+  for (int i = 0; i < TotalNumberOfSamples; ++i) {
+    hSamCorr->SetBinContent(i+1, i+1, 1.0);
+    hSamCorr->GetXaxis()->SetBinLabel(i+1, SampleInfo[i].Name.c_str());
+    for (int j = 0; j < TotalNumberOfSamples; ++j) {
+      hSamCorr->GetYaxis()->SetBinLabel(j+1, SampleInfo[j].Name.c_str());
+    }
+  }
+
+  std::vector<std::vector<std::unique_ptr<TH2D>>> SamCorr(TotalNumberOfSamples);
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    SamCorr[i].resize(TotalNumberOfSamples);
+    const double Min_i = minVals[i];
+    const double Max_i = maxVals[i];
+    for (int j = 0; j < TotalNumberOfSamples; ++j)
+    {
+      const double Min_j = minVals[j];
+      const double Max_j = maxVals[j];
+      // TH2D to hold the Correlation
+      std::string name  = "SamCorr_" + std::to_string(i) + "_" + std::to_string(j);
+      SamCorr[i][j] = std::make_unique<TH2D>(name.c_str(), name.c_str(), 70, Min_i, Max_i, 70, Min_j, Max_j);
+      SamCorr[i][j]->SetDirectory(nullptr);
+      SamCorr[i][j]->SetMinimum(0);
+      SamCorr[i][j]->GetXaxis()->SetTitle(SampleInfo[i].Name.c_str());
+      SamCorr[i][j]->GetYaxis()->SetTitle(SampleInfo[j].Name.c_str());
+      SamCorr[i][j]->GetZaxis()->SetTitle("Events");
+    }
+  }
+
+  // Now we are sure we have the diagonal elements, let's make the off-diagonals
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      // Skip the diagonal elements which we've already done above
+      if (j == i) continue;
+
+      for (int iToy = 0; iToy < Ntoys; ++iToy)
+      {
+        SamCorr[i][j]->Fill(Toys[i][iToy]->Integral(), Toys[j][iToy]->Integral());
+      }
+      SamCorr[i][j]->Smooth();
+
+      // The value of the Covariance
+      const double corr = SamCorr[i][j]->GetCorrelationFactor();
+      hSamCorr->SetBinContent(i+1, j+1, corr);
+      hSamCorr->SetBinContent(j+1, i+1, corr);
+    }// End j loop
+  }// End i loop
+
+  hSamCorr->Draw("colz");
+  hSamCorr->Write("Sample_Corr");
+
+  if(DebugHistograms) {
+    for (int i = 0; i < TotalNumberOfSamples; ++i){
+      for (int j = 0; j <= i; ++j) {
+        // Skip the diagonal elements which we've already done above
+        if (j == i) continue;
+        SamCorr[i][j]->Write();
+      }// End j loop
+    }// End i loop
+  } // end if debugHist
+
+  PredictiveDir->cd();
+}
 
 // ****************
 // Calculate the LLH for TH1, set the LLH to title of MCHist
-void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const {
+void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerInterface* SampleHandler) const {
 // ****************
   const double llh = CalcLLH(DatHist, MCHist, W2Hist, SampleHandler);
   std::stringstream ss;

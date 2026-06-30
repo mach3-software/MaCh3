@@ -2,7 +2,7 @@
 # download CPM.cmake
 file(
   DOWNLOAD
-  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.1/CPM.cmake
+  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.3/CPM.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
@@ -104,14 +104,3 @@ if(MaCh3_MINUIT2_ENABLED)
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MaCh3_MINUIT2)
 endif()
 
-######################### python binding ##########################
-if( MaCh3_PYTHON_ENABLED )
-  set(PYBIND11_FINDPYTHON ON)
-  CPMFindPackage(
-      NAME pybind11
-      VERSION 2.13.5
-      GITHUB_REPOSITORY "pybind/pybind11"
-      GIT_SHALLOW YES
-      GIT_TAG v2.13.5
-    )
-endif()

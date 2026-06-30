@@ -59,7 +59,14 @@
   /// @namespace M3
   /// @brief Main namespace for MaCh3 software
 
+  /// @namespace M3::Utils
+  /// @brief Utility helpers used across MaCh3
 
+  /// @namespace M3::Plotting
+  /// @brief Flexible, experiment-agnostic plotting utilities for MaCh3.
+
+  /// @namespace M3::detail
+  /// @brief Implementation details only for experts
 
   /// @defgroup MaCh3Plotting MaCh3 Plotting
   /// @brief Flexible, experiment-agnostic plotting utilities for MaCh3.

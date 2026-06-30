@@ -1,9 +1,9 @@
 #include "InputManager.h"
 
-
-namespace MaCh3Plotting {
+namespace M3 {
+namespace Plotting {
 // this is the constructor with user specified translation config file
-InputManager::InputManager(const std::string &translationConfigName) {
+InputManager::InputManager(const std::string &translationConfigName, const std::vector<std::string>& _fileNames) {
   // read the config file
   _translatorConfig = M3OpenConfig(translationConfigName);
 
@@ -19,6 +19,9 @@ InputManager::InputManager(const std::string &translationConfigName) {
   _knownParameters = Get<std::vector<std::string>>(_parametersConfig["Parameters"], __FILE__, __LINE__);
   _knownSamples = Get<std::vector<std::string>>(_samplesConfig["Samples"], __FILE__, __LINE__);
 
+  if(_knownParameters.size() == 0){
+    _knownParameters = TryToFindDefaultParamNames(_fileNames[0]);
+  }
   MACH3LOG_DEBUG("Will now check the specified parameters for tags");
 
   // loop through all parameters and get their tags
@@ -55,6 +58,10 @@ InputManager::InputManager(const std::string &translationConfigName) {
       }
     }
     _sampleToTagsMap[samp] = tags;
+  }
+
+  for (std::string fileName : _fileNames) {
+    addFile(fileName);
   }
 }
 
@@ -823,7 +830,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, const bool printThought
       // double check that we actually found it.. just in case
       if (LLHObj == nullptr)
       {
-        MACH3LOG_ERROR("Hmmm, something seems to have gone wrong and I couldnt find the {} LLH scan for {} when attempting to read the data for it", LLHType, parameter);
+        MACH3LOG_ERROR("Hmmm, something seems to have gone wrong and I couldn't find the {} LLH scan for {} when attempting to read the data for it", LLHType, parameter);
         MACH3LOG_ERROR("This will very likely cause segfaults and sadness");
       }
 
@@ -883,4 +890,49 @@ void InputManager::fillFileData(InputFile &inputFileDef, const bool printThought
     find1dPosterior(inputFileDef, parameter, inputFileDef.fitter, true);
   }
 }
-} // namespace MaCh3Plotting
+
+std::vector<std::string> InputManager::TryToFindDefaultParamNames(const std::string& fileName) const {
+  std::vector<std::string> ParamNames;
+  auto file = std::unique_ptr<TFile>(TFile::Open(fileName.c_str()));
+  // MCMC processor output format
+  if (auto* ProcessorDir = dynamic_cast<TDirectory*>(file->Get("Post"));
+  ProcessorDir != nullptr)
+  {
+    TIter next(ProcessorDir->GetListOfKeys());
+
+    while (auto* key = dynamic_cast<TKey*>(next())) {
+      ParamNames.emplace_back(key->GetName());
+      MACH3LOG_DEBUG("Adding name {}, assuming MCMC Processor file", ParamNames.back());
+    }
+
+    return ParamNames;
+  }
+
+  // LLH scan format
+  if (auto* llhDir = dynamic_cast<TDirectory*>(file->Get("Total_LLH"));
+  llhDir != nullptr)
+  {
+    TIter next(llhDir->GetListOfKeys());
+
+    while (auto* key = dynamic_cast<TKey*>(next())) {
+      std::string name = key->GetName();
+      // Remove _total from hist name
+      const char suffix[] = "_full";
+      const std::size_t suffix_len = sizeof(suffix) - 1;
+      name.erase(name.size() - suffix_len);
+      ParamNames.push_back(std::move(name));
+      MACH3LOG_DEBUG("Adding name {}, assuming LLH scan file", ParamNames.back());
+    }
+
+    return ParamNames;
+  }
+
+   MACH3LOG_ERROR("You didn't specify any parameter in universalTranslator.yaml");
+   MACH3LOG_ERROR("Also you specified file I don't know format of so couldn't atomically find params");
+   throw MaCh3Exception(__FILE__, __LINE__);
+   return ParamNames;
+}
+
+
+} // namespace Plotting
+} // namespace M3

@@ -1,7 +1,5 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 
-namespace adaptive_mcmc{
-
 // ********************************************
 AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
 // ********************************************
@@ -65,7 +63,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   }
 
   // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["DoAdaption"], false)) {
+  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["DoAdaption"], false, __FILE__ , __LINE__)) {
     MACH3LOG_WARN("Not using adaption for {}", matrix_name_str);
     return false;
   }
@@ -75,24 +73,24 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
     MACH3LOG_ERROR("This is required if you are using adaptive MCMC");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
-  start_adaptive_throw  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartThrow"], 10);
-  start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartUpdate"], 0);
-  end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["EndUpdate"], 10000);
-  adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
-  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
-  output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
+  auto AdaptSettings = adapt_manager["AdaptionOptions"]["Settings"];
+  start_adaptive_throw  = GetFromManager<int>(AdaptSettings["StartThrow"], 10, __FILE__ , __LINE__);
+  start_adaptive_update = GetFromManager<int>(AdaptSettings["StartUpdate"], 0, __FILE__ , __LINE__);
+  end_adaptive_update   = GetFromManager<int>(AdaptSettings["EndUpdate"], 10000, __FILE__ , __LINE__);
+  adaptive_update_step  = GetFromManager<int>(AdaptSettings["UpdateStep"], 100, __FILE__ , __LINE__);
+  adaptive_save_n_iterations  = GetFromManager<int>(AdaptSettings["SaveNIterations"], -1, __FILE__ , __LINE__);
+  output_file_name = GetFromManager<std::string>(AdaptSettings["OutputFileName"], "", __FILE__ , __LINE__);
 
   // Check for Robbins-Monro adaption
-  use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
-  target_acceptance = GetFromManager<double>(adapt_manager["AdaptionOptions"]["Settings"]["TargetAcceptance"], 0.234);
+  use_robbins_monro = GetFromManager<bool>(AdaptSettings["UseRobbinsMonro"], false, __FILE__ , __LINE__);
+  target_acceptance = GetFromManager<double>(AdaptSettings["TargetAcceptance"], 0.234, __FILE__ , __LINE__);
   if (target_acceptance <= 0 || target_acceptance >= 1) {
     MACH3LOG_ERROR("Target acceptance must be in (0,1), got {}", target_acceptance);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  acceptance_rate_batch_size = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AcceptanceRateBatchSize"], 10000);
-  total_rm_restarts = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["TotalRobbinsMonroRestarts"], 0);
+  acceptance_rate_batch_size = GetFromManager<int>(AdaptSettings["AcceptanceRateBatchSize"], 10000, __FILE__ , __LINE__);
+  total_rm_restarts = GetFromManager<int>(AdaptSettings["TotalRobbinsMonroRestarts"], 0, __FILE__ , __LINE__);
   n_rm_restarts = 0;
 
   prev_step_accepted = false; 
@@ -118,19 +116,20 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   // We'll use the same start scale for Robbins-Monro as standard adaption
   adaption_scale = 2.38/std::sqrt(GetNumParams()); 
 
+  auto AdaptOptions = adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str];
   // HH: added ability to define blocks by parameter names
-  bool matrix_blocks_by_name = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocksByName"], false);
+  bool matrix_blocks_by_name = GetFromManager<bool>(AdaptOptions["MatrixBlocksByName"], false, __FILE__ , __LINE__);
   std::vector<std::vector<int>> matrix_blocks;
   // HH: read blocks by names and convert to indices
   if (matrix_blocks_by_name) {
-    auto matrix_blocks_input = GetFromManager<std::vector<std::vector<std::string>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+    auto matrix_blocks_input = GetFromManager<std::vector<std::vector<std::string>>>(AdaptOptions["MatrixBlocks"], {{}}, __FILE__ , __LINE__);
     // Now we need to convert to indices
     for (const auto& block : matrix_blocks_input) {
       auto block_indices = GetParIndicesFromNames(block);
       matrix_blocks.push_back(block_indices);
     }
   } else {
-    matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+    matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(AdaptOptions["MatrixBlocks"], {{}}, __FILE__ , __LINE__);
   }
   SetAdaptiveBlocks(matrix_blocks);
 
@@ -574,5 +573,3 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
     adaption_scale -= target_acceptance * scale_factor;
   }
 }
-
-} //end adaptive_mcmc

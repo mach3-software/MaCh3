@@ -7,7 +7,7 @@ name: Mark stale issues and pull requests
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # KS: Every Monday at midnight to not disturb during weekend...
+    - cron: '0 12 * * 1' # KS: Every Monday at 12:00 PM (noon) to not disturb during weekend...
 
 jobs:
   stale:
@@ -18,7 +18,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899  # v10.3.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: 'Stale issue message'

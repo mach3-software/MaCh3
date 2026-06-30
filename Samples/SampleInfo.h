@@ -51,14 +51,16 @@ struct SampleInfo {
   /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::vector<std::string> VarStr;
 
-  /// @brief the name of this sample e.g."muon-like"
+  /// @brief the name of this sample e.g."muon-like" used for printing
   std::string SampleTitle = "";
+  /// @brief tag for sample used to easily set by which uncertainties should be affected
+  std::string SampleName = "";
 
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
 
   /// names of mc files associated associated with this object
-  std::vector<std::string> mc_files;
+  std::vector<std::vector<std::string>> mc_files;
   /// names of spline files associated associated with this object
   std::vector<std::string> spline_files;
 
@@ -71,56 +73,4 @@ struct SampleInfo {
   TH1* MCHist = nullptr;
   /// histogram used for plotting storing W2 distribution
   TH1* W2Hist = nullptr;
-};
-
-/// @brief Stores info about each MC event used during reweighting routine
-/// @author Dan Barrow
-/// @author Ed Atkin
-/// @author Kamil Skwarczynski
-/// @warning Try to no add more variables here as it will impact RAM usage
-/// @ingroup SamplesAndParameters
-struct EventInfo {
-  /// @brief Default constructor.
-  EventInfo(){}
-  /// @brief Copy constructor (deleted to prevent copying).
-  EventInfo(EventInfo const &other) = delete;
-  /// @brief Move constructor (defaulted to allow moving).
-  EventInfo(EventInfo &&other) = default;
-  /// @brief Copy assignment operator (deleted).
-  EventInfo& operator=(EventInfo const &other) = delete;
-  /// @brief Move assignment operator (deleted).
-  EventInfo& operator=(EventInfo &&other) = delete;
-  /// @brief default destructor
-  ~EventInfo(){}
-
-  /// target the interaction was on
-  const int* Target = 0;
-  /// PDG of neutrino after oscillation
-  const int* nupdg  = 0;
-  /// PDG of neutrino before oscillation
-  const int* nupdgUnosc = 0;
-
-  /// Pointer to true Neutrino Energy
-  const double* rw_etru = &M3::_BAD_DOUBLE_;
-  /// Pointer to true cosine zenith
-  const double* rw_truecz = &M3::_BAD_DOUBLE_;
-
-  /// Pointers to normalisation weights which are being taken from Parameter Handler
-  std::vector<const double*> norm_pointers;
-
-  /// Pointers to weights like oscillation spline etc
-  std::vector<const M3::float_t*> total_weight_pointers;
-
-  /// The x_var and y_vars and beyond that you're binning in
-  std::vector<const double*> KinVar;
-  /// starting bins for each dimensions allowing to perform quick lookup
-  std::vector<int> NomBin;
-
-  /// Nominal sample to which event is associated
-  int NominalSample = M3::_BAD_INT_;
-  /// Is event NC or not
-  bool isNC = false;
-
-  /// Pointer to MaCh3 mode
-  const double* mode = &M3::Unity_D;
 };

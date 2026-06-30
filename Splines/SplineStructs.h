@@ -18,7 +18,7 @@
 /// @author Ewan Miller
 
 // *******************
-/// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
+/// @brief CW: Add a struct to hold info about the splinified parameters and help with FindSplineSegment
 struct FastSplineInfo {
 // *******************
   /// @brief Constructor
@@ -41,46 +41,46 @@ struct FastSplineInfo {
   M3::int_t CurrSegment;
 
   /// Array of the knots positions
-  const double* splineParsPointer;
+  const M3::float_t* splineParsPointer;
 };
 
-
 // ***************************************************************************
-/// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
-inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
+/// @brief EM: Apply capping to knot weight for specified spline parameter. SplineGraph needs to have been set in graph array first
+inline void ApplyKnotWeightCap(TGraph* SplineGraph, const int splineParsIndex, ParameterHandlerGeneric* ParHandler) {
 // ***************************************************************************
-  if(xsecgraph == nullptr){
-    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in xsecgraph yet", XsecCov->GetParFancyName(splineParsIndex));
+  if(SplineGraph == nullptr){
+    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in SplineGraph yet",
+                   ParHandler->GetParFancyName(splineParsIndex));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   // EM: cap the weights of the knots if specified in the config
   if(
-    (XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound)
-    || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
+    (ParHandler->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound)
+    || (ParHandler->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
   {
-    for(int knotId = 0; knotId < xsecgraph->GetN(); knotId++){
+    for(int knotId = 0; knotId < SplineGraph->GetN(); knotId++){
       double x,y;
 
       // EM: get the x and y of the point. Also double check that the requested point was valid just to be super safe
-      if( xsecgraph->GetPoint(knotId, x, y) == -1) {
+      if(SplineGraph->GetPoint(knotId, x, y) == -1) {
         MACH3LOG_ERROR("Invalid knot requested: {}", knotId);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
-      y = std::min(y, XsecCov->GetParSplineKnotUpperBound(splineParsIndex));
-      y = std::max(y, XsecCov->GetParSplineKnotLowerBound(splineParsIndex));
+      y = std::min(y, ParHandler->GetParSplineKnotUpperBound(splineParsIndex));
+      y = std::max(y, ParHandler->GetParSplineKnotLowerBound(splineParsIndex));
 
-      xsecgraph->SetPoint(knotId, x, y);
+      SplineGraph->SetPoint(knotId, x, y);
     }
 
     // EM: check if our cap made the spline flat, if so we set to 1 knot to avoid problems later on
     bool isFlat = true;
-    for(int knotId = 0; knotId < xsecgraph->GetN(); knotId++){
+    for(int knotId = 0; knotId < SplineGraph->GetN(); knotId++){
       double x,y;
 
       // EM: get the x and y of the point. Also double check that the requested point was valid just to be super safe
-      if( xsecgraph->GetPoint(knotId, x, y) == -1) {
+      if(SplineGraph->GetPoint(knotId, x, y) == -1) {
         MACH3LOG_ERROR("Invalid knot requested: {}", knotId);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
@@ -88,24 +88,26 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, Par
     }
 
     if(isFlat){
-      xsecgraph->Set(1);
-      xsecgraph->SetPoint(0, 0.0, 1.0);
+      SplineGraph->Set(1);
+      SplineGraph->SetPoint(0, 0.0, 1.0);
     }
   }
 }
 
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in Spline array first
-inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
+inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIndex, ParameterHandlerGeneric* ParHandler) {
 // ***************************************************************************
   if(Spline == nullptr) {
-    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in Spline yet", XsecCov->GetParFancyName(splineParsIndex));
+    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in Spline yet",
+                   ParHandler->GetParFancyName(splineParsIndex));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   std::string oldName = Spline->GetName();
   // EM: cap the weights of the knots if specified in the config
-  if((XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound) || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
+  if((ParHandler->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound)
+    || (ParHandler->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
   {
     const int NValues = Spline->GetNp();
     std::vector<double> XVals(NValues);
@@ -115,8 +117,8 @@ inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIn
       // Extract X and Y
       Spline->GetKnot(knotId, x, y);
 
-      y = std::min(y, XsecCov->GetParSplineKnotUpperBound(splineParsIndex));
-      y = std::max(y, XsecCov->GetParSplineKnotLowerBound(splineParsIndex));
+      y = std::min(y, ParHandler->GetParSplineKnotUpperBound(splineParsIndex));
+      y = std::max(y, ParHandler->GetParSplineKnotLowerBound(splineParsIndex));
 
       XVals[knotId] = x;
       YVals[knotId] = y;
@@ -133,15 +135,15 @@ class TResponseFunction_red {
 // ************************
 public:
   /// @brief Empty constructor
-  TResponseFunction_red() { }
+  TResponseFunction_red(){};
   /// @brief Empty destructor
-  virtual ~TResponseFunction_red() { }
+  virtual ~TResponseFunction_red(){};
   /// @brief Evaluate a variation
-  virtual double Eval(const double var)=0;
+  virtual double Eval(const double var)const =0;
   /// @brief KS: Printer
-  virtual void Print()=0;
+  virtual void Print()const =0;
   /// @brief DL: Get number of points
-  virtual M3::int_t GetNp()=0;
+  virtual M3::int_t GetNp()const =0;
 };
 
 // ************************
@@ -157,7 +159,7 @@ public:
 
   /// @brief Empty destructor
   virtual ~TF1_red() {
-    if (Par != NULL) {
+    if (Par != nullptr) {
       delete[] Par;
       Par = nullptr;
     }
@@ -190,7 +192,7 @@ public:
   }
 
   /// @brief Evaluate a variation
-  inline double Eval(const double var) override {
+  inline double Eval(const double var) const override {
     return Par[1]+Par[0]*var;
 
     /* FIXME in future we might introduce more TF1
@@ -218,7 +220,7 @@ public:
   }
 
   /// @brief Get a parameter value
-  double GetParameter(M3::int_t Parameter) {
+  double GetParameter(M3::int_t Parameter) const {
     if (Parameter > length) {
       MACH3LOG_ERROR("You requested parameter number {} but length is {} parameters", Parameter, length);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -233,9 +235,9 @@ public:
     Par = new M3::float_t[length];
   }
   /// @brief Get the size
-  inline int GetSize() { return length; }
+  inline int GetSize() const { return length; }
   /// @brief Print detailed info
-  inline void Print() override {
+  inline void Print() const override {
     MACH3LOG_INFO("Printing TF1_red:");
     MACH3LOG_INFO("  Length  = {}", length);
     for (int i = 0; i < length; i++) {
@@ -253,7 +255,7 @@ public:
   }
 
   /// @brief DL: Get number of points
-  inline M3::int_t GetNp() override { return length; }
+  inline M3::int_t GetNp() const override { return length; }
 
 private:
   /// The parameters
@@ -346,7 +348,7 @@ public:
     //CW: Reduce to use linear spline interpolation for certain parameters
     // Not the most elegant way: use TSpline3 object but set coefficients to zero and recalculate spline points; the smart way (but more human intensive) would be to save memory here and simply not store the zeros at all
     // Get which parameters should be linear from the fit manager
-    // Convert the spline number to global xsec parameter
+    // Convert the spline number to global parameter
     // Loop over the splines points
     // KS: kLinearFunc should be used with TF1, this is just as safety
     else if(InterPolation == kLinear || InterPolation == kLinearFunc)
@@ -392,7 +394,7 @@ public:
 
       for (int i = -2; i <= nPoints; ++i) {
         // if segment is first or last or 2nd to first or last, needs to be dealt with slightly differently;
-        // need to estimate the values for additinal points which would lie outside of the spline
+        // need to estimate the values for additional points which would lie outside of the spline
         if(i ==-2){
           mvals[i+2] = M3::float_t(3.0 * (YResp[1] - YResp[0]) / (XPos[1] - XPos[0]) - 2.0*(YResp[2] - YResp[1]) / (XPos[2] - XPos[1]));
         }
@@ -411,7 +413,7 @@ public:
         }
       }
 
-      for(int i =2; i<=nPoints+2; i++){
+      for(int i = 2; i<=nPoints+2; i++){
         if (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]) != 0.0){
           svals[i-2] = (std::abs(mvals[i+1] - mvals[i]) * mvals[i-1] + std::abs(mvals[i-1] - mvals[i-2]) *mvals[i]) / (std::abs(mvals[i+1] - mvals[i]) + std::abs(mvals[i-1] - mvals[i-2]));
         }
@@ -432,7 +434,7 @@ public:
       }
 
       // check the input spline for linear segments, if there are any then overwrite the calculated coefficients
-      // this will pretty much only ever be the case if they are set to be linear in samplePDFND i.e. the user wants it to be linear
+      // this will pretty much only ever be the case if they are set to be linear in SampleHandlerBase i.e. the user wants it to be linear
       for(int i = 0; i <nPoints-1; i++){
         double x = -999.99, y = -999.99, b = -999.99, c = -999.99, d = -999.99;
         spline->GetCoeff(i, x, y, b, c, d);
@@ -452,7 +454,7 @@ public:
     {
       // values of the secants at each point (for calculating monotone spline)
       M3::float_t * Secants = new M3::float_t[nPoints -1];
-      // values of the tangens at each point (for calculating monotone spline)
+      // values of the tangents at each point (for calculating monotone spline)
       M3::float_t *  Tangents = new M3::float_t[nPoints];
 
       // get the knot values for the spline
@@ -507,7 +509,6 @@ public:
             Tangents[i] = 0.0;
             Tangents[i+1] = 0.0;
           }
-
           else{
             alpha = Tangents[i]  / Secants[i];
             beta = Tangents[i+1] / Secants[i];
@@ -671,7 +672,7 @@ public:
   /// @brief Find the segment relevant to this variation in x
   /// @see <a href="https://root.cern/doc/master/classTSpline3.html#TSpline3:FindX">TSpline3::FindX(double)</a> for ROOT implementation
   /// @see @ref SplineBase::FindSplineSegment FindSplineSegment for the base class version
-  inline int FindX(double x) {
+  inline int FindX(double x) const {
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;
     int kHigh = nPoints-1;
@@ -705,7 +706,7 @@ public:
   }
 
   /// @brief CW: Evaluate the weight from a variation
-  inline double Eval(double var) override {
+  inline double Eval(const double var) const override {
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation
@@ -718,15 +719,16 @@ public:
   }
 
   /// @brief CW: Get the number of points
-  inline M3::int_t GetNp() override { return nPoints; }
+  inline M3::int_t GetNp() const override { return nPoints; }
   // Get the ith knot's x and y position
-  inline void GetKnot(int i, M3::float_t &xtmp, M3::float_t &ytmp) {
+  inline void GetKnot(int i, M3::float_t &xtmp, M3::float_t &ytmp) const {
     xtmp = XPos[i];
     ytmp = YResp[i];
   }
 
   /// @brief CW: Get the coefficient of a given segment
-  inline void GetCoeff(int segment, M3::float_t &x, M3::float_t &y, M3::float_t &b, M3::float_t &c, M3::float_t &d) {
+  inline void GetCoeff(int segment, M3::float_t &x, M3::float_t &y,
+                       M3::float_t &b, M3::float_t &c, M3::float_t &d) const {
     b = Par[segment][0];
     c = Par[segment][1];
     d = Par[segment][2];
@@ -756,7 +758,7 @@ public:
   }
 
   /// @brief Print detailed info
-  inline void Print() override {
+  inline void Print() const override {
     MACH3LOG_INFO("Printing TSpline_red:");
     MACH3LOG_INFO(" Nknots = {}", nPoints);
     for (int i = 0; i < nPoints; ++i) {
@@ -808,19 +810,17 @@ inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::
   ReducedVector.reserve(MasterSpline.size());
 
   // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Make the temp vector
     std::vector<TSpline3_red*> TempVector;
     TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
     // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {
       // Here's our delicious TSpline3 object
       TSpline3 *spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer
       TSpline3_red *red = nullptr;
-      if (spline != NULL) {
+      if (spline != nullptr) {
         red = new TSpline3_red(spline);
         (*InnerIt) = spline;
       }
@@ -846,19 +846,17 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   ReducedVector.reserve(MasterSpline.size());
 
   // Loop over each parameter
-  int OuterCounter = 0;
-  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt, ++OuterCounter) {
+  for (OuterIt = MasterSpline.begin(); OuterIt != MasterSpline.end(); ++OuterIt) {
     // Make the temp vector
     std::vector<TF1_red*> TempVector;
     TempVector.reserve(OuterIt->size());
-    int InnerCounter = 0;
     // Loop over each TSpline3 pointer
-    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt, ++InnerCounter) {
+    for (InnerIt = OuterIt->begin(); InnerIt != OuterIt->end(); ++InnerIt) {
       // Here's our delicious TSpline3 object
       TF1* spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer (which deleted TSpline3)
       TF1_red* red = nullptr;
-      if (spline != NULL) {
+      if (spline != nullptr) {
         red = new TF1_red(spline);
         (*InnerIt) = spline;
       }

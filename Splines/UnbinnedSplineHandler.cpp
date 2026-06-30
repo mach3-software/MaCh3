@@ -1,4 +1,4 @@
-#include "SplineMonolith.h"
+#include "UnbinnedSplineHandler.h"
 
 #ifdef MaCh3_CUDA
 #include "Splines/gpuSplineUtils.cuh"
@@ -9,7 +9,7 @@
 
 // *****************************************
 //Set everything to NULL or 0
-void SMonolith::Initialise() {
+void UnbinnedSplineHandler::Initialise() {
 // *****************************************
 #ifdef MaCh3_CUDA
   MACH3LOG_INFO("Using GPU version event by event monolith");
@@ -33,7 +33,7 @@ void SMonolith::Initialise() {
 }
 
 // *****************************************
-SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
+UnbinnedSplineHandler::UnbinnedSplineHandler(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
                      const std::vector<RespFuncType> &SplineType,
                      const bool SaveFlatTree,
                      const std::string& _FastSplineName) : SplineBase() {
@@ -50,7 +50,7 @@ SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSp
 
 // *****************************************
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
-void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
+void UnbinnedSplineHandler::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
 // *****************************************
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   int maxnSplines = 0;
@@ -73,23 +73,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   MACH3LOG_INFO("Number of splines = {}", NSplines_valid);
   MACH3LOG_INFO("Found total {} coeffs in all TF1", nTF1coeff);
   MACH3LOG_INFO("Number of TF1 = {}", NTF1_valid);
-
-  // Can pass the spline segments to the GPU instead of the values
-  // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
-  //KS: Since we are going to copy it each step use fancy CUDA memory allocation
-  #ifdef MaCh3_CUDA
-  gpu_spline_handler->InitGPU_Segments(&SplineSegments);
-  gpu_spline_handler->InitGPU_Vals(&ParamValues);
-  #else
-  SplineSegments = new short int[nParams];
-  ParamValues = new float[nParams];
-  #endif
-
-  for (M3::int_t j = 0; j < nParams; j++)
-  {
-    SplineSegments[j] = 0;
-    ParamValues[j] = -999;
-  }
 
   unsigned int event_size_max = _max_knots * nParams;
   // Declare the {x}, {y,b,c,d} arrays for all possible splines which the event has
@@ -200,7 +183,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
         ++TF1sCounter;
       }
       //KS: Don't delete in debug
-      #ifndef DEBUG
+      #ifndef MACH3_DEBUG
       delete MasterSpline[EventCounter][ParamNumber];
       MasterSpline[EventCounter][ParamNumber] = nullptr;
       #endif
@@ -236,7 +219,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   MACH3LOG_WARN("Found in total {} BAD X", BadXCounter);
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
   #ifndef MaCh3_CUDA
-  cpu_total_weights = new float[NEvents]();
+  cpu_total_weights = new M3::float_t[NEvents]();
   cpu_weights_spline_var = new float[NSplines_valid]();
   cpu_weights_tf1_var = new float[NTF1_valid]();
   #endif
@@ -246,11 +229,15 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   if(SaveSplineFile) PrepareSplineFile(FastSplineName);
 
   MoveToGPU();
+
+  // Can pass the spline segments to the GPU instead of the values
+  // Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure
+  SetupSegments();
 }
 
 // *****************************************
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
-void SMonolith::MoveToGPU() {
+void UnbinnedSplineHandler::MoveToGPU() {
 // *****************************************
   #ifdef MaCh3_CUDA
   unsigned int event_size_max = _max_knots * nParams;
@@ -267,7 +254,7 @@ void SMonolith::MoveToGPU() {
   //                                1 coefficient array of size coeff_array_size*4, holding y,b,c,d in order (y11,b11,c11,d11; y12,b12,c12,d12;...) where ynm is n = spline number, m = spline point. Should really make array so that order is (y11,b11,c11,d11; y21,b21,c21,d21;...) because it will optimise cache hits I think; try this if you have time
   //                                return gpu_weights
 
-  gpu_spline_handler = new SMonolithGPU();
+  gpu_spline_handler = new SplineMonolithGPU();
 
   // The gpu_XY arrays don't actually need initialising, since they are only placeholders for what we'll move onto the GPU. As long as we cudaMalloc the size of the arrays correctly there shouldn't be any problems
   // Can probably make this a bit prettier but will do for now
@@ -314,7 +301,7 @@ void SMonolith::MoveToGPU() {
 // Need to specify template functions in header
 // *****************************************
 // Scan the master spline to get the maximum number of knots in any of the TSpline3*
-void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
+void UnbinnedSplineHandler::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
                                  short int &MaxPoints,
                                  short int &numParams,
@@ -439,7 +426,7 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
 
 // *****************************************
 // Load SplineFile
-SMonolith::SMonolith(const std::string& FileName)
+UnbinnedSplineHandler::UnbinnedSplineHandler(const std::string& FileName)
           : SplineBase() {
 // *****************************************
   Initialise();
@@ -450,7 +437,7 @@ SMonolith::SMonolith(const std::string& FileName)
 
 // *****************************************
 // Load SplineMonolith from ROOT file
-void SMonolith::LoadSplineFile(std::string FileName) {
+void UnbinnedSplineHandler::LoadSplineFile(std::string FileName) {
 // *****************************************
   M3::AddPath(FileName);
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
@@ -485,22 +472,13 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   NTF1_valid = nTF1Valid_temp;
   nTF1coeff = nTF1coeff_temp;
 
-  //KS: Since we are going to copy it each step use fancy CUDA memory allocation
-#ifdef MaCh3_CUDA
-  gpu_spline_handler->InitGPU_Segments(&SplineSegments);
-  gpu_spline_handler->InitGPU_Vals(&ParamValues);
-#else
-  SplineSegments = new short int[nParams]();
-  ParamValues = new float[nParams]();
-#endif
-
   cpu_nParamPerEvent.resize(2*NEvents);
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
   cpu_coeff_TF1_many.resize(nTF1coeff);
 
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
 #ifndef MaCh3_CUDA
-  cpu_total_weights = new float[NEvents]();
+  cpu_total_weights = new M3::float_t[NEvents]();
   cpu_weights_spline_var = new float[NSplines_valid]();
   cpu_weights_tf1_var = new float[NTF1_valid]();
 #endif
@@ -536,11 +514,31 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   PrintInitialsiation();
 
   MoveToGPU();
+
+  SetupSegments();
+}
+
+// *****************************************
+void UnbinnedSplineHandler::SetupSegments() {
+// *****************************************
+  //KS: Since we are going to copy it each step use fancy CUDA memory allocation
+  #ifdef MaCh3_CUDA
+  gpu_spline_handler->InitGPU_Segments(&SplineSegments);
+  gpu_spline_handler->InitGPU_Vals(&ParamValues);
+  #else
+  SplineSegments = new short int[nParams]();
+  ParamValues = new float[nParams]();
+  #endif
+  for (M3::int_t j = 0; j < nParams; j++)
+  {
+    SplineSegments[j] = 0;
+    ParamValues[j] = -999;
+  }
 }
 
 // *****************************************
 // Save SplineMonolith into ROOT file
-void SMonolith::PrepareSplineFile(std::string FileName) {
+void UnbinnedSplineHandler::PrepareSplineFile(std::string FileName) {
 // *****************************************
   M3::AddPath(FileName);
 
@@ -615,13 +613,11 @@ void SMonolith::PrepareSplineFile(std::string FileName) {
 // *****************************************
 // Destructor
 // Cleans up the allocated GPU memory
-SMonolith::~SMonolith() {
+UnbinnedSplineHandler::~UnbinnedSplineHandler() {
 // *****************************************
   #ifdef MaCh3_CUDA
-  gpu_spline_handler->CleanupGPU_SplineMonolith(cpu_total_weights);
   //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
-  gpu_spline_handler->CleanupGPU_Segments(SplineSegments, ParamValues);
-
+  gpu_spline_handler->CleanupPinnedMemory(cpu_total_weights, SplineSegments, ParamValues);
   delete gpu_spline_handler;
   #else
   if(SplineSegments != nullptr) delete[] SplineSegments;
@@ -639,7 +635,7 @@ SMonolith::~SMonolith() {
 // Get the spline coefficients from the TSpline3 so that we can load ONLY these onto the GPU, not the whole TSpline3 object
 // This loads up coefficients into two arrays: one x array and one yabcd array
 // This should maximize our cache hits!
-void SMonolith::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *& xArray, float *& manyArray) const {
+void UnbinnedSplineHandler::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *& xArray, float *& manyArray) const {
 // *****************************************
   // Initialise all arrays to 1.0
   for (int i = 0; i < _max_knots; ++i) {
@@ -691,7 +687,7 @@ void SMonolith::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
 // This should be used when we're using separate x,y,a,b,c,d arrays
 // Also pass the segments for the parameter along with their parameter values
 // This avoids doing lots of binary searches on the GPU
-void SMonolith::Evaluate() {
+void UnbinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
@@ -701,14 +697,12 @@ void SMonolith::Evaluate() {
   gpu_spline_handler->RunGPU_SplineMonolith(
           cpu_total_weights,
           ParamValues,
-          SplineSegments,
-          NSplines_valid,
-          NTF1_valid);
+          SplineSegments);
 }
 #else
 //If CUDA is not enabled do the same on CPU
 // *****************************************
-void SMonolith::Evaluate() {
+void UnbinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
@@ -723,7 +717,7 @@ void SMonolith::Evaluate() {
 #endif
 
 //*********************************************************
-void SMonolith::CalcSplineWeights() {
+void UnbinnedSplineHandler::CalcSplineWeights() {
 //*********************************************************
   #ifdef MULTITHREAD
   //KS: Open parallel region
@@ -788,7 +782,7 @@ void SMonolith::CalcSplineWeights() {
 
 //*********************************************************
 //KS: Calc total event weight on CPU
-void SMonolith::CalcTotalEventWeight() {
+void UnbinnedSplineHandler::CalcTotalEventWeight() {
 //*********************************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -824,13 +818,13 @@ void SMonolith::CalcTotalEventWeight() {
     }
 
     // Store the total weight for the current event
-    cpu_total_weights[EventNum] = totalWeight;
+    cpu_total_weights[EventNum] = static_cast<M3::float_t>(totalWeight);
   }
 }
 
 //*********************************************************
 //KS: Print info about how much knots etc has been initialised
-void SMonolith::PrintInitialsiation() const {
+void UnbinnedSplineHandler::PrintInitialsiation() const {
 //*********************************************************
   unsigned int event_size_max = _max_knots * nParams;
 
@@ -847,9 +841,10 @@ void SMonolith::PrintInitialsiation() const {
 
 //*********************************************************
 //KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-void SMonolith::SynchroniseMemTransfer() const {
+void UnbinnedSplineHandler::SynchroniseMemTransfer() const {
 //*********************************************************
   #ifdef MaCh3_CUDA
   SynchroniseSplines();
+  CudaCheckError();
   #endif
 }

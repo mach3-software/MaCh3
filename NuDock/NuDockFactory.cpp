@@ -104,12 +104,12 @@ void InitialiseNuDockObj(Manager *man,
 
 void FormatOscParsForNuDock(const std::string &param_name, double &param_value) {
   if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
-    param_value = asin(sqrt(param_value));
+    param_value = std::asin(std::sqrt(param_value));
   }
 }
 
 void FormatOscParsForMaCh3(const std::string &param_name, double &param_value) {
   if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
-    param_value = sin(param_value) * sin(param_value);
+    param_value = std::sin(param_value) * std::sin(param_value);
   }
 }

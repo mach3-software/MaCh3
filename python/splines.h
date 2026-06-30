@@ -1,10 +1,15 @@
+#pragma once
+
+/// @file splines.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 // MaCh3 includes
 #include "Splines/SplineBase.h"
-#include "Splines/SplineMonolith.h"
+#include "Splines/UnbinnedSplineHandler.h"
 #include "Splines/SplineStructs.h"
 #include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
@@ -60,10 +65,7 @@ public:
 };
 
 
-void initSplines(py::module &m) {
-    auto m_splines = m.def_submodule("splines");
-    m_splines.doc() = 
-        "This is a Python binding of MaCh3s C++ based spline library.";
+void initSplinesModule(py::module &m_splines){
 
     // Bind the interpolation type enum that lets us set different interpolation types for our splines
     py::enum_<SplineInterpolation>(m_splines, "InterpolationType")
@@ -139,7 +141,7 @@ void initSplines(py::module &m) {
         )
     ; // End of binding for ResponseFunction
 
-    py::class_<SMonolith, SplineBase>(m_splines, "EventSplineMonolith")
+    py::class_<UnbinnedSplineHandler, SplineBase>(m_splines, "EventSplineMonolith")
         .def(
             py::init(
                 [](std::vector<std::vector<TResponseFunction_red*>> &responseFns, const bool saveFlatTree)
@@ -154,7 +156,7 @@ void initSplines(py::module &m) {
                         // then just read them here and pass through to the constructor
                         respFnTypes.push_back(RespFuncType::kTSpline3_red);
                     }
-                    return new SMonolith(responseFns, respFnTypes, saveFlatTree);
+                    return new UnbinnedSplineHandler(responseFns, respFnTypes, saveFlatTree);
                 }
             ),
             "Create an EventSplineMonolith \n"
@@ -173,19 +175,19 @@ void initSplines(py::module &m) {
 
         .def(
             "evaluate",
-            &SMonolith::Evaluate,
+            &UnbinnedSplineHandler::Evaluate,
             "Evaluate the splines at their current values."
         )
 
         .def(
             "sync_mem_transfer",
-            &SMonolith::SynchroniseMemTransfer,
+            &UnbinnedSplineHandler::SynchroniseMemTransfer,
             "This is important when running on GPU. After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied."
         )
 
         .def(
             "get_event_weight",
-            &SMonolith::retPointer,
+            &UnbinnedSplineHandler::RetPointer,
             py::return_value_policy::reference,
             "Get the weight of a particular event. \n"
             ":param event: The index of the event whose weight you would like.",
@@ -194,9 +196,9 @@ void initSplines(py::module &m) {
 
         .def(
             "set_param_value_array",
-            // Wrap up the setSplinePointers method so that we can take in a numpy array and get 
+            // Wrap up the SetSplinePointers method so that we can take in a numpy array and get 
             // pointers to it's sweet sweet data and use those pointers in the splineMonolith 
-            [](SMonolith &self, py::array_t<double, py::array::c_style> &array)
+            [](UnbinnedSplineHandler &self, py::array_t<M3::float_t, py::array::c_style> &array)
             {
                 py::buffer_info bufInfo = array.request();
 
@@ -210,7 +212,7 @@ void initSplines(py::module &m) {
                     throw MaCh3Exception(__FILE__, __LINE__, "Number of entries in parameter array must equal the number of parameters!");
                 }
 
-                std::vector<const double *> paramVec;
+                std::vector<const M3::float_t *> paramVec;
                 paramVec.resize(self.GetNParams());
 
                 for( int idx = 0; idx < self.GetNParams(); idx++ )
@@ -219,7 +221,7 @@ void initSplines(py::module &m) {
                     paramVec[idx] = array.data() + idx;
                 } 
 
-                self.setSplinePointers(paramVec);
+                self.SetSplinePointers(paramVec);
             },
             "Set the array that the monolith should use to read parameter values from. \n"
             "Usage of this might vary a bit from what you're used to in python. \n"

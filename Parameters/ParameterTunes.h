@@ -20,7 +20,7 @@ class ParameterTunes{
   /// @brief Simply print all tunes and associated values
   void PrintTunes() const;
  private:
-  /// Name of each Tun
+  /// Name of each Tune
    std::vector<std::string> TuneNames;
   /// Values for each Tune and Parameter
   std::vector<std::vector<double>> TuneValues;

@@ -37,10 +37,18 @@ jobs:
             test: MaCh3CLI --NuMCMCToolsValidations
             compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
-          - name: Fitter Validations
+          - name: Fitter Validations Low Memory
             test: MaCh3CLI --FitterValidations
             compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
+          
+          - name: NuMCMC Tools Validations Low Memory
+            test: MaCh3CLI --NuMCMCToolsValidations
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
 
+          - name: NuDock Validations
+            test: MaCh3CLI --NuDockValidations
+            compilation_flags: -DMaCh3Tutorial_NUDOCK_ENABLED=ON
+    
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
@@ -51,7 +59,7 @@ jobs:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Run MaCh3 Validations
         uses: ./.github/actions/mach3-tutorial

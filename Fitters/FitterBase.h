@@ -6,7 +6,7 @@
 #include <sstream>
 
 // MaCh3 Includes
-#include "Samples/SampleHandlerBase.h"
+#include "Samples/SampleHandlerInterface.h"
 #include "Parameters/ParameterHandlerBase.h"
 #include "Manager/Manager.h"
 #include "Fitters/MCMCProcessor.h"
@@ -19,9 +19,10 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
-/// @details This class wraps MaCh3 classes like @ref SampleHandlerBase and @ref ParameterHandlerBase.
+/// @details This class wraps MaCh3 classes like @ref SampleHandlerInterface and @ref ParameterHandlerBase.
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
+///
 /// @ingroup CoreClasses
 class FitterBase {
  public:
@@ -33,7 +34,7 @@ class FitterBase {
 
   /// @brief This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans.
   /// @param sample A pointer to a sample PDF object derived from ParameterHandlerBase.
-  void AddSampleHandler(SampleHandlerBase* sample);
+  void AddSampleHandler(SampleHandlerInterface* sample);
 
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from ParameterHandlerBase.
@@ -54,6 +55,7 @@ class FitterBase {
   void RunLLHMap();
 
   /// @brief LLH scan is good first estimate of step scale
+  /// @param filename by default empty, however if specified it will allow to load LLH scan from external file
   void GetStepScaleBasedOnLLHScan(const std::string& filename = "");
 
   /// @brief Perform a 2D likelihood scan.
@@ -68,7 +70,7 @@ class FitterBase {
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
-  inline std::string GetName() const {return AlgorithmName;};
+  std::string GetName() const {return AlgorithmName;};
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
@@ -127,7 +129,7 @@ class FitterBase {
   std::vector<double> syst_llh;
 
   /// Sample holder
-  std::vector<SampleHandlerBase*> samples;
+  std::vector<SampleHandlerInterface*> samples;
   /// Total number of samples used, single SampleHandler can store more than one analysis sample!
   unsigned int TotalNSamples;
 
@@ -168,7 +170,7 @@ class FitterBase {
   /// Name of fitting algorithm that is being used
   std::string AlgorithmName;
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   /// Debugging flag
   bool debug;
   /// Debugging Output file

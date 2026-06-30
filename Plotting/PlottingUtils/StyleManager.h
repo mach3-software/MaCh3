@@ -12,17 +12,17 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TStyle.h"
 _MaCh3_Safe_Include_End_ //}
 
-
-namespace MaCh3Plotting {
-/// @author Ewan Miller
+namespace M3 {
+namespace Plotting {
 
 /// @brief EW: provides centralized styling utilities for plots, including name prettification and style application
+/// @author Ewan Miller
 /// @ingroup MaCh3Plotting
 class StyleManager {
 public:
   /// @brief Constructor
   /// @param configName The style config to read from
-  StyleManager(std::string configName);
+  StyleManager(const std::string& configName);
   
   // NO COPYING!
   StyleManager( const StyleManager& ) = delete;
@@ -37,7 +37,7 @@ public:
   /// @param origName The "internal" name used to uniquely identify the parameter inside the
   /// plotting code
   /// @return A beautiful formatted name that can be used in plots
-  inline std::string prettifyParamName(const std::string &origName) const {
+  std::string prettifyParamName(const std::string &origName) const {
     return prettifyName(origName, "parameters");
   };
 
@@ -46,7 +46,7 @@ public:
   /// @param origName The "internal" name used to uniquely identify the sample inside the plotting
   /// code
   /// @return A beautiful formatted name that can be used in plots
-  inline std::string prettifySampleName(const std::string &origName) const {
+  std::string prettifySampleName(const std::string &origName) const {
     return prettifyName(origName, "samples");
   };
 
@@ -55,9 +55,13 @@ public:
   /// @param origName The "internal" name used to uniquely identify the kinematics inside the plotting
   /// code
   /// @return A beautiful formatted name that can be used in plots
-  inline std::string prettifyKinematicName(const std::string &origName) const {
+  std::string prettifyKinematicName(const std::string &origName) const {
     return prettifyName(origName, "kinematics");
   };
+
+  /// @brief Get bin-width scaling factor for a given kinematic variable
+  /// @param variable Name of the kinematic variable (e.g. RecoNeutrinoEnergy, TrueQ2)
+  double getBinWidthScale(const std::string &Name) const;
 
   // style setting options
   /// @brief Set the root colour palette to one of the default root pallettes as defined in (root
@@ -82,5 +86,5 @@ private:
   std::string prettifyName(const std::string &origName, const std::string &nameType) const;
 
 };
-
-} // namespace MaCh3Plotting
+} // namespace Plotting
+} // namespace M3

@@ -3,7 +3,8 @@
 #include <string>
 
 #include "Samples/SampleStructs.h"
-#include "Samples/FarDetectorCoreInfoStruct.h"
+#include "Samples/SampleInfo.h"
+#include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 
 // ***************************
@@ -174,7 +175,9 @@ class BinningHandler {
   /// @param iSample index of a given sample
   /// @param Bins Vector of bin indices along each dimension
   std::string GetBinName(const int iSample, const std::vector<int>& Bins) const;
-
+  /// @brief Returns sample index based on global bin
+  /// @param GlobalBin bin for which we will return sample index
+  int GetSampleIndex(const int GlobalBin) const;
   /// @brief Get N-dim bin edges for a given sample
   /// @param iSample index of a given sample
   /// @param iDim dimension for which we extract bin edges

@@ -6,6 +6,11 @@
 /// @details This file includes macros and enums for defining spline coefficients.
 /// It is designed to be compatible with older CUDA versions, so be cautious
 /// when adding new features or including other headers.
+///
+/// @warning KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old.
+/// If you add some header with fancy templates it will not compile for older CUDA.
+/// This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h
+///
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 
@@ -24,12 +29,43 @@ enum SplineSegmentCoeffs
 };
 
 // *******************
+/// @brief Flat representation of a spline index entry
+struct SplineIndex {
+// *******************
+  /// @brief destructor
+  virtual ~SplineIndex() = default;
+
+  /// Index into the flattened spline weight vector
+  int value    = 0;
+  /// Sample index
+  int iSample  = 0;
+  /// Oscillation channel index
+  int iOscChan = 0;
+  /// Systematic parameter index
+  int iSyst    = 0;
+  /// Mode index within a systematic
+  int iMode    = 0;
+  /// First kinematic bin index
+  int iVar1    = 0;
+  /// Second kinematic bin index
+  int iVar2    = 0;
+  /// Third kinematic bin index
+  int iVar3    = 0;
+
+  #ifndef __CUDACC__
+  // Include ClassDef macro for ROOT dictionary generation, but only in C++ code
+  ClassDef(SplineIndex, 1);
+  #endif
+};
+
+// *******************
 /// @brief KS: Struct storing information for spline monolith
 /// @details This structure holds the X coefficients, other spline coefficients,
 /// the number of knots per spline, and the number of points per spline on the CPU.
 struct SplineMonoStruct {
 // *******************
-  virtual ~SplineMonoStruct() {};
+  /// @brief destructor
+  virtual ~SplineMonoStruct() = default;
 
   /// KS: CPU arrays to hold X coefficient
   std::vector<float> coeff_x;
@@ -49,5 +85,3 @@ struct SplineMonoStruct {
   #endif
 };
 
-
-// WARNING KS: Please add stuff here with super caution. This header is being added to gpuSplineUtils.cu. Right now we support most of CUDA even super old. If you add some header with fancy templates it will not compile for older CUDA. This header is a way to use common macros or Enum in CPU and GPU code. For more sophisticated structs please use SplineStructs.h

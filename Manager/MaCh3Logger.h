@@ -39,8 +39,7 @@ _MaCh3_Safe_Include_End_ //}
 #define MACH3LOG_OFF SPDLOG_OFF
 
 /// @brief KS: Map string macro to spdlog::level enum
-/// @todo make constexpr with c++17
-inline spdlog::level::level_enum get_default_log_level() {
+inline constexpr spdlog::level::level_enum get_default_log_level() {
   #ifdef SPDLOG_ACTIVE_LEVEL
   switch (SPDLOG_ACTIVE_LEVEL) {
     case SPDLOG_LEVEL_TRACE:    return spdlog::level::trace;
@@ -62,7 +61,7 @@ inline void SetMaCh3LoggerFormat()
 {
   //KS: %H for hour, %M for minute, %S for second, [%s:%#] for class and line
   //For documentation see https://github.com/gabime/spdlog/wiki/3.-Custom-formatting
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   //spdlog::set_pattern("[%H:%M:%S][%s:%#][%^%l%$] %v");
   spdlog::set_pattern("[%s:%#][%^%l%$] %v");
   #else

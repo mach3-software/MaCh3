@@ -862,6 +862,7 @@ INPUT                  = . \
                          Manager \
                          Splines \
                          Samples \
+                         NuDock \
                          Fitters \
                          Diagnostics \
                          Plotting \
@@ -907,6 +908,7 @@ FILE_PATTERNS          = *.c \
                          *.h \
                          *.hh \
                          *.hxx \
+                         *.txx \
                          *.hpp \
                          *.h++ \
                          *.md \

@@ -16,7 +16,7 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
+    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
     if (AnnealTemp < 0)
         anneal = false;
     else
@@ -153,9 +153,9 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
     }
 
     for (ParameterHandlerBase *cov : systematics) {
-        cov->PrintNominalCurrProp();
+        cov->PrintPreFitCurrPropValues();
     }
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
     if (debug)
     {
         debugFile << "\n-------------------------------------------------------" << std::endl;
@@ -209,7 +209,7 @@ bool MCMCBase::IsStepAccepted(const double acc_prob) {
     // Get the random number
     const double fRandom = random->Rndm();
     // Do the accept/reject
-    #ifdef DEBUG
+    #ifdef MACH3_DEBUG
     debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;
     #endif
 

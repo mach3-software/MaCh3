@@ -4,26 +4,6 @@
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
-#ifdef DEBUG
-  #define DEBUG_PCA 1
-#endif
-
-#ifdef DEBUG_PCA
-//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
-#include "TCanvas.h"
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TColor.h"
-#include "TLine.h"
-#include "TText.h"
-#include "TLegend.h"
-
-#if DEBUG_PCA == 2
-#include "Eigen/Eigenvalues"
-#endif
-
-#endif
-
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 /// @author Clarence Wret
 ///
@@ -72,7 +52,7 @@ class PCAHandler{
   /// @param fCurr_Val pointer to current position of parameter
   /// @param fProp_Val pointer to proposed position of parameter
   void SetupPointers(std::vector<double>* fCurr_Val,
-                     std::vector<double>* fProp_Val);
+                     std::vector<M3::float_t>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
@@ -137,14 +117,12 @@ class PCAHandler{
 
   /// @brief Is parameter fixed in PCA base or not
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   bool IsParameterFixedPCA(const int i) const {
     if (_fErrorPCA[i] < 0) { return true;  }
     else                   { return false; }
   }
 
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
-  /// @ingroup ParameterHandlerGetters
   const TMatrixD GetEigenVectors() const {
     return eigen_vectors;
   }
@@ -152,7 +130,6 @@ class PCAHandler{
   /// @brief Set proposed value for parameter in PCA base
   /// @param i Parameter index
   /// @param value new value
-  /// @ingroup ParameterHandlerSetters
   void SetParPropPCA(const int i, const double value) {
     _fParPropPCA(i) = value;
     // And then transfer back to the parameter basis
@@ -170,54 +147,42 @@ class PCAHandler{
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetParPropPCA(const int i) const {
     return _fParPropPCA(i);
   }
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetPreFitValuePCA(const int i) const {
     return _fPreFitValuePCA[i];
   }
 
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   double GetParCurrPCA(const int i) const {
     return _fParCurrPCA(i);
   }
 
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
-  /// @ingroup ParameterHandlerGetters
   const TMatrixD GetTransferMatrix() const {
     return TransferMat;
   }
 
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMaster
-  /// @ingroup ParameterHandlerGetters
   const TVectorD GetEigenValues() const {
     return eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use GetEigenValues
-  /// @ingroup ParameterHandlerGetters
   const std::vector<double> GetEigenValuesMaster() const {
     return eigen_values_master;
   }
 
   /// @brief Check if parameter in PCA base is decomposed or not
   /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
   bool IsParameterDecomposed(const int i) const {
     if(isDecomposedPCA[i] >= 0) return false;
     else return true;
   }
-
-  #ifdef DEBUG_PCA
-  /// @brief KS: Let's dump all useful matrices to properly validate PCA
-  void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar);
-  #endif
 
  private:
   /// @brief KS: Make sure decomposed matrix isn't correlated with undecomposed
@@ -259,6 +224,6 @@ class PCAHandler{
   /// Pointer to current value of the parameter
   std::vector<double>* _pCurrVal;
   /// Pointer to proposed value of the parameter
-  std::vector<double>* _pPropVal;
+  std::vector<M3::float_t>* _pPropVal;
 };
 

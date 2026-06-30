@@ -1,5 +1,4 @@
 #include "FitterBase.h"
-#include "Samples/SampleHandlerFD.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
@@ -26,7 +25,7 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   // Fit summary and debug info
   debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
   #endif
@@ -54,7 +53,7 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
   SampleFolder = outputFile->mkdir("SampleFolder");
   outputFile->cd();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   // Prepare the output log file
   if (debug) debugFile.open((outfile+".log").c_str());
   #endif
@@ -126,8 +125,8 @@ void FitterBase::SaveSettings() {
 
   fitMan->SaveSettings(outputFile);
 
-  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
-  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", M3::Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", M3::Utils::getValue("MemTotal") / 1048576.0);
 
   MACH3LOG_INFO("#####Current Setup#####");
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
@@ -135,9 +134,9 @@ void FitterBase::SaveSettings() {
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i) {
-    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNsamples());
-    for(int iSam = 0; iSam < samples[i]->GetNsamples(); ++iSam) {
-      MACH3LOG_INFO("   {}: Sample name: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
+    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNSamples());
+    for(int iSam = 0; iSam < samples[i]->GetNSamples(); ++iSam) {
+      MACH3LOG_INFO("   {}: Sample title: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
     }
   }
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
@@ -204,7 +203,7 @@ void FitterBase::PrepareOutput() {
   }
 
   MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   if (debug) {
     debugFile << "----- Starting MCMC -----" << std::endl;
   }
@@ -242,7 +241,7 @@ void FitterBase::SaveOutput() {
 
   MACH3LOG_INFO("{} steps took {:.2e} seconds to complete. ({:.2e}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   if (debug)
   {
     debugFile << "\n\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;
@@ -258,12 +257,12 @@ void FitterBase::SaveOutput() {
 
 // *************************
 // Add SampleHandler object to the Markov Chain
-void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
+void FitterBase::AddSampleHandler(SampleHandlerInterface* const sample) {
 // *************************
   // Check if any subsample name collides with already-registered subsamples
   for (const auto &s : samples) {
-    for (int iExisting = 0; iExisting < s->GetNsamples(); ++iExisting) {
-      for (int iNew = 0; iNew < sample->GetNsamples(); ++iNew) {
+    for (int iExisting = 0; iExisting < s->GetNSamples(); ++iExisting) {
+      for (int iNew = 0; iNew < sample->GetNSamples(); ++iNew) {
         if (s->GetSampleTitle(iExisting) == sample->GetSampleTitle(iNew)) {
           MACH3LOG_ERROR(
             "Duplicate sample title '{}' in handler {} detected: "
@@ -277,17 +276,17 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 
   for (const auto &s : samples) {
     if (s->GetName() == sample->GetName()) {
-      MACH3LOG_WARN("SampleHandler with name '{}' already exists!", sample->GetName());
-      MACH3LOG_WARN("Is it intended?");
-      //throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetName());
+      MACH3LOG_ERROR("Is it intended?");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   // Save additional info from samples
   SampleFolder->cd();
 
   sample->SaveAdditionalInfo(SampleFolder);
-  TotalNSamples += sample->GetNsamples();
-  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
+  TotalNSamples += sample->GetNSamples();
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNSamples());
   samples.push_back(sample);
   outputFile->cd();
 }
@@ -324,7 +323,7 @@ void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
   CovFolder->cd();
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i) {
-    n_vec[i] = cov->GetParInit(i);
+    n_vec[i] = cov->GetParPreFit(i);
   }
   cov->GetCovMatrix()->Write(cov->GetName().c_str());
 
@@ -372,7 +371,6 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain (from path {}) and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-
       delete ConfigCov;
     }
 
@@ -388,7 +386,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     systematics[s]->AcceptStep();
 
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
-    systematics[s]->PrintNominalCurrProp();
+    systematics[s]->PrintPreFitCurrPropValues();
 
     // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
@@ -541,16 +539,7 @@ bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRa
 // *************************
 bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const {
 // *************************
-  bool skip = false;
-  for(unsigned int is = 0; is < SkipVector.size(); ++is)
-  {
-    if(ParamName.substr(0, SkipVector[is].length()) == SkipVector[is])
-    {
-      skip = true;
-      break;
-    }
-  }
-  return skip;
+  return M3::CaseInsensitiveMatchAny(ParamName, SkipVector);
 }
 
 
@@ -573,7 +562,7 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   CentralValue = cov->GetParProp(i);
   if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-  double prior = cov->GetParInit(i);
+  double prior = cov->GetParPreFit(i);
   if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
   if (std::abs(CentralValue - prior) > 1e-10) {
@@ -656,7 +645,7 @@ void FitterBase::RunLLHScan() {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
     {
-      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
+      for(int is = 0; is < samples[ivs]->GetNSamples(); ++is )
       {
         SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleTitle(is)+ "_LLH").c_str());
         SampleIterator++;
@@ -726,7 +715,7 @@ void FitterBase::RunLLHScan() {
         sampleSplitllh.resize(TotalNSamples);
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
+          for(int is = 0; is < samples[ivs]->GetNSamples(); ++is )
           {
             auto histName = name + samples[ivs]->GetSampleTitle(is);
             auto histTitle = std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})";
@@ -741,7 +730,7 @@ void FitterBase::RunLLHScan() {
       for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
-          MaCh3Utils::PrintProgressBar(j, n_points);
+          M3::Utils::PrintProgressBar(j, n_points);
 
         // For PCA we have to do it differently
         if (IsPCA) {
@@ -778,7 +767,7 @@ void FitterBase::RunLLHScan() {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
           {
-            for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
+            for(int is = 0; is < samples[ivs]->GetNSamples(); ++is)
             {
               sampleSplitllh[SampleIterator] = samples[ivs]->GetSampleLikelihood(is);
               SampleIterator++;
@@ -801,7 +790,7 @@ void FitterBase::RunLLHScan() {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
           {
-            for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
+            for(int is = 0; is < samples[ivs]->GetNSamples(); ++is)
             {
               hScanSamSplit[SampleIterator]->SetBinContent(j+1, 2*sampleSplitllh[SampleIterator]);
               SampleIterator++;
@@ -830,7 +819,7 @@ void FitterBase::RunLLHScan() {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
+          for(int is = 0; is < samples[ivs]->GetNSamples(); ++is)
           {
             SampleSplit_LLH[SampleIterator]->cd();
             hScanSamSplit[SampleIterator]->Write();
@@ -871,7 +860,7 @@ void FitterBase::RunLLHScan() {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
     {
-      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
+      for(int is = 0; is < samples[ivs]->GetNSamples(); ++is )
       {
         SampleSplit_LLH[SampleIterator]->Write();
         delete SampleSplit_LLH[SampleIterator];
@@ -890,10 +879,9 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   if(outputFileName != ""){
     outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
     ownsfile = true;
-  }
-  else
+  } else {
     outputFileLLH = outputFile;
-
+  }
   TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
@@ -926,13 +914,17 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
       // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
       const double Var = 1.;
-      const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
-
+      const double approxSigma = std::abs(Var)/std::sqrt(LLH_val);
+      const double GlobalScale = cov->GetGlobalStepScale();
       // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      const double NewStepScale = approxSigma * 2.38/std::sqrt(npars);
+      const double TargetStep = approxSigma * 2.38 / std::sqrt(npars);
+      // KS: Need to divide by currently used gloalStepScale
+      const double NewStepScale = TargetStep / GlobalScale;
+
       StepScale[i] = NewStepScale;
       MACH3LOG_DEBUG("Sigma: {}", approxSigma);
-      MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
+      MACH3LOG_DEBUG("Target Step Size (before accounting for global step size): {}", TargetStep);
+      MACH3LOG_DEBUG("Optimal Step Size: {}", NewStepScale);
     }
     cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();
@@ -999,7 +991,7 @@ void FitterBase::Run2DLLHScan() {
         for (int x = 0; x < n_points; ++x)
         {
           if (x % countwidth == 0)
-            MaCh3Utils::PrintProgressBar(x, n_points);
+            M3::Utils::PrintProgressBar(x, n_points);
 
           for (int y = 0; y < n_points; ++y)
           {
@@ -1125,7 +1117,7 @@ void FitterBase::RunLLHMap() {
     if (IsPCA)
       CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-    double prior = cov->GetParInit(i);
+    double prior = cov->GetParPreFit(i);
     if (IsPCA)
       prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
@@ -1199,7 +1191,7 @@ void FitterBase::RunLLHMap() {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
     {
-      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
+      for(int is = 0; is < samples[ivs]->GetNSamples(); ++is )
       {
         std::string NameTemp =samples[ivs]->GetSampleTitle(is)+"_LLH";
         LLHMap->Branch(NameTemp.c_str(), &SampleSplitLogL[SampleIterator]);
@@ -1277,7 +1269,7 @@ void FitterBase::RunLLHMap() {
       int SampleIterator = 0;
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
-        for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
+        for(int is = 0; is < samples[ivs]->GetNSamples(); ++is)
         {
           SampleSplitLogL[SampleIterator] = 2.*samples[ivs]->GetSampleLikelihood(is);
           SampleIterator++;
@@ -1288,7 +1280,7 @@ void FitterBase::RunLLHMap() {
     LLHMap->Fill();
 
     if (sp % countwidth == 0)
-      MaCh3Utils::PrintProgressBar(sp, TotalPoints);
+      M3::Utils::PrintProgressBar(sp, TotalPoints);
   }
 
   outputFile->cd();
@@ -1326,21 +1318,19 @@ void WriteHistograms(TH1 *hist, const std::string& baseName) {
   } else if (className.Contains("TH2")) {
     hist->GetZaxis()->SetTitle("Events");
   }
-  hist->SetDirectory(nullptr);
   hist->Write(baseName.c_str());
-  delete hist;
 }
 
 // *************************
 /// Generic histogram writer - should make main code more palatable
-void WriteHistogramsByMode(SampleHandlerBase *sample,
+void WriteHistogramsByMode(SampleHandlerInterface *sample,
                            const std::string& suffix,
                            const bool by_mode,
                            const bool by_channel,
                            const std::vector<TDirectory*>& SampleDir) {
 // *************************
   MaCh3Modes *modes = sample->GetMaCh3Modes();
-  for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
+  for (int iSample = 0; iSample < sample->GetNSamples(); ++iSample) {
     SampleDir[iSample]->cd();
     const std::string sampleName = sample->GetSampleTitle(iSample);
     for(int iDim1 = 0; iDim1 < sample->GetNDim(iSample); iDim1++) {
@@ -1351,14 +1341,14 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
       if (by_mode) {
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
-          WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
+          WriteHistograms(modeHist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
         }
       }
 
       if (by_channel) {
         for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
           auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, -1, iChan); // -1 skips over mode plotting
-          WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+          WriteHistograms(chanHist.get(), sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
         }
       }
 
@@ -1366,14 +1356,14 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
             auto hist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode, iChan);
-            WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+            WriteHistograms(hist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
           }
         }
       }
 
       if (!by_mode && !by_channel) {
         auto hist = sample->Get1DVarHist(iSample, ProjectionName);
-        WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
+        WriteHistograms(hist.get(), sampleName + ProjectionSuffix + suffix);
         // Only for 2D and Beyond
         for (int iDim2 = iDim1 + 1; iDim2 < sample->GetNDim(iSample); ++iDim2) {
           // Get the names for the two dimensions
@@ -1385,7 +1375,7 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
 
           // Write the histogram
           std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + suffix;
-          WriteHistograms(hist2D, sampleName + suffix2D);
+          WriteHistograms(hist2D.get(), sampleName + suffix2D);
         }
       }
     }
@@ -1398,8 +1388,8 @@ void FitterBase::RunSigmaVar() {
   // Save the settings into the output file
   SaveSettings();
 
-  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false);
-  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false);
+  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false, __FILE__ , __LINE__);
+  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["SigmaVar"]["SkipVector"], {}, __FILE__ , __LINE__);
 
   if (plot_by_mode) MACH3LOG_INFO("Plotting by sample and mode");
@@ -1430,7 +1420,7 @@ void FitterBase::RunSigmaVar() {
       ParamDir->cd();
 
       const double ParamCentralValue = systematics[s]->GetParProp(i);
-      const double Prior = systematics[s]->GetParInit(i);
+      const double Prior = systematics[s]->GetParPreFit(i);
       const double ParamLower = systematics[s]->GetLowerBound(i);
       const double ParamUpper = systematics[s]->GetUpperBound(i);
 
@@ -1441,8 +1431,8 @@ void FitterBase::RunSigmaVar() {
       for(unsigned int iSample = 0; iSample < samples.size(); ++iSample)
       {
         auto* MaCh3Sample = samples[iSample];
-        std::vector<TDirectory*> SampleDir(MaCh3Sample->GetNsamples());
-        for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex) {
+        std::vector<TDirectory*> SampleDir(MaCh3Sample->GetNSamples());
+        for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNSamples(); ++SampleIndex) {
           SampleDir[SampleIndex] = ParamDir->mkdir(MaCh3Sample->GetSampleTitle(SampleIndex).c_str());
         }
 
@@ -1479,7 +1469,7 @@ void FitterBase::RunSigmaVar() {
 
           WriteHistogramsByMode(MaCh3Sample, suffix, plot_by_mode, plot_by_channel, SampleDir);
         }
-        for (int subSampleIndex = 0; subSampleIndex < MaCh3Sample->GetNsamples(); ++subSampleIndex) {
+        for (int subSampleIndex = 0; subSampleIndex < MaCh3Sample->GetNSamples(); ++subSampleIndex) {
           SampleDir[subSampleIndex]->Close();
           delete SampleDir[subSampleIndex];
         }

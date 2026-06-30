@@ -42,7 +42,7 @@ When creating a Pull Request (PR), make sure the title starts with one of the fo
 
 ## Continuous Integration
 
-MaCh3 undergoes rigorous checks via multiple continuous integration (CI) processes. You can find the full list of CI checks [here](https://github.com/mach3-software/MaCh3/tree/develop/.github/workflows#readme).
+MaCh3 undergoes rigorous checks via multiple continuous integration (CI) processes. You can find the full list of CI checks [here](https://github.com/mach3-software/MaCh3/tree/develop/.github/workflows#readme). We try to follow guidelines outlined [here](https://github.com/github/awesome-copilot/blob/main/instructions/github-actions-ci-cd-best-practices.instructions.md).
 
 CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
 
@@ -248,8 +248,7 @@ Putting it all together might look like:
 This allows us to disable the diagnostic just for the relevant line.
 
 ## C++ Standard
-As of May 2025, the minimum supported C++ standard for MaCh3 is **C++14**, although the codebase is compatible with newer standards such as **C++17** and beyond.
-These are often referred to collectively as *modern C++*.
+The minimum supported C++ standard for MaCh3 is **C++17**. This is
 MaCh3 aims to use modern C++ features to encourage safer, cleaner, and more maintainable code.
 
 ### Pointers
@@ -323,6 +322,36 @@ int parameter_counter; //Not par_count
 
 Please note that a lot of this has not been followed in MaCh3 but we are trying to improve the coding style so please bare this in mind when contributing!
 
+## Namespace
+Main MaCh3 namespace is `M3`. If possible, always use it.
+
+If you plan to use another namespace like `blarb`, please follow the rule below:
+
+### ✅ Correct
+```cpp
+M3::blarb
+```
+
+### ❌ Incorrect
+```cpp
+blarb
+```
+
+or
+
+```cpp
+MaCh3blarb
+```
+
 ## ROOT
 MaCh3 uses the CERN ROOT package for plotting and I/O operations. While MaCh3 does not require a specific ROOT version—ensuring compatibility across a wide range of scientific clusters used by different users—be aware that ROOT developers occasionally introduce bugs or breaking changes in new releases.
 To improve stability and portability, it is recommended to prefer standard C++ (STL) counterparts whenever possible.
+
+## AI Usage
+The following rules are in service of producing correct, maintainable code while not inundating the maintainers.
+
+1. You (the author of the PR) are responsible for the PR, regardless of the tools you use to create it. Make sure you understand it thoroughly and agree with its contents before you submit a PR.
+2. Corollary: AI is not a co-author, AI is a tool. If you wouldn't list Emacs as a co-author, don't list Claude either. Following this principle, we will not allow AI systems to directly commit to MaCh3.
+3. Do not use AI to generate documentation. If you need AI to help with wording or grammar that's ok. However avoid "AI generate documentation" and copy pasting without reading. It is difficult read with ton of unnecessary and artificial text.
+
+Highly inspired by [yaml-cpp](https://github.com/jbeder/yaml-cpp/blob/2decf96e915d2b0c26c68c1659665789dfef2633/CONTRIBUTING.md?plain=1#L28-L35)

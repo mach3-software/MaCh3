@@ -1,5 +1,11 @@
 //MaCh3 includes
 #include "Fitters/StatisticalUtils.h"
+#include <numeric>
+
+_MaCh3_Safe_Include_Start_ //{
+// ROOT includes
+#include "Math/QuantFuncMathCore.h"
+_MaCh3_Safe_Include_End_ //}
 
 // **************************
 std::string GetJeffreysScale(const double BayesFactor){
@@ -460,20 +466,37 @@ double GetIQR(TH1D *Hist) {
 }
 
 // ********************
-double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
-// *********************
+double ComputeKLDivergence(const std::vector<double>& Data,
+                           const std::vector<double>& MC) {
+// ********************
   double klDivergence = 0.0;
-  double DataIntegral = NoOverflowIntegral(DataPoly);
-  double MCIntegral = NoOverflowIntegral(PolyMC);
-  for (int i = 1; i < DataPoly->GetNumberOfBins()+1; ++i)
+  double DataIntegral = std::accumulate(Data.begin(), Data.end(), 0.0);
+  double MCIntegral   = std::accumulate(MC.begin(), MC.end(), 0.0);
+  for (size_t i = 0; i < Data.size(); ++i)
   {
-    if (DataPoly->GetBinContent(i) > 0 && PolyMC->GetBinContent(i) > 0) {
-      klDivergence += DataPoly->GetBinContent(i) / DataIntegral *
-      std::log((DataPoly->GetBinContent(i) / DataIntegral) / ( PolyMC->GetBinContent(i) / MCIntegral));
+    if (Data[i] > 0 && MC[i] > 0) {
+      klDivergence += Data[i] / DataIntegral *
+                      std::log((Data[i] / DataIntegral) / ( MC[i] / MCIntegral));
     }
   }
   return klDivergence;
 }
+
+// ********************
+double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC) {
+// *********************
+  int nBins = DataPoly->GetNumberOfBins();
+  std::vector<double> Data(nBins);
+  std::vector<double> MC(nBins);
+
+  for (int i = 0; i < nBins; ++i) {
+    Data[i] = DataPoly->GetBinContent(i+1);
+    MC[i] = PolyMC->GetBinContent(i+1);
+  }
+
+  return ComputeKLDivergence(Data, MC);
+}
+
 // ********************
 double FisherCombinedPValue(const std::vector<double>& pvalues) {
 // ********************
@@ -521,7 +544,7 @@ void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
   MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
   for (Long64_t i = 0; i < nEntries; i++) {
     if (i % (nEntries/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::PrintProgressBar(i, nEntries);
     }
     if (i % ThinningCut == 0) {
       inTree->GetEntry(i);
@@ -654,7 +677,33 @@ void Get2DBayesianpValue(TH2D *Histogram) {
   TempCanvas->Write();
 }
 
+// ****************
+// Converts posterior likelihood to dchi2
+std::unique_ptr<TH1D> GetDeltaChi2(TH1D* posterior_probability_hist) {
+// ****************
+  auto delta_chi2 = M3::Clone(posterior_probability_hist);
+  delta_chi2->GetYaxis()->SetTitle("#Delta#chi^{2}");
 
+  int max_bin = delta_chi2->GetMaximumBin();
+  double max_content = delta_chi2->GetBinContent(max_bin);
+  if (max_content == 0) {
+    MACH3LOG_ERROR("Histogram {}, has larges bin with 0", delta_chi2->GetTitle());
+    MACH3LOG_ERROR("This suggest you skewed binning for posterior probability or something else");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  double NewMaximum = M3::_BAD_DOUBLE_;
+  for(int iBin = 1; iBin < delta_chi2->GetNbinsX()+1; iBin++) {
+    double bin_content = delta_chi2->GetBinContent(iBin);
+    if(bin_content == 0) bin_content = 1.0 ;
+
+    double chi2_likelihood = -2*std::log(bin_content/max_content);
+    delta_chi2->SetBinContent(iBin, chi2_likelihood);
+    NewMaximum = std::max(NewMaximum, chi2_likelihood);
+  }
+  delta_chi2->SetMaximum(NewMaximum*1.1);
+  return delta_chi2;
+}
 
 // ****************
 void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {
@@ -667,4 +716,76 @@ void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {
       RatioHist->SetBinError(j, dx);
     }
   }
+}
+
+
+// ****************
+std::unique_ptr<TGraphAsymmErrors> PoissonGraph(const TH1D* hist, double cl) {
+// ****************
+  auto graph = std::make_unique<TGraphAsymmErrors>();
+
+  const double alpha = 1.0 - cl;
+  const double half = alpha / 2.0;
+
+  for (int i = 1; i <= hist->GetNbinsX(); i++)
+  {
+    double N  = hist->GetBinContent(i);
+    double x  = hist->GetBinCenter(i);
+    double ex = hist->GetBinWidth(i) / 2.0;
+
+    double low = 0.0;
+    double high = 0.0;
+
+    if (N > 0) {
+      low  = N - ROOT::Math::gamma_quantile(half, N, 1.0);
+      high = ROOT::Math::gamma_quantile_c(half, N + 1, 1.0) - N;
+    } else {
+      low = 0.0;
+      high = ROOT::Math::gamma_quantile_c(half, 1, 1.0);
+    }
+
+    int p = graph->GetN();
+    graph->SetPoint(p, x, N);
+    graph->SetPointError(p, ex, ex, low, high);
+  }
+  return graph;
+}
+
+
+// ***************************************************************************
+std::unique_ptr<TGraphAsymmErrors> PoissonGraphScaled(const TH1D* hist, double scale, double cl) {
+// ***************************************************************************
+  auto graph = std::make_unique<TGraphAsymmErrors>();
+
+  const double alpha = 1.0 - cl;
+  const double half = alpha / 2.0;
+
+  for (int i = 1; i <= hist->GetNbinsX(); i++) {
+    double N = hist->GetBinContent(i);  // Raw count
+    double x = hist->GetBinCenter(i);
+    double ex = hist->GetBinWidth(i) / 2.0;
+    double binWidth = hist->GetBinWidth(i);
+
+    double low = 0.0;
+    double high = 0.0;
+
+    if (N > 0) {
+      low = N - ROOT::Math::gamma_quantile(half, N, 1.0);
+      high = ROOT::Math::gamma_quantile_c(half, N + 1, 1.0) - N;
+    } else {
+      low = 0.0;
+      high = ROOT::Math::gamma_quantile_c(half, 1, 1.0);
+    }
+
+    // Scale the y-value and y-errors by (scale / binWidth)
+    double scaleFactor = scale / binWidth;
+    double y = N * scaleFactor;
+    double low_scaled = low * scaleFactor;
+    double high_scaled = high * scaleFactor;
+
+    int p = graph->GetN();
+    graph->SetPoint(p, x, y);
+    graph->SetPointError(p, ex, ex, low_scaled, high_scaled);
+  }
+  return graph;
 }

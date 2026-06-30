@@ -6,7 +6,7 @@
 
 // *******************
 // The constructor
-SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerBase* const sample, const int nSteps) {
+SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerInterface* const sample, const int nSteps) {
 // *******************
   MACH3LOG_DEBUG("Making sample summary class...");
   #ifdef MULTITHREAD
@@ -988,7 +988,6 @@ void SampleSummary::MakePredictive() {
 
     // Count the -2LLH for each histogram
     double negLogL_Mean = 0.0;
-    double negLogL_Mode = 0.0;
 
     // Loop over each pmu cosmu bin
     for (int j = 1; j < maxBins[SampleNum]+1; ++j)
@@ -1019,7 +1018,6 @@ void SampleSummary::MakePredictive() {
       // Increment -2LLH
       //KS: do times 2 because banff reports chi2
       negLogL_Mean += 2*TempLLH_Mean;
-      negLogL_Mode += 2*TempLLH_Mode;
       
       // Set the content and error to the mean in the bin
       MeanHist[SampleNum]->SetBinContent(j, MeanHist[SampleNum]->GetBinContent(j)+nMean);
@@ -1147,7 +1145,7 @@ void SampleSummary::MakeChi2Hists() {
   for (unsigned int i = 0; i < nThrows; ++i)
   {
     if (i % (nThrows/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nThrows);
+      M3::Utils::PrintProgressBar(i, nThrows);
     }
 
     // Set the total LLH to zero to initialise

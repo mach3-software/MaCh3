@@ -92,14 +92,14 @@ namespace M3 {
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
-#ifndef DEBUG
+#ifndef MACH3_DEBUG
 #define _noexcept_ noexcept
 #else
 #define _noexcept_
 #endif
 
 /// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
-#ifndef DEBUG
+#ifndef MACH3_DEBUG
   /// KS: For GCC decoration is here: https://gcc.gnu.org/onlinedocs/gcc/Restricted-Pointers.html
   /// If we are sure other compiler support it as well please add
   #if defined(__GNUC__)
@@ -133,6 +133,7 @@ _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
 _Pragma("GCC diagnostic ignored \"-Wsuggest-override\"") \
+_Pragma("GCC diagnostic ignored \"-Wsign-compare\"")
 _Pragma("GCC diagnostic ignored \"-Wtautological-compare\"")
 #if defined(__GNUC__) && __GNUC__ >= 13
   _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
@@ -154,7 +155,11 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wshadow\"") \
   _Pragma("clang diagnostic ignored \"-Wdeprecated-literal-operator\"") \
   _Pragma("clang diagnostic ignored \"-Wsuggest-override\"") \
+  _Pragma("clang diagnostic ignored \"-Wsign-compare\"")
   _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-literal-operator\"")
+  _Pragma("clang diagnostic ignored \"-Wbitwise-instead-of-logical\"")
+  _Pragma("clang diagnostic ignored \"-Wlanguage-extension-token\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

@@ -7,7 +7,7 @@ _MaCh3_Safe_Include_End_ //}
 
 // ************************************************
 OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile, bool BinningPerOscChannel_,
-                                       std::vector<const double*> OscParams_, const int SubChannels) {
+                                       std::vector<const M3::float_t*> OscParams_, const int SubChannels) {
 // ************************************************
   EqualBinningPerOscChannel = BinningPerOscChannel_;
   OscParams = OscParams_;
@@ -32,7 +32,11 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
       MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    NuOscProbCalcers[0][0]->Setup();
+    LoggerPrint("NuOscillator",
+                [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+                [this]() {
+                  NuOscProbCalcers[0][0]->Setup();
+                });
   } else {
     NuOscProbCalcers[0].resize(SubChannels);
     for (int iChannel = 0; iChannel < SubChannels; iChannel++) {
@@ -80,11 +84,14 @@ void OscillationHandler::AddSample(const std::string& NuOscillatorConfigFile, co
 // ************************************************
 void OscillationHandler::Evaluate() {
 // ************************************************
-  std::vector<M3::float_t> OscVec(OscParams.size());
+  // NuOscillator is using FLOAT_T while MaCh3 M3::float_t
+  // Moslty they are same however it is possible to have double on M3
+  // but float on NuOsc hence we need conversion
+  std::vector<FLOAT_T> OscVec(OscParams.size());
   for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wuseless-cast"
-    OscVec[iPar] = static_cast<M3::float_t>(*OscParams[iPar]);
+    OscVec[iPar] = static_cast<FLOAT_T>(*OscParams[iPar]);
     #pragma GCC diagnostic pop
   }
 
@@ -127,5 +134,9 @@ void OscillationHandler::SetOscillatorBinning(const int Sample, const int Channe
     NuOscProbCalcers[Sample][Channel]->SetEnergyArrayInCalcer(EnergyArray);
     if(CosineZArray.size() != 0) NuOscProbCalcers[Sample][Channel]->SetCosineZArrayInCalcer(CosineZArray);
   }
-  NuOscProbCalcers[Sample][Channel]->Setup();
+  LoggerPrint("NuOscillator",
+              [](const std::string& message) { MACH3LOG_INFO("{}", message); },
+              [this, Sample, Channel]() {
+                NuOscProbCalcers[Sample][Channel]->Setup();
+              });
 }

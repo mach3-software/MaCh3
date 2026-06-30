@@ -6,6 +6,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TEllipse.h"
 #include "TLatex.h"
 #include "TVector2.h"
+#include "TComplex.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -16,7 +17,6 @@ OscProcessor::OscProcessor(const std::string &InputFile) : MCMCProcessor(InputFi
   //KS: WARNING this only work when you project from Chain, will nor work when you try SetBranchAddress etc. Turn it on only if you know how to use it
   PlotJarlskog = false;
 
-  /// @todo Here where we should add all unitarity triangles, fancy Jarlskog studies and other hacky things that only make sense for oscitations
   Sin2Theta13Index = M3::_BAD_INT_;
   Sin2Theta12Index = M3::_BAD_INT_;
   Sin2Theta23Index = M3::_BAD_INT_;
@@ -133,6 +133,42 @@ double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique
 }
 
 // ***************
+void OscProcessor::Get1DReactorConstraintInfo(std::pair<double, double>& Sin13_NewPrior, bool& DoReweight) const {
+// ***************
+  // Now read the MCMC file
+  TFile *TempFile = M3::Open((MCMCFile + ".root"), "open", __FILE__, __LINE__);
+
+  // Get the settings for the MCMC
+  TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");
+
+  if (Config != nullptr) {
+    MACH3LOG_INFO("Found Reweight_Config in chain");
+
+    // Print the reweight configuration for user info
+    YAML::Node Settings = TMacroToYAML(*Config);
+    // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
+    if(CheckNodeExists(Settings, "Weight")) {
+      YAML::Node firstReweight = Settings["Weight"];
+      int dimension = Get<int>(firstReweight["ReweightDim"], __FILE__ , __LINE__);
+      std::string reweightType = Get<std::string>(firstReweight["ReweightType"],__FILE__ , __LINE__);
+      auto paramNames = Get<std::vector<std::string>>(firstReweight["ReweightVar"], __FILE__ , __LINE__);
+      if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
+         auto Priors = Get<std::vector<std::pair<double, double>>>(firstReweight["ReweightPrior"], __FILE__,__LINE__);
+         Sin13_NewPrior = Priors[0];
+        DoReweight = true;
+      } else {
+        MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
+      }
+    } else {
+      MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
+    }
+  }
+
+  TempFile->Close();
+  delete TempFile;
+}
+
+// ***************
 // Perform Several Jarlskog Plotting
 void OscProcessor::PerformJarlskogAnalysis() {
 // ***************
@@ -148,42 +184,12 @@ void OscProcessor::PerformJarlskogAnalysis() {
   }
   MACH3LOG_INFO("Starting {}", __func__);
 
-  bool DoReweight = false;
-
   double s2th13, s2th23, s2th12, dcp, dm2 = M3::_BAD_DOUBLE_;
   double weight = 1.0;
+
+  bool DoReweight = false;
   std::pair<double, double> Sin13_NewPrior;
-
-  // Now read the MCMC file
-  TFile *TempFile = M3::Open((MCMCFile + ".root"), "open", __FILE__, __LINE__);
-
-  // Get the settings for the MCMC
-  TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");
-
-  if (Config != nullptr) {
-    MACH3LOG_INFO("Found Reweight_Config in chain");
-    
-    // Print the reweight configuration for user info
-    YAML::Node Settings = TMacroToYAML(*Config); 
-    // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
-    if(CheckNodeExists(Settings, "ReweightMCMC")) {
-      YAML::Node firstReweight = Settings["ReweightMCMC"].begin()->second;
-      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1);
-      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "");
-      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {});
-      if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
-        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"],__FILE__,__LINE__);
-        DoReweight = true;
-      } else {
-        MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
-      }
-    } else {
-      MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
-    }
-}
-
-  TempFile->Close();
-  delete TempFile;
+  Get1DReactorConstraintInfo(Sin13_NewPrior, DoReweight);
 
   TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
   JarlskogDir->cd();
@@ -265,8 +271,8 @@ void OscProcessor::PerformJarlskogAnalysis() {
 
   for(int i = 0; i < nEntries; ++i) {
     if (i % countwidth == 0) {
-      MaCh3Utils::PrintProgressBar(i, nEntries);
-      MaCh3Utils::EstimateDataTransferRate(Chain, i);
+      M3::Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::EstimateDataTransferRate(Chain, i);
     } else {
       Chain->GetEntry(i);
     }
@@ -840,4 +846,448 @@ void OscProcessor::MakePiePlot() {
   draw_text(tbf, kRed);
 
   canvas.Print(CanvasName);
+}
+
+// ***************
+// MP: Calculate PMNS matrix elements
+std::array<std::array<TComplex, 3>, 3> OscProcessor::CalculatePMNSElements(const double s2th13, const double s2th23, const double s2th12, const double dcp) const {
+// ***************
+  const double s13 = std::sqrt(s2th13);
+  const double s23 = std::sqrt(s2th23);
+  const double s12 = std::sqrt(s2th12);
+
+  const double sdcp = std::sin(dcp);
+  const double cdcp = std::cos(dcp);
+  
+  const double c13 = std::sqrt(1.-s2th13);
+  const double c12 = std::sqrt(1.-s2th12);
+  const double c23 = std::sqrt(1.-s2th23);
+
+  double real_ue[3];
+  double imag_ue[3];
+  real_ue[0] = c12*c13;
+  imag_ue[0] = 0.;
+  real_ue[1] = s12*c13;
+  imag_ue[1] = 0.;
+  real_ue[2] = s13*cdcp;
+  imag_ue[2] = -s13*sdcp;
+
+  double real_umu[3];
+  double imag_umu[3];
+  real_umu[0] = -s12*c23 - c12*s23*s13*cdcp;
+  imag_umu[0] = -c12*s23*s13*sdcp;
+  real_umu[1] =  c12*c23 - s12*s23*s13*cdcp;
+  imag_umu[1] = -s12*s23*s13*sdcp;
+  real_umu[2] =  s23*c13;
+  imag_umu[2] = 0.;
+
+  double real_utau[3];
+  double imag_utau[3];
+  real_utau[0] =  s12*s23 - c12*c23*s13*cdcp;
+  imag_utau[0] = -c12*c23*s13*sdcp;
+  real_utau[1] = -c12*s23 - s12*c23*s13*cdcp;
+  imag_utau[1] = -s12*c23*s13*sdcp;
+  real_utau[2] =  c23*c13;
+  imag_utau[2] = 0.;
+
+  TComplex U[3][3];
+  for (int i = 0; i < 3; i++) {
+    U[0][i] = TComplex(real_ue[i], imag_ue[i]);
+    U[1][i] = TComplex(real_umu[i], imag_umu[i]);
+    U[2][i] = TComplex(real_utau[i], imag_utau[i]);
+  }
+
+  return {{{U[0][0], U[0][1], U[0][2]}, {U[1][0], U[1][1], U[1][2]}, {U[2][0], U[2][1], U[2][2]}}};
+}
+
+// ***************
+// MP: Produce PMNS matrix elements
+void OscProcessor::ProducePMNSElements() {
+// ***************
+  if(!OscEnabled ||
+    Sin2Theta13Index == M3::_BAD_INT_ ||
+    Sin2Theta12Index == M3::_BAD_INT_ ||
+    Sin2Theta23Index == M3::_BAD_INT_ ||
+    DeltaCPIndex == M3::_BAD_INT_)
+  {
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
+    return;
+  }
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  double s2th13, s2th23, s2th12, dcp = M3::_BAD_DOUBLE_;
+  double weight = 1.0;
+
+  TDirectory *PMNSElementsDir = OutputFile->mkdir("PMNSElements");
+  PMNSElementsDir->cd();
+
+  unsigned int step = 0;
+  Chain->SetBranchStatus("*", false);
+
+  Chain->SetBranchStatus(Sin2Theta13Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta13Name.c_str(), &s2th13);
+
+  Chain->SetBranchStatus(Sin2Theta23Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta23Name.c_str(), &s2th23);
+
+  Chain->SetBranchStatus(Sin2Theta12Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta12Name.c_str(), &s2th12);
+
+  Chain->SetBranchStatus(DeltaCPName.c_str(), true);
+  Chain->SetBranchAddress(DeltaCPName.c_str(), &dcp);
+
+  Chain->SetBranchStatus("step", true);
+  Chain->SetBranchAddress("step", &step);
+
+  if (Chain->GetBranch("Weight")) {
+    Chain->SetBranchStatus("Weight", true);
+    Chain->SetBranchAddress("Weight", &weight);
+  } else {
+    MACH3LOG_WARN("No Weight branch found — defaulting to 1.0");
+    weight = 1.0;
+  }
+  constexpr int n_bins = 1000;
+
+  std::unique_ptr<TH1D> h_ue[3];
+  std::unique_ptr<TH1D> h_umu[3];
+  std::unique_ptr<TH1D> h_utau[3];
+
+  std::unique_ptr<TH1D> h_ue_real[3];
+  std::unique_ptr<TH1D> h_umu_real[3];
+  std::unique_ptr<TH1D> h_utau_real[3];
+
+  std::unique_ptr<TH1D> h_ue_imag[3];
+  std::unique_ptr<TH1D> h_umu_imag[3];
+  std::unique_ptr<TH1D> h_utau_imag[3];
+
+  std::unique_ptr<TH2D> h_ue_s2th12[3];
+  std::unique_ptr<TH2D> h_umu_s2th12[3];
+  std::unique_ptr<TH2D> h_utau_s2th12[3];
+
+  std::unique_ptr<TH2D> h_ue_s2th13[3];
+  std::unique_ptr<TH2D> h_umu_s2th13[3];
+  std::unique_ptr<TH2D> h_utau_s2th13[3];
+
+  std::unique_ptr<TH2D> h_ue_s2th23[3];
+  std::unique_ptr<TH2D> h_umu_s2th23[3];
+  std::unique_ptr<TH2D> h_utau_s2th23[3];
+
+  std::unique_ptr<TH2D> h_ue_dcp[3];
+  std::unique_ptr<TH2D> h_umu_dcp[3];
+  std::unique_ptr<TH2D> h_utau_dcp[3];
+
+  for (int iU = 0; iU < 3; iU++) {
+    h_ue[iU] = std::make_unique<TH1D>(Form("h_ue%d", iU+1), Form(";|U_{e%d}|", iU+1), n_bins, 0., 1.);
+    h_ue[iU]->SetDirectory(nullptr);
+    h_umu[iU] = std::make_unique<TH1D>(Form("h_umu%d", iU+1), Form(";|U_{#mu%d}|", iU+1), n_bins, 0., 1.);
+    h_umu[iU]->SetDirectory(nullptr);
+    h_utau[iU] = std::make_unique<TH1D>(Form("h_utau%d", iU+1), Form(";|U_{#tau%d}|", iU+1), n_bins, 0., 1.);
+    h_utau[iU]->SetDirectory(nullptr);
+
+    h_ue_real[iU] = std::make_unique<TH1D>(Form("h_ue%d_real", iU+1), Form(";Re(U_{e%d})", iU+1), n_bins, -1., 1.);
+    h_ue_real[iU]->SetDirectory(nullptr);
+    h_umu_real[iU] = std::make_unique<TH1D>(Form("h_umu%d_real", iU+1), Form(";Re(U_{#mu%d})", iU+1), n_bins, -1., 1.);
+    h_umu_real[iU]->SetDirectory(nullptr);
+    h_utau_real[iU] = std::make_unique<TH1D>(Form("h_utau%d_real", iU+1), Form(";Re(U_{#tau%d})", iU+1), n_bins, -1., 1.);
+    h_utau_real[iU]->SetDirectory(nullptr);
+
+    h_ue_imag[iU] = std::make_unique<TH1D>(Form("h_ue%d_imag", iU+1), Form(";Im(U_{e%d})", iU+1), n_bins, -1., 1.);
+    h_ue_imag[iU]->SetDirectory(nullptr);
+    h_umu_imag[iU] = std::make_unique<TH1D>(Form("h_umu%d_imag", iU+1), Form(";Im(U_{#mu%d})", iU+1), n_bins, -1., 1.);
+    h_umu_imag[iU]->SetDirectory(nullptr);
+    h_utau_imag[iU] = std::make_unique<TH1D>(Form("h_utau%d_imag", iU+1), Form(";Im(U_{#tau%d})", iU+1), n_bins, -1., 1.);
+    h_utau_imag[iU]->SetDirectory(nullptr);
+
+    h_ue_s2th12[iU] = std::make_unique<TH2D>(Form("h_ue%d_s2th12", iU+1), Form(";|U_{e%d}|;sin^{2}(#theta_{12})", iU+1),
+                                             n_bins, 0., 1., n_bins, 0.15, 0.5);
+    h_ue_s2th12[iU]->SetDirectory(nullptr);
+    h_umu_s2th12[iU] = std::make_unique<TH2D>(Form("h_umu%d_s2th12", iU+1), Form(";|U_{#mu%d}|;sin^{2}(#theta_{12})", iU+1),
+                                              n_bins, 0., 1., n_bins, 0.15, 0.5);
+    h_umu_s2th12[iU]->SetDirectory(nullptr);
+    h_utau_s2th12[iU] = std::make_unique<TH2D>(Form("h_utau%d_s2th12", iU+1), Form(";|U_{#tau%d}|;sin^{2}(#theta_{12})", iU+1),
+                                               n_bins, 0., 1., n_bins, 0.15, 0.5);
+    h_utau_s2th12[iU]->SetDirectory(nullptr);
+
+
+    h_ue_s2th13[iU] = std::make_unique<TH2D>(Form("h_ue%d_s2th13", iU+1), Form(";|U_{e%d}|;sin^{2}(#theta_{13})", iU+1),
+                                             n_bins, 0., 1., n_bins, 0., 0.1);
+    h_ue_s2th13[iU]->SetDirectory(nullptr);
+    h_umu_s2th13[iU] = std::make_unique<TH2D>(Form("h_umu%d_s2th13", iU+1), Form(";|U_{#mu%d}|;sin^{2}(#theta_{13})", iU+1),
+                                              n_bins, 0., 1., n_bins, 0., 0.1);
+    h_umu_s2th13[iU]->SetDirectory(nullptr);
+    h_utau_s2th13[iU] = std::make_unique<TH2D>(Form("h_utau%d_s2th13", iU+1), Form(";|U_{#tau%d}|;sin^{2}(#theta_{13})", iU+1),
+                                               n_bins, 0., 1., n_bins, 0., 0.1);
+    h_utau_s2th13[iU]->SetDirectory(nullptr);
+
+
+    h_ue_s2th23[iU] = std::make_unique<TH2D>(Form("h_ue%d_s2th23", iU+1), Form(";|U_{e%d}|;sin^{2}(#theta_{23})", iU+1),
+                                             n_bins, 0., 1., n_bins, 0.3, 0.8);
+    h_ue_s2th23[iU]->SetDirectory(nullptr);
+    h_umu_s2th23[iU] = std::make_unique<TH2D>(Form("h_umu%d_s2th23", iU+1), Form(";|U_{#mu%d}|;sin^{2}(#theta_{23})", iU+1),
+                                              n_bins, 0., 1., n_bins, 0.3, 0.8);
+    h_umu_s2th23[iU]->SetDirectory(nullptr);
+    h_utau_s2th23[iU] = std::make_unique<TH2D>(Form("h_utau%d_s2th23", iU+1), Form(";|U_{#tau%d}|;sin^{2}(#theta_{23})", iU+1),
+                                               n_bins, 0., 1., n_bins, 0.3, 0.8);
+    h_utau_s2th23[iU]->SetDirectory(nullptr);
+
+
+    h_ue_dcp[iU] = std::make_unique<TH2D>(Form("h_ue%d_dcp", iU+1), Form(";|U_{e%d}|;#delta_{CP}", iU+1),
+                                          n_bins, 0., 1., n_bins, -TMath::Pi(), TMath::Pi());
+    h_ue_dcp[iU]->SetDirectory(nullptr);
+    h_umu_dcp[iU] = std::make_unique<TH2D>(Form("h_umu%d_dcp", iU+1), Form(";|U_{#mu%d}|;#delta_{CP}", iU+1),
+                                           n_bins, 0., 1., n_bins, -TMath::Pi(), TMath::Pi());
+    h_umu_dcp[iU]->SetDirectory(nullptr);
+    h_utau_dcp[iU] = std::make_unique<TH2D>(Form("h_utau%d_dcp", iU+1), Form(";|U_{#tau%d}|;#delta_{CP}", iU+1),
+                                            n_bins, 0., 1., n_bins, -TMath::Pi(), TMath::Pi());
+    h_utau_dcp[iU]->SetDirectory(nullptr);
+  }
+
+  // MP: 2D histograms for all unique pairs of |U_{alpha i}| vs |U_{beta j}| (no self-pairs)
+  std::vector<std::unique_ptr<TH2D>> h_UU;
+  std::string U_names[9] = {"ue1", "ue2", "ue3", "umu1", "umu2", "umu3", "utau1", "utau2", "utau3"};
+  std::string U_tex[9]  = {"|U_{e1}|", "|U_{e2}|", "|U_{e3}|", "|U_{#mu1}|", "|U_{#mu2}|", "|U_{#mu3}|", "|U_{#tau1}|", "|U_{#tau2}|", "|U_{#tau3}|"};
+  for(int i=0; i < 9; ++i){
+    for(int j = i+1; j < 9; ++j){
+      std::string name = "h_" + U_names[i] + "_" + U_names[j];
+      std::string title = ";" + U_tex[i] + ";" + U_tex[j];
+      h_UU.push_back(std::make_unique<TH2D>(name.c_str(), title.c_str(), n_bins, 0., 1., n_bins, 0., 1.));
+      h_UU.back()->SetDirectory(nullptr);
+    }
+  }
+  const Long64_t countwidth = nEntries/5;
+  for(int i = 0; i < nEntries; i++) {
+    if (i % countwidth == 0) {
+      M3::Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::EstimateDataTransferRate(Chain, i);
+    } else {
+      Chain->GetEntry(i);
+    }
+
+    if(step < BurnInCut) continue; // burn-in cut
+
+    const std::array<std::array<TComplex, 3>, 3> U = CalculatePMNSElements(s2th13, s2th23, s2th12, dcp);
+    
+    for(int iU = 0; iU < 3; iU++){
+      h_ue[iU]->Fill(TComplex::Abs(U[0][iU]), weight);
+      h_umu[iU]->Fill(TComplex::Abs(U[1][iU]), weight);
+      h_utau[iU]->Fill(TComplex::Abs(U[2][iU]), weight);
+
+      h_ue_real[iU]->Fill(U[0][iU].Re(), weight);
+      h_umu_real[iU]->Fill(U[1][iU].Re(), weight);
+      h_utau_real[iU]->Fill(U[2][iU].Re(), weight);
+
+      h_ue_imag[iU]->Fill(U[0][iU].Im(), weight);
+      h_umu_imag[iU]->Fill(U[1][iU].Im(), weight);
+      h_utau_imag[iU]->Fill(U[2][iU].Im(), weight);
+
+      h_ue_s2th12[iU]->Fill(TComplex::Abs(U[0][iU]), s2th12, weight);
+      h_umu_s2th12[iU]->Fill(TComplex::Abs(U[1][iU]), s2th12, weight);
+      h_utau_s2th12[iU]->Fill(TComplex::Abs(U[2][iU]), s2th12, weight);
+
+      h_ue_s2th13[iU]->Fill(TComplex::Abs(U[0][iU]), s2th13, weight);
+      h_umu_s2th13[iU]->Fill(TComplex::Abs(U[1][iU]), s2th13, weight);
+      h_utau_s2th13[iU]->Fill(TComplex::Abs(U[2][iU]), s2th13, weight);
+
+      h_ue_s2th23[iU]->Fill(TComplex::Abs(U[0][iU]), s2th23, weight);
+      h_umu_s2th23[iU]->Fill(TComplex::Abs(U[1][iU]), s2th23, weight);
+      h_utau_s2th23[iU]->Fill(TComplex::Abs(U[2][iU]), s2th23, weight);
+
+      h_ue_dcp[iU]->Fill(TComplex::Abs(U[0][iU]), dcp, weight);
+      h_umu_dcp[iU]->Fill(TComplex::Abs(U[1][iU]), dcp, weight);
+      h_utau_dcp[iU]->Fill(TComplex::Abs(U[2][iU]), dcp, weight);
+    }
+
+    // MP: Store in an array for easy access
+    double U_mod[9] = {TComplex::Abs(U[0][0]), TComplex::Abs(U[0][1]), TComplex::Abs(U[0][2]), TComplex::Abs(U[1][0]), TComplex::Abs(U[1][1]), TComplex::Abs(U[1][2]), TComplex::Abs(U[2][0]), TComplex::Abs(U[2][1]), TComplex::Abs(U[2][2])};
+    int idx = 0;
+    for(int ix = 0; ix < 9; ++ix){
+      for(int iy = ix+1; iy<9; ++iy){
+        h_UU[idx]->Fill(U_mod[ix], U_mod[iy],  weight);
+        ++idx;
+      }
+    }
+  } // end loop over steps
+
+  // Now we save
+  PMNSElementsDir->cd();
+
+  for (int iU = 0; iU < 3; iU++) {
+    h_ue[iU]->Write(Form("h_ue%d", iU+1));
+    h_umu[iU]->Write(Form("h_umu%d", iU+1));
+    h_utau[iU]->Write(Form("h_utau%d", iU+1));
+
+    h_ue_real[iU]->Write(Form("h_ue%d_real", iU+1));
+    h_umu_real[iU]->Write(Form("h_umu%d_real", iU+1));
+    h_utau_real[iU]->Write(Form("h_utau%d_real", iU+1));
+
+    h_ue_imag[iU]->Write(Form("h_ue%d_imag", iU+1));
+    h_umu_imag[iU]->Write(Form("h_umu%d_imag", iU+1));
+    h_utau_imag[iU]->Write(Form("h_utau%d_imag", iU+1));
+
+    h_ue_s2th12[iU]->Write(Form("h_ue%d_s2th12", iU+1));
+    h_umu_s2th12[iU]->Write(Form("h_umu%d_s2th12", iU+1));
+    h_utau_s2th12[iU]->Write(Form("h_utau%d_s2th12", iU+1));
+
+    h_ue_s2th13[iU]->Write(Form("h_ue%d_s2th13", iU+1));
+    h_umu_s2th13[iU]->Write(Form("h_umu%d_s2th13", iU+1));
+    h_utau_s2th13[iU]->Write(Form("h_utau%d_s2th13", iU+1));
+
+    h_ue_s2th23[iU]->Write(Form("h_ue%d_s2th23", iU+1));
+    h_umu_s2th23[iU]->Write(Form("h_umu%d_s2th23", iU+1));
+    h_utau_s2th23[iU]->Write(Form("h_utau%d_s2th23", iU+1));
+
+    h_ue_dcp[iU]->Write(Form("h_ue%d_dcp", iU+1));
+    h_umu_dcp[iU]->Write(Form("h_umu%d_dcp", iU+1));
+    h_utau_dcp[iU]->Write(Form("h_utau%d_dcp", iU+1));
+  }
+
+  // MP: Write all |U_{alpha i}| vs |U_{beta j}| 2D histograms (no self-pairs)
+  for(size_t iPlot = 0; iPlot < h_UU.size(); ++iPlot){
+    h_UU[iPlot]->Write();
+  }
+
+  PMNSElementsDir->Close();
+  delete PMNSElementsDir;
+
+  Chain->SetBranchStatus("*", true);
+  OutputFile->cd();
+}
+
+// ***************
+// MP: Produce unitarity triangles from PMNS matrix elements
+void OscProcessor::ProduceUnitarityTriangles() {
+// ***************
+  if(!OscEnabled ||
+    Sin2Theta13Index == M3::_BAD_INT_ ||
+    Sin2Theta12Index == M3::_BAD_INT_ ||
+    Sin2Theta23Index == M3::_BAD_INT_ ||
+    DeltaCPIndex == M3::_BAD_INT_)
+  {
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
+    return;
+  }
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  double s2th13, s2th23, s2th12, dcp = M3::_BAD_DOUBLE_;
+  double weight = 1.0;
+
+  TComplex tr_emu_num, tr_etau_num, tr_mutau_num, tr_12_num, tr_13_num, tr_23_num;
+  TComplex tr_emu_denom, tr_etau_denom, tr_mutau_denom, tr_12_denom, tr_13_denom, tr_23_denom;
+  TComplex tr_emu, tr_etau, tr_mutau, tr_12, tr_13, tr_23;
+
+  TDirectory *UnitarityTrianglesDir = OutputFile->mkdir("UnitarityTriangles");
+  UnitarityTrianglesDir->cd();
+
+  unsigned int step = 0;
+  Chain->SetBranchStatus("*", false);
+
+  Chain->SetBranchStatus(Sin2Theta13Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta13Name.c_str(), &s2th13);
+
+  Chain->SetBranchStatus(Sin2Theta23Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta23Name.c_str(), &s2th23);
+
+  Chain->SetBranchStatus(Sin2Theta12Name.c_str(), true);
+  Chain->SetBranchAddress(Sin2Theta12Name.c_str(), &s2th12);
+
+  Chain->SetBranchStatus(DeltaCPName.c_str(), true);
+  Chain->SetBranchAddress(DeltaCPName.c_str(), &dcp);
+
+  Chain->SetBranchStatus("step", true);
+  Chain->SetBranchAddress("step", &step);
+
+  if (Chain->GetBranch("Weight")) {
+    Chain->SetBranchStatus("Weight", true);
+    Chain->SetBranchAddress("Weight", &weight);
+  } else {
+    MACH3LOG_WARN("No Weight branch found — defaulting to 1.0");
+    weight = 1.0;
+  }
+  constexpr int n_bins = 1000;
+
+  std::unique_ptr<TH2D> h_tr_emu;
+  std::unique_ptr<TH2D> h_tr_etau;
+  std::unique_ptr<TH2D> h_tr_mutau;
+
+  std::unique_ptr<TH2D> h_tr_12;
+  std::unique_ptr<TH2D> h_tr_13;
+  std::unique_ptr<TH2D> h_tr_23;
+
+  h_tr_emu = std::make_unique<TH2D>("h_tr_emu",";#rho_{e#mu};#eta_{e#mu}",n_bins,-5,5,n_bins,-5,5);
+  h_tr_emu->SetDirectory(nullptr);
+  h_tr_etau = std::make_unique<TH2D>("h_tr_etau",";#rho_{e#tau};#eta_{e#tau}",n_bins,0,2,n_bins,-1,1);
+  h_tr_etau->SetDirectory(nullptr);
+  h_tr_mutau = std::make_unique<TH2D>("h_tr_mutau",";#rho_{#mu#tau};#eta_{#mu#tau}",n_bins,0,2,n_bins,-1,1);
+  h_tr_mutau->SetDirectory(nullptr);
+
+  h_tr_12 = std::make_unique<TH2D>("h_tr_12",";#rho_{12};#eta_{12}",n_bins,0,3.2,n_bins,-1.5,1.5);
+  h_tr_12->SetDirectory(nullptr);
+  h_tr_13 = std::make_unique<TH2D>("h_tr_13",";#rho_{13};#eta_{13}",n_bins,0,2,n_bins,-1,1);
+  h_tr_13->SetDirectory(nullptr);
+  h_tr_23 = std::make_unique<TH2D>("h_tr_23",";#rho_{23};#eta_{23}",n_bins,-8,8,n_bins,-8,8);
+  h_tr_23->SetDirectory(nullptr);
+
+  const Long64_t countwidth = nEntries/5;
+  for(int i = 0; i < nEntries; i++) {
+    if (i % countwidth == 0) {
+      M3::Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::EstimateDataTransferRate(Chain, i);
+    } else {
+      Chain->GetEntry(i);
+    }
+
+    if(step < BurnInCut) continue; // burn-in cut
+
+    const std::array<std::array<TComplex, 3>, 3> U = CalculatePMNSElements(s2th13, s2th23, s2th12, dcp);
+
+    // Calculate the sides of the unitarity triangles
+    tr_emu_num   = U[0][0].operator*(TComplex::Conjugate(U[1][0]));
+    tr_emu_denom = U[0][2].operator*(TComplex::Conjugate(U[1][2]));
+    tr_emu       = - tr_emu_num.operator/(tr_emu_denom);
+
+    tr_etau_num   = U[0][1].operator*(TComplex::Conjugate(U[2][1]));
+    tr_etau_denom = U[0][0].operator*(TComplex::Conjugate(U[2][0]));
+    tr_etau       = - tr_etau_num.operator/(tr_etau_denom);
+
+    tr_mutau_num   = U[1][2].operator*(TComplex::Conjugate(U[2][2]));
+    tr_mutau_denom = U[1][1].operator*(TComplex::Conjugate(U[2][1]));
+    tr_mutau       = - tr_mutau_num.operator/(tr_mutau_denom);
+
+    tr_12_num   = U[0][0].operator*(TComplex::Conjugate(U[0][1]));
+    tr_12_denom = U[1][0].operator*(TComplex::Conjugate(U[1][1]));
+    tr_12       = - tr_12_num.operator/(tr_12_denom);
+
+    tr_13_num   = U[1][0].operator*(TComplex::Conjugate(U[1][2]));
+    tr_13_denom = U[2][0].operator*(TComplex::Conjugate(U[2][2]));
+    tr_13       = - tr_13_num.operator/(tr_13_denom);
+
+    tr_23_num   = U[2][1].operator*(TComplex::Conjugate(U[2][2]));
+    tr_23_denom = U[0][1].operator*(TComplex::Conjugate(U[0][2]));
+    tr_23       = - tr_23_num.operator/(tr_23_denom);
+
+    h_tr_emu->Fill(tr_emu.Re(), tr_emu.Im(), weight);
+    h_tr_etau->Fill(tr_etau.Re(), tr_etau.Im(), weight);
+    h_tr_mutau->Fill(tr_mutau.Re(), tr_mutau.Im(), weight);
+
+    h_tr_12->Fill(tr_12.Re(), tr_12.Im(), weight);
+    h_tr_13->Fill(tr_13.Re(), tr_13.Im(), weight);
+    h_tr_23->Fill(tr_23.Re(), tr_23.Im(), weight);
+  } // end loop over steps
+
+  // Now we save
+  UnitarityTrianglesDir->cd();
+
+  h_tr_emu->Write("h_tr_emu");
+  h_tr_etau->Write("h_tr_etau");
+  h_tr_mutau->Write("h_tr_mutau");
+  
+  h_tr_12->Write("h_tr_12");
+  h_tr_13->Write("h_tr_13");
+  h_tr_23->Write("h_tr_23");
+
+  UnitarityTrianglesDir->Close();
+  delete UnitarityTrianglesDir;
+
+  Chain->SetBranchStatus("*", true);
+  OutputFile->cd();
 }

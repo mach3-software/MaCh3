@@ -13,7 +13,7 @@ class LikelihoodFit : public FitterBase {
     /// @brief Chi2 calculation over all included samples and syst objects
     virtual double CalcChi2(const double* x);
     /// @brief Get total number of params, this sums over all covariance objects
-    inline int GetNPars(){return NPars;};
+    int GetNPars() const {return NPars;};
 
   protected:
     /// @brief prepare output and perform sanity checks

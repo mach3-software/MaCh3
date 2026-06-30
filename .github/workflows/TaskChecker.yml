@@ -10,6 +10,6 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: kentaro-m/task-completed-checker-action@v0.1.2
+      - uses: kentaro-m/task-completed-checker-action@2ddb65fdd5577bae4a8e82e0564e459677aec893  # v0.1.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"

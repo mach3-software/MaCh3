@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.4.2 LANGUAGES CXX)
+project(MaCh3 VERSION 2.6.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -17,6 +17,22 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
+set(MaCh3_PYTHON_INSTALL_DIR  CACHE STRING "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If not set then will be installed in the build location of MaCh3")
+
+if (NOT DEFINED CMAKE_BUILD_TYPE OR
+        CMAKE_BUILD_TYPE STREQUAL "" OR
+        CMAKE_BUILD_TYPE STREQUAL "Release" OR
+        CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  # Do nothing as this is default
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(MaCh3_DEBUG_ENABLED ON)
+else()
+  message(FATAL_ERROR "Passed not supported build type: ${CMAKE_BUILD_TYPE}")
+endif()
+
+if ("${MaCh3_PYTHON_INSTALL_DIR}" STREQUAL "")
+  set(MaCh3_PYTHON_INSTALL_DIR ${PROJECT_BINARY_DIR}/pyMaCh3)
+endif()
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -34,11 +50,9 @@ if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED)
   cmessage(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
-  set(CPU_ONLY FALSE)
 else()
   cmessage(STATUS "CUDA not found. Proceeding without CUDA support.")
   set(MaCh3_GPU_ENABLED OFF)
-  set(CPU_ONLY TRUE)
 endif()
 
 # Changes default install path to be a subdirectory of the build dir.
@@ -58,7 +72,7 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
-set(CXX_MINIMAL_STANDARD 14)
+set(CXX_MINIMAL_STANDARD 17)
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
   set(CMAKE_CXX_STANDARD ${CXX_MINIMAL_STANDARD})
   cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
@@ -118,8 +132,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
-    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
-  )
+    )
+  # KS: For older gcc it complaints that we should have overide final, while we follow modern apporach and have just final
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 10)
+    target_compile_options(MaCh3Warnings INTERFACE
+      -Wsuggest-override   # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
+    )
+  endif()
 endif()
 
 # KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
@@ -164,7 +183,7 @@ if(MaCh3_DEBUG_ENABLED)
       )
     endif()
   endif()
-  target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
+  target_compile_definitions(MaCh3CompileDefinitions INTERFACE MACH3_DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
   #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
@@ -180,9 +199,9 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
-      $<$<COMPILE_LANGUAGE:CXX>:-flto=auto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
-      -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
-      #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
+      $<$<COMPILE_LANGUAGE:CXX>:-flto=auto>   # Enable link-time optimization, don't apply it to CUDA or other languages!
+      -finline-limit=100000000                # Increase the limit for inlining functions to improve performance
+      #-fipa-pta                              # Pointer analysis for better intraprocedural optimization, increases compilation time
     )
   #KS: add Link-Time Optimization (LTO)
   target_link_libraries(MaCh3CompilerOptions INTERFACE -flto=auto)
@@ -229,7 +248,7 @@ endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 set_target_properties(MaCh3GPUCompilerOptions PROPERTIES EXPORT_NAME GPUCompilerOptions)
-install(TARGETS MaCh3CompilerOptions MaCh3GPUCompilerOptions MaCh3CompileDefinitions
+install(TARGETS MaCh3CompilerOptions MaCh3GPUCompilerOptions MaCh3CompileDefinitions MaCh3Warnings
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
@@ -261,9 +280,9 @@ LIST(APPEND ALL_FEATURES
   GPU
   PYTHON
   LOW_MEMORY_STRUCTS
+  NUDOCK
   Oscillator
   Fitter
-  NUDOCK
   )
 cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})
@@ -271,7 +290,10 @@ foreach(f ${ALL_FEATURES})
 endforeach()
 
 ################################# Build MaCh3 ##################################
-
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
+add_library(MaCh3 INTERFACE)
+target_link_libraries(MaCh3 INTERFACE MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 # Build components
 add_subdirectory(Manager)
 add_subdirectory(Parameters)
@@ -280,26 +302,28 @@ add_subdirectory(Samples)
 add_subdirectory(Fitters)
 add_subdirectory(Diagnostics)
 add_subdirectory(Plotting)
-if (MaCh3_PYTHON_ENABLED)
-  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-  add_subdirectory(python)
-endif()
-if (MaCh3_NUDOCK_ENABLED)
-  add_subdirectory(NuDock)
-endif()
+add_subdirectory(python)
 
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
-if (MaCh3_NUDOCK_ENABLED)
-  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
-endif()
-target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+  set_property(
+    TARGET
+    ${lib}
+    PROPERTY
+      INSTALL_RPATH "$ORIGIN"
+  )
+endforeach()
+
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
+
+add_library(MaCh3::All ALIAS MaCh3)
+
+if (MaCh3_NUDOCK_ENABLED)
+  add_subdirectory(NuDock)
+endif()
 
 add_library(MaCh3::All ALIAS MaCh3)
 
@@ -313,6 +337,16 @@ install(EXPORT MaCh3-targets
 )
 install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
 
+## create the pyMaCh3 module for core if enabled
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
+if (MaCh3_PYTHON_ENABLED)
+  setup_pyMaCh3(
+    INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
+    BINDING_FILES python/pyMaCh3.cpp
+  )
+
+endif()
+
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL
                     COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
@@ -323,7 +357,6 @@ if(MaCh3_DependancyGraph)
 endif()
 
 ############################  Install  ####################################
-
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
   ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/MaCh3Config.cmake.in ${CMAKE_BINARY_DIR}/MaCh3Config.cmake
@@ -370,6 +403,7 @@ add_custom_command(
           -DMaCh3_VERSION=${MaCh3_VERSION}
           -DYAML_CPP_VERSION=${YAML_CPP_VERSION}
           -DSPDLOG_VERSION=${SPDLOG_VERSION}
+          -DNuOscillator_VERSION=${MaCh3_NuOscillatorBranch}
           -DMaCh3_GPU_ENABLED=${MaCh3_GPU_ENABLED}
           -P ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/version.cmake
   COMMENT "Generating version.h and _version.h"

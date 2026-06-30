@@ -1,4 +1,5 @@
 #include "NuDockServerBase.h"
+#include "Samples/SampleHandlerBase.h"
 
 // ***************************************************************************
 /// @copydoc NuDockServerBase::NuDockServerBase
@@ -36,10 +37,10 @@ double NuDockServerBase::getLogLikelihood() {
     for (size_t s = 0; s < systematics.size(); ++s) {
       // Get the likelihood from the systematics
       syst_llh[s] = systematics[s]->GetLikelihood();
-      if (verbose) std::cout << "Syst " << systematics[s]->GetName() << " llh: " << syst_llh[s] << std::endl;
+      if (verbose) MACH3LOG_INFO("Syst {} llh: {}", systematics[s]->GetName(), syst_llh[s]);
       llh += syst_llh[s];
 
-      if (verbose) std::cout << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
+      if (verbose) MACH3LOG_INFO("LLH after {} {}", systematics[s]->GetName(), llh);
     }
   }
 
@@ -48,16 +49,14 @@ double NuDockServerBase::getLogLikelihood() {
     // Get the sample likelihoods and add them
     sample_llh[i] = samples[i]->GetLikelihood();
     if (verbose) {
-      std::cout << "Total LLH in sample handler " << i << ": " << sample_llh[i] << std::endl;
-      for (int iSample = 0; iSample < samples[i]->GetNsamples(); ++iSample) {
+      MACH3LOG_INFO("Total LLH in sample handler {}: {}", i, sample_llh[i]);
+      for (int iSample = 0; iSample < samples[i]->GetNSamples(); ++iSample) {
         double sample_llh_ind = samples[i]->GetSampleLikelihood(iSample);
-        std::cout << "  Sample " << samples[i]->GetSampleTitle(iSample)
-                  << " llh: " << sample_llh_ind << std::endl;
+        MACH3LOG_INFO("  Sample {} llh: {}", samples[i]->GetSampleTitle(iSample), sample_llh_ind);
       }
     }
     llh += sample_llh[i];
-    if (verbose) std::cout << "LLH after sample " << i << " " << llh << std::endl;
-  }
+    if (verbose) MACH3LOG_INFO("LLH after sample {} {}", i, llh);  }
 
   return llh;
 }
@@ -75,7 +74,7 @@ nlohmann::json NuDockServerBase::setParameters(const nlohmann::json &request) {
   for (size_t s = 0; s < systematics.size(); ++s) {
     int npars = systematics[s]->GetNumParams();
     // Loop over each parameter in the systematics object
-    for (size_t p = 0; p < npars; ++p) {
+    for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
       // Check if this is an oscillation parameter
       if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()) {
@@ -122,21 +121,14 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   // reweight sample and add to data
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     samples[ipdf]->Reweight();
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
-        if (fd_casted_sample->GetNDim(iSample) == 1) {
-          fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample));
-        } else if (fd_casted_sample->GetNDim(iSample) == 2) {
-          fd_casted_sample->AddData(iSample, (TH2D*)fd_casted_sample->GetMCHist(iSample));
-        } else {
-          MACH3LOG_ERROR("Unsupported histogram dimension for SampleHandlerFD: {}", fd_casted_sample->GetNDim(iSample));
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-      }
-    } else {
-      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerFD. Consider overloading setAsimovPoint for this sample type.");
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      base_casted_sample->AddData(iSample, base_casted_sample->GetMCArray(iSample));
+    }
   }
 
   // set prefit parameter values to the current parameter values
@@ -154,6 +146,63 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   response["status"] = "success";
   return response;
 }
+// ***************************************************************************
+void TH1toResponse(const TH1* mc_hist, const std::string& sample_title, nlohmann::json &response) {
+// ***************************************************************************
+  auto hist1d = dynamic_cast<const TH1D*>(mc_hist);
+  if (!hist1d) {
+    MACH3LOG_ERROR("{}: input histogram is not TH1D", __func__);
+    throw MaCh3Exception(__FILE__,__LINE__);
+  }
+  const TAxis *ax = mc_hist->GetXaxis();
+  std::string xtitle = ax->GetTitle();
+  int nxbins = ax->GetNbins();
+  std::vector<double> xbins(nxbins+1);
+  std::vector<double> binvals(nxbins);
+
+  xbins[0] = ax->GetBinLowEdge(1);
+  for (int ix = 1; ix <= nxbins; ++ix) {
+    xbins[ix] = ax->GetBinUpEdge(ix);
+    binvals[ix-1] = mc_hist->GetBinContent(ix);
+  }
+  response["axis_titles"][sample_title] = {xtitle};
+  response["bin_edges"][sample_title] = {xbins};
+  response["bin_values"][sample_title] = binvals;
+}
+
+// ***************************************************************************
+void TH2toResponse(const TH2* mc_hist, const std::string& sample_title, nlohmann::json &response) {
+// ***************************************************************************
+  auto hist2d = dynamic_cast<const TH2D*>(mc_hist);
+  if (!hist2d) {
+    MACH3LOG_ERROR("{}: input histogram is not TH2D", __func__);
+    throw MaCh3Exception(__FILE__,__LINE__);
+  }
+  const TAxis *x_axis = mc_hist->GetXaxis();
+  std::string xtitle = x_axis->GetTitle();
+  int nxbins = x_axis->GetNbins();
+  std::vector<double> xbins(nxbins+1);
+
+  const TAxis *y_axis = mc_hist->GetYaxis();
+  std::string ytitle = y_axis->GetTitle();
+  int nybins = y_axis->GetNbins();
+  std::vector<double> ybins(nybins+1);
+
+  std::vector<std::vector<double>> binvals(nxbins, std::vector<double>(nybins));
+
+  xbins[0] = x_axis->GetBinLowEdge(1);
+  ybins[0] = y_axis->GetBinLowEdge(1);
+  for (int ix = 1; ix <= nxbins; ++ix) {
+    for (int iy = 1; iy <= nybins; ++iy) {
+      xbins[ix] = x_axis->GetBinUpEdge(ix);
+      ybins[iy] = y_axis->GetBinUpEdge(iy);
+      binvals[ix-1][iy-1] = mc_hist->GetBinContent(ix, iy);
+    }
+  }
+  response["axis_titles"][sample_title] = {xtitle, ytitle};
+  response["bin_edges"][sample_title] = {xbins, ybins};
+  response["bin_values"][sample_title] = binvals;
+}
 
 // ***************************************************************************
 /// @copydoc NuDockServerBase::getMCSpectrum
@@ -165,64 +214,27 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
-        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
-        sample_titles.push_back(sample_title);
-
-        int dimension = fd_casted_sample->GetNDim(iSample);
-        response["dimensions"][sample_title] = dimension;
-
-        if (dimension == 1) {
-          TH1D* mc_hist = (TH1D*)fd_casted_sample->GetMCHist(iSample)->Clone();
-
-          TAxis *ax = mc_hist->GetXaxis();
-          std::string xtitle = ax->GetTitle(); 
-          int nxbins = ax->GetNbins();
-          std::vector<double> xbins(nxbins+1); 
-          std::vector<double> binvals(nxbins);
-
-          xbins[0] = ax->GetBinLowEdge(1);
-          for (int ix = 1; ix <= nxbins; ++ix) {
-            xbins[ix] = ax->GetBinUpEdge(ix);
-            binvals[ix-1] = mc_hist->GetBinContent(ix);
-          }
-          response["axis_titles"][sample_title] = {xtitle};
-          response["bin_edges"][sample_title] = {xbins};
-          response["bin_values"][sample_title] = binvals;
-        } else if (dimension == 2) {
-          TH2D* mc_hist = (TH2D*)fd_casted_sample->GetMCHist(iSample)->Clone();
-
-          TAxis *x_axis = mc_hist->GetXaxis();
-          std::string xtitle = x_axis->GetTitle();
-          int nxbins = x_axis->GetNbins();
-          std::vector<double> xbins(nxbins+1);
-
-          TAxis *y_axis = mc_hist->GetYaxis();
-          std::string ytitle = y_axis->GetTitle();
-          int nybins = y_axis->GetNbins();
-          std::vector<double> ybins(nybins+1);
-
-          std::vector<std::vector<double>> binvals(nxbins, std::vector<double>(nybins));
-
-          xbins[0] = x_axis->GetBinLowEdge(1);
-          ybins[0] = y_axis->GetBinLowEdge(1);
-          for (int ix = 1; ix <= nxbins; ++ix) {
-            for (int iy = 1; iy <= nybins; ++iy) {
-              xbins[ix] = x_axis->GetBinUpEdge(ix);
-              ybins[iy] = y_axis->GetBinUpEdge(iy);
-              binvals[ix-1][iy-1] = mc_hist->GetBinContent(ix, iy);
-            }
-          }
-          response["axis_titles"][sample_title] = {xtitle, ytitle};
-          response["bin_edges"][sample_title] = {xbins, ybins};
-          response["bin_values"][sample_title] = binvals;
-        }
-      }
-    } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getMCSpectrum for this sample type.");
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+      sample_titles.push_back(sample_title);
+
+      int dimension = samples[ipdf]->GetNDim(iSample);
+      response["dimensions"][sample_title] = dimension;
+
+      if (dimension == 1) {
+        TH1toResponse(samples[ipdf]->GetMCHist(iSample), sample_title, response);
+      } else if (dimension == 2) {
+        TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetMCHist(iSample)), sample_title, response);
+      } else {
+        MACH3LOG_ERROR("Not implemented for dim =", dimension);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
+    }
   }
   response["sample_names"] = sample_titles;
   return response;
@@ -238,64 +250,27 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
-        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
-        sample_titles.push_back(sample_title);
-
-        int dimension = fd_casted_sample->GetNDim(iSample);
-        response["dimensions"][sample_title] = dimension;
-
-        if (dimension == 1) {
-          TH1D* data_hist = (TH1D*)fd_casted_sample->GetDataHist(iSample)->Clone();
-
-          TAxis *ax = data_hist->GetXaxis();
-          std::string xtitle = ax->GetTitle(); 
-          int nxbins = ax->GetNbins();
-          std::vector<double> xbins(nxbins+1); 
-          std::vector<double> binvals(nxbins);
-
-          xbins[0] = ax->GetBinLowEdge(1);
-          for (int ix = 1; ix <= nxbins; ++ix) {
-            xbins[ix] = ax->GetBinUpEdge(ix);
-            binvals[ix-1] = data_hist->GetBinContent(ix);
-          }
-          response["axis_titles"][sample_title] = {xtitle};
-          response["bin_edges"][sample_title] = {xbins};
-          response["bin_values"][sample_title] = binvals;
-        } else if (dimension == 2) {
-          TH2D* data_hist = (TH2D*)fd_casted_sample->GetDataHist(iSample)->Clone();
-
-          TAxis *x_axis = data_hist->GetXaxis();
-          std::string xtitle = x_axis->GetTitle();
-          int nxbins = x_axis->GetNbins();
-          std::vector<double> xbins(nxbins+1);
-
-          TAxis *y_axis = data_hist->GetYaxis();
-          std::string ytitle = y_axis->GetTitle();
-          int nybins = y_axis->GetNbins();
-          std::vector<double> ybins(nybins+1);
-
-          std::vector<std::vector<double>> binvals(nxbins, std::vector<double>(nybins));
-
-          xbins[0] = x_axis->GetBinLowEdge(1);
-          ybins[0] = y_axis->GetBinLowEdge(1);
-          for (int ix = 1; ix <= nxbins; ++ix) {
-            for (int iy = 1; iy <= nybins; ++iy) {
-              xbins[ix] = x_axis->GetBinUpEdge(ix);
-              ybins[iy] = y_axis->GetBinUpEdge(iy);
-              binvals[ix-1][iy-1] = data_hist->GetBinContent(ix, iy);
-            }
-          }
-          response["axis_titles"][sample_title] = {xtitle, ytitle};
-          response["bin_edges"][sample_title] = {xbins, ybins};
-          response["bin_values"][sample_title] = binvals;
-        }
-      }
-    } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getDataSpectrum for this sample type.");
+    auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf]);
+    if(!base_casted_sample) {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading {} for this sample type.", __func__);
       throw MaCh3Exception(__FILE__,__LINE__);
-    } 
+    }
+    for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
+      std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+      sample_titles.push_back(sample_title);
+
+      int dimension = samples[ipdf]->GetNDim(iSample);
+      response["dimensions"][sample_title] = dimension;
+
+      if (dimension == 1) {
+        TH1toResponse(samples[ipdf]->GetDataHist(iSample), sample_title, response);
+      } else if (dimension == 2) {
+        TH2toResponse(static_cast<const TH2*>(samples[ipdf]->GetDataHist(iSample)), sample_title, response);
+      } else {
+        MACH3LOG_ERROR("Not implemented for dim =", dimension);
+        throw MaCh3Exception(__FILE__,__LINE__);
+      }
+    }
   }
   response["sample_names"] = sample_titles;
   return response;
@@ -310,7 +285,7 @@ nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &reques
 
   for (size_t s = 0; s < systematics.size(); ++s) {
     int npars = systematics[s]->GetNumParams();
-    for (size_t p = 0; p < npars; ++p) {
+    for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
       if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()) continue;
       if (!systematics[s]->IsParameterFixed(p)) {
@@ -332,7 +307,7 @@ nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
 
   for (size_t s = 0; s < systematics.size(); ++s) {
     int npars = systematics[s]->GetNumParams();
-    for (size_t p = 0; p < npars; ++p) {
+    for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
       double param_value = systematics[s]->GetParProp(p);
       if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()){
