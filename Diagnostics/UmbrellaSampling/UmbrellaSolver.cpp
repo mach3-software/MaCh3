@@ -622,15 +622,13 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 #ifdef MULTITHREAD
   bool openmp_available = true;
   std::cout << "OpenMP: AVAILABLE" << std::endl;
+  if (config.use_openmp) {
+    std::cout << "OpenMP: ENABLED (using " << omp_get_max_threads() << " threads)" << std::endl;
+  }
 #else
   bool openmp_available = false;
   std::cout << "OpenMP: NOT AVAILABLE" << std::endl;
-#endif
-
-  if (config.use_openmp && openmp_available) {
-    std::cout << "OpenMP: ENABLED (using " << omp_get_max_threads()
-              << " threads)" << std::endl;
-  } else if (config.use_openmp && !openmp_available) {
+  if (config.use_openmp) {
     std::cout << "OpenMP: NOT AVAILABLE - falling back to single-threaded execution" << std::endl;
     std::cout << "Note: For OpenMP support, try compiling with: g++ -fopenmp ..." << std::endl;
     std::cout << "Or ensure OpenMP library is properly loaded in ROOT" << std::endl;
@@ -638,6 +636,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   } else {
     std::cout << "OpenMP: DISABLED (single-threaded execution)" << std::endl;
   }
+#endif
 
   // Load data from input files
   std::vector<std::vector<double>> samples; // Declare here to ensure it exists in the scope of the entire
@@ -869,7 +868,12 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   bool openmp_works = false;
   if (config.use_openmp) {
     std::cout << "Testing OpenMP parallelization..." << std::endl;
+    #ifdef MULTITHREAD
     int max_threads = omp_get_max_threads();
+    #else
+    int max_threads = 1;
+    #endif
+
     std::cout << "Max threads reported: " << max_threads << std::endl;
 
     // Test parallel region
