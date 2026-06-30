@@ -24,10 +24,6 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
         anneal = true;
     }
-
-    /// Initialise the multicanonical handler
-    multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
-    
 }
 
 
@@ -40,6 +36,9 @@ void MCMCBase::RunMCMC() {
     MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
     if (multicanonical) {
+        /// Initialise the multicanonical handler
+        multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
+    
         // Initialize the multicanonical handler with the systematics
         multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
         AlgorithmName += "_UmbrellaSampling"; // Append to the algorithm name
