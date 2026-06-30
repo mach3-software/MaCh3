@@ -882,7 +882,11 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       #pragma omp master
       #endif
       {
+        #ifdef MULTITHREAD
         actual_threads = omp_get_num_threads();
+        #else
+        actual_threads = 1;
+        #endif
         std::cout << "Actual threads in parallel region: " << actual_threads << std::endl;
       }
     }
