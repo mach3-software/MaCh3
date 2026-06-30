@@ -18,3 +18,5 @@ foreach(app
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
+
+add_subdirectory(UmbrellaSampling)
