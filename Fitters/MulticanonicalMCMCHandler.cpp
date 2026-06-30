@@ -281,7 +281,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
 }
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp) {
-  constexpr double inv_sqrt_2pi = 1 / std::sqrt(2 * TMath::Pi());
+  const double inv_sqrt_2pi = 1 / std::sqrt(2 * TMath::Pi());
   const double neg_half_sigma_sq = -1 / (2 * umbrellaWidth * umbrellaWidth);
   // return the log likelihood, ie the log of the normalised gaussian
   return (-std::log(inv_sqrt_2pi * (1 / umbrellaWidth) * std::exp(neg_half_sigma_sq * (deltacp - umbrellaMean) * (deltacp - umbrellaMean)))) * (multicanonicalBeta);
