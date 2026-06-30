@@ -174,7 +174,7 @@ void initParametersModule(py::module &m_parameters){
             "Is the parameter at index i flat?. \n\
             :param index: index of the parameter")
 
-        .def("get_par_error", &ParameterHandlerBase::GetDiagonalError, py::arg("index"), 
+        .def("get_par_error", &ParameterHandlerBase::GetError, py::arg("index"), 
             "The prior error on parameter at index i \n\
             :param index: index of the parameter")
 
