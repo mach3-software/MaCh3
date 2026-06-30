@@ -240,7 +240,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<Param
   if (!multicanonicalSpline) {
     for (auto& syst : systematics) {
       if (syst->GetName() == "osc_cov") {
-        syst->PrintNominalCurrProp();
+        syst->PrintPreFitCurrPropValues();
         syst->SetParCurrProp(multicanonicalVar, umbrellaMean);
         MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", umbrellaMean);
         // pass the mean to the covarianceOsc object for parameter flipping DO NOT USE: UNTESTED
@@ -251,7 +251,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<Param
         //    oscCov->setMulticanonicalSeparateMean(umbrellaMean);
         //  }
         //}
-        syst->PrintNominalCurrProp();
+        syst->PrintPreFitCurrPropValues();
         MACH3LOG_INFO("Setting starting point of chain to umbrella center: {}", umbrellaMean);
       }
     }
