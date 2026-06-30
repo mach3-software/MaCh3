@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include "Fitters/MulticanonicalMCMCHandler.h"
 #include "Parameters/ParameterHandlerBase.h"
+#include "Samples/HistogramUtils.h"
 
 /// @file MulticanonicalMCMCHandler.cpp
 ///
