@@ -26,7 +26,7 @@ namespace M3{
 /// - Performing Savage-Dickey tests
 /// - Calculating parameter evolution
 /// - Comparing multiple MCMC chains
-  class ProcessMCMCModule: public IModule{
+  class ProcessMCMCModule: public IModuleBase{
 
     public:
       /// @brief Destructor
@@ -97,6 +97,5 @@ namespace M3{
       std::vector <std::string> FileNames;       ///< List of MCMC chain file paths
       std::vector <std::string> TitleNames;      ///< List of titles for each chain
       std::string config;                        ///< Path to the configuration file
-      MaCh3ArgumentParser* m_parser;             ///< Argument parser for this module
   };
 };

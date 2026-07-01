@@ -22,7 +22,7 @@ namespace M3{
   /// This module retrieves penalty terms from flux and cross-section systematic
   /// chains, since these systematic uncertainties are handled separately and the
   /// penalty term cannot be taken directly from the chain.
-  class GetPenaltyTermModule: public IModule{
+  class GetPenaltyTermModule: public IModuleBase{
 
     public:
       /// @brief Destructor
@@ -70,7 +70,5 @@ namespace M3{
       /// @param configFile Path to the YAML configuration file
       void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile);
 
-    private:
-      MaCh3ArgumentParser* m_parser;  ///< Argument parser for this module
   };
 };
