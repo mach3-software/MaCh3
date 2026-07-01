@@ -9,12 +9,10 @@
 
 namespace M3{
 
-  ProcessMCMCModule::~ProcessMCMCModule(){
-    if (this->m_parser) { delete this->m_parser; } 
-  }
+  ProcessMCMCModule::~ProcessMCMCModule() = default;
 
   MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){
-    m_parser = new MaCh3ArgumentParser("process", "1.0", argparse::default_arguments::help);
+    m_parser = std::make_unique<MaCh3ArgumentParser>("process", "1.0", argparse::default_arguments::help);
     m_parser->add_description("Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc.");
     m_parser->add_epilog("""\
   ProcessMCMC The main application for analysing the ND280 chain.\n\
@@ -58,7 +56,7 @@ namespace M3{
       .metavar("MCMC_CHAIN1 [TITLE1 MCMC_CHAIN2 TITLE2 [MCMC_CHAIN3 TITLE3]]")
       .nargs(1, 6)
       .required();
-    return m_parser;
+    return m_parser.get();
   }
 
 

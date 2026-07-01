@@ -11,7 +11,7 @@ namespace M3{
   ///
   /// This module provides diagnostics such as convergence tests, autocorrelation
   /// analysis, and batch means calculations to assess the quality of MCMC samples.
-  class DiagMCMCModule: public IModule{
+  class DiagMCMCModule: public IModuleBase{
 
     public:
       /// @brief Destructor
@@ -24,9 +24,5 @@ namespace M3{
       /// @brief Execute the MCMC diagnostics
       /// @return Exit code (0 on success)
       int Run() override;
-
-
-    private:
-      MaCh3ArgumentParser* m_parser;  ///< Argument parser for this module
   };
 };

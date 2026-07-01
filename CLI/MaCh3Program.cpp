@@ -4,6 +4,7 @@
 #include <dlfcn.h>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include "Manager/MaCh3Logger.h"
 #include "CLI/MaCh3Program.hpp"
@@ -125,59 +126,26 @@ namespace M3{
 
         while (std::getline(ss, path, ':')) {
             for (const auto& sofile : this->expand_plugin_path(path)) {
-                void* handle = dlopen(sofile.c_str(), RTLD_NOW);
-                if (!handle) {
-                    std::cerr << "dlopen failed - shared library '"<< sofile << "' not loaded: " << dlerror() << "\n";
-                    continue;
-                }
 
-                auto create = reinterpret_cast<create_plugin_t>(dlsym(handle, "create_plugin"));
-                auto destroy = reinterpret_cast<destroy_plugin_t>(dlsym(handle, "destroy_plugin"));
-
-                if (!create || !destroy) {
-                    std::cerr << "Invalid plugin: " << sofile << "\n";
-                    dlclose(handle);
-                    continue;
-                }
-
-                IPlugin* plugin = nullptr;
                 try{
-                    plugin = create();
-                    if (!plugin){
-                        throw std::runtime_error("null pointer");
+                    std::unique_ptr<DynamicPlugin> dlplugin = std::make_unique<DynamicPlugin>(sofile);
+                    MaCh3ArgumentParser* parser = dlplugin->get_parser();
+                    if (!parser) {
+                        std::cerr << "Plugin " << sofile << " did not provide a valid parser.\n";
+                        continue;
                     }
-                }
-                catch (...){
-                    std::cerr << "Error instantiating plugin: " << sofile << "\n";
-                    dlclose(handle);
-                    continue;
-                }
 
-                MaCh3ArgumentParser* parser = nullptr;
-                try{
-                    parser = plugin->get_parser();
-                    if (!parser){
-                        throw std::runtime_error("null pointer");
-                    }
-                }
-                catch(...){
-                    std::cerr<< "Error retrieving parser" << "\n";
-                    destroy(plugin);
-                    dlclose(handle);
-                    continue;
-                }
-
-
-                try{
                     this->add_subparser(*parser);
-                    m_dynamic_plugin_map[parser] = new DynamicPlugin(handle, plugin, destroy);
+                    m_dynamic_plugin_map[parser] = std::move(dlplugin);
                     m_subcommands.push_back(parser->name());
                 }
-                catch(...){
-                    std::cerr<< "Error finalising loading of plugin." << "\n";
-                    destroy(plugin);
-                    dlclose(handle);
-                    continue;    
+                catch (const std::exception& e) {
+                    std::cerr << "Failed to load plugin from " << sofile << ": " << e.what() << "\n";
+                    continue;
+                }
+                catch (...) {
+                    std::cerr << "Failed to load plugin from " << sofile << ": unknown error\n";
+                    continue;
                 }
             }
         }
@@ -185,11 +153,8 @@ namespace M3{
 
     /// @brief Unload all dynamic plugins and clean up resources
     ///
-    /// Calls the destroy function for each loaded plugin and closes the dynamic library handles.
+    /// Clears the plugin map. Smart pointers automatically handle cleanup.
     void MaCh3Program::unload_dynamic_plugins(){
-        for (auto& [_, plugin] : m_dynamic_plugin_map){
-            plugin->destroy();
-        }
         m_dynamic_plugin_map.clear();
     }
 
