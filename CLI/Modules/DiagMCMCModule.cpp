@@ -11,12 +11,10 @@
 
 namespace M3{
 
-  DiagMCMCModule::~DiagMCMCModule(){
-    if (this->m_parser) { delete this->m_parser; } 
-  }
+  DiagMCMCModule::~DiagMCMCModule() = default;
 
   MaCh3ArgumentParser* DiagMCMCModule::get_parser(){
-    m_parser = new MaCh3ArgumentParser("diag", "1.0", argparse::default_arguments::help);
+    m_parser = std::make_unique<MaCh3ArgumentParser>("diag", "1.0", argparse::default_arguments::help);
     m_parser->add_argument("mcmc-output")
       .help("MCMC chain root file.")
       .metavar("MCMC_CHAIN")
@@ -25,7 +23,7 @@ namespace M3{
       .help("Config file.")
       .metavar("CONFIG")
       .required();
-    return m_parser;
+    return m_parser.get();
   }
 
 

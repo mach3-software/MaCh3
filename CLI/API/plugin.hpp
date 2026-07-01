@@ -2,6 +2,7 @@
 /// @brief Plugin interface and registration macros for MaCh3
 
 #pragma once
+#include <memory>
 #include "CLI/API/argparse.hpp"
 
 
@@ -28,6 +29,27 @@ namespace M3 {
     /// @typedef IModule
     /// @brief Alias for IPlugin, used for core modules
     typedef IPlugin IModule;
+
+    /// @class IModuleBase
+    /// @brief Base class for core modules in MaCh3
+    ///
+    /// This class provides a common interface for core modules, allowing them
+    /// to be managed and executed by the MaCh3 program.
+    class PluginBase : public IPlugin {
+        public:
+            virtual ~PluginBase() = default;
+
+        protected:
+            /// @brief Argument parser for this plugin
+            std::unique_ptr<MaCh3ArgumentParser> m_parser;  ///< Argument parser for this plugin
+    };
+
+
+
+    /// @typedef IModuleBase
+    /// @brief Alias for IPluginBase, used for core modules
+    typedef PluginBase IModuleBase;
+
 };
 
 /// @typedef create_plugin_t

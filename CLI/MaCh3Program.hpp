@@ -3,6 +3,7 @@
 
 #pragma once
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -69,8 +70,8 @@ namespace M3{
 
         private:
             std::vector<std::string> m_subcommands;                                     ///< List of registered subcommand names
-            std::map<const MaCh3ArgumentParser*, IModule*> m_module_map;                ///< Map of parsers to core modules
-            std::map<const MaCh3ArgumentParser*, DynamicPlugin*> m_dynamic_plugin_map;  ///< Map of parsers to dynamic plugins
+            std::map<const MaCh3ArgumentParser*, IModule*> m_module_map;                ///< Map of parsers to core modules (non-owning)
+            std::map<const MaCh3ArgumentParser*, std::unique_ptr<DynamicPlugin>> m_dynamic_plugin_map;  ///< Map of parsers to dynamic plugins (owning)
 
             static constexpr std::string_view BASH_COMPLETION = R"(
 _mach3_complete() {
