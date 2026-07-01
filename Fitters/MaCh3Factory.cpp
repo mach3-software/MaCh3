@@ -125,6 +125,28 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
       SanityOverwrite(key);
       SanityOverwrite(key2);
       FitManager->OverrideSettings(section, key, key2, value);
+    } else if (colonCount == 4) {
+      const size_t firstColon = arg.find(':');
+      const size_t secondColon = arg.find(':', firstColon + 1);
+      const size_t thirdColon = arg.find(':', secondColon + 1);
+      const size_t fourthColon = arg.find(':', thirdColon + 1);
+
+      const std::string section = arg.substr(0, firstColon);
+      const std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);
+      const std::string key2 = arg.substr(secondColon + 1, thirdColon - secondColon - 1);
+      const std::string key3 = arg.substr(thirdColon + 1, fourthColon - thirdColon - 1);
+      const std::string value = arg.substr(fourthColon + 1);
+
+      MACH3LOG_INFO(
+        "Overriding setting: Section={}, Key={}, Key={}, Key={}, Value={}",
+        section, key, key2, key3, value);
+
+      SanityOverwrite(section);
+      SanityOverwrite(key);
+      SanityOverwrite(key2);
+      SanityOverwrite(key3);
+
+      FitManager->OverrideSettings(section, key, key2, key3, value);
     } else {
       MACH3LOG_ERROR("Invalid override argument format: {}", arg);
       MACH3LOG_ERROR("Expected format:Section:Key:Key:Value, Section:Key:Value or Section:Value");

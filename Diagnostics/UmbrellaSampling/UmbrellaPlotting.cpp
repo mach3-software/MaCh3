@@ -21,7 +21,8 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #pragma GCC diagnostic ignored "-Wconversion"
 
-void UmbrellaPlotting() {
+void UmbrellaPlotting(std::string InputFile,
+                      std::string outputDir) {
     // ============================================
     // Configuration: Number of bins for each variable
     // ============================================
@@ -67,49 +68,11 @@ void UmbrellaPlotting() {
                   << std::endl;
     };
     
+    TFile *f = TFile::Open(InputFile.c_str());
+
     // ============================================
     // Open the ROOT file
-    // ============================================
-    //TFile *f = TFile::Open("hk_umbrella_stepscale_ON_width_0.05_mean_0.725_flipping_0_verbose_test.root");  // Update with your actual filename
-    // TFile *f = TFile::Open("/home/ppe/d/driley/Projects/hk_umbrella/mach3-hk/build/output/hk_umbrella_stepscale_ON_width_0.01_mean_0.725_flipping_0_verbose_test_FLIPPING_DELM23_FIX.root");  // Update with your actual filename
-    // TFile *f = TFile::Open("/home/ppe/d/driley/Projects/hk_umbrella/mach3-hk/build/output/hk_umbrella_stepscale_ON_width_0.01_mean_0.725_flipping_0_verbose_test_FLIPPING_DELM23_FIX_long.root"); 
-    // TFile *f = TFile::Open("/home/ppe/d/driley/Projects/umbrella/utils_mcm/utils_umbrella_multicanonical/window_solver/umbrella_output_fullwidth.root");
-    //TFile *f = TFile::Open("/project/6002456/driley/T2K_outputs/umbrella_testing/AsimovA22_wider_vonMises/window_solve_output/A22_wider_vonMises.root");
-    
-    // current inputs
-    //TFile *f = TFile::Open("/home/driley/Projects-T2K-MaCh3/umbrella_t2k/mcm_utils/utils_umbrella_multicanonical/window_solver/A22_dense_windows_subset_test.root");
-    //std::string outputDir = "outputs/dense_test/";
-    //TFile *f = TFile::Open("/home/driley/Projects-T2K-MaCh3/umbrella_t2k/mcm_utils/utils_umbrella_multicanonical/window_solver/outputs/slurm_31456021/A22_dense_windows_subset_test.root");
-    //std::string outputDir = "outputs/t2k_denser_windows_vmwideish/";
-   
-    //TFile *f = TFile::Open("/home/driley/Projects-T2K-MaCh3/umbrella_t2k/mcm_utils/utils_umbrella_multicanonical/window_solver/outputs/slurm_32871924/A22_gaussian_test.root");
-    //std::string outputDir = "outputs/t2k_gaussian_but_accidentally_vonMises";
-    
-    //TFile *f = TFile::Open("/home/driley/Projects-T2K-MaCh3/umbrella_t2k/mcm_utils/utils_umbrella_multicanonical/window_solver/pihalf_fine_umbrella.root");
-    //std::string outputDir = "outputs/hk_fine/";
-
-    // Raw window file used to read MaCh3_Config YAML (contains Asimov metadata).
-    //std::string mach3ConfigSourceFile = "/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcp_mpihalf_gen_gaus_020626/burnin_window_0.root";
-    // Combined plotting input.
-    //TFile *f = TFile::Open("/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcp_mpihalf_gen_gaus_020626/gen_gaussian_mpihalf.root");
-    //std::string outputDir = "outputs/hk_gengaus_dcpmpihalf/";
-    
-    //std::string mach3ConfigSourceFile = "/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcpzero_gen_gaus_020626/burnin_window_0.root";
-    //TFile *f = TFile::Open("/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcpzero_gen_gaus_020626/gen_gaussian_dcpzerp.root");
-    //std::string outputDir = "outputs/hk_gengaus_dcpzero/";
-    
-    std::string mach3ConfigSourceFile = "/home/driley/projects/def-blairt2k/driley/HyperK_output_archive/umbrella_testing/hk_gen_gaus_dense_2205/archive_2905_sinth23flipping/burnin_window_1.root";
-    TFile *f = TFile::Open("/home/driley/projects/def-blairt2k/driley/HyperK_output_archive/umbrella_testing/hk_gen_gaus_dense_2205/archive_2905_sinth23flipping/gen_gaussian_dense_flipon.root");
-    std::string outputDir = "outputs/hk_gengaus_new_dense_flippingon/";
-
-    //std::string mach3ConfigSourceFile = "/project/6002456/driley/HyperK_output_archive/umbrella_testing/hk_p_pihalf_IO/output_accidentally_NO/burnin_window_0.root";
-    //TFile *f = TFile::Open("/project/6002456/driley/HyperK_output_archive/umbrella_testing/hk_p_pihalf_NO/accidental_NO_results/gen_gaussian_dcpzero_finer_NO_only.root");
-    //std::string outputDir = "outputs/hk_p_pihalf_NO_only/";
-    
-    //std::string mach3ConfigSourceFile = "/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcpzero_gen_gaus_finer_020626/burnin_window_0.root";
-    //TFile *f = TFile::Open("/project/6002456/driley/HyperK_output_archive/umbrella_testing/dcpzero_gen_gaus_finer_020626/gen_gaussian_dcpzero_finer.root");
-    //std::string outputDir = "outputs/hk_gengaus_dcpzero_finer/";
-
+    // ===========================================
     // T2K regerence posterior input
     //std::string referenceFile = "/home/driley/projects/def-blairt2k/driley/T2K_outputs/reduce_AsimovA22Fit_070723_FinalChain.root";
     //std::string referenceTreeName = "osc_posteriors";
@@ -153,76 +116,7 @@ void UmbrellaPlotting() {
 
     // Read Asimov metadata from MaCh3_Config YAML in the raw chain file.
     // this is for plotting of asimov point 
-    bool hasMaCh3Config = false;
     bool isAsimovChain = false;
-    std::vector<double> asimovOscillationParameters;
-
-    double asimovSin2th12 = std::numeric_limits<double>::quiet_NaN();
-    double asimovSin2th23 = std::numeric_limits<double>::quiet_NaN();
-    double asimovSin2th13 = std::numeric_limits<double>::quiet_NaN();
-    double asimovDelm12 = std::numeric_limits<double>::quiet_NaN();
-    double asimovDelm23 = std::numeric_limits<double>::quiet_NaN();
-    double asimovDcp = std::numeric_limits<double>::quiet_NaN();
-    double asimovBaseline = std::numeric_limits<double>::quiet_NaN();
-    double asimovElectronDensity = std::numeric_limits<double>::quiet_NaN();
-
-    TFile *fConfig = TFile::Open(mach3ConfigSourceFile.c_str());
-    if (!fConfig || fConfig->IsZombie()) {
-        std::cerr << "Error: Cannot open MaCh3 config source file: " << mach3ConfigSourceFile << std::endl;
-        return;
-    } else {
-        TMacro *mach3ConfigMacro = dynamic_cast<TMacro *>(fConfig->Get("MaCh3_Config"));
-        if (!mach3ConfigMacro) {
-            std::cerr << "Error: MaCh3_Config not found in " << mach3ConfigSourceFile << std::endl;
-            fConfig->Close();
-            return;
-        } else {
-            hasMaCh3Config = true;
-            const std::string tmpYamlPath = std::string(gSystem->TempDirectory()) + "/umbrella_plotting_MaCh3_Config.yaml";
-            mach3ConfigMacro->SaveSource(tmpYamlPath.c_str());
-
-            try {
-                YAML::Node cfg = YAML::LoadFile(tmpYamlPath);
-                YAML::Node general = cfg["General"];
-                isAsimovChain = general["Asimov"].as<bool>();
-                YAML::Node osc = general["OscillationParameters"];
-                for (std::size_t i = 0; i < osc.size(); ++i) {
-                    asimovOscillationParameters.push_back(osc[i].as<double>());
-                }
-            } catch (const std::exception &e) {
-                std::cerr << "Error: Failed to parse MaCh3_Config YAML with yaml-cpp: " << e.what() << std::endl;
-                fConfig->Close();
-                return;
-            }
-        }
-        fConfig->Close();
-    }
-
-    asimovSin2th12 = asimovOscillationParameters[0];
-    asimovSin2th23 = asimovOscillationParameters[1];
-    asimovSin2th13 = asimovOscillationParameters[2];
-    asimovDelm12 = asimovOscillationParameters[3];
-    asimovDelm23 = asimovOscillationParameters[4];
-    asimovDcp = asimovOscillationParameters[5];
-    asimovBaseline = asimovOscillationParameters[6];
-    asimovElectronDensity = asimovOscillationParameters[7];
-
-    std::cout << "[DEBUG] hasMaCh3Config=" << hasMaCh3Config
-              << " isAsimovChain=" << isAsimovChain
-              << " oscParamCount=" << asimovOscillationParameters.size() << std::endl;
-    if (isAsimovChain && !asimovOscillationParameters.empty()) {
-        std::cout << std::fixed << std::setprecision(6)
-                  << "[DEBUG] Asimov named values: "
-                  << "sin2th12=" << asimovSin2th12
-                  << " sin2th23=" << asimovSin2th23
-                  << " sin2th13=" << asimovSin2th13
-                  << " delm12=" << asimovDelm12
-                  << " delm23=" << asimovDelm23
-                  << " dcp(rad)=" << asimovDcp
-                  << " baseline=" << asimovBaseline
-                  << " electronDensity=" << asimovElectronDensity
-                  << std::endl;
-    }
 
     auto calculateJarlskog = [&](double sin2th12, double sin2th23, double sin2th13, double dcp) {
         if (!std::isfinite(sin2th12) || !std::isfinite(sin2th23) || !std::isfinite(sin2th13) || !std::isfinite(dcp)) {
@@ -2005,5 +1899,13 @@ void UmbrellaPlotting() {
     } else {
         std::cout << "WARNING:::::No umbrella weights found, skipping weighted triangle plots marginalized by ordering." << std::endl;
     }
+}
 
+// Main function for compiled version
+int main(int argc, char *argv[]) {
+    std::string InputFile = argv[1];
+    std::string outputDir = argv[2];
+
+    UmbrellaPlotting(InputFile, outputDir);
+    return 0;
 }
