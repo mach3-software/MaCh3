@@ -79,6 +79,15 @@ void UmbrellaPlotting(std::string InputFile,
     bool use_reference_chain = false;
     bool use_reference_LLH_scan = true;
     
+    double asimovSin2th12 = std::numeric_limits<double>::quiet_NaN();
+    double asimovSin2th23 = std::numeric_limits<double>::quiet_NaN();
+    double asimovSin2th13 = std::numeric_limits<double>::quiet_NaN();
+    double asimovDelm12 = std::numeric_limits<double>::quiet_NaN();
+    double asimovDelm23 = std::numeric_limits<double>::quiet_NaN();
+    double asimovDcp = std::numeric_limits<double>::quiet_NaN();
+    double asimovBaseline = std::numeric_limits<double>::quiet_NaN();
+    double asimovElectronDensity = std::numeric_limits<double>::quiet_NaN();
+
     // load in reference chain
     std::string referenceFile = "";
     std::string referenceTreeName = "";
