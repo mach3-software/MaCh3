@@ -636,7 +636,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
   for (int iVar = 0 ; iVar < matrixSize; iVar++) {
     // if((*cov)(iVar, iVar)>1e-4){
       matrix_shift[iVar] = 1e-9;
-    }
+    // }
   }
 
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
