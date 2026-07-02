@@ -657,12 +657,12 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
         continue;
       }
       // HW: If we exceed by factor of 10 we stop updating!
-      if(*(cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
-        MACH3LOG_WARNING("Diagonal element {} has been shifted too much (>{} times original value). Stopping further shifts.", iVar, 10);
-        orginal_diagonal[iVar] = 0; // Prevent further shifts for this element
+      if( (*cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
+        MACH3LOG_WARN("Diagonal element {} has been shifted too much (>{} times original value). Stopping further shifts.", iVar, 10);
+        original_diagonal[iVar] = 0; // Prevent further shifts for this element
         continue;
       }
-      (*cov)(iVar, iVar) += matrix_shift[iVar];
+      (*cov)(iVar, iVar) += 1e-9;
     }
   }
 
