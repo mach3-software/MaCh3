@@ -822,15 +822,15 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
-  for(int k = 1; k < 480; k++){ // Left regularisation
-    if(_fPropVal[k] == 0 || _fPropVal[k-1] == 0 || k % 40 == 0) { // Do not regularise across boundaries or if params are 0
+  for(int k = 1; k < _fNumPar; k++){ // Left regularisation
+    if(_fPropVal[k] == 0 || _fPropVal[k-1] == 0 || k % (_fNumPar / 12) == 0) { // Do not regularise across boundaries or if params are 0
       continue;
     }
     double ParamDiff = _fPropVal[k] - _fPropVal[k-1];
     logL += RegVal * ParamDiff * ParamDiff / (_fPropVal[k] * _fPropVal[k]); 
   }
-  for(int k = 0; k < 479; k++){ // Right regularisation
-    if(_fPropVal[k] == 0 || _fPropVal[k+1] == 0 || (k+1) % 40 == 0) { // Do not regularise across boundaries or if params are 0
+  for(int k = 0; k < _fNumPar - 1; k++){ // Right regularisation
+    if(_fPropVal[k] == 0 || _fPropVal[k+1] == 0 || (k+1) % (_fNumPar / 12) == 0) { // Do not regularise across boundaries or if params are 0
       continue;
     }
     double ParamDiff = _fPropVal[k] - _fPropVal[k+1];
