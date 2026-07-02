@@ -548,7 +548,7 @@ inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
 }
 
 // *************************************
-// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
+// @brief Checks main contributors to the eigenvalues of a matrix and prints them out for debugging
 inline void DiagnoseMatrixPosDef(TMatrixDSym* cov, const std::vector<std::string>& FancyNames={}) {
 // *************************************
   if(!cov) {
@@ -556,10 +556,7 @@ inline void DiagnoseMatrixPosDef(TMatrixDSym* cov, const std::vector<std::string
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-
   // HW: Apologies anyone looking at this code, ROOT's linear algebra is horrible!
-
-  // Do eigenvalue decomposition to check for positive definiteness
   TMatrixDSymEigen eigenDecomp(*cov);
   TVectorD eigenValues = eigenDecomp.GetEigenValues();
   
@@ -569,48 +566,51 @@ inline void DiagnoseMatrixPosDef(TMatrixDSym* cov, const std::vector<std::string
     return;
   }
 
-  // Count the actual number of negative eigenvalues
   int numNegEigenValues = 0;
   for (int i = 0; i < eigenValues.GetNrows(); ++i) {
     if (eigenValues[i] < 0) { numNegEigenValues++; }
   }
 
-  MACH3LOG_ERROR("Matrix is not positive semi-definite. Found {} negative eigenvalues out of {} total.", 
-                 numNegEigenValues, eigenValues.GetNrows());
+  int evals_to_show = std::min(5, numNegEigenValues);
+  MACH3LOG_WARN("Matrix is not positive semi-definite. Found {} negative eigenvalues out of {} total. Displaying top {}", 
+                 numNegEigenValues, eigenValues.GetNrows(), evals_to_show);
   
-  // TMatrixDSymEigen returns eigenvectors as the columns of a standard TMatrixD
   const TMatrixD& eigenVectors = eigenDecomp.GetEigenVectors();
-  
-  // Loop over the eigenvalues to diagnose the negative ones
-  for (int i = 0; i < eigenValues.GetNrows(); ++i) {
-    if (eigenValues[i] < 0) {
-      MACH3LOG_ERROR("Eigenvalue {}: {}", i, eigenValues[i]);
+  for (int i = 0; i < evals_to_show; ++i) {
+
+    // HW: Want MOST Negative eigenvals so go backwards!
+    int idx = eigenValues.GetNrows() - 1 - i;
+    if (eigenValues[idx] < 0) {
       
+      MACH3LOG_WARN("Top contributors to negative Eigenvalue {} (={:.4f}):", i, eigenValues[idx]);
       // Correct way to pull a column out of a ROOT TMatrixD
       TVectorD eigenVector(eigenVectors.GetNrows());
       for (int r = 0; r < eigenVectors.GetNrows(); ++r) {
-        eigenVector[r] = eigenVectors[r][i]; // [row][column]
+        eigenVector[r] = eigenVectors[r][idx];
       }
 
-      // Find the top contributors to this eigenvector
+      // HW: Find the top contributors to this eigenvector
       std::vector<std::pair<int, double>> contributions;
       contributions.reserve(eigenVector.GetNrows());
       for (int j = 0; j < eigenVector.GetNrows(); ++j) {
         contributions.emplace_back(j, std::abs(eigenVector[j]));
       }
       
+      // Sort contributions by magnitude in descending order (std::sort bad but I'm lazy)
       std::sort(contributions.begin(), contributions.end(), [](const auto& a, const auto& b) {
         return a.second > b.second;
       });
       
-      MACH3LOG_ERROR("Top contributors to negative Eigenvalue {}:", i);
       int maxOutput = std::min(10, static_cast<int>(contributions.size()));
       for (int k = 0; k < maxOutput; ++k) {
         int index = contributions[k].first;
         double value = contributions[k].second;
-        // Safe size check conversion
-        std::string name = (index < static_cast<int>(FancyNames.size())) ? FancyNames[index] : "Unknown";
-        MACH3LOG_ERROR("  Index {}: {}, Magnitude: {:.4f}", index, name, value);
+        
+        std::string name = "Unknown";
+        if (index < static_cast<int>(FancyNames.size())) {
+          name = FancyNames[index];
+        }
+        MACH3LOG_WARN("  Index {}: {}, Magnitude: {:.4f}", index, name, value);
       }
     }
   }
@@ -621,6 +621,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
 // *************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
+
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
 
@@ -640,20 +641,25 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
     if (CanDecomposeMatrix(*cov)) {
       CanDecomp = true;
       break;
-    } else {
-      #ifdef MULTITHREAD
-      #pragma omp parallel for
-      #endif
-      for (int iVar = 0 ; iVar < matrixSize; iVar++) {
-        (*cov)(iVar, iVar) += matrix_shift[iVar];
-      }
+    }
+
+    if(iAttempt == 0){
+      MACH3LOG_WARN("Matrix is not positive definite, attempting to shift diagonal by 1e-9 of the diagonal values");
+      MACH3LOG_WARN("The following eigenvalue diagnostics may help identify the problem:");
+      M3::DiagnoseMatrixPosDef(cov, FancyNames);
+    }
+
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
+    for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+      (*cov)(iVar, iVar) += matrix_shift[iVar];
     }
   }
 
   if (!CanDecomp) {
     MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix, the following diagnostics may help:");
-    DiagnoseMatrixPosDef(cov, FancyNames);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 

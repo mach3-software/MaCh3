@@ -857,7 +857,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);
   }
 
-  M3::MakeMatrixPosDef(cov);
+  M3::MakeMatrixPosDef(cov, _fFancyNames);
 }
 
 // ********************************************
