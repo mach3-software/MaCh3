@@ -610,7 +610,7 @@ inline void DiagnoseMatrixPosDef(TMatrixDSym* cov, const std::vector<std::string
         if (index < static_cast<int>(FancyNames.size())) {
           name = FancyNames[index];
         }
-        MACH3LOG_WARN("  Index {}: {}, Magnitude: {:.4f}", index, name, value);
+        MACH3LOG_WARN("  Index {}: {}, Magnitude: {:.4e}", index, name, value);
       }
     }
   }
