@@ -348,9 +348,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   MACH3LOG_INFO("Getting starting position from {}", FitName);
   TFile *infile = M3::Open(FitName, "READ", __FILE__, __LINE__);
   TTree *posts = infile->Get<TTree>("posteriors");
-  unsigned int step_val = 0;
   double log_val = M3::_LARGE_LOGL_;
-  posts->SetBranchAddress("step",&step_val);
   posts->SetBranchAddress("LogL",&log_val);
 
   for (size_t s = 0; s < systematics.size(); ++s)
@@ -388,22 +386,17 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
     systematics[s]->PrintPreFitCurrPropValues();
 
-    // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
+    // Resetting branch addressed to nullptr as we don't want to write into a deleted vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
     }
   }
   logLCurr = log_val;
   logLProp = log_val;
+
   delete posts;
   infile->Close();
   delete infile;
-
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    if(systematics[s]->GetDoAdaption()){ //Use separate throw matrix for xsec
-      systematics[s]->SetNumberOfSteps(step_val);
-    }
-  }
 }
 
 // *******************
