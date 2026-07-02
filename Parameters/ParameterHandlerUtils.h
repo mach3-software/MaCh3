@@ -634,7 +634,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
   // HW: We'll store the diagonal *1e-9 first to prevent inflating the matrix too much!
   std::vector<double> matrix_shift(matrixSize, 0.0);
   for (int iVar = 0 ; iVar < matrixSize; iVar++) {
-    if((*cov)(iVar, iVar)>1e-4){
+    // if((*cov)(iVar, iVar)>1e-4){
       matrix_shift[iVar] = 1e-9;
     }
   }
