@@ -632,11 +632,9 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
   bool CanDecomp = false;
   
   // HW: We'll store the diagonal *1e-9 first to prevent inflating the matrix too much!
-  std::vector<double> matrix_shift(matrixSize, 0.0);
+  std::vector<double> original_diagonal(matrixSize, 0.0);
   for (int iVar = 0 ; iVar < matrixSize; iVar++) {
-    if((*cov)(iVar, iVar)>1e-6){
-      matrix_shift[iVar] = 1e-9;
-    }
+    original_diagonal[iVar] = (*cov)(iVar, iVar);
   }
 
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
@@ -655,6 +653,15 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
     #pragma omp parallel for
     #endif
     for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+      if(original_diagonal[iVar] == 0){
+        continue;
+      }
+      // HW: If we exceed by factor of 10 we stop updating!
+      if(*(cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
+        MACH3LOG_WARNING("Diagonal element {} has been shifted too much (>{} times original value). Stopping further shifts.", iVar, 10);
+        orginal_diagonal[iVar] = 0; // Prevent further shifts for this element
+        continue;
+      }
       (*cov)(iVar, iVar) += matrix_shift[iVar];
     }
   }
