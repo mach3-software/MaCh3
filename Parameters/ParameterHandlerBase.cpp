@@ -850,14 +850,19 @@ void ParameterHandlerBase::PrintIndivStepScale() const {
 
 // ********************************************
 //Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
-void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
+void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov, bool verbose) {
 // ********************************************
   if(cov == nullptr){
     cov = &*covMatrix;
     MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);
   }
 
-  M3::MakeMatrixPosDef(cov);
+  int n_attempts = M3::MakeMatrixPosDef(cov);
+
+  if(n_attempts > 0 && verbose) {
+    MACH3LOG_WARN("Covariance matrix {} was not positive-definite, made it positive-definite after {} attempts", matrixName, n_attempts);
+  }
+
 }
 
 // ********************************************
@@ -903,7 +908,11 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
-  else MakePosDef(throwMatrix);
+  else {
+    // HW: Prevent spam from adaptive handler
+    bool verbose = AdaptiveHandler ? AdaptiveHandler->GetTotalSteps() < 2 : true;
+    MakePosDef(throwMatrix, verbose);
+  }
 
   auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
 

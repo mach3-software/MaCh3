@@ -8,7 +8,6 @@
 #include "Parameters/ParameterTunes.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
-///
 /// @details Provides core functionality for managing systematic parameters,
 /// including likelihood evaluation and covariance handling.
 ///
@@ -354,7 +353,8 @@ class ParameterHandlerBase {
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness
-  void MakePosDef(TMatrixDSym *cov = nullptr);
+  /// @param verbose Do we want it to print warning if it was not positive definite and we had to fix it
+  void MakePosDef(TMatrixDSym *cov = nullptr, bool verbose = true);
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
   void MakeClosestPosDef(TMatrixDSym *cov);
