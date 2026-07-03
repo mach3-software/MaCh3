@@ -653,9 +653,9 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov, const std::vector<std::string>& F
     #pragma omp parallel for
     #endif
     for (int iVar = 0 ; iVar < matrixSize; iVar++) {
-      if(original_diagonal[iVar] == 0){
-        continue;
-      }
+      // if(original_diagonal[iVar] == 0){
+      //   continue;
+      // }
       // HW: If we exceed by factor of 10 we stop updating!
       if( (*cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
         MACH3LOG_WARN("Diagonal element {} has been shifted too much (>{} times original value). Stopping further shifts.", iVar, 10);
