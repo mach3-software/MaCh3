@@ -183,8 +183,8 @@ int main(int argc, char *argv[]) {
   MACH3LOG_INFO("... Starting generating 1D profiled and marginalized likelihoods ...");
   MACH3LOG_WARN("!!! LLHMap numerical marginalization assumes uncorrelated priors !!!");
 
-  std::map<std::string, TH1D*> hProfiles1d;
-  std::map<std::string, TH1D*> hMarginals1d;
+  std::map<std::string, std::unique_ptr<TH1D>> hProfiles1d;
+  std::map<std::string, std::unique_ptr<TH1D>> hMarginals1d;
   for(auto p = ParamsToProfile.begin(); p != ParamsToProfile.end(); ++p)
   {
     // Find the binning for the histograms.
@@ -197,8 +197,13 @@ int main(int argc, char *argv[]) {
     std::string hMargTitle = *p+" marginalized L";
     std::string hMargName = *p+"_LMarg1D";
 
-    TH1D* hprof1d = new TH1D(hProfName.c_str(), hProfTitle.c_str(), int(binning.second.size()-1), binning.second.data());
-    TH1D* hmarg1d = new TH1D(hMargName.c_str(), hMargTitle.c_str(), int(binning.second.size()-1), binning.second.data());
+    // Prepare histograms and detach from ROOT
+    auto hprof1d = std::make_unique<TH1D>(hProfName.c_str(), hProfTitle.c_str(), int(binning.second.size()-1), binning.second.data());
+    hprof1d->SetDirectory(nullptr);
+
+    auto hmarg1d = std::make_unique<TH1D>(hMargName.c_str(), hMargTitle.c_str(), int(binning.second.size()-1), binning.second.data());
+    hmarg1d->SetDirectory(nullptr);
+
     if (binning.first)
     {
       MACH3LOG_INFO("Initializing 1D profiled -2LogL and marginalized L histograms for {} of {} bins from {:.3e} to {:.3e} (bin center at {:.3e} and {:.3e})", *p, hprof1d->GetNbinsX(), hprof1d->GetXaxis()->GetXmin(), hprof1d->GetXaxis()->GetXmax(), hprof1d->GetBinCenter(1), hprof1d->GetBinCenter(hprof1d->GetNbinsX()));
@@ -216,8 +221,8 @@ int main(int argc, char *argv[]) {
       MACH3LOG_INFO("Initializing 1D profiled -2LogL and marginalized L histograms of {} bins with edges{}.", binning.second.size(), binnies);
     }
 
-    hProfiles1d[*p]  = hprof1d;
-    hMarginals1d[*p] = hmarg1d;
+    hProfiles1d[*p]  = std::move(hprof1d);
+    hMarginals1d[*p] = std::move(hmarg1d);
   }
 
   for(auto p = ParamsToProfile.begin(); p != ParamsToProfile.end(); ++p)
@@ -266,8 +271,8 @@ int main(int argc, char *argv[]) {
 
     std::vector<std::string> Keys2D;
     std::vector<std::string> ParamsFiltered;
-    std::map<std::string, TH2D*> hProfiles2d;
-    std::map<std::string, TH2D*> hMarginals2d;
+    std::map<std::string, std::unique_ptr<TH2D>> hProfiles2d;
+    std::map<std::string, std::unique_ptr<TH2D>> hMarginals2d;
 
     for(auto p : ParamsToProfile)
     {
@@ -295,23 +300,25 @@ int main(int argc, char *argv[]) {
 
         std::string hProfTitle = *p1+" vs. "+*p2+" profiled -2LogL";
         std::string hProfName = key+"_LLHProf2D";
-        TH2D* hprof2d = new TH2D(
+        auto hprof2d = std::make_unique<TH2D>(
             hProfName.c_str(), hProfTitle.c_str(),
             h1->GetXaxis()->GetNbins(), h1->GetXaxis()->GetXbins()->GetArray(),
             h2->GetXaxis()->GetNbins(), h2->GetXaxis()->GetXbins()->GetArray()
         );
+        hprof2d->SetDirectory(nullptr);
 
-        hProfiles2d[key] = hprof2d;
+        hProfiles2d[key] = std::move(hprof2d);
 
         std::string hMargTitle = *p1+" vs. "+*p2+" marginalized L";
         std::string hMargName = key+"_LMarg1D";
-        TH2D* hmarg2d = new TH2D(
+        auto hmarg2d = std::make_unique<TH2D>(
             hMargName.c_str(), hMargTitle.c_str(),
             h1->GetXaxis()->GetNbins(), h1->GetXaxis()->GetXbins()->GetArray(),
             h2->GetXaxis()->GetNbins(), h2->GetXaxis()->GetXbins()->GetArray()
         );
+        hmarg2d->SetDirectory(nullptr);
 
-        hMarginals2d[key] = hmarg2d;
+        hMarginals2d[key] = std::move(hmarg2d);
       }
     }
 
@@ -348,7 +355,8 @@ int main(int argc, char *argv[]) {
             if(llhmin >= M3::_LARGE_LOGL_) llhmin = -12345;
             hProfiles2d[key]->SetBinContent(bidx, bidy, llhmin);
 
-            auto L = LLHMap.Filter(*p1+">"+std::to_string(bx_lo)+"&&"+*p1+"<"+std::to_string(bx_hi)+"&&"+*p2+">"+std::to_string(by_lo)+"&&"+*p2+"<"+std::to_string(by_hi)).Sum("L");
+            auto L = LLHMap.Filter(*p1+">"+std::to_string(bx_lo)+"&&"+*p1+"<"+std::to_string(bx_hi)
+                                  +"&&"+*p2+">"+std::to_string(by_lo)+"&&"+*p2+"<"+std::to_string(by_hi)).Sum("L");
 
             hMarginals2d[key]->SetBinContent(bidx,bidy, *L);
           } // end bins y loop
