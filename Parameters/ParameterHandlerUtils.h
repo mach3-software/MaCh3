@@ -549,7 +549,7 @@ inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
 
 // *************************************
 /// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
-inline void MakeMatrixPosDef(TMatrixDSym *cov) {
+inline int MakeMatrixPosDef(TMatrixDSym *cov) {
 // *************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
@@ -568,15 +568,14 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
     original_diagonal[iVar] = (*cov)(iVar, iVar);
   }
 
+  int attempts = 0;
+
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
     if (CanDecomposeMatrix(*cov)) {
-      if(iAttempt > 0){
-      	MACH3LOG_WARN("Matrix now positive definite, took {} shifts to fix", iAttempt+1);
-      }
 
       CanDecomp = true;
-      break;
-    } 
+      attempts = iAttempt;
+    }
     else {
       #ifdef MULTITHREAD
       #pragma omp parallel for
@@ -600,6 +599,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
 
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
+  return attempts;
 }
 
 
