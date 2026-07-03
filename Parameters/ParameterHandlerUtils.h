@@ -549,7 +549,7 @@ inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
 
 // *************************************
 /// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
-inline void MakeMatrixPosDef(TMatrixDSym *cov) {
+inline int MakeMatrixPosDef(TMatrixDSym *cov) {
 // *************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
@@ -561,16 +561,31 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
   const int matrixSize = cov->GetNrows();
   int iAttempt = 0;
   bool CanDecomp = false;
+  
+  // HW: We'll store the diagonal first to prevent inflating the matrix too much!
+  std::vector<double> original_diagonal(matrixSize, 0.0);
+  for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+    original_diagonal[iVar] = (*cov)(iVar, iVar);
+  }
+
+  int attempts = 0;
 
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
     if (CanDecomposeMatrix(*cov)) {
       CanDecomp = true;
+      attempts = iAttempt;
       break;
-    } else {
+    }
+    else {
       #ifdef MULTITHREAD
       #pragma omp parallel for
-      #endif
+      #endif 
       for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+        if( (*cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
+          MACH3LOG_DEBUG("Diagonal element {} has been shifted too much (> original value/10). Stopping further shifts.", iVar);
+          original_diagonal[iVar] = 0; // Prevent further shifts for this element
+          continue;
+        }
         (*cov)(iVar, iVar) += 1e-9;
       }
     }
@@ -584,6 +599,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
 
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
+  return attempts;
 }
 
 
