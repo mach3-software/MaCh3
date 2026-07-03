@@ -8,7 +8,6 @@
 #include "Parameters/ParameterTunes.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
-///verbose
 /// @details Provides core functionality for managing systematic parameters,
 /// including likelihood evaluation and covariance handling.
 ///
