@@ -69,7 +69,7 @@ std::pair<bool,std::vector<double>> ExtractBinning(std::string param, YAML::Node
     nExpBins = GetFromManager<unsigned int>(Settings["LLHScan"]["ScanPoints"][param], nExpBins, __FILE__, __LINE__);
 
 
-  // Preparing a histogram. Again, this now works only with uniform steps in LLHMap
+  // Preparing a histogram.
   auto values = Map.Take<double>(param.c_str());
 
   // remove duplicates
@@ -82,7 +82,7 @@ std::pair<bool,std::vector<double>> ExtractBinning(std::string param, YAML::Node
     nExpBins = static_cast<unsigned int>(unique.size());
   }
 
-  // Extract minimum and mximum
+  // Extract minimum and maximum
   double minx = *unique.begin();
   double maxx = *unique.rbegin();
 
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
   auto Map = ROOT::RDataFrame("llhmap", inpFileList);
 
   // Now prepare the L column
-  // TODO: Let
+  // TODO: Let the user choose whether they want the Total_LLH or something else... but why?
   auto LLHMap = Map.Define("L", "exp(-0.5*Total_LLH)");
 
   // Process what parameters to plot
@@ -285,20 +285,8 @@ int main(int argc, char *argv[]) {
     {
       for(auto p2 = std::next(p1); p2 != ParamsFiltered.end(); ++p2)
       {
-        // Skip whenever p1 == p2 or already profiled in reversed order (p1-p2 or p2-p1)
-        // if(p1 == p2)
-        //   continue;
-        // if(std::find(Strings2D.begin(), Strings2D.end(), p2+"_"+p1) != Strings2D.end())
-        //   continue;
-
-        // std::string hProf1Name = p1+"_LLHProf1D";
-        // std::string hProf2Name = p2+"_LLHProf1D";
-
-        // Get the binning info from 1D histograms
-
         auto h1 = DirProfile1D->Get<TH1D>((*p1+"_LLHProf1D").c_str());
         auto h2 = DirProfile1D->Get<TH1D>((*p2+"_LLHProf1D").c_str());
-
 
         std::string key = *p1+"_"+*p2;
         Keys2D.push_back(key);
@@ -353,10 +341,10 @@ int main(int argc, char *argv[]) {
             auto by_lo = hProfiles2d[key]->GetYaxis()->GetBinLowEdge(bidy);
             auto by_hi = by_lo + hProfiles2d[key]->GetYaxis()->GetBinWidth(bidy);
 
+            // TODO: Think how to do this smarter and faster
             double llhmin = LLHMap.Filter(*p1+">"+std::to_string(bx_lo)+"&&"+*p1+"<"+std::to_string(bx_hi)+"&&"+*p2+">"+std::to_string(by_lo)+"&&"+*p2+"<"+std::to_string(by_hi)).Min("Total_LLH").GetValue();
 
-            // Rather store a non-sensensical value if out of bounds
-            // TODO: Think how to do this smarter and faster
+            // Rather store a non-sensical value if out of bounds
             if(llhmin >= M3::_LARGE_LOGL_) llhmin = -12345;
             hProfiles2d[key]->SetBinContent(bidx, bidy, llhmin);
 
