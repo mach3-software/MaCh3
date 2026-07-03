@@ -64,9 +64,9 @@ std::pair<bool,std::vector<double>> ExtractBinning(std::string param, YAML::Node
 // *******************
 {
   // Expected number of bins based on the config
-  long unsigned int nExpBins = GetFromManager<long unsigned int>(Settings["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
+  unsigned int nExpBins = GetFromManager<unsigned int>(Settings["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
   if(CheckNodeExists(Settings,"LLHScan","ScanPoints"))
-    nExpBins = GetFromManager<int>(Settings["LLHScan"]["ScanPoints"][param], nExpBins, __FILE__, __LINE__);
+    nExpBins = GetFromManager<unsigned int>(Settings["LLHScan"]["ScanPoints"][param], nExpBins, __FILE__, __LINE__);
 
 
   // Preparing a histogram. Again, this now works only with uniform steps in LLHMap
@@ -77,9 +77,9 @@ std::pair<bool,std::vector<double>> ExtractBinning(std::string param, YAML::Node
 
   MACH3LOG_INFO("There are {} values (bins) for parameter {} inside LLHMap.", unique.size(), param);
 
-  if(nExpBins != unique.size()) {
+  if(nExpBins != static_cast<unsigned int>(unique.size())) {
     MACH3LOG_WARN("The config expects different number of {} bins for parameter {} than {} values included in LLHMap!", nExpBins, param, unique.size());
-    nExpBins = unique.size();
+    nExpBins = static_cast<unsigned int>(unique.size());
   }
 
   // Extract minimum and mximum
@@ -95,7 +95,7 @@ std::pair<bool,std::vector<double>> ExtractBinning(std::string param, YAML::Node
   }
 
   if (unique.size() > 1) {
-    int bins = int( 1 + std::abs(maxx-minx) / minDiff );
+    unsigned int bins = static_cast<unsigned int>( 1 + std::abs(maxx-minx) / minDiff );
     if (nExpBins != bins) {
       MACH3LOG_WARN("The scan is not uniform! Instead, we will use bins based on unique scan values and minimal {:.3e} distance between them!", minDiff);
       nExpBins = 0;
@@ -197,8 +197,8 @@ int main(int argc, char *argv[]) {
     std::string hMargTitle = *p+" marginalized L";
     std::string hMargName = *p+"_LMarg1D";
 
-    TH1D* hprof1d = new TH1D(hProfName.c_str(), hProfTitle.c_str(), binning.second.size()-1, binning.second.data());
-    TH1D* hmarg1d = new TH1D(hMargName.c_str(), hMargTitle.c_str(), binning.second.size()-1, binning.second.data());
+    TH1D* hprof1d = new TH1D(hProfName.c_str(), hProfTitle.c_str(), int(binning.second.size()-1), binning.second.data());
+    TH1D* hmarg1d = new TH1D(hMargName.c_str(), hMargTitle.c_str(), int(binning.second.size()-1), binning.second.data());
     if (binning.first)
     {
       MACH3LOG_INFO("Initializing 1D profiled -2LogL and marginalized L histograms for {} of {} bins from {:.3e} to {:.3e} (bin center at {:.3e} and {:.3e})", *p, hprof1d->GetNbinsX(), hprof1d->GetXaxis()->GetXmin(), hprof1d->GetXaxis()->GetXmax(), hprof1d->GetBinCenter(1), hprof1d->GetBinCenter(hprof1d->GetNbinsX()));
