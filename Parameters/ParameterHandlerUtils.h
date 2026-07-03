@@ -572,9 +572,9 @@ inline int MakeMatrixPosDef(TMatrixDSym *cov) {
 
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
     if (CanDecomposeMatrix(*cov)) {
-
       CanDecomp = true;
       attempts = iAttempt;
+      break;
     }
     else {
       #ifdef MULTITHREAD
