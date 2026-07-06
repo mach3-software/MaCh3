@@ -33,6 +33,10 @@ jobs:
             test: MaCh3CLI --FitterValidations
             compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
+          - name: Multi Canonical Validations
+            test: MaCh3CLI --MultiCanonicalValidations
+            compilation_flags:
+            
           - name: NuMCMC Tools Validations
             test: MaCh3CLI --NuMCMCToolsValidations
             compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
