@@ -31,6 +31,8 @@ ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFil
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = true;
+  flipdelMProb = 0.5;
+  flipLoc = 0;
 
   Randomize();
   Print();
@@ -52,8 +54,9 @@ void ParameterHandlerOsc::ProposeStep() {
 
   // Okay now we've done the standard steps, we can add in our nice flips
   // hierarchy flip first
-  if(random_number[0]->Uniform() < 0.5 && flipdelM){
-    _fPropVal[kDeltaM23] *= -1;
+  if(random_number[0]->Uniform() < flipdelMProb && flipdelM){
+    // std::cout << "Flipping delm23 sign with prob " << flipdelMProb << std::endl;
+    _fPropVal[kDeltaM23] = 2*flipLoc - _fPropVal[kDeltaM23];
   }
   // now octant flip
   if(random_number[0]->Uniform() < 0.5) {

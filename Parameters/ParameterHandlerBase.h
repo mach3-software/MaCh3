@@ -482,6 +482,14 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
+  /// HH: Whether to apply step prior or not
+  std::vector<bool> _fStepPrior;
+  /// HH: Location of step prior
+  std::vector<double> _fStepPriorLoc;
+  /// HH: Lower part of step prior
+  std::vector<double> _fStepPriorLower;
+  /// HH: Upper part of step prior
+  std::vector<double> _fStepPriorUpper;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 

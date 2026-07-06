@@ -17,6 +17,8 @@ class ParameterHandlerOsc : public ParameterHandlerBase
   void ProposeStep() override;
   /// @brief Sets whether to flip delta M23.
   void SetFlipDeltaM23(bool flip){flipdelM = flip;}
+  void SetFlipDeltaM23Prob(double prob){flipdelMProb = prob;}
+  void SetFlipLoc(double loc){flipLoc = loc;}
   /// @brief Get pointers to Osc params from Sample name
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
@@ -28,6 +30,8 @@ class ParameterHandlerOsc : public ParameterHandlerBase
     void CircularPrior(const int i, const double LowBound, const double UpBound);
     /// Do we flip DeltaM23 or not
     bool flipdelM;
+    double flipdelMProb; 
+    double flipLoc;
     /// There is special treatment for delta CP, therefore store enum keeping track when to apply special treatment
     int kDeltaCP;
     /// There is special treatment for DeltaM23, therefore store enum keeping track when to apply special treatment

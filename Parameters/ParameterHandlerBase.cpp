@@ -208,6 +208,12 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
     //ETA - now for parameters which are optional and have default values
     _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
 
+    // HH
+    _fStepPrior[i] = GetFromManager<bool>(param["Systematic"]["StepPrior"], false, __FILE__ , __LINE__);
+    _fStepPriorLoc[i] = GetFromManager<double>(param["Systematic"]["StepPriorLoc"], 0., __FILE__ , __LINE__);
+    _fStepPriorLower[i] = GetFromManager<double>(param["Systematic"]["StepPriorLower"], 0., __FILE__ , __LINE__);
+    _fStepPriorUpper[i] = GetFromManager<double>(param["Systematic"]["StepPriorUpper"], 0., __FILE__ , __LINE__);
+
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
       ToggleFixParameter(_fFancyNames[i]);
@@ -318,6 +324,10 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fLowBound = std::vector<double>(SizeVec);
   _fUpBound = std::vector<double>(SizeVec);
   _fFlatPrior = std::vector<bool>(SizeVec);
+  _fStepPrior = std::vector<bool>(SizeVec);
+  _fStepPriorLoc = std::vector<double>(SizeVec);
+  _fStepPriorLower = std::vector<double>(SizeVec);
+  _fStepPriorUpper = std::vector<double>(SizeVec);
   _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
@@ -335,6 +345,10 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
     _fLowBound.at(i) = -999.99;
     _fUpBound.at(i) = 999.99;
     _fFlatPrior.at(i) = false;
+    _fStepPrior.at(i) = false;
+    _fStepPriorLoc.at(i) = 0.;
+    _fStepPriorLower.at(i) = 0.;
+    _fStepPriorUpper.at(i) = 0.;
     _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
   }
@@ -662,6 +676,14 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
   #endif
   for(int i = 0; i < _fNumPar; ++i){
     if(_fFlatPrior[i]){
+      // HH: If using step prior, add the contribution to the likelihood from the step prior
+      if (_fStepPrior[i]) {
+        if (_fPropVal[i] < _fStepPriorLoc[i]) {
+          logL += _fStepPriorLower[i];
+        } else {
+          logL += _fStepPriorUpper[i];
+        }
+      }
       //HW: Flat prior, no need to calculate anything
       continue;
     }
