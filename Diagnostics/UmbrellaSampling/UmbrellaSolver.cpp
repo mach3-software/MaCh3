@@ -64,7 +64,7 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     config.tolerance = Get<double>(yaml_config["tolerance"], __FILE__ , __LINE__);
     config.print_frequency = GetFromManager<int>(yaml_config["print_frequency"], 0, __FILE__ , __LINE__);
     config.dynamic_files = GetFromManager<bool>(yaml_config["dynamic_files"], false, __FILE__ , __LINE__);
-    config.dynamic_n_windows = Get<int>(yaml_config["dynamic_pattern"], __FILE__ , __LINE__);
+    config.dynamic_pattern = Get<std::string>(yaml_config["dynamic_pattern"], __FILE__ , __LINE__);
     config.dynamic_n_windows = Get<int>(yaml_config["dynamic_n_windows"], __FILE__ , __LINE__);
     config.use_openmp = GetFromManager<bool>(yaml_config["use_openmp"], true, __FILE__ , __LINE__);
 
