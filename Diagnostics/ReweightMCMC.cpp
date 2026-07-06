@@ -27,11 +27,22 @@ _MaCh3_Safe_Include_End_ //}
 /// @author David Riley
 /// @author Evan Goodman
 
+
+namespace M3 {
+  /// @brief Types of chain reweighting available
+  enum kReweightType {
+    kGaussian,     //!< Assumes gaussian prior
+    kTGraph,       //!< Calculates Likelihood based on TGraph
+    kTGraph2D,     //!< Calculates Likelihood based on TGraph2D
+    kReweightTypes //!< This only enumerates
+  };
+}
+
 /// Structure to hold reweight configuration
 struct ReweightConfig {
   std::string key;       ///< The YAML key for this reweight
   std::string name;
-  std::string type;  ///< "Gaussian", "TGraph2D"
+  M3::kReweightType type;  ///< "Gaussian", "TGraph2D"
   int dimension;     ///< 1 or 2
   std::vector<std::string> paramNames; ///< Parameter names.
   std::vector<std::vector<double>> newPriorValues; ///< new [mean, sigma] pairs
@@ -170,21 +181,22 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 
     ReweightConfig reweightConfig;
     reweightConfig.key = reweightKey;
-    reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey, __FILE__ , __LINE__);
-    reweightConfig.type = GetFromManager<std::string>(reweightConfigNode["ReweightType"], "Gaussian", __FILE__ , __LINE__);
-    reweightConfig.dimension = GetFromManager<int>(reweightConfigNode["ReweightDim"], 1);
-    // reweightConfig.weightBranchName = "Weight_" + reweightKey; // for now all weights will be stored in branches called Weight until multi weight support
-    reweightConfig.weightBranchName = "Weight";
+    reweightConfig.name = Get<std::string>(reweightConfigNode["ReweightName"], __FILE__ , __LINE__);
+    auto ReweightType = Get<std::string>(reweightConfigNode["ReweightType"], __FILE__ , __LINE__);
+    reweightConfig.dimension = Get<int>(reweightConfigNode["ReweightDim"], __FILE__ , __LINE__);
+
+    reweightConfig.weightBranchName = reweightKey;
     reweightConfig.enabled = true;
 
-    auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {}, __FILE__ , __LINE__);
+    auto paramNames = Get<std::vector<std::string>>(reweightConfigNode["ReweightVar"], __FILE__ , __LINE__);
     reweightConfig.paramNames = paramNames;
     reweightConfig.oldPriorValues.resize(paramNames.size());
     reweightConfig.flatPrior.resize(paramNames.size());
 
     // Handle different reweight types as they fill different members
     if (reweightConfig.dimension == 1) {
-      if (reweightConfig.type == "Gaussian") {
+      if (ReweightType == "Gaussian") {
+        reweightConfig.type = M3::kGaussian;
         // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
         // Get prior values - handle both single [mean, sigma] pair and list of pairs for safety
         auto priorNode = reweightConfigNode["ReweightPrior"];
@@ -194,14 +206,14 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
           // Check if first element is a number (single [mean, sigma] pair) or sequence (list of pairs)
           if (priorNode[0].IsScalar()) {
             // Single [mean, sigma] pair - convert to list format
-            auto newPriorValues = GetFromManager<std::vector<double>>(priorNode, {}, __FILE__ , __LINE__);
+            auto newPriorValues = Get<std::vector<double>>(priorNode, __FILE__ , __LINE__);
             if (newPriorValues.size() == 2) {
               allPriorValues.push_back(newPriorValues);
             }
           } else {
             // List of [mean, sigma] pairs
             for (const auto& priorPair : priorNode) {
-              auto newPriorValues = GetFromManager<std::vector<double>>(priorPair, {}, __FILE__ , __LINE__);
+              auto newPriorValues = Get<std::vector<double>>(priorPair, __FILE__ , __LINE__);
               if (newPriorValues.size() == 2) {
                 allPriorValues.push_back(newPriorValues);
               }
@@ -216,10 +228,11 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                           reweightKey, paramNames.size(), allPriorValues.size());
           continue;
         }
-      } else if (reweightConfig.type == "TGraph") {
+      } else if (ReweightType == "TGraph") {
+        reweightConfig.type = M3::kTGraph;
         // For TGraph reweights, we need the parameter name and the TGraph file and name
-        auto fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "", __FILE__ , __LINE__);
-        auto graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "", __FILE__ , __LINE__);
+        auto fileName = Get<std::string>(reweightConfigNode["ReweightPrior"]["file"], __FILE__ , __LINE__);
+        auto graphName = Get<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], __FILE__ , __LINE__);
         reweightConfig.fileName = fileName;
         reweightConfig.graphName = graphName;
 
@@ -248,7 +261,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
           continue;
         }
       } else {
-        MACH3LOG_ERROR("Unknown 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
+        MACH3LOG_ERROR("Unknown 1D reweight type: {} for {}", ReweightType, reweightKey);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     } else if (reweightConfig.dimension == 2) {
@@ -258,10 +271,11 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
           continue;
         }
 
-        if (reweightConfig.type == "TGraph2D") {
+        if (ReweightType == "TGraph2D") {
+          reweightConfig.type = M3::kTGraph2D;
           auto priorConfig = reweightConfigNode["ReweightPrior"];
-          reweightConfig.fileName = GetFromManager<std::string>(priorConfig["file"], "", __FILE__ , __LINE__);
-          reweightConfig.graphName = GetFromManager<std::string>(priorConfig["graph_name"], "", __FILE__ , __LINE__);
+          reweightConfig.fileName = Get<std::string>(priorConfig["file"], __FILE__ , __LINE__);
+          reweightConfig.graphName = Get<std::string>(priorConfig["graph_name"], __FILE__ , __LINE__);
           reweightConfig.hierarchyType = GetFromManager<std::string>(priorConfig["hierarchy"], "auto", __FILE__ , __LINE__);
 
           if (reweightConfig.fileName.empty() || reweightConfig.graphName.empty()) {
@@ -313,7 +327,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 
           constraintFile->Close();
         } else {
-          MACH3LOG_ERROR("Unknown 2D reweight type: {} for {}", reweightConfig.type, reweightKey);
+          MACH3LOG_ERROR("Unknown 2D reweight type: {} for {}", ReweightType, reweightKey);
           continue;
         }
     } else {
@@ -322,14 +336,11 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
     } // end check over dimensions
 
     reweightConfigs.push_back(std::move(reweightConfig));
-    MACH3LOG_INFO("Added reweight configuration: {} ({}D, type: {})", reweightConfigs.back().name, reweightConfigs.back().dimension, reweightConfigs.back().type);
+    MACH3LOG_INFO("Added reweight configuration: {} ({}D, type: {})", reweightConfigs.back().name, reweightConfigs.back().dimension, ReweightType);
   }
 
   if (reweightConfigs.empty()) {
     MACH3LOG_ERROR("No valid reweight configurations found in config file");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  } else if (reweightConfigs.size() > 1) {    // check number of ReweightConfigs, currently maximum supported is 1 due to structure of ProcessMCMC
-    MACH3LOG_ERROR("Currently only one reweight configuration is supported at a time, found {}", reweight_settings.size());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
@@ -338,7 +349,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 [[nodiscard]] double Get1DWeight(const ReweightConfig& rwConfig,
                                  const std::map<std::string, double>& paramValues) {
   double weight = 1.;
-  if(rwConfig.type == "Gaussian") {
+  if(rwConfig.type == M3::kGaussian) {
     auto& paramNames = rwConfig.paramNames;
     //KS: Calculate reweight weight. Weights are multiplicative so we can do several reweights at once.
     /// @warning Big limitation is that code only works for uncorrelated parameters :(
@@ -367,12 +378,9 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
       }
       weight *= new_prior/old_prior;
     }
-  } else if (rwConfig.type == "TGraph") {
+  } else if (rwConfig.type == M3::kTGraph) {
     double paramValue = paramValues.at(rwConfig.paramNames.at(0));
     weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
-  } else {
-    MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
-    throw MaCh3Exception(__FILE__, __LINE__);
   }
   return weight;
 }
@@ -381,7 +389,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
 [[nodiscard]] double Get2DWeight(const ReweightConfig& rwConfig,
                                  const std::map<std::string, double>& paramValues) {
   double weight = 1.;
-  if (rwConfig.type == "TGraph2D") {
+  if (rwConfig.type == M3::kTGraph2D) {
     double dm32 = paramValues.at(rwConfig.paramNames.at(0));
     double theta13 = paramValues.at(rwConfig.paramNames.at(1));
     if (dm32 > 0) {

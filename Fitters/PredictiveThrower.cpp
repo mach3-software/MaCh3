@@ -486,7 +486,7 @@ void PredictiveThrower::ProduceToys() {
   MACH3LOG_INFO("Starting {}", __func__);
 
   outputFile->cd();
-  double Penalty = 0, Weight = 1;
+  double Penalty = 0, Weight = 1.;
   int Draw = 0;
 
   TTree *ToyTree = new TTree("ToySummary", "ToySummary");
@@ -542,6 +542,10 @@ void PredictiveThrower::ProduceToys() {
   auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
   TDirectory* ByModeDirectory = nullptr;
   if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
+  auto ReweightNames = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ReweightNames"],
+                                                                {"Weight"}, __FILE__, __LINE__);
+  bool doReweight = false;
+  std::vector<double> reweight_weight(ReweightNames.size(), 1.0);
 
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
@@ -557,12 +561,16 @@ void PredictiveThrower::ProduceToys() {
     PosteriorFile->Add(PosteriorFileName.c_str());
 
     PosteriorFile->SetBranchAddress("step", &Step);
-    if (PosteriorFile->GetBranch("Weight")) {
-      PosteriorFile->SetBranchStatus("Weight", true);
-      PosteriorFile->SetBranchAddress("Weight", &Weight);
-    } else {
-      MACH3LOG_WARN("Not applying reweighting weight");
-      Weight = 1.0;
+    doReweight = true;
+    for (size_t i = 0; i < ReweightNames.size(); ++i) {
+      const auto& name = ReweightNames[i];
+      if (PosteriorFile->GetBranch(name.c_str())) {
+        PosteriorFile->SetBranchStatus(name.c_str(), true);
+        PosteriorFile->SetBranchAddress(name.c_str(), &reweight_weight[i]);
+      } else {
+        MACH3LOG_WARN("Missing reweight branch '{}' -> disabling ALL reweighting", name);
+        doReweight = false;
+      }
     }
 
     for (size_t s = 0; s < systematics.size(); ++s) {
@@ -638,6 +646,12 @@ void PredictiveThrower::ProduceToys() {
     }
 
     PenaltyTerm[i] = Penalty;
+    Weight = 1.;
+    if(doReweight) {
+      for (size_t iWeight = 0; iWeight < reweight_weight.size(); ++iWeight) {
+        Weight *= reweight_weight[iWeight];
+      }
+    }
     ReweightWeight[i] = Weight;
 
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
