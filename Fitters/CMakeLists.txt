@@ -13,6 +13,7 @@ set(HEADERS
     PredictiveThrower.h
     StatisticalUtils.h
     gpuMCMCProcessorUtils.cuh
+    MulticanonicalMCMCHandler.h
 )
 
 add_library(Fitters SHARED
@@ -29,6 +30,7 @@ add_library(Fitters SHARED
     MaCh3Factory.cpp
     StatisticalUtils.cpp
     PredictiveThrower.cpp
+    MulticanonicalMCMCHandler.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 

@@ -46,6 +46,29 @@ void MR2T2::ProposeStep() {
 #endif
     }
 
+  // if we're using the multicanonical method, we need to add the penalty to the
+  // likelihood now prior to the Large LLH check
+    if (multicanonical) {
+    // get the proposed value of delta_cp and apply the multicanonical pentalty,
+    // weighting it using the beta value to increase or decrease the strenght of
+    // the penalty
+
+        double delta_cp_value = systematics[multicanonicalHandler->oscCovVar]->GetParProp(multicanonicalHandler->multicanonicalVar);
+        double delm23_value = systematics[multicanonicalHandler->oscCovVar]->GetParProp(multicanonicalHandler->multicanonicalVar_dm23);
+        double multicanonical_penalty = multicanonicalHandler->GetMulticanonicalWeight(delta_cp_value, delm23_value);
+
+#ifdef DEBUG
+        // Print the multicanonical penalty and the delta_cp and delm23 values to the debug file
+        if (debug) debugFile << " delta_cp: " << delta_cp_value << " delm23: " << delm23_value << " multicanonical_penalty: " << multicanonical_penalty << std::endl;
+#endif
+
+        llh += multicanonical_penalty;
+
+        MACH3LOG_DEBUG("Delta CP value: {}", delta_cp_value);
+        MACH3LOG_DEBUG("Multicanonical penalty: {}", multicanonical_penalty);
+        MACH3LOG_DEBUG("LLH after multicanonical penalty: {}", llh);
+    }
+
     // Check if we've hit a boundary in the systematics
     // In this case we can save time by not having to reconfigure the simulation
     if (llh >= M3::_LARGE_LOGL_)

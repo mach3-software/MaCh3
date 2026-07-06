@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Fitters/FitterBase.h"
-
+#include "Fitters/MulticanonicalMCMCHandler.h"
 /// @brief Base class for MCMC fitting algorithms
 /// @details Inherits from `FitterBase` and defines the interface for MCMC-based fitting, including chain management and step handling.
 /// @author Asher Kaboth
@@ -57,6 +57,9 @@ class MCMCBase : public FitterBase {
     /// @param StepsPrint whether to print info about accepted steps and -LogL
     void PrintProgress(const bool StepsPrint = true);
 
+    /// multicanonical handler for umbrella sampling    
+    std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler;
+
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;
 
@@ -70,4 +73,7 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
+
+    /// multi-canonical method toggle on/off
+    bool multicanonical;
 };
