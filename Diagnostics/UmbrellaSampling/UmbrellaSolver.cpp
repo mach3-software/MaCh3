@@ -23,8 +23,8 @@ _MaCh3_Safe_Include_End_ //}
 
 bool debug_mode = false;
 
-// Structure to hold each window configuration
-// These are individual window settings, function type & params plus filename
+/// Structure to hold each window configuration
+/// These are individual window settings, function type & params plus filename
 struct WindowConfig {
   std::string name;
   M3::BiasFunction umbrellaBiasFunction;
@@ -34,8 +34,8 @@ struct WindowConfig {
   double vonMises_kappa;
 };
 
-// Structure to hold umbrella configuration
-// This is the global settings of the umbrella fit eg number of windows and solve settings
+/// Structure to hold umbrella configuration
+/// This is the global settings of the umbrella fit eg number of windows and solve settings
 struct UmbrellaConfig {
   std::vector<WindowConfig> windows;
   std::string output_file;
@@ -49,7 +49,7 @@ struct UmbrellaConfig {
   bool use_openmp;
 };
 
-// YAML-based config parser using yaml-cpp library
+/// YAML-based config parser using yaml-cpp library
 UmbrellaConfig parseYAMLConfig(const std::string &filename) {
   UmbrellaConfig config;
 
@@ -58,38 +58,15 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     YAML::Node yaml_config = yaml_diag_config["UmbrellaSolver"];
 
     // Parse other configuration
-    if (yaml_config["output_file"]) {
-      config.output_file = yaml_config["output_file"].as<std::string>();
-    }
-    if (yaml_config["variable_of_interest"]) {
-      config.variable_of_interest =
-          yaml_config["variable_of_interest"].as<std::string>();
-    }
-    if (yaml_config["max_iterations"]) {
-      config.max_iterations = yaml_config["max_iterations"].as<int>();
-    }
-    if (yaml_config["tolerance"]) {
-      config.tolerance = yaml_config["tolerance"].as<double>();
-    }
-    if (yaml_config["print_frequency"]) {
-      config.print_frequency = yaml_config["print_frequency"].as<int>();
-    }
-    if (yaml_config["dynamic_files"]) {
-      config.dynamic_files = yaml_config["dynamic_files"].as<bool>();
-    } else {
-      config.dynamic_files = false; // Default to false
-    }
-    if (yaml_config["dynamic_pattern"]) {
-      config.dynamic_pattern = yaml_config["dynamic_pattern"].as<std::string>();
-    }
-    if (yaml_config["dynamic_n_windows"]) {
-      config.dynamic_n_windows = yaml_config["dynamic_n_windows"].as<int>();
-    }
-    if (yaml_config["use_openmp"]) {
-      config.use_openmp = yaml_config["use_openmp"].as<bool>();
-    } else {
-      config.use_openmp = true; // Default to enabled
-    }
+    config.output_file = Get<std::string>(yaml_config["output_file"], __FILE__ , __LINE__);
+    config.variable_of_interest = Get<std::string>(yaml_config["variable_of_interest"], __FILE__ , __LINE__);
+    config.max_iterations = Get<int>(yaml_config["max_iterations"], __FILE__ , __LINE__);
+    config.tolerance = Get<double>(yaml_config["tolerance"], __FILE__ , __LINE__);
+    config.print_frequency = GetFromManager<int>(yaml_config["print_frequency"], 0, __FILE__ , __LINE__);
+    config.dynamic_files = GetFromManager<bool>(yaml_config["dynamic_files"], false, __FILE__ , __LINE__);
+    config.dynamic_n_windows = Get<int>(yaml_config["dynamic_pattern"], __FILE__ , __LINE__);
+    config.dynamic_n_windows = Get<int>(yaml_config["dynamic_n_windows"], __FILE__ , __LINE__);
+    config.use_openmp = GetFromManager<bool>(yaml_config["use_openmp"], true, __FILE__ , __LINE__);
 
     if (!config.dynamic_files) {
       // TODO: these are mostly redundant now that the MaCh3_Config macro is
@@ -128,9 +105,8 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     }
 
   } catch (const YAML::Exception &e) {
-    std::cerr << "Error parsing YAML file " << filename << ": " << e.what()
-              << std::endl;
-    throw;
+    MACH3LOG_ERROR("Error parsing YAML file {}: {}", filename, e.what());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   return config;
@@ -167,9 +143,9 @@ double generalisedGaussian2(double x, double mean, double width) {
   return likelihood;
 }
 
-// TODO modify this to instead use atan2 implementation for wrapping
+/// @todo modify this to instead use atan2 implementation for wrapping
 double GetMulticanonicalWeightGenGaussian(double deltacp, double mean, double width) {
-  // implemenetation of the generalised gaussian as a bias function
+  // implementation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
 
   double g0 = generalisedGaussian2(deltacp, mean, width);
@@ -192,7 +168,8 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
     } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
       window_val = GetMulticanonicalWeightGenGaussian(x, windows[k].center, windows[k].width);
     } else {
-      std::cout << "Unrecognised BiasFunction!!" << std::endl;
+      MACH3LOG_ERROR("Unrecognised BiasFunction!!");
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
     sum += window_val / z_values[k];
   }
@@ -228,7 +205,8 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
           } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
             cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
           } else {
-            std::cout << "Unrecognised function!!!!!" << std::endl;
+            MACH3LOG_ERROR("Unrecognised BiasFunction!!");
+            throw MaCh3Exception(__FILE__, __LINE__);
           }
         }
       }
@@ -244,7 +222,8 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
           } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
             cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
           } else {
-            std::cout << "Unrecognised function!!!!!" << std::endl;
+            MACH3LOG_ERROR("Unrecognised function!!!!!");
+            throw MaCh3Exception(__FILE__, __LINE__);
           }
         }
       }
@@ -264,9 +243,8 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
         cache_size_bytes += cache[i][j].size() * sizeof(double);
       }
     }
-    std::cout << "Window cache size: " << cache_size_bytes / (1024.0 * 1024.0) << " MB" << std::endl;
-
-    std::cout << "Window cache built successfully." << std::endl;
+    MACH3LOG_INFO("Window cache size: {:.2f} MB", cache_size_bytes / (1024.0 * 1024.0));
+    MACH3LOG_INFO("Window cache built successfully.");
     TFile *cache_file = TFile::Open("window_cache_debug_histograms.root", "RECREATE");
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
@@ -319,7 +297,7 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
     } else {
       z_inv[i] = 0.0; // Handle zero or negative z values gracefully
       if (debug_mode) {
-        std::cerr << "Warning: z_current[" << i << "] is non-positive (" << z_current[i] << "). Setting its inverse to 0 in F matrix calculation." << std::endl;
+        MACH3LOG_WARN("Warning: z_current[{}] is non-positive ({}). Setting its inverse to 0 in F matrix calculation.", i, z_current[i]);
       }
     }
   }
@@ -352,14 +330,12 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             sum += integrand;
             count++;
           } else if (debug_mode) {
-            printf("Denominator is zero for sample %f in window %d, "
-                   "skipping...\\n",
-                   sample, i);
+            MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
           }
         }
 
         if (debug_mode) {
-          printf("F[%d][%d] sum: %f, count: %d\\n", i, j, sum, count);
+          MACH3LOG_INFO("F[{}][{}] sum: {}, count: {}", i, j, sum, count);
         }
 
         if (count > 0) {
@@ -392,14 +368,12 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             sum += integrand;
             count++;
           } else if (debug_mode) {
-            printf("Denominator is zero for sample %f in window %d, "
-                   "skipping...\\n",
-                   sample, i);
+            MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
           }
         }
 
         if (debug_mode) {
-          printf("F[%d][%d] sum: %f, count: %d\\n", i, j, sum, count);
+          MACH3LOG_WARN("F[{}][{}] sum: {}, count: {}", i, j, sum, count);
         }
 
         if (count > 0) {
@@ -422,8 +396,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
 
   int n_windows = windows.size();
   if (verbose && !use_openmp) {
-    std::cout << "Using single-threaded computation for F matrix..."
-              << std::endl;
+    MACH3LOG_INFO("Using single-threaded computation for F matrix...");
   }
 
   // F matrix and update z values
@@ -456,18 +429,18 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
     }
   }
 
-  // Normalize z to prevent scale drift and maintain sum(z)=1
-  // TODO: try this with magnitude = 1, the absolute scale doesn't matter but
-  // maybee this condition is preventing elements meeeting their required
-  // values? also just try compleetely disabled
-  // double z_sum = 0.0;
-  // for (int i = 0; i < n_windows; i++) {
-  //    z_sum += z_new[i];
-  //}
-  // if (z_sum > 0) {
-  //   for (int i = 0; i < n_windows; i++) {
-  //        z_new[i] /= z_sum;
-  //    }
+  /// Normalize z to prevent scale drift and maintain sum(z)=1
+  /// @todo: try this with magnitude = 1, the absolute scale doesn't matter but
+  /// maybee this condition is preventing elements meeting their required
+  /// values? also just try completely disabled
+  /// double z_sum = 0.0;
+  /// for (int i = 0; i < n_windows; i++) {
+  ///    z_sum += z_new[i];
+  ///}
+  /// if (z_sum > 0) {
+  ///   for (int i = 0; i < n_windows; i++) {
+  ///        z_new[i] /= z_sum;
+  ///    }
   //}
 
   // normalise the z values so that magnitude of the vector is 1
@@ -486,7 +459,6 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
 }
 
 /// A few different convergence checks
-
 // Check convergence
 bool checkConvergence(const std::vector<double> &z_current, const std::vector<double> &z_prev, double tolerance) {
   double sum_diffs = 0.0;
@@ -584,7 +556,8 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
   previous_moving_average = moving_average;
 
   if (stagnant_iterations == stagnant_required) {
-    std::cout << "Convergence appears stalled: moving-average change stayed within " << bound << " for " << stagnant_required << " iterations." << std::endl;
+    MACH3LOG_WARN("Convergence appears stalled: moving-average change stayed within {} for {} iterations.",
+                  bound, stagnant_required);
   }
 
   return stagnant_iterations >= stagnant_required;
@@ -593,49 +566,47 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
 // Main function to run the umbrella sampling solver
 void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
-  std::cout << "=== Umbrella Sampling Z-Factor Solver ===" << std::endl;
-
+  MACH3LOG_INFO("=== Umbrella Sampling Z-Factor Solver ===");
   // Debug OpenMP status first
-  std::cout << "Debugging OpenMP availability..." << std::endl;
+  MACH3LOG_INFO("Debugging OpenMP availability...");
 
-#ifdef MULTITHREAD
-  std::cout << "_OPENMP is defined with value: " << _OPENMP << std::endl;
-  std::cout << "OpenMP version: " << _OPENMP << std::endl;
-  std::cout << "Max threads available: " << omp_get_max_threads() << std::endl;
-#else
-  std::cout << "_OPENMP is NOT defined - OpenMP not available" << std::endl;
-#endif
-
-  std::cout << "Loading configuration from: " << config_file << std::endl;
+  #ifdef MULTITHREAD
+  MACH3LOG_INFO("_OPENMP is defined with value: {}", _OPENMP);
+  MACH3LOG_INFO("OpenMP version: {}", _OPENMP);
+  MACH3LOG_INFO("Max threads available: {}", omp_get_max_threads());
+  #else
+  MACH3LOG_WARN("_OPENMP is NOT defined - OpenMP not available");
+  #endif
+  MACH3LOG_INFO("Loading configuration from: {}", config_file);
 
   // Parse configuration
   UmbrellaConfig config = parseYAMLConfig(config_file);
 
   if (config.windows.empty() && !config.dynamic_files) {
-    std::cerr << "Error: No windows defined in configuration and dynamic file loading is disabled." << std::endl;
+    MACH3LOG_ERROR("No windows defined in configuration and dynamic file loading is disabled.");
     return;
   }
 
-  std::cout << "Variable of interest: " << config.variable_of_interest << std::endl;
-  std::cout << "Output file: " << config.output_file << std::endl;
+  MACH3LOG_INFO("Variable of interest: {}", config.variable_of_interest);
+  MACH3LOG_INFO("Output file: {}", config.output_file);
 
 // Check OpenMP status with detailed debugging
 #ifdef MULTITHREAD
   bool openmp_available = true;
-  std::cout << "OpenMP: AVAILABLE" << std::endl;
+  MACH3LOG_INFO("OpenMP: AVAILABLE");
   if (config.use_openmp) {
-    std::cout << "OpenMP: ENABLED (using " << omp_get_max_threads() << " threads)" << std::endl;
+    MACH3LOG_INFO("OpenMP: ENABLED (using {} threads)", omp_get_max_threads());
   }
 #else
   bool openmp_available = false;
-  std::cout << "OpenMP: NOT AVAILABLE" << std::endl;
+  MACH3LOG_WARN("OpenMP: NOT AVAILABLE");
   if (config.use_openmp) {
-    std::cout << "OpenMP: NOT AVAILABLE - falling back to single-threaded execution" << std::endl;
-    std::cout << "Note: For OpenMP support, try compiling with: g++ -fopenmp ..." << std::endl;
-    std::cout << "Or ensure OpenMP library is properly loaded in ROOT" << std::endl;
+    MACH3LOG_WARN("OpenMP: NOT AVAILABLE - falling back to single-threaded execution");
+    MACH3LOG_INFO("Note: For OpenMP support, try compiling with: g++ -fopenmp ...");
+    MACH3LOG_INFO("Or ensure OpenMP library is properly loaded in ROOT");
     config.use_openmp = false;
   } else {
-    std::cout << "OpenMP: DISABLED (single-threaded execution)" << std::endl;
+    MACH3LOG_INFO("OpenMP: DISABLED (single-threaded execution)");
   }
 #endif
 
@@ -672,7 +643,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       input_trees.push_back(tree);
     }
   } else {
-    std::cout << "Dynamic file loading enabled. Searching for files in directory: " << config.dynamic_pattern << std::endl;
+    MACH3LOG_INFO("Dynamic file loading enabled. Searching for files in directory: {}", config.dynamic_pattern);
     // Use ROOT's TSystem to find all files in the directory
     TSystemDirectory dir("", config.dynamic_pattern.c_str());
     TList *files = dir.GetListOfFiles();
@@ -683,40 +654,36 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       while ((file = (TSystemFile *)next())) {
         std::string filename = file->GetName();
         if (filename.find(".root") == std::string::npos) {
-          std::cout << "Skipping non-root file: " << filename << std::endl;
+          MACH3LOG_INFO("Skipping non-root file: {}", filename);
           continue;
         }
 
         std::string full_path = config.dynamic_pattern + "/" + filename;
-        std::cout << "Found file: " << full_path << std::endl;
+        MACH3LOG_INFO("Found file: {}", full_path);
 
-        TFile *root_file = TFile::Open(full_path.c_str(), "READ");
-        if (!root_file || root_file->IsZombie()) {
-          std::cerr << "Error: Cannot open file " << full_path << std::endl;
-          throw std::runtime_error("Cannot open file: " + full_path);
-        }
+        TFile *root_file = M3::Open(full_path, "READ", __FILE__, __LINE__);
 
         TTree *tree = (TTree *)root_file->Get("posteriors");
         if (!tree) {
-          std::cerr << "Error: Cannot find 'posteriors' tree in " << full_path << std::endl;
+          MACH3LOG_ERROR("Cannot find 'posteriors' tree in {}", full_path);
           root_file->Close();
-          throw std::runtime_error("Missing 'posteriors' tree in file: " + full_path);
+          throw MaCh3Exception(__FILE__, __LINE__, "Missing 'posteriors' tree in file: " + full_path);
         }
-
         file_count++;
 
         input_files.push_back(root_file);
         input_trees.push_back(tree);
-        std::cout << "Loaded tree 'posteriors' from file: " << full_path << std::endl;
+        MACH3LOG_INFO("Loaded tree 'posteriors' from file: {}", full_path);
       }
     } else {
-      std::cerr << "Error: No files found matching pattern: " << config.dynamic_pattern << std::endl;
-      throw std::runtime_error("No files found matching pattern: " + config.dynamic_pattern);
+      MACH3LOG_ERROR("No files found matching pattern: {}", config.dynamic_pattern);
+      throw MaCh3Exception(__FILE__, __LINE__, "No files found matching pattern: " + config.dynamic_pattern);
     }
 
     if (file_count != config.dynamic_n_windows) {
-      std::cerr << "Error: Number of files found (" << file_count << ") does not match expected dynamic_n_windows (" << config.dynamic_n_windows << ")." << std::endl;
-      throw std::runtime_error("File count mismatch for dynamic loading.");
+      MACH3LOG_ERROR("Number of files found ({}) does not match expected dynamic_n_windows ({}).",
+                     file_count, config.dynamic_n_windows);
+      throw MaCh3Exception(__FILE__, __LINE__, "File count mismatch for dynamic loading.");
     }
   }
 
@@ -724,11 +691,10 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     TTree *tree = input_trees[i];
     TFile *file = input_files[i];
 
-    std::cout << "\nProcessing file " << i + 1 << "/" << input_trees.size() << ": " << file->GetName() << std::endl;
-
+    MACH3LOG_INFO("Processing file {}/{}: {}", i + 1, input_trees.size(), file->GetName());
     TMacro *macro = (TMacro *)file->Get("MaCh3_Config");
     if (macro) {
-      std::cout << "Found MaCh3_Config macro in file." << std::endl;
+      MACH3LOG_INFO("Found MaCh3_Config macro in file.");
 
       // Convert TMacro to YAML: concatenate all lines and parse
       std::stringstream yaml_text;
@@ -744,22 +710,23 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
             macro_yaml["General"]["MCMC"]["Multicanonical"];
         // Extract window parameters
         config.windows[i].center = umbrellaConfig["Umbrella"]["UmbrellaMean"].as<double>();
-        std::cout << "Window " << i << " center updated to " << config.windows[i].center << std::endl;
+        MACH3LOG_INFO("Window {} center updated to {}", i, config.windows[i].center);
 
         // Check if using von Mises distribution
         std::string biasString = umbrellaConfig["Umbrella"]["UmbrellaBiasFunction"].as<std::string>();
         M3::BiasFunction biasMode;
         if (biasString == "gaussian") {
           biasMode = M3::BiasFunction::kGaussian;
-          std::cout << "Window wieghted with gaussian" << std::endl;
+          MACH3LOG_INFO("Window weighted with gaussian");
         } else if (biasString == "generalisedGaussian") {
           biasMode = M3::BiasFunction::kGeneralisedGaussian;
-          std::cout << "Window weighted with generalised gaussian" << std::endl;
+          MACH3LOG_INFO("Window weighted with generalised gaussian");
         } else if (biasString == "vonMises") {
           biasMode = M3::BiasFunction::kVonMises;
-          std::cout << "Window weighted with vonMises" << std::endl;
+          MACH3LOG_INFO("Window weighted with vonMises");
         } else {
-          std::cout << "Unrecognised Bias" << std::endl;
+          MACH3LOG_ERROR("Unrecognised Bias");
+          throw MaCh3Exception(__FILE__, __LINE__);
         }
         config.windows[i].umbrellaBiasFunction = biasMode;
 
@@ -768,16 +735,16 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
           double vonMises_sigma = umbrellaConfig["Umbrella"]["UmbrellaWidth"].as<double>();
           config.windows[i].vonMises_kappa = 1.0 / (vonMises_sigma * vonMises_sigma);
           config.windows[i].width = vonMises_sigma; // Store sigma in width for reference
-          std::cout << "Window " << i << " using von Mises: sigma = " << vonMises_sigma << ", kappa = " << config.windows[i].vonMises_kappa << std::endl;
+          MACH3LOG_INFO("Window {} using von Mises: sigma = {}, kappa = {}",
+                        i, vonMises_sigma, config.windows[i].vonMises_kappa);
         } else {
           // Extract Gaussian sigma
           config.windows[i].width = umbrellaConfig["Umbrella"]["UmbrellaWidth"].as<double>();
           config.windows[i].vonMises_kappa = -1.0; // Not using von Mises
-          std::cout << "Window " << i << " using Gaussian: width = " << config.windows[i].width << std::endl;
+          MACH3LOG_INFO("Window {} using Gaussian: width = {}", i, config.windows[i].width);
         }
-
       } catch (const std::exception &e) {
-        std::cerr << "Warning: Could not parse macro as YAML: " << e.what() << std::endl;
+        MACH3LOG_WARN("Could not parse macro as YAML: {}", e.what());
       }
     }
 
@@ -788,7 +755,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
     Long64_t nentries = tree->GetEntries();
     Long64_t filtered_entries = 0;
-    std::cout << "Window " << i << ": " << nentries << " entries" << std::endl;
+    MACH3LOG_INFO("Window {}: {} entries", i, nentries);
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
@@ -820,13 +787,12 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   }
 
   // verify the order and file associations after sorting
-  std::cout << "\nFinal window configurations after sorting:" << std::endl;
+  MACH3LOG_INFO("Final window configurations after sorting:");
   for (size_t i = 0; i < config.windows.size(); i++) {
-    std::cout << "Window " << i << ": center = " << config.windows[i].center 
-              << ", width = " << config.windows[i].width 
-              << ", vonMises_mode = " << (config.windows[i].umbrellaBiasFunction == M3::BiasFunction::kVonMises ? "Yes" : "No")
-              << ", vonMises_kappa = " << config.windows[i].vonMises_kappa
-              << ", samples = " << samples[i].size() << std::endl;
+    MACH3LOG_INFO("Window {}: center = {}, width = {}, vonMises_mode = {}, vonMises_kappa = {}, samples = {}",
+      i, config.windows[i].center, config.windows[i].width,
+      (config.windows[i].umbrellaBiasFunction == M3::BiasFunction::kVonMises ? "Yes" : "No"),
+      config.windows[i].vonMises_kappa, samples[i].size());
   }
 
   // Initialize z values
@@ -858,24 +824,23 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         0.0080599626292932776,  0.011429554834689368,   0.018117848911520615};
     z_prev = z_current; // Start with the same values for previous to avoid
                         // large initial changes
-    std::cout << "!!!!!!!starting from hacky start vector!!!!!!" << std::endl;
+    MACH3LOG_WARN("!!!!!!!starting from hacky start vector!!!!!!");
   }
 
   std::vector<std::vector<double>> z_evolution;
 
-  std::cout << "\nStarting iterative z-solver..." << std::endl;
-
+  MACH3LOG_INFO("Starting iterative z-solver...");
   // Test OpenMP functionality once before the main loop this can probably be wrapped in debug TODO
   bool openmp_works = false;
   if (config.use_openmp) {
-    std::cout << "Testing OpenMP parallelization..." << std::endl;
+    MACH3LOG_INFO("Testing OpenMP parallelization...");
     #ifdef MULTITHREAD
     int max_threads = omp_get_max_threads();
     #else
     int max_threads = 1;
     #endif
 
-    std::cout << "Max threads reported: " << max_threads << std::endl;
+    MACH3LOG_INFO("Max threads reported: {}", max_threads);
 
     // Test parallel region
     int actual_threads = 1;
@@ -892,23 +857,23 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         #else
         actual_threads = 1;
         #endif
-        std::cout << "Actual threads in parallel region: " << actual_threads << std::endl;
+        MACH3LOG_INFO("Actual threads in parallel region: {}", actual_threads);
       }
     }
 
     if (actual_threads > 1) {
-      std::cout << "OpenMP is working correctly with " << actual_threads << " threads" << std::endl;
+      MACH3LOG_INFO("OpenMP is working correctly with {} threads", actual_threads);
       openmp_works = true;
     } else if (max_threads > 1) {
-      std::cout << "WARNING: OpenMP pragmas not working in CLING - falling back to single-threaded" << std::endl;
+      MACH3LOG_WARN("OpenMP pragmas not working in CLING - falling back to single-threaded");
       openmp_works = false;
     } else {
       openmp_works = false;
     }
   }
 
-  std::cout << "Precomputing window cache..." << std::endl;
-  // TODO: this is slow as hell and causes massive memory usage, whats a smarter
+  MACH3LOG_INFO("Precomputing window cache...");
+  // TODO: this is slow as hell and causes massive memory usage, what's a smarter
   // way to do this? break out to a file? RDataFrame?
   std::vector<std::vector<std::vector<double>>> window_cache = buildWindowCache(config.windows, samples, openmp_works);
 
@@ -921,7 +886,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     std::string base_name = (pos != std::string::npos) ? config.output_file.substr(0, pos) : config.output_file;
     F_file = TFile::Open((base_name + "_matrix_evolution.root").c_str(), "RECREATE"); // use name from config with .root subtracted with _matrix_evolution suffix added
     if (!F_file || F_file->IsZombie()) {
-      std::cerr << "Error: Cannot create file " << base_name + "_matrix_evolution.root" << std::endl;
+      MACH3LOG_ERROR("Cannot create file {}", base_name + "_matrix_evolution.root");
       save_matrix = false; // Disable saving if file cannot be created
     }
     // add an initial FMatrix with the initial z values for reference
@@ -933,7 +898,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       }
     }
     F_file->cd();
-    std::cout << "Saving initial F matrix to file..." << std::endl;
+    MACH3LOG_INFO("Saving initial F matrix to file...");
     initial_F_TH2D.Write();
   }
 
@@ -946,7 +911,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
              // convergence
 
   if (!converged_robustness_check) {
-    std::cout << "\nStarting iterative solver with convergence checks..." << std::endl;
+    MACH3LOG_INFO("Starting iterative solver with convergence checks...");
   }
 
   // Iterative solver
@@ -989,7 +954,6 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         std::cout << "]" << std::endl;
         total_output_lines = 1;
       }
-
       last_print_time = current_time;
     }
 
@@ -1012,12 +976,12 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         }
       }
       // for the purposes of picking back up a solve after it has been
-      // interrrupted also save the std::vector of z_current. You can put this into hacky start to pick up
+      // interrupted also save the std::vector of z_current. You can put this into hacky start to pick up
       TTree *z_tree = new TTree(Form("z_saved_iter_%02d", iteration), Form("Z vector at iteration %02d", iteration));
       z_tree->Branch("z_saved", &z_current);
       z_tree->Fill();
       F_file->cd();
-      std::cout << "Saving F matrix for iteration " << iteration << " to file..." << std::endl;
+      MACH3LOG_INFO("Saving F matrix for iteration {} to file...", iteration);
       F_TH2D.Write();
       z_tree->Write();
     }
@@ -1033,31 +997,29 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     if (iteration % 100 == 0 &&
         (checkConvergence(z_current, z_prev, config.tolerance) || checkConvergenceStalled(z_current, z_prev, config.tolerance))) {
       if (!converged_robustness_check && apply_robustness_check) {
-        std::cout << "\nConvergence check passed at iteration " << iteration << ". Starting robustness check with random perturbation..." << std::endl;
+        MACH3LOG_INFO("Convergence check passed at iteration {}. Starting robustness check with random perturbation...", iteration);
         converged_robustness_check = true;
 
         // Apply random perturbation to z_current
         std::vector<double> z_perturbed = z_current;
         for (size_t i = 0; i < z_perturbed.size(); i++) {
           double perturbation = (rand() / RAND_MAX - 0.5) * z_perturbed[i]; // Random perturbation up to 10 times the tolerance
-          std::cout << "Applying perturbation of " << std::scientific << std::setprecision(6) << perturbation << " to z[" << i << "] = " << std::scientific << std::setprecision(6) << z_perturbed[i] << std::endl;
+          MACH3LOG_INFO("Applying perturbation of {:.6e} to z[{}] = {:.6e}", perturbation, i, z_perturbed[i]);
           z_perturbed[i] += perturbation;
           if (z_perturbed[i] < 0)
             z_perturbed[i] = abs(z_perturbed[i]); // Ensure no negative values
         }
         z_current = z_perturbed;
-        std::cout << "\nApplied random perturbation to z values for robustness "
-                     "check.\n" << std::endl;
-
+          MACH3LOG_INFO("\nApplied random perturbation to z values for robustness check.\n");
       } else {
         if (checkConvergence(z_current, z_prev, config.tolerance)) {
-          std::cout << "\nConvergence achieved at iteration " << iteration << std::endl;
+          MACH3LOG_INFO("Convergence achieved at iteration {}", iteration);
         } else {
-          std::cout << "\nConvergence appears to be stalled at iteration " << iteration << std::endl;
+          MACH3LOG_WARN("Convergence appears to be stalled at iteration {}", iteration);
         }
 
         if (iteration == config.max_iterations - 1) {
-          std::cout << "Reached maximum iterations without convergence." << std::endl;
+          MACH3LOG_WARN("Reached maximum iterations without convergence.");
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -1066,25 +1028,27 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         if (save_matrix) {
           F_file->Close();
         }
-        std::cout << "\nTerminating at iteration " << iteration << std::endl;
-        std::cout << "Average time per iteration: " << avg_time_total << " ms" << std::endl;
+        MACH3LOG_INFO("Terminating at iteration {}", iteration);
+        MACH3LOG_INFO("Average time per iteration: {} ms", avg_time_total);
         break;
       }
     }
   }
 
-  std::cout << "\nFinal z values: [";
+  std::ostringstream oss;
+  oss << "\nFinal z values: [";
   for (size_t i = 0; i < z_current.size(); i++) {
-    std::cout << std::fixed << std::setprecision(5) << z_current[i];
+    oss << std::fixed << std::setprecision(5) << z_current[i];
     if (i < z_current.size() - 1)
-      std::cout << ", ";
+      oss << ", ";
   }
-  std::cout << "]" << std::endl;
+  oss << "]";
+  MACH3LOG_INFO("{}", oss.str());
 
   // Create output file
   TFile *output_file = TFile::Open(config.output_file.c_str(), "RECREATE");
   if (!output_file || output_file->IsZombie()) {
-    throw std::runtime_error("Cannot create output file: " + config.output_file);
+    throw MaCh3Exception(__FILE__, __LINE__, "Cannot create output file: " + config.output_file);
   }
   output_file->cd();
 
@@ -1100,8 +1064,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   double umbrella_weight;
   int window_id;
 
-  // TODO: MAJOR make this generic so that we can use systematics aswell
-  // Set up branches
+  /// @todo: MAJOR make this generic so that we can use systematics aswell
+  /// Set up branches
   combined_tree->Branch("sin2th_12", &sin2th_12, "sin2th_12/D");
   combined_tree->Branch("sin2th_23", &sin2th_23, "sin2th_23/D");
   combined_tree->Branch("sin2th_13", &sin2th_13, "sin2th_13/D");
@@ -1146,14 +1110,14 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     Long64_t nentries = tree->GetEntries();
 
     if (z_current[i] == 0) {
-      std::cout << "WARNING: Z value for window " << i << " is zero, skipping weighting for this window to avoid division by zero." << std::endl;
+      MACH3LOG_WARN("Z value for window {} is zero, skipping weighting for this window to avoid division by zero.", i);
     }
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
 
       if (z_current[i] == 0) {
-        umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set it to 0 (competely downweight this window's contribution)
+        umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set it to 0 (completely downweigh this window's contribution)
       } else {
         // Calculate umbrella weight for this event
         // The umbrella weight corrects for the bias introduced by the window function Weight is 1 / sum of all window contributions (equation 4 from paper) 
@@ -1163,17 +1127,17 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         umbrella_weight = denominator; // This is the correct form based on the paper - the z_current[i] factor is already included in the summedWindowsWeighted function
 
         if (combined_tree->Fill() < 0) {
-          throw std::runtime_error("Failed writing output tree. Check disk quota/space and write permissions for: " + config.output_file);
+          MACH3LOG_WARN("Failed writing output tree. Check disk quota/space and write permissions for: {}", config.output_file);
+          throw MaCh3Exception(__FILE__, __LINE__);
         }
       }
     }
   }
 
   // Save diagnostics
-  TCanvas *c1 = new TCanvas("c1", "Z Evolution", 800, 600);
-
+  TCanvas c1("c1", "Z Evolution", 800, 600);
   std::vector<TGraph*> z_graphs(config.windows.size());
-  TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
+  TLegend legend(0.7, 0.7, 0.9, 0.9);
 
   double ymax = 0.0;
   double ymin = std::numeric_limits<double>::max();
@@ -1206,16 +1170,16 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       z_graphs[i]->Draw("L SAME");
     }
 
-    legend->AddEntry(z_graphs[i], Form("Window %lu", i), "l");
+    legend.AddEntry(z_graphs[i], Form("Window %lu", i), "l");
     z_graphs[i]->Write();
   }
 
-  legend->Draw();
+  legend.Draw();
   z_graphs[0]->SetMaximum(ymax);
   z_graphs[0]->SetMinimum(ymin);
-  c1->Update();
-  c1->SetLogy();
-  c1->Write();
+  c1.Update();
+  c1.SetLogy();
+  c1.Write();
 
   // Write final results
   combined_tree->Write();
@@ -1240,9 +1204,9 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     file->Close();
   }
 
-  std::cout << "\nUmbrella sampling outputs created (make sure to check for convergence issues)!" << std::endl;
-  std::cout << "Output written to: " << config.output_file << std::endl;
-  std::cout << "Combined tree contains " << total_entries << " entries with umbrella weights." << std::endl;
+  MACH3LOG_INFO("Umbrella sampling outputs created (make sure to check for convergence issues)!");
+  MACH3LOG_INFO("Output written to: {}", config.output_file);
+  MACH3LOG_INFO("Combined tree contains {} entries with umbrella weights.", total_entries);
 }
 
 // Main function for compiled version
@@ -1252,12 +1216,11 @@ int main(int argc, char *argv[]) {
     config_file = argv[1];
   }
 
-  std::cout << "Running compiled version with OpenMP support" << std::endl;
-
+  MACH3LOG_INFO("Running compiled version with OpenMP support");
   try {
     UmbrellaSolver(config_file);
   } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    MACH3LOG_ERROR("Error: {}", e.what());
     return 1;
   }
 
