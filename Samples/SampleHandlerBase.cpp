@@ -2006,13 +2006,13 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
   MACH3LOG_INFO("Printing for {}", GetName());
 
   if (!DataOnly) {
-    const std::string sep_full(71, '-');
+    const std::string sep_full(81, '-');
     MACH3LOG_INFO("{}", sep_full);
-    MACH3LOG_INFO("{:<40}{:<10}{:<10}{:<10}|", "Sample", "Data", "MC", "-LLH");
+    MACH3LOG_INFO("{:<40}{:<15}{:<15}{:<10}|", "Sample", "Data", "MC", "-LLH");
   } else {
-    const std::string sep_data(51, '-');
+    const std::string sep_data(56, '-');
     MACH3LOG_INFO("{}", sep_data);
-    MACH3LOG_INFO("{:<40}{:<10}|", "Sample", "Data");
+    MACH3LOG_INFO("{:<40}{:<15}|", "Sample", "Data");
   }
 
   double sumData = 0.0;
@@ -2030,19 +2030,19 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
       sumMC += mcIntegral;
       likelihood = GetSampleLikelihood(iSample);
 
-      MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
+      MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
     } else {
-      MACH3LOG_INFO("{:<40}{:<10.2f}|", name, dataIntegral);
+      MACH3LOG_INFO("{:<40}{:<15.2f}|", name, dataIntegral);
     }
   }
   if (!DataOnly) {
     likelihood = GetLikelihood();
-    MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
-    const std::string sep_full(71, '-');
+    MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
+    const std::string sep_full(81, '-');
     MACH3LOG_INFO("{}", sep_full);
   } else {
-    MACH3LOG_INFO("{:<40}{:<10.2f}|", "Total", sumData);
-    const std::string sep_data(51, '-');
+    MACH3LOG_INFO("{:<40}{:<20.2f}|", "Total", sumData);
+    const std::string sep_data(56, '-');
     MACH3LOG_INFO("{}", sep_data);
   }
 }

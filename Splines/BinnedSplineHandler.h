@@ -69,7 +69,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @param SampleTitle The title of the sample to search for.
     int GetSampleIndex(const std::string& SampleTitle) const;
     /// @brief Ensure we have spline for a given bin
-    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3) const;
+    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, const std::vector<int>& iVar) const;
     /// @brief Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector).
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
@@ -87,8 +87,9 @@ class BinnedSplineHandler : public SplineBase {
     std::vector<std::vector<std::string>> DimensionLabels;
     std::vector<int> nSplineParams;
     std::vector<int> nOscChans;
-
+    /// Holds TAxis for [sample][channel][dimension]
     std::vector< std::vector< std::vector<TAxis*> > > SplineBinning;
+    /// [Sample][Syst]
     std::vector< std::vector<std::string> > SplineFileParPrefixNames;
     /// A vector of vectors of the spline modes that a systematic applies to
     /// This gets compared against the event mode to figure out if a syst should
@@ -111,7 +112,7 @@ class BinnedSplineHandler : public SplineBase {
     std::vector<SplineIndex> IndexVect;
     /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
     std::map<std::tuple<int, int, int, int, int, int, int>, int> IndexVectMap;
-
+    /// Number of coefficients for a single flat (after flattening)
     std::vector<int > coeffindexvec;
     /// Unique coefficient indices
     std::vector<int> uniquecoeffindices;
