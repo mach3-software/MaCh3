@@ -1138,9 +1138,9 @@ void FitterBase::RunLLHMap() {
     if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanRanges"))
       ParamsRanges[name].second = GetFromManager<std::pair<double,double>>(fitMan->raw()["LLHScan"]["ScanRanges"][name], ParamsRanges[name].second, __FILE__, __LINE__);
 
-    MACH3LOG_INFO("{} from {:.4f} to {:.4f} with a {:.5f} step ({} points total)",
+    MACH3LOG_INFO("{} from {:.4f} (lower bin edge) to {:.4f} (upper bin edge) with a {:.5f} step ({} points total)",
                   name, ParamsRanges[name].second.first, ParamsRanges[name].second.second,
-                  (ParamsRanges[name].second.second - ParamsRanges[name].second.first)/(ParamsRanges[name].first - 1.),
+                  (ParamsRanges[name].second.second - ParamsRanges[name].second.first)/(ParamsRanges[name].first),
                   ParamsRanges[name].first);
 
     TotalPoints *= ParamsRanges[name].first;
@@ -1222,8 +1222,8 @@ void FitterBase::RunLLHMap() {
       if (n > 0)
         idx[n] = idx[n] / ( dev / points );
 
-      // Parameter test value = low + ( high - low ) * idx / ( #points - 1 )
-      ParamsValues[n] = low + (high-low) * double(idx[n])/double(points-1);
+      // Parameter test value = low + ( high - low ) * idx / #points
+      ParamsValues[n] = low +  (2 * double(idx[n]) + 1) * (high-low) / (2 * double(points));
 
       // Now set the covariance objects
       // Auxiliary
