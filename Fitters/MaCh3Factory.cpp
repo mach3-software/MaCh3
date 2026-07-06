@@ -80,6 +80,8 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
         Name.find("Samples") != std::string::npos)
     {
       MACH3LOG_CRITICAL("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+      /// @todo DL: Should probably replace this with something that doesn't require modifying core code
+      MACH3LOG_CRITICAL("If you're sure you want to do this, e.g. for testing or step size tuning, you can remove the throw that lives here:");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   };
