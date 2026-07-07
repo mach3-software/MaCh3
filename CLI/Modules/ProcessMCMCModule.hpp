@@ -98,4 +98,4 @@ namespace M3{
       std::vector <std::string> TitleNames;      ///< List of titles for each chain
       std::string config;                        ///< Path to the configuration file
   };
-};
+}

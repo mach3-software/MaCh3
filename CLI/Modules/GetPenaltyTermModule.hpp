@@ -71,4 +71,4 @@ namespace M3{
       void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile);
 
   };
-};
+}
