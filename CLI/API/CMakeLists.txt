@@ -8,21 +8,26 @@ FetchContent_MakeAvailable(argparse)
 
 set(HEADERS
     plugin.hpp
-    argparse.hpp
+    m3argparse.hpp
 )
+
+install(DIRECTORY ${argparse_SOURCE_DIR}/include/
+        DESTINATION include/CLI/API/argparse)
+target_include_directories(argparse INTERFACE
+    $<BUILD_INTERFACE:${argparse_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/CLI/API/argparse>
+)
+install(TARGETS argparse
+        EXPORT MaCh3-targets
+        INCLUDES DESTINATION include/CLI/API/argparse)
 
 
 add_library(CLIApi INTERFACE)
 
+target_link_libraries(CLIApi INTERFACE argparse)
 target_include_directories(CLIApi INTERFACE
-    $<BUILD_INTERFACE:${argparse_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include/CLI/API/argparse>
-)
-
-target_include_directories(CLIApi
-    INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:include/CLI/API>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include/CLI/API>
 )
 
 set_target_properties(CLIApi PROPERTIES
