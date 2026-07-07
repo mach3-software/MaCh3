@@ -14,7 +14,10 @@ set(HEADERS
 
 add_library(CLIApi INTERFACE)
 
-target_include_directories(CLIApi INTERFACE ${argparse_SOURCE_DIR}/include)
+target_include_directories(CLIApi INTERFACE
+    $<BUILD_INTERFACE:${argparse_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/CLI/API/argparse>
+)
 
 target_include_directories(CLIApi
     INTERFACE
