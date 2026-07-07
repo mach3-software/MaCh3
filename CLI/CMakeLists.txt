@@ -7,6 +7,6 @@ add_executable(mach3
     MaCh3Program.cpp
 )
 
-target_link_libraries(mach3 PRIVATE MaCh3::CLIModules MaCh3::All)
+target_link_libraries(mach3 PRIVATE MaCh3::CLIModules MaCh3::All dl)
 
 install(TARGETS mach3 DESTINATION bin)
