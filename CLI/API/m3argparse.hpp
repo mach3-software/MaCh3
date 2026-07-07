@@ -1,4 +1,4 @@
-/// @file argparse.hpp
+/// @file m3argparse.hpp
 /// @brief MaCh3 wrapper for argparse library with additional functionality
 
 #pragma once
