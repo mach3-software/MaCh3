@@ -174,6 +174,11 @@ void MCMCBase::CheckAcceptanceRates() {
 // *******************
     const auto StepEnd = stepStart + chainLength;
 
+    // Skip check for reallllly early steps
+    if(step - stepStart < std::min(10, StepEnd/10)) {
+        return;
+    }
+
     if(accCount==0 && step - stepStart > StepEnd/10) {
         MACH3LOG_ERROR("No steps were accepted in the MCMC chain after {} steps. Please check your  step sizes.", step - stepStart);
         throw MaCh3Exception(__FILE__, __LINE__);
