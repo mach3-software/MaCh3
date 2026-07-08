@@ -118,6 +118,7 @@ void MCMCBase::PreStepProcess() {
     // Print 10 steps in total
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
+        CheckAcceptanceRates();
         PrintProgress();
     }
 }
@@ -150,7 +151,6 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
 // *******************
     if(StepsPrint) MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     if(StepsPrint) MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
-    CheckAcceptanceRates();
 
     for (size_t i = 0; i < samples.size(); ++i) {
         samples[i]->PrintRates();
