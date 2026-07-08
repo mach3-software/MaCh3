@@ -175,7 +175,7 @@ void MCMCBase::CheckAcceptanceRates() {
     const auto StepEnd = stepStart + chainLength;
 
     // Skip check for reallllly early steps
-    if(step - stepStart < std::min(10, StepEnd/10)) {
+    if(step - stepStart < std::min(10.0, static_cast<double>(StepEnd)/10)) {
         return;
     }
 
