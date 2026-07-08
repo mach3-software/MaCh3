@@ -89,7 +89,7 @@ namespace M3{
     YAML::Node Settings = TMacroToYAML(*Config);
 
     //CW: Get the Covariance matrix
-    std::vector<std::string> CovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+    std::vector<std::string> CovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"}, __FILE__, __LINE__);
     if(CovPos.back() == "none")
     {
       MACH3LOG_WARN("Couldn't find Cov branch in output");

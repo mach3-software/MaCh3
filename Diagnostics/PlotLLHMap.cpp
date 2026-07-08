@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
   // Open the settings and output file
   YAML::Node Settings = M3OpenConfig(std::string(argv[1]));
-  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root");
+  auto OutFileName = GetFromManager<std::string>(Settings["General"]["OutputFile"], "LLHMap.root", __FILE__, __LINE__);
   auto Plot2D = GetFromManager<bool>(Settings["LLHScan"]["Plot2D"], false, __FILE__, __LINE__);
 
   auto OutFile = new TFile(OutFileName.c_str(),"UPDATE");
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
   auto LLHMap = Map.Define("L", "exp(-0.5*Total_LLH)");
 
   // Process what parameters to plot
-  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{});
+  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(Settings["LLHScan"]["LLHParameters"],{}, __FILE__, __LINE__);
   std::vector<std::string> ParamsToProfile = GetParams(ParamsOfInterest, Map);
 
   MACH3LOG_INFO("... Starting generating 1D profiled and marginalized likelihoods ...");

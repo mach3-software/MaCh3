@@ -44,14 +44,14 @@ namespace M3{
     auto Processor = std::make_unique<MCMCProcessor>(inputFile);
     Processor->SetOutputSuffix("_MCMC_Diag");
     //KS:Turn off plotting detector and some other setting
-    Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedTypes"], {}));
-    Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedNames"], {}));
-    Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedGroups"], {}));
-    Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["DiagMCMC"]["PlotRelativeToPrior"], false));
+    Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedTypes"], {}, __FILE__, __LINE__));
+    Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedNames"], {}, __FILE__, __LINE__));
+    Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedGroups"], {}, __FILE__, __LINE__));
+    Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["DiagMCMC"]["PlotRelativeToPrior"], false, __FILE__, __LINE__));
     //KS: Use 20 batches for batched means
-    Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20));
-    Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000));
-    Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true));
+    Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20, __FILE__, __LINE__));
+    Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000, __FILE__, __LINE__));
+    Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true, __FILE__, __LINE__));
     Processor->Initialise();
     if(Settings["MaxEntries"]) {
         Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
