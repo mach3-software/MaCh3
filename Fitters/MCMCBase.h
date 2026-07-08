@@ -57,6 +57,9 @@ class MCMCBase : public FitterBase {
     /// @param StepsPrint whether to print info about accepted steps and -LogL
     void PrintProgress(const bool StepsPrint = true);
 
+    /// @brief Check the acceptance rates
+    void CheckAcceptanceRates();
+
     /// multicanonical handler for umbrella sampling    
     std::unique_ptr<MulticanonicalMCMCHandler> multicanonicalHandler;
 
