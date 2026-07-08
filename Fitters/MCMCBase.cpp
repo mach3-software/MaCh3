@@ -150,6 +150,7 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
 // *******************
     if(StepsPrint) MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     if(StepsPrint) MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
+    CheckAcceptanceRates();
 
     for (size_t i = 0; i < samples.size(); ++i) {
         samples[i]->PrintRates();
@@ -165,6 +166,24 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
         debugFile << "Step:\t" << step + 1 << "/" << chainLength << "  |  current: " << logLCurr << " proposed: " << logLProp << std::endl;
     }
 #endif
+}
+
+// *******************
+// Handles warnings for low acceptance rates
+void MCMCBase::CheckAcceptanceRates() {
+// *******************
+    if(accCount==0 && step - stepStart > StepEnd/10) {
+        MACH3LOG_CRITICAL("No steps were accepted in the MCMC chain after {} steps. This is likely due to a very low acceptance rate.
+                            Please check your proposal distributions and step sizes.", step - stepStart);
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    double acc_rate = static_cast<double>(accCount) / static_cast<double>(step - stepStart);
+    if (acc_rate < 0.01) {
+        MACH3LOG_WARNING("Acceptance rate is very low: {:.2f}. This may indicate that the proposal distribution is not well-tuned. Consider adjusting the step sizes or proposal distributions.", acc_rate);
+    } else if (acc_rate > 0.5) {
+        MACH3LOG_WARNING("Acceptance rate is very high: {:.2f}. This may indicate that the proposal distribution is too narrow. Consider adjusting the step sizes or proposal distributions.", acc_rate);
+    }
 }
 
 // *******************
