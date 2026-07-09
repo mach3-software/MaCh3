@@ -80,6 +80,8 @@ function(setup_pyMaCh3)
   else() ## we are installing core pyMaCh3 - so libs haven't been installed yet so can't just copy them
     install(
       TARGETS
+        CLIApi
+        CLIModules
         yaml-cpp
         OscProbCalcer
         Oscillator

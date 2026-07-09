@@ -27,7 +27,6 @@ namespace M3 {
 ///
 /// @author David Riley
 /// @cite Matthews2018umbrella
-
 class MulticanonicalMCMCHandler {
 public:
   /// @brief Constructor
