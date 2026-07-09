@@ -20,8 +20,8 @@ void NuDockServerBase::setup() {
   // Resize the likelihood storage vectors
   syst_llh.resize(systematics.size(), M3::_BAD_DOUBLE_);
   sample_llh.resize(samples.size(), M3::_BAD_DOUBLE_);
-  verbose = GetFromManager(fitMan->raw()["NuDock"]["Verbose"], false);
-  add_prior_llh = GetFromManager(fitMan->raw()["NuDock"]["AddPriorLLH"], false);
+  verbose = GetFromManager(fitMan->raw()["NuDock"]["Verbose"], false, __FILE__, __LINE__);
+  add_prior_llh = GetFromManager(fitMan->raw()["NuDock"]["AddPriorLLH"], false, __FILE__, __LINE__);
 }
 
 // ***************************************************************************
