@@ -868,6 +868,9 @@ INPUT                  = . \
                          Diagnostics/UmbrellaSampling \
                          Plotting \
                          Plotting/plottingUtils \
+                         CLI \
+                         CLI/API \
+                         CLI/Modules \
                          Parameters \
                          python \
                          Doc/User-Guide/ 
