@@ -50,7 +50,7 @@ namespace M3 {
     /// @brief Alias for IPluginBase, used for core modules
     typedef PluginBase IModuleBase;
 
-};
+}
 
 /// @typedef create_plugin_t
 /// @brief Function pointer type for plugin factory function

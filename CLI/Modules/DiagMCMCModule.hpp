@@ -25,4 +25,4 @@ namespace M3{
       /// @return Exit code (0 on success)
       int Run() override;
   };
-};
+}

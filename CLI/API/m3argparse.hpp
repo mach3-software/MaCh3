@@ -46,4 +46,4 @@ namespace M3 {
                 return (*this);
             }
     };
-};
+}
