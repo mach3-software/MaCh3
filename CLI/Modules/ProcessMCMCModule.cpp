@@ -164,26 +164,26 @@ namespace M3{
     YAML::Node card_yaml = M3OpenConfig(config.c_str());
     YAML::Node Settings = card_yaml["ProcessMCMC"];
     
-    const bool PlotCorr = m_parser->get<bool>("--corr") || GetFromManager<bool>(Settings["PlotCorr"], false);
+    const bool PlotCorr = m_parser->get<bool>("--corr") || GetFromManager<bool>(Settings["PlotCorr"], false, __FILE__, __LINE__);
 
-    Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
-    Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
-    Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
+    Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}, __FILE__, __LINE__));
+    Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}, __FILE__, __LINE__));
+    Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}, __FILE__, __LINE__));
 
     //Apply additional cuts to 1D posterior
-    Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
+    Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], "", __FILE__, __LINE__));
 
     if(PlotCorr) Processor->SetOutputSuffix("_drawCorr");
     //KS:Turn off plotting detector and some other setting, should be via some config
-    Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false));
-    Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true));
+    Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false, __FILE__, __LINE__));
+    Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true, __FILE__, __LINE__));
 
     //KS: Whether you want prior error bands for parameters with flat prior or not
-    Processor->SetPlotErrorForFlatPrior(GetFromManager<bool>(Settings["PlotErrorForFlatPrior"], true));
-    Processor->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
-    Processor->SetPlotBinValue(GetFromManager<bool>(Settings["PlotBinValue"], false));
+    Processor->SetPlotErrorForFlatPrior(GetFromManager<bool>(Settings["PlotErrorForFlatPrior"], true, __FILE__, __LINE__));
+    Processor->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true, __FILE__, __LINE__));
+    Processor->SetPlotBinValue(GetFromManager<bool>(Settings["PlotBinValue"], false, __FILE__, __LINE__));
     //KS: Plot only 2D posteriors with correlations greater than 0.2
-    Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2));
+    Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2, __FILE__, __LINE__));
 
     Processor->Initialise();
 
@@ -209,50 +209,50 @@ namespace M3{
     Processor->MakePostfit(this->GetCustomBinning(Settings));
     Processor->DrawPostfit();
     //KS: Should set via config whether you want below or not
-    if(m_parser->get<bool>("--MakeCredibleIntervals") || GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
-      Processor->MakeCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
-                                      GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
-                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false));
+    if(m_parser->get<bool>("--MakeCredibleIntervals") || GetFromManager<bool>(Settings["MakeCredibleIntervals"], true, __FILE__, __LINE__)) {
+      Processor->MakeCredibleIntervals(GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}, __FILE__, __LINE__),
+                                      GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}, __FILE__, __LINE__),
+                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false, __FILE__, __LINE__));
     }
-    if(m_parser->get<bool>("--CalcBayesFactor") || GetFromManager<bool>(Settings["CalcBayesFactor"], true))  this->CalcBayesFactor(Processor.get());
-    if(m_parser->get<bool>("--CalcSavageDickey") || GetFromManager<bool>(Settings["CalcSavageDickey"], true)) this->CalcSavageDickey(Processor.get());
-    if(m_parser->get<bool>("--CalcBipolarPlot") || GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) this->CalcBipolarPlot(Processor.get());
-    if(m_parser->get<bool>("--CalcParameterEvolution") || GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) this->CalcParameterEvolution(Processor.get());
+    if(m_parser->get<bool>("--CalcBayesFactor") || GetFromManager<bool>(Settings["CalcBayesFactor"], true, __FILE__, __LINE__))  this->CalcBayesFactor(Processor.get());
+    if(m_parser->get<bool>("--CalcSavageDickey") || GetFromManager<bool>(Settings["CalcSavageDickey"], true, __FILE__, __LINE__)) this->CalcSavageDickey(Processor.get());
+    if(m_parser->get<bool>("--CalcBipolarPlot") || GetFromManager<bool>(Settings["CalcBipolarPlot"], false, __FILE__, __LINE__)) this->CalcBipolarPlot(Processor.get());
+    if(m_parser->get<bool>("--CalcParameterEvolution") || GetFromManager<bool>(Settings["CalcParameterEvolution"], false, __FILE__, __LINE__)) this->CalcParameterEvolution(Processor.get());
 
     if(PlotCorr)
     {
-      Processor->SetSmoothing(GetFromManager<bool>(Settings["Smoothing"], true));
+      Processor->SetSmoothing(GetFromManager<bool>(Settings["Smoothing"], true, __FILE__, __LINE__));
       // Make the covariance matrix
       //We have different treatment for multithread
       Processor->CacheSteps();
       //KS: Since we cached let's make fancy violins :)
-      if(GetFromManager<bool>(Settings["MakeViolin"], true)) Processor->MakeViolin();
+      if(GetFromManager<bool>(Settings["MakeViolin"], true, __FILE__, __LINE__)) Processor->MakeViolin();
       Processor->MakeCovariance_MP();
 
       Processor->DrawCovariance();
-      if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], "UpdatedCorrelationMatrix.yaml"), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD"));
+      if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true, __FILE__, __LINE__)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], "UpdatedCorrelationMatrix.yaml", __FILE__, __LINE__), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD", __FILE__, __LINE__));
 
       auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
       if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
 
-      if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false)) {
-        Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
-                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
-                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false), 
-                                      GetFromManager<bool>(Settings["Draw2DPosterior"], true),
-                                      GetFromManager<bool>(Settings["DrawBestFit"], true));
+      if(GetFromManager<bool>(Settings["MakeCredibleRegions"], false, __FILE__, __LINE__)) {
+        Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}, __FILE__, __LINE__),
+                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}, __FILE__, __LINE__),
+                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}, __FILE__, __LINE__),
+                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false, __FILE__, __LINE__),
+                                      GetFromManager<bool>(Settings["Draw2DPosterior"], true, __FILE__, __LINE__),
+                                      GetFromManager<bool>(Settings["DrawBestFit"], true, __FILE__, __LINE__));
       }
-      if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) this->GetTrianglePlot(Processor.get());
+      if(GetFromManager<bool>(Settings["GetTrianglePlot"], true, __FILE__, __LINE__)) this->GetTrianglePlot(Processor.get());
 
       //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
-      if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) this->DiagnoseCovarianceMatrix(Processor.get(), inputFile);
+      if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false, __FILE__, __LINE__)) this->DiagnoseCovarianceMatrix(Processor.get(), inputFile);
     }
-    Processor->ProduceChi2(GetFromManager<std::string>(Settings["Chi2Group"], "Osc"));
-    if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true))          Processor->PerformJarlskogAnalysis();
-    if(GetFromManager<bool>(Settings["ProducePMNSElements"], true))       Processor->ProducePMNSElements();
-    if(GetFromManager<bool>(Settings["ProduceUnitarityTriangles"], true)) Processor->ProduceUnitarityTriangles();
-    if(GetFromManager<bool>(Settings["MakePiePlot"], true))               Processor->MakePiePlot();
+    Processor->ProduceChi2(GetFromManager<std::string>(Settings["Chi2Group"], "Osc", __FILE__, __LINE__));
+    if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true, __FILE__, __LINE__))          Processor->PerformJarlskogAnalysis();
+    if(GetFromManager<bool>(Settings["ProducePMNSElements"], true, __FILE__, __LINE__))       Processor->ProducePMNSElements();
+    if(GetFromManager<bool>(Settings["ProduceUnitarityTriangles"], true, __FILE__, __LINE__)) Processor->ProduceUnitarityTriangles();
+    if(GetFromManager<bool>(Settings["MakePiePlot"], true, __FILE__, __LINE__))               Processor->MakePiePlot();
   }
 
   /// @brief Compare multiple MCMC chains
@@ -281,15 +281,15 @@ namespace M3{
       Processor[ik] = std::make_unique<MCMCProcessor>(FileNames[ik]);
       Processor[ik]->SetOutputSuffix(("_" + std::to_string(ik)).c_str());
 
-      Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
-      Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
-      Processor[ik]->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
+      Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}, __FILE__, __LINE__));
+      Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}, __FILE__, __LINE__));
+      Processor[ik]->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}, __FILE__, __LINE__));
 
       //Apply additional cuts to 1D posterior
-      Processor[ik]->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
+      Processor[ik]->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], "", __FILE__, __LINE__));
 
-      Processor[ik]->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false));
-      Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
+      Processor[ik]->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false, __FILE__, __LINE__));
+      Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true, __FILE__, __LINE__));
       Processor[ik]->Initialise();
 
       if(Settings["BurnInSteps"]) {
@@ -460,7 +460,7 @@ namespace M3{
     Posterior->cd();
     Posterior->Clear();
 
-    if(GetFromManager<bool>(Settings["PerformKStest"], true)) this->KolmogorovSmirnovTest(Processor, Posterior, canvasname);
+    if(GetFromManager<bool>(Settings["PerformKStest"], true, __FILE__, __LINE__)) this->KolmogorovSmirnovTest(Processor, Posterior, canvasname);
     
     // Close the pdf file
     MACH3LOG_INFO("Closing pdf {}", canvasname);
@@ -579,12 +579,12 @@ namespace M3{
 
       std::vector<std::string> NameVec = dg[1].as<std::vector<std::string>>();
       Processor->MakeTrianglePlot(NameVec,
-                                  GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}),
-                                  GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
-                                  GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
-                                  GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
-                                  GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                  GetFromManager<bool>(Settings["CredibleInSigmas"], false));
+                                  GetFromManager<std::vector<double>>(Settings["CredibleIntervals"], {0.99, 0.90, 0.68}, __FILE__, __LINE__),
+                                  GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}, __FILE__, __LINE__),
+                                  GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}, __FILE__, __LINE__),
+                                  GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}, __FILE__, __LINE__),
+                                  GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}, __FILE__, __LINE__),
+                                  GetFromManager<bool>(Settings["CredibleInSigmas"], false, __FILE__, __LINE__));
     }
   }
 
@@ -631,7 +631,7 @@ namespace M3{
     YAML::Node Settings = card_yaml["ProcessMCMC"];
 
     const int entries = int(Processor->GetnSteps());
-    const int NIntervals = GetFromManager<int>(Settings["NIntervals"], 5);
+    const int NIntervals = GetFromManager<int>(Settings["NIntervals"], 5, __FILE__, __LINE__);
     const int IntervalsSize = entries/NIntervals;
     //We start with burn from 0 (no burn in at all)
     int BurnIn = 0;

@@ -109,9 +109,9 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
   /// @todo DR: I realised this will fail if you set spline to true but don't
   // delete the umbrella section, thats not ideal
-  multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"], false);
+  multicanonicalSpline = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Spline"]["SplineMode"], false, __FILE__, __LINE__);
 
-  const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaBiasFunction"], "");
+  const std::string biasFunctionName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaBiasFunction"], "", __FILE__, __LINE__);
   const bool hasBiasFunction = !biasFunctionName.empty();
 
   // Spline and umbrella modes are mutually exclusive
@@ -136,7 +136,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   // setup for spline bias mode
   if (multicanonicalSpline) {
 
-    std::string splineFileName = GetFromManager<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], "nofile");
+    std::string splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
 
     TFile* splineFile = M3::Open(splineFileName.c_str(), "READ",__FILE__, __LINE__);
 
@@ -159,44 +159,44 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   } else {
     // Umbrella mode with explicit bias function selection
     MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
-    umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0);
+    umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0, __FILE__, __LINE__);
     MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
 
-    umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5);
+    umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5, __FILE__, __LINE__);
 
     // dynamically adjust the width of the gaussians to ensure a certain level
     // of overlap? be careful, not enough windows here will lead to posterior
     // (rather than bias) dominated results
-    umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false);
+    umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false, __FILE__, __LINE__);
 
     if (umbrellaOverlapMode) {
       MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
-      umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0);
+      umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0, __FILE__, __LINE__);
       MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
       umbrellaWidth = TMath::Pi() / ((umbrellaNumber - 1) * (umbrellaSigmaOverlap));
     } else {
       // just grab the width directly from the config
-      umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2 * TMath::Pi()) / umbrellaNumber);
+      umbrellaWidth = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], (2 * TMath::Pi()) / umbrellaNumber, __FILE__, __LINE__);
       MACH3LOG_INFO("Setting width based on value in config {}", umbrellaWidth);
     }
 
     // set individual step scale for dcp, so that the ratio of the step scale to
     // the multicanonical sigma is stepscale/1sigmaerror = 1/2pi
-    umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false);
-    umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0);
+    umbrellaAdjustStepScale = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaAdjustStepScale"], false, __FILE__, __LINE__);
+    umbrellaStepScaleFactor = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaStepScaleFactor"], 1.0, __FILE__, __LINE__);
 
     AdjustUmbrellaStepScale(systematics);
 
     // Set the flip window flag for the oscillation systematic DO NOT USE THIS
     // flipWindow =
     // GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"],
-    // false); MACH3LOG_INFO("Flip Window: {}", flipWindow);
+    // false, __FILE__, __LINE__); MACH3LOG_INFO("Flip Window: {}", flipWindow);
   }
 
   // initialize von Mises parameters
   if (umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
     double temp_vonMises_sigma;
-    temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth);
+    temp_vonMises_sigma = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaWidth"], umbrellaWidth, __FILE__, __LINE__);
     vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
     vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
     MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
@@ -310,7 +310,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
 }
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightTripleGaussian(double deltacp) { // pretty much deprecated at this point, just here for testing
-  // precalculate constants
+  // precalculated constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   double sigma = umbrellaWidth;
   const double neg_half_sigma_sq = -1 / (2 * sigma * sigma);

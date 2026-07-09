@@ -32,7 +32,7 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
 void MCMCBase::RunMCMC() {
 // *******************
     // Multicanonical method toggle from yaml config
-    multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"], false);
+    multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"], false, __FILE__, __LINE__);
     MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
     if (multicanonical) {

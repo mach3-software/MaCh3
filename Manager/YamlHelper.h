@@ -326,7 +326,7 @@ Type Get(const YAML::Node& node, const std::string& File, const int Line) {
 /// @param File name of file in which function is being called to make better error message
 /// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, const Type defval, const std::string& File = "", const int Line = 1) {
+Type GetFromManager(const YAML::Node& node, const Type defval, const std::string& File, const int Line) {
 // **********************
   if (!node) {
     return defval;

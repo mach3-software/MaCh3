@@ -10,6 +10,7 @@ set(HEADERS
     plugin.hpp
     m3argparse.hpp
 )
+
 list(TRANSFORM HEADERS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 install(DIRECTORY ${argparse_SOURCE_DIR}/include/
