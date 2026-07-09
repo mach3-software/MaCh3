@@ -11,6 +11,8 @@ set(HEADERS
     m3argparse.hpp
 )
 
+list(TRANSFORM HEADERS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+
 install(DIRECTORY ${argparse_SOURCE_DIR}/include/
         DESTINATION include/CLI/API/argparse)
 target_include_directories(argparse INTERFACE

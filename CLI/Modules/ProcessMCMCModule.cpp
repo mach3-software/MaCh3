@@ -248,8 +248,11 @@ namespace M3{
       //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
       if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false, __FILE__, __LINE__)) this->DiagnoseCovarianceMatrix(Processor.get(), inputFile);
     }
-    if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true, __FILE__, __LINE__)) Processor->PerformJarlskogAnalysis();
-    if(GetFromManager<bool>(Settings["MakePiePlot"], true, __FILE__, __LINE__))      Processor->MakePiePlot();
+    Processor->ProduceChi2(GetFromManager<std::string>(Settings["Chi2Group"], "Osc", __FILE__, __LINE__));
+    if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true, __FILE__, __LINE__))          Processor->PerformJarlskogAnalysis();
+    if(GetFromManager<bool>(Settings["ProducePMNSElements"], true, __FILE__, __LINE__))       Processor->ProducePMNSElements();
+    if(GetFromManager<bool>(Settings["ProduceUnitarityTriangles"], true, __FILE__, __LINE__)) Processor->ProduceUnitarityTriangles();
+    if(GetFromManager<bool>(Settings["MakePiePlot"], true, __FILE__, __LINE__))               Processor->MakePiePlot();
   }
 
   /// @brief Compare multiple MCMC chains
