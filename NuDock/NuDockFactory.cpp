@@ -63,14 +63,14 @@ void InitialiseNuDockObj(Manager *man,
     MACH3LOG_INFO("Setting up NuDock server.");
   }
 
-  bool useDebug = GetFromManager(man->raw()[nudock_conf_name]["Debug"], false);
+  bool useDebug = GetFromManager(man->raw()[nudock_conf_name]["Debug"], false, __FILE__, __LINE__);
   std::string schemaLocation = GetFromManager<std::string>(
-      man->raw()[nudock_conf_name]["SchemaLocation"], "");
+      man->raw()[nudock_conf_name]["SchemaLocation"], "", __FILE__, __LINE__);
   std::string commTypeStr = GetFromManager<std::string>(
-      man->raw()[nudock_conf_name]["CommunicationType"], "LOCALHOST");
-  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234);
+      man->raw()[nudock_conf_name]["CommunicationType"], "LOCALHOST", __FILE__, __LINE__);
+  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234, __FILE__, __LINE__);
   std::string verbosity =
-      GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO");
+      GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO", __FILE__, __LINE__);
 
   CommunicationType commType;
   if (CommunicationTypeMap.find(commTypeStr) != CommunicationTypeMap.end()) {
