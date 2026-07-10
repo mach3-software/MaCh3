@@ -290,7 +290,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp
 double MulticanonicalMCMCHandler::generalisedGaussian2(double x, double mean, double width) {
   constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2 for now due to normalisation
   // 1/4 * Gamma(1/4) = 0.906402477055 (this factor from 2n/Gamma(1/2n) for n=2)
-  const double normFactor = 1 / ((0.906402477055) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions), im just going to hardcode them for now
+  const double normFactor = 1 / ((M3::UmbrellaGaussianNormFactor) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions), im just going to hardcode them for now
   double likelihood = normFactor * std::exp(-std::pow((std::pow(x - mean, 2) / (2 * std::pow(width, 2))), n));
   return likelihood;
 }

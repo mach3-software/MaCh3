@@ -13,16 +13,8 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TSystemDirectory.h"
 _MaCh3_Safe_Include_End_ //}
 
-//this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#pragma GCC diagnostic ignored "-Wconversion"
 
 bool debug_mode = false;
-
 /// Structure to hold each window configuration
 /// These are individual window settings, function type & params plus filename
 struct WindowConfig {
@@ -86,8 +78,7 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
       // Parse input files
       if (yaml_config["input_files"]) {
         const YAML::Node &input_files = yaml_config["input_files"];
-        for (size_t i = 0; i < input_files.size() && i < config.windows.size();
-             i++) {
+        for (size_t i = 0; i < input_files.size() && i < config.windows.size(); i++) {
           config.windows[i].input_file = input_files[i].as<std::string>();
         }
       }
@@ -137,7 +128,7 @@ double vonMisesWindow(double x, double center, double kappa) {
 double generalisedGaussian2(double x, double mean, double width) {
   constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2
                        // for now due to normalisation
-  const double normFactor = 1 / ((0.906402477055) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions),
+  const double normFactor = 1 / ((M3::UmbrellaGaussianNormFactor) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions),
                    // im just going to hardcode them for now
   double likelihood = normFactor * std::exp(-std::pow((std::pow(x - mean, 2) / (2 * std::pow(width, 2))), n));
   return likelihood;
@@ -181,7 +172,7 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
 // Memory heavy depending on number of steps/cores/windows
 std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector<WindowConfig> &windows, const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
 
-  int n_windows = windows.size();
+  int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<std::vector<double>>> cache(n_windows);
 
   for (int i = 0; i < n_windows; i++) {
@@ -243,7 +234,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
         cache_size_bytes += cache[i][j].size() * sizeof(double);
       }
     }
-    MACH3LOG_INFO("Window cache size: {:.2f} MB", cache_size_bytes / (1024.0 * 1024.0));
+    MACH3LOG_INFO("Window cache size: {:.2f} MB", static_cast<double>(cache_size_bytes) / (1024.0 * 1024.0));
     MACH3LOG_INFO("Window cache built successfully.");
     TFile *cache_file = TFile::Open("window_cache_debug_histograms.root", "RECREATE");
     for (int i = 0; i < n_windows; i++) {
@@ -287,7 +278,7 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             const std::vector<std::vector<std::vector<double>>> &window_cache,
             bool use_openmp = true) {
 
-  int n_windows = windows.size();
+  int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
 
   std::vector<double> z_inv = z_current; // make a copy to avoid modifying the original z_current
@@ -392,9 +383,9 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
         const std::vector<std::vector<double>> &samples,
         const std::vector<std::vector<std::vector<double>>> &window_cache,
         bool use_openmp = true, bool verbose = false,
-        int *total_lines = nullptr) {
+        [[maybe_unused]] int *total_lines = nullptr) {
 
-  int n_windows = windows.size();
+  int n_windows = static_cast<int>(windows.size());
   if (verbose && !use_openmp) {
     MACH3LOG_INFO("Using single-threaded computation for F matrix...");
   }
@@ -477,7 +468,9 @@ bool checkConvergence(const std::vector<double> &z_current, const std::vector<do
     // should be more robust to individual elements fluctuating
     // around their target value while the overall z
     // distribution is still converging
-    if (sum_diffs / z_current.size() > tolerance) { return false;}
+    if (sum_diffs / static_cast<double>(z_current.size()) > tolerance) {
+      return false;
+    }
   }
   return true;
 }
@@ -515,12 +508,12 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
   }
 
   z_history.push_back(z_current);
-  if ((int)z_history.size() > moving_average_window) {
+  if (static_cast<int>(z_history.size()) > moving_average_window) {
     z_history.pop_front();
   }
 
   // Wait until the moving-average window is fully populated.
-  if ((int)z_history.size() < moving_average_window) {
+  if (static_cast<int>(z_history.size()) < moving_average_window) {
     return false;
   }
 
@@ -592,13 +585,11 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
 // Check OpenMP status with detailed debugging
 #ifdef MULTITHREAD
-  bool openmp_available = true;
   MACH3LOG_INFO("OpenMP: AVAILABLE");
   if (config.use_openmp) {
     MACH3LOG_INFO("OpenMP: ENABLED (using {} threads)", omp_get_max_threads());
   }
 #else
-  bool openmp_available = false;
   MACH3LOG_WARN("OpenMP: NOT AVAILABLE");
   if (config.use_openmp) {
     MACH3LOG_WARN("OpenMP: NOT AVAILABLE - falling back to single-threaded execution");
@@ -632,7 +623,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         continue;
       }
 
-      TTree *tree = (TTree *)file->Get("posteriors");
+      TTree *tree = static_cast<TTree*>(file->Get("posteriors"));
       if (!tree) {
         std::cerr << "Error: Cannot find 'posteriors' tree in " << config.windows[i].input_file << std::endl;
         file->Close();
@@ -651,7 +642,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     if (files) {
       TIter next(files);
       TSystemFile *file;
-      while ((file = (TSystemFile *)next())) {
+      while ((file = static_cast<TSystemFile*>(next()))) {
         std::string filename = file->GetName();
         if (filename.find(".root") == std::string::npos) {
           MACH3LOG_INFO("Skipping non-root file: {}", filename);
@@ -663,7 +654,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
         TFile *root_file = M3::Open(full_path, "READ", __FILE__, __LINE__);
 
-        TTree *tree = (TTree *)root_file->Get("posteriors");
+        TTree *tree = static_cast<TTree*>(root_file->Get("posteriors"));
         if (!tree) {
           MACH3LOG_ERROR("Cannot find 'posteriors' tree in {}", full_path);
           root_file->Close();
@@ -692,7 +683,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     TFile *file = input_files[i];
 
     MACH3LOG_INFO("Processing file {}/{}: {}", i + 1, input_trees.size(), file->GetName());
-    TMacro *macro = (TMacro *)file->Get("MaCh3_Config");
+    TMacro *macro = static_cast<TMacro*>(file->Get("MaCh3_Config"));
     if (macro) {
       MACH3LOG_INFO("Found MaCh3_Config macro in file.");
 
@@ -700,7 +691,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       std::stringstream yaml_text;
       TList *lines = macro->GetListOfLines();
       for (int iline = 0; iline < lines->GetEntries(); ++iline) {
-        TObjString *line = (TObjString *)lines->At(iline);
+        TObjString *line = static_cast<TObjString*>(lines->At(iline));
         yaml_text << line->GetString().Data() << "\n";
       }
 
@@ -754,7 +745,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     tree->SetBranchAddress("LogL", &logL_value);
 
     Long64_t nentries = tree->GetEntries();
-    Long64_t filtered_entries = 0;
+    //Long64_t filtered_entries = 0;
     MACH3LOG_INFO("Window {}: {} entries", i, nentries);
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
@@ -891,7 +882,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     }
     // add an initial FMatrix with the initial z values for reference
     std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache, openmp_works);
-    int n_windows = config.windows.size();
+    int n_windows = static_cast<int>(config.windows.size());
     TH2D initial_F_TH2D("F_matrix_initial", "Initial F matrix;Window j;Window i", n_windows, 0, n_windows, n_windows, 0, n_windows);
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {initial_F_TH2D.SetBinContent(j + 1, i + 1, initial_F[i][j]); // Note the order of i and j for correct axis labeling
@@ -934,7 +925,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
           double rel_change = std::abs(z_current[i] - z_prev[i]) / std::max(std::abs(z_current[i]), 1e-10);
           avg_relative_change += rel_change;
         }
-        avg_relative_change /= z_current.size();
+        avg_relative_change /= static_cast<double>(z_current.size());
       }
 
       // Print z-values
@@ -946,7 +937,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       }
       if (iteration > 0) {
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_print_time);
-        double avg_time_per_iteration = duration.count() / double(config.print_frequency);
+        double avg_time_per_iteration = static_cast<double>(duration.count()) /
+                                        static_cast<double>(config.print_frequency);
         std::cout << "] (avg: " << std::setw(6) << std::setprecision(1) << avg_time_per_iteration << " ms/iter)" << std::endl;
         std::cout << "Avg relative change: " << std::scientific << std::setprecision(3) << avg_relative_change << " (target: " << config.tolerance << ")" << std::endl;
         total_output_lines = 2;
@@ -968,7 +960,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     if (save_matrix && (iteration < 15 || iteration % config.print_frequency == 0)) {
       std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache, openmp_works);
       // convert F_matrix to Th2D for saving to root file
-      int n_windows = config.windows.size();
+      int n_windows = static_cast<int>(config.windows.size());
       TH2D F_TH2D(Form("F_matrix_iter_%02d", iteration),Form("F matrix at iteration %02d;Window j;Window i", iteration), n_windows, 0, n_windows, n_windows, 0, n_windows);
       for (int i = 0; i < n_windows; i++) {
         for (int j = 0; j < n_windows; j++) {
@@ -1024,7 +1016,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
 
         auto end_time = std::chrono::high_resolution_clock::now();
         auto total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-        double avg_time_total = total_duration.count() / double(iteration + 1);
+        double avg_time_total = static_cast<double>(total_duration.count()) /
+                                static_cast<double>(iteration + 1);
         if (save_matrix) {
           F_file->Close();
         }
@@ -1145,7 +1138,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   for (size_t i = 0; i < config.windows.size(); i++) {
     std::vector<double> iterations, z_vals;
     for (size_t j = 0; j < z_evolution.size(); j++) {
-      iterations.push_back(j);
+      iterations.push_back(static_cast<int>(j));
       z_vals.push_back(z_evolution[j][i]);
     }
 
@@ -1156,8 +1149,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         ymin = val;
     }
 
-    z_graphs[i] = new TGraph(iterations.size(), &iterations[0], &z_vals[0]);
-    z_graphs[i]->SetLineColor(i + 1);
+    z_graphs[i] = new TGraph(static_cast<int>(iterations.size()), &iterations[0], &z_vals[0]);
+    z_graphs[i]->SetLineColor(static_cast<Color_t>(i + 1));
     z_graphs[i]->SetLineWidth(2);
     z_graphs[i]->SetName(Form("z_evolution_window_%lu", i));
     z_graphs[i]->SetTitle("Evolution of Z Values");
