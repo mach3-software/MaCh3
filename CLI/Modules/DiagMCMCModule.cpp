@@ -15,6 +15,7 @@ namespace M3{
 
   MaCh3ArgumentParser* DiagMCMCModule::get_parser(){
     m_parser = std::make_unique<MaCh3ArgumentParser>("diag", "1.0", argparse::default_arguments::help);
+    m_parser->add_description("Tool for MCMC diagnostic like autocorrelations.");
     m_parser->add_argument("mcmc-output")
       .help("MCMC chain root file.")
       .metavar("MCMC_CHAIN")

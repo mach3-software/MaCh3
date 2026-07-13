@@ -21,6 +21,8 @@ namespace M3{
     /// - Managing core modules and dynamic plugins
     /// - Installing and generating shell completions
     /// - Running selected subcommands
+    ///
+    /// @author Alexander Richards
     class MaCh3Program: public MaCh3ArgumentParser{
         public:
             using MaCh3ArgumentParser::MaCh3ArgumentParser;
