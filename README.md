@@ -209,6 +209,7 @@ and do this everytime you begin from a fresh terminal and want to use MaCh3.
 Other external libraries, which currently include:
 1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. [spdlog](https://github.com/gabime/spdlog)
+3. [argparse](https://github.com/p-ranav/argparse)
 
 are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 

@@ -47,16 +47,19 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  std::string arg2 = argv[2];
+  std::string arg2;
+  if (argc > 2) {
+    arg2 = argv[2];
+  }
   // Check if we are using --override mode, or for some CLI whether we simply passed .yaml
   if ((argc == 4 && arg2 == "--override") ||
       (argc == 3 && arg2.size() >= 5 && arg2.compare(arg2.size() - 5, 5, ".yaml") == 0)) {
     std::string overrideFile;
 
-    if (std::string(argv[2]) == "--override") {
+    if (arg2 == "--override") {
       overrideFile = argv[3];
     } else {
-      overrideFile = argv[2];
+      overrideFile = arg2;
     }
     MACH3LOG_INFO("Merging configuration files: base config '{}', override config '{}'. "
                   "Options in '{}' will take precedence over '{}'.",

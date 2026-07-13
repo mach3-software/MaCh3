@@ -31,6 +31,7 @@ namespace M3{
 
   MaCh3ArgumentParser* GetPenaltyTermModule::get_parser(){
     m_parser = std::make_unique<MaCh3ArgumentParser>("penterm", "1.0", argparse::default_arguments::help);
+    m_parser->add_description("Calculate penalty term for selected parameters, for every step");
     m_parser->add_argument("inputfile")
       .help("Root file to analyse.")
       .metavar("INPUTFILE")
