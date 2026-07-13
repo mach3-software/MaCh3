@@ -17,6 +17,16 @@ namespace M3 {
     kVonMises,
     kGeneralisedGaussian
   };
+
+
+  /// Normalisation constant for the n=2 umbrella sampling Gaussian.
+  ///
+  /// The factor comes from:
+  ///   2n / Gamma(1/(2n))
+  /// with n = 2:
+  ///   4 / Gamma(1/4) = 0.906402477055
+  ///
+  constexpr double UmbrellaGaussianNormFactor = 0.906402477055;
 }
 
 /// @brief Helper class for configuring and evaluating multicanonical umbrella weights.
