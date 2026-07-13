@@ -13,7 +13,7 @@ namespace M3{
 
   MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){
     m_parser = std::make_unique<MaCh3ArgumentParser>("process", "1.0", argparse::default_arguments::help);
-    m_parser->add_description("Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc.");
+    m_parser->add_description("Main executable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc.");
     m_parser->add_epilog("""\
   ProcessMCMC The main application for analysing the ND280 chain.\n\
   It prints posterior distributions after the burn-in cut and allows comparison of two or three different chains.\n\
