@@ -21,5 +21,4 @@ jobs:
           gh release create "${{ github.ref_name }}" \
               --repo="${{ github.repository }}" \
               --title="${{ github.ref_name }}" \
-              --generate-notes \
-              --discussion-category "announcements"
+              --generate-notes
