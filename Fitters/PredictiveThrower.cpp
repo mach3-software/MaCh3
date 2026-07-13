@@ -160,10 +160,10 @@ void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGr
   if (ModelSystematic) {
     auto ThrowParamGroupOnly = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowParamGroupOnly"], {}, __FILE__, __LINE__);
     auto UniqueParamGroup = ModelSystematic->GetUniqueParameterGroups();
-    auto ParameterOnlyToVaryString = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowSinlgeParams"], {}, __FILE__, __LINE__);
+    auto ParameterOnlyToVaryString = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowSingleParams"], {}, __FILE__, __LINE__);
 
     if (!ThrowParamGroupOnly.empty() && !ParameterOnlyToVaryString.empty()) {
-      MACH3LOG_ERROR("Can't use ThrowParamGroupOnly and ThrowSinlgeParams at the same time");
+      MACH3LOG_ERROR("Can't use ThrowParamGroupOnly and ThrowSingleParams at the same time");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
