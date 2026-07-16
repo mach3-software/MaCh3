@@ -599,6 +599,7 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
 }
 
 // *************************
+
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
@@ -610,7 +611,9 @@ void FitterBase::RunLLHScan() {
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);
-
+  //Do we want a logarithmic LLH scan                                    
+  bool LLHLogarithmic = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHLogarithmic"], false, __FILE__ , __LINE__);
+  
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
@@ -669,8 +672,27 @@ void FitterBase::RunLLHScan() {
       // Get the parameter central and bounds
       double CentralValue, lower, upper;
       GetParameterScanRange(cov, i, CentralValue, lower, upper, n_points);
-      // Make the TH1D
-      auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+      // Define the TH1D 
+      std::unique_ptr<TH1D> hScan;
+      // See if we want to do it logarithmically
+       if(LLHLogarithmic){
+	 
+	 std::vector<double> binEdges(n_points + 1);
+
+	 double logLower = std::log10(lower);
+	 double logUpper = std::log10(upper);
+
+	 for (int j = 0; j <= n_points; ++j) {
+	   binEdges[j] = std::pow( 10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+	 }
+    hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
+       }
+    
+       //If not then just do the normal thing  
+      else {
+    hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+       }
+       
       hScan->SetTitle((std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
       hScan->SetDirectory(nullptr);
 
@@ -718,8 +740,9 @@ void FitterBase::RunLLHScan() {
           }
         }
       }
-
+      
       // Scan over the parameter space
+       
       for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
