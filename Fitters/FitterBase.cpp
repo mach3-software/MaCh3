@@ -1,4 +1,7 @@
 #include "FitterBase.h"
+#include "TMath.h"
+#include <vector>
+#include <memory>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
@@ -676,18 +679,24 @@ void FitterBase::RunLLHScan() {
       std::unique_ptr<TH1D> hScan;
       // See if we want to do it logarithmically
        if(LLHLogarithmic){
-	 
+
+	 //negative values break it
+	 if (lower <= 0.0 || upper <= 0.0) {
+	   MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan",name, lower, upper);
+	   hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+       }
+	 else {
 	 std::vector<double> binEdges(n_points + 1);
 
-	 double logLower = std::log10(lower);
-	 double logUpper = std::log10(upper);
+	 double logLower = TMath::Log10(lower);
+	 double logUpper = TMath::Log10(upper);
 
 	 for (int j = 0; j <= n_points; ++j) {
-	   binEdges[j] = std::pow( 10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+	   binEdges[j] = TMath::Power(10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
 	 }
     hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
        }
-    
+    }
        //If not then just do the normal thing  
       else {
     hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
