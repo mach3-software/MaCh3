@@ -601,7 +601,24 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   MACH3LOG_INFO("Scanning {} {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", suffix, name, n_points, lower, upper, CentralValue);
 }
 
+
+// *************************                                                                      
+// Calculate bin edges for logarithmic LLH scans
 // *************************
+std::vector<double>FitterBase::CalculateBinEdges(double lowerlimit, double upperlimit, int n_points) const {
+     std::vector<double> binEdges(n_points + 1);
+
+     double logLower = TMath::Log10(lowerlimit);
+     double logUpper = TMath::Log10(upperlimit);
+
+     for (int j = 0; j <= n_points; ++j) {
+       binEdges[j] = TMath::Power(10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+     }
+	 
+   return binEdges;
+  
+}
+
 
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -686,17 +703,10 @@ void FitterBase::RunLLHScan() {
 	   hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
        }
 	 else {
-	 std::vector<double> binEdges(n_points + 1);
-
-	 double logLower = TMath::Log10(lower);
-	 double logUpper = TMath::Log10(upper);
-
-	 for (int j = 0; j <= n_points; ++j) {
-	   binEdges[j] = TMath::Power(10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+	  auto binEdges = CalculateBinEdges(lower, upper, n_points);
+	  hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
 	 }
-    hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
        }
-    }
        //If not then just do the normal thing  
       else {
     hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
@@ -992,8 +1002,8 @@ void FitterBase::Run2DLLHScan() {
       if (IsPCA) name_x += "_PCA";
       // Get the parameter central and bounds
       double central_x, lower_x, upper_x;
-      std::vector<double> binEdges_x;
       GetParameterScanRange(cov, i, central_x, lower_x, upper_x, n_points, "X");
+      std::vector<double> binEdges_x;
        
       //Logarithmic scan 
       if(LLHLogarithmic){
@@ -1003,13 +1013,7 @@ void FitterBase::Run2DLLHScan() {
 	}
 
 	else{
-	 binEdges_x.resize(n_points + 1);
-
-         double logLower_x = TMath::Log10(lower_x);
-         double logUpper_x = TMath::Log10(upper_x);
-	 for (int k = 0; k <= n_points; ++k) {
-	   binEdges_x[k] = TMath::Power(10.0, logLower_x + (logUpper_x - logLower_x) * double(k) / double(n_points));
-	 }
+	binEdges_x = CalculateBinEdges(lower_x, upper_x, n_points);
 	}
 
       }
@@ -1041,15 +1045,7 @@ void FitterBase::Run2DLLHScan() {
 	   hScanSam->GetZaxis()->SetTitle("2LLH_sam");
        }
 	 else {
-	   
-	 std::vector<double> binEdges_y(n_points + 1);
-	 
-	 double logLower_y = TMath::Log10(lower_y);
-         double logUpper_y = TMath::Log10(upper_y);
-
-	 for (int l = 0; l <= n_points; ++l) {
-	   binEdges_y[l] = TMath::Power(10.0, logLower_y + (logUpper_y - logLower_y) * double(l) / double(n_points));
-	 }
+	 auto binEdges_y = CalculateBinEdges(lower_y, upper_y, n_points);
 	 hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, binEdges_x.data(), n_points, binEdges_y.data());
        }
     }
