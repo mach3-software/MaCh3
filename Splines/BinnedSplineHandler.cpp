@@ -2,7 +2,6 @@
 #include <memory>
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
@@ -331,7 +330,7 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
               entry.iMode    = iMode;
               entry.iVar = {iVar1, iVar2, iVar3};
               IndexVect.push_back(entry);
-              IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3)] = static_cast<int>(IndexVect.size() - 1);
+              IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, std::vector<int>{iVar1, iVar2, iVar3})] = static_cast<int>(IndexVect.size() - 1);
             }
           }
         }
@@ -444,7 +443,7 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
 const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables) const {
 //****************************************
   int Index = IndexVectMap.at(std::make_tuple(Variables.iSample, Variables.iOscChan, Variables.iSyst,
-                                              Variables.iMode, Variables.iVar[0], Variables.iVar[1], Variables.iVar[2]));
+                                              Variables.iMode, Variables.iVar));
   return &weightvec_Monolith[IndexVect[Index].value];
 }
 
@@ -675,7 +674,7 @@ bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int
 //****************************************
   int iSample = GetSampleIndex(SampleTitle);
 
-  bool found = IndexVectMap.find(std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar[0], iVar[1], iVar[2])) != IndexVectMap.end();
+  bool found = IndexVectMap.find(std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar)) != IndexVectMap.end();
 
   if (!found)
   {
@@ -743,7 +742,7 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
       //Only consider if the event mode (Mode) matches ones of the spline modes
       if (Mode == spline_modes[iMode]) {
         int index = IndexVectMap.at(std::make_tuple(SampleIndex, iOscChan, iSyst, iMode,
-                                                    var_bins[0], var_bins[1], var_bins[2]));
+                                                    var_bins));
         int splineID = IndexVect[index].value;
         //Also check that the spline isn't flat
         if(!isflatarray[splineID]) {
@@ -846,7 +845,7 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       int Var1Bin = std::stoi(Tokens[kVar1BinToken]);
       int Var2Bin = std::stoi(Tokens[kVar2BinToken]);
       int Var3Bin = std::stoi(Tokens[kVar3BinToken]);
-
+      std::vector<int> VarBins = {Var1Bin, Var2Bin, Var3Bin};
       int SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
         if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
@@ -878,7 +877,7 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
 
       mySpline = Key->ReadObject<TSpline3>();
       // loop over all the spline knots and check their value
-      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, {Var1Bin, Var2Bin, Var3Bin})) {
+      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, VarBins)) {
         MACH3LOG_TRACE("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
         int nKnots = mySpline->GetNp();
@@ -894,7 +893,7 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
         }
 
         //Rather than keeping a mega vector of splines then converting, this should just keep everything nice in memory!
-        int index = IndexVectMap.at(std::make_tuple(iSample, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin));
+        int index = IndexVectMap.at(std::make_tuple(iSample, iOscChan, SystNum, ModeNum, VarBins));
         IndexVect[index].value = MonolithIndex;
         coeffindexvec.push_back(CoeffIndex);
         // Should save memory rather saving [x_i_0 ,... x_i_maxknots] for every spline!
@@ -1064,8 +1063,7 @@ void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
     IndexVect[iEntry] = *IndexTemp;
 
     auto key = std::make_tuple(IndexTemp->iSample, IndexTemp->iOscChan, IndexTemp->iSyst,
-                               IndexTemp->iMode, IndexTemp->iVar[0], IndexTemp->iVar[1],
-                               IndexTemp->iVar[2]);
+                               IndexTemp->iMode, IndexTemp->iVar);
     IndexVectMap[key] = static_cast<int>(iEntry);
   }
 
