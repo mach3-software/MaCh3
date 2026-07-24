@@ -10,6 +10,7 @@ Plotting 📊:
       - any-glob-to-any-file: 
           - Plotting/**
           - Diagnostics/**
+          - CLI/**
 
 Parameters ⚙️:
   - changed-files:
@@ -32,6 +33,8 @@ Documentation 📚:
   - changed-files:
       - any-glob-to-any-file: 
           - Doc/**
+          - .mailmap
+
 Cmake 🛠️:
   - changed-files:
       - any-glob-to-any-file:
