@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "github-actions" # Specify that Dependabot should check for GitHub Actions updates
     directory: ".github/workflows/" # Location of the GitHub Actions workflow files
     schedule:
-      interval: "weekly" # Check for updates on a weekly basis
+      interval: "monthly" # Check for updates on a weekly basis
     commit-message:
       prefix: "tidy"
 
@@ -16,4 +16,4 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"  # Location of your requirements.txt file
     schedule:
-      interval: "weekly"
+      interval: "monthly"

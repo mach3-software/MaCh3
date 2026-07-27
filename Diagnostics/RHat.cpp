@@ -87,7 +87,6 @@ void CapVariable(double var, double cap);
 // *******************
 int main(int argc, char *argv[]) {
 // *******************
-
   SetMaCh3LoggerFormat();
   M3::Utils::MaCh3Welcome();
 

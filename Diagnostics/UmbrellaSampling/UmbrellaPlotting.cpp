@@ -1912,6 +1912,7 @@ void UmbrellaPlotting(std::string InputFile,
 
 // Main function for compiled version
 int main(int argc, char *argv[]) {
+    SetMaCh3LoggerFormat();
     std::string InputFile = argv[1];
     std::string outputDir = argv[2];
 

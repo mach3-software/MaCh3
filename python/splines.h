@@ -12,11 +12,11 @@
 #include "Splines/UnbinnedSplineHandler.h"
 #include "Splines/SplineStructs.h"
 #include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
+
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TSpline.h"
-
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
+_MaCh3_Safe_Include_End_ //}
 
 namespace py = pybind11;
 
