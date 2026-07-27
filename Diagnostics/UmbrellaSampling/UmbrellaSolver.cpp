@@ -3,6 +3,7 @@
 ///
 /// @author David Riley
 
+#include <filesystem>
 #include "Fitters/MCMCProcessor.h"
 #include "Manager/Manager.h"
 #include "Fitters/MulticanonicalMCMCHandler.h"
@@ -12,7 +13,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TSystemDirectory.h"
 _MaCh3_Safe_Include_End_ //}
-
 
 bool debug_mode = false;
 /// Structure to hold each window configuration
@@ -611,19 +611,14 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   std::vector<TTree *> input_trees;
 
   if (!config.dynamic_files) {
-    std::cout << "Using static input files from configuration." << std::endl;
+    MACH3LOG_INFO("Using static input files from configuration.");
     for (size_t i = 0; i < config.windows.size(); i++) {
-      std::cout << "Loading file: " << config.windows[i].input_file << std::endl;
-
-      TFile *file = TFile::Open(config.windows[i].input_file.c_str(), "READ");
-      if (!file || file->IsZombie()) {
-        std::cerr << "Error: Cannot open file " << config.windows[i].input_file << std::endl;
-        continue;
-      }
+      MACH3LOG_INFO("Loading file: {}", config.windows[i].input_file);
+      TFile *file = M3::Open(config.windows[i].input_file.c_str(), "READ", __FILE__, __LINE__);
 
       TTree *tree = static_cast<TTree*>(file->Get("posteriors"));
       if (!tree) {
-        std::cerr << "Error: Cannot find 'posteriors' tree in " << config.windows[i].input_file << std::endl;
+        MACH3LOG_ERROR("Cannot find 'posteriors' tree in {}", config.windows[i].input_file);
         file->Close();
         continue;
       }
@@ -853,9 +848,6 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     if (actual_threads > 1) {
       MACH3LOG_INFO("OpenMP is working correctly with {} threads", actual_threads);
       openmp_works = true;
-    } else if (max_threads > 1) {
-      MACH3LOG_WARN("OpenMP pragmas not working in CLING - falling back to single-threaded");
-      openmp_works = false;
     } else {
       openmp_works = false;
     }
@@ -1036,15 +1028,15 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   oss << "]";
   MACH3LOG_INFO("{}", oss.str());
 
+  std::filesystem::copy_file(input_files[0]->GetName(), config.output_file,
+                             std::filesystem::copy_options::overwrite_existing);
   // Create output file
-  TFile *output_file = TFile::Open(config.output_file.c_str(), "RECREATE");
-  if (!output_file || output_file->IsZombie()) {
-    throw MaCh3Exception(__FILE__, __LINE__, "Cannot create output file: " + config.output_file);
-  }
+  TFile *output_file = M3::Open(config.output_file.c_str(), "UPDATE", __FILE__, __LINE__);
   output_file->cd();
 
+  TTree *input_tree = dynamic_cast<TTree*>(output_file->Get("posteriors"));
   // Create combined tree with weights
-  TTree* combined_tree = input_trees[0]->CloneTree(0);
+  TTree *combined_tree = input_tree->CloneTree(0);
 
   // Variables for the combined tree
   double umbrella_weight;
@@ -1092,7 +1084,11 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       }
     }
   }
+  // Write final results
+  combined_tree->Write(input_tree->GetName(), TObject::kOverwrite);
 
+  TDirectory* UmbreallaDir = output_file->mkdir("Umbrealla");
+  UmbreallaDir->cd();
   // Save diagnostics
   TCanvas c1("c1", "Z Evolution", 800, 600);
   std::vector<TGraph*> z_graphs(config.windows.size());
@@ -1140,9 +1136,6 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   c1.SetLogy();
   c1.Write();
 
-  // Write final results
-  combined_tree->Write();
-
   // Create summary histogram of delta_cp distribution
   TH1D *h_delta_cp = new TH1D("h_delta_cp_weighted", "Weighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
   TH1D *h_delta_cp_unweighted = new TH1D("h_delta_cp_unweighted", "Unweighted Delta CP Distribution", 100, -TMath::Pi(), TMath::Pi());
@@ -1153,9 +1146,13 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   h_delta_cp->Write();
   h_delta_cp_unweighted->Write();
 
+  UmbreallaDir->Close();
+  delete UmbreallaDir;
+
   // Get entry count before closing the file
   Long64_t total_entries = combined_tree->GetEntries();
 
+  output_file->cd();
   output_file->Close();
 
   // Close input files
