@@ -692,17 +692,17 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
 
   TDirectory * ogdir = gDirectory;
   TDirectory* ToyDir = nullptr;
-  TFile* file = nullptr;
-  if (Is_PriorPredictive) {
-    ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
-  } else{
-    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
-    // Open the ROOT file
-    int originalErrorWarning = gErrorIgnoreLevel;
-    gErrorIgnoreLevel = kFatal;
-    file = TFile::Open(PosteriorFileName.c_str(), "READ");
-    gErrorIgnoreLevel = originalErrorWarning;
 
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  gErrorIgnoreLevel = originalErrorWarning;
+
+  if (file == nullptr || file->IsZombie()) {
+    ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+  } else {
     ToyDir = file->GetDirectory("Toys_1DHistVar");
     // If toys not amiable in posterior file this means they must be in output file
     if(ToyDir == nullptr) {
@@ -792,18 +792,17 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
 
   TDirectory* ogdir = gDirectory;
   TDirectory* ToyDir = nullptr;
-  TFile* file = nullptr;
-  if (Is_PriorPredictive) {
+
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  gErrorIgnoreLevel = originalErrorWarning;
+
+  if (file == nullptr || file->IsZombie()) {
     ToyDir = outputFile->GetDirectory("Toys_ByMode");
-  } else{
-    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
-    // Open the ROOT file
-    int originalErrorWarning = gErrorIgnoreLevel;
-    gErrorIgnoreLevel = kFatal;
-
-    file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
-    gErrorIgnoreLevel = originalErrorWarning;
+  } else {
     ToyDir = file->GetDirectory("Toys_ByMode");
     // If toys not amiable in posterior file this means they must be in output file
     if(ToyDir == nullptr) {
