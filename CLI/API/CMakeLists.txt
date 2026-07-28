@@ -1,10 +1,8 @@
-include(FetchContent)
-FetchContent_Declare(
-    argparse
-    GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+CPMAddPackage(
+    NAME argparse
+    GITHUB_REPOSITORY p-ranav/argparse
     GIT_TAG d924b84eba1f0f0adf38b20b7b4829f6f65b6570
 )
-FetchContent_MakeAvailable(argparse)
 
 set(HEADERS
     plugin.hpp
