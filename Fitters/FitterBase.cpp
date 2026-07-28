@@ -1,10 +1,13 @@
 #include "FitterBase.h"
+#include <vector>
+#include <memory>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
+#include "TMath.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -598,7 +601,25 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   MACH3LOG_INFO("Scanning {} {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", suffix, name, n_points, lower, upper, CentralValue);
 }
 
+
+// *************************                                                                      
+// Calculate bin edges for logarithmic LLH scans
 // *************************
+std::vector<double>FitterBase::CalculateBinEdges(double lowerlimit, double upperlimit, int n_points) const {
+     std::vector<double> binEdges(n_points + 1);
+
+     double logLower = TMath::Log10(lowerlimit);
+     double logUpper = TMath::Log10(upperlimit);
+
+     for (int j = 0; j <= n_points; ++j) {
+       binEdges[j] = TMath::Power(10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+     }
+	 
+   return binEdges;
+  
+}
+
+
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
@@ -610,7 +631,9 @@ void FitterBase::RunLLHScan() {
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);
-
+  //Do we want a logarithmic LLH scan                                    
+  bool LLHLogarithmic = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHLogarithmic"], false, __FILE__ , __LINE__);
+  
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
@@ -669,8 +692,26 @@ void FitterBase::RunLLHScan() {
       // Get the parameter central and bounds
       double CentralValue, lower, upper;
       GetParameterScanRange(cov, i, CentralValue, lower, upper, n_points);
-      // Make the TH1D
-      auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+      // Define the TH1D 
+      std::unique_ptr<TH1D> hScan;
+      // See if we want to do it logarithmically
+       if(LLHLogarithmic){
+
+	 //negative values break it
+	 if (lower < 0.0 || upper < 0.0) {
+	   MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan",name, lower, upper);
+	   hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+       }
+	 else {
+	  auto binEdges = CalculateBinEdges(lower, upper, n_points);
+	  hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
+	 }
+       }
+       //If not then just do the normal thing  
+      else {
+    hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+       }
+       
       hScan->SetTitle((std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
       hScan->SetDirectory(nullptr);
 
@@ -718,8 +759,9 @@ void FitterBase::RunLLHScan() {
           }
         }
       }
-
+      
       // Scan over the parameter space
+       
       for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
@@ -936,7 +978,10 @@ void FitterBase::Run2DLLHScan() {
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
-
+  
+  //Do we want a logarithmic LLH scan                                    
+  bool LLHLogarithmic = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHLogarithmic"], false, __FILE__ , __LINE__);
+  
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["2DLLHScanPoints"], 20, __FILE__ , __LINE__);
   // We print 5 reweights
@@ -958,10 +1003,24 @@ void FitterBase::Run2DLLHScan() {
       // Get the parameter central and bounds
       double central_x, lower_x, upper_x;
       GetParameterScanRange(cov, i, central_x, lower_x, upper_x, n_points, "X");
+      std::vector<double> binEdges_x;
+       
+      //Logarithmic scan 
+      if(LLHLogarithmic){
 
+	if (lower_x < 0.0 || upper_x < 0.0){
+	  MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan", name_x, lower_x, upper_x);
+	}
+
+	else{
+	binEdges_x = CalculateBinEdges(lower_x, upper_x, n_points);
+	}
+
+      }
+      
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name_x)) continue;
-
+            
       for (int j = 0; j < i; ++j)
       {
         std::string name_y = cov->GetParFancyName(j);
@@ -969,17 +1028,37 @@ void FitterBase::Run2DLLHScan() {
         // KS: Check if we want to skip this parameter
         if(CheckSkipParameter(SkipVector, name_y)) continue;
 
+	 std::unique_ptr<TH2D> hScanSam;
+	 
         // Get the parameter central and bounds
         double central_y, lower_y, upper_y;
         GetParameterScanRange(cov, j, central_y, lower_y, upper_y, n_points, "Y");
+	if(LLHLogarithmic){
 
-        auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
-                                                n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+	 //negative values break it
+	 if (lower_x < 0.0 || upper_x < 0.0 || lower_y < 0.0 || upper_y < 0.0 ) {
+	   MACH3LOG_WARN("Cannot perform logarithmic scan for {} and {} "" with range [{}, {}], [{}, {}], falling back to linear scan", name_x, lower_x, upper_x, name_y, lower_y, upper_y);
+	  hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+	   hScanSam->SetDirectory(nullptr);
+	   hScanSam->GetXaxis()->SetTitle(name_x.c_str());
+	   hScanSam->GetYaxis()->SetTitle(name_y.c_str());
+	   hScanSam->GetZaxis()->SetTitle("2LLH_sam");
+       }
+	 else {
+	 auto binEdges_y = CalculateBinEdges(lower_y, upper_y, n_points);
+	 hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, binEdges_x.data(), n_points, binEdges_y.data());
+       }
+    }
+       //If not then just do the normal thing  
+      else {
+
+        hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
         hScanSam->SetDirectory(nullptr);
         hScanSam->GetXaxis()->SetTitle(name_x.c_str());
         hScanSam->GetYaxis()->SetTitle(name_y.c_str());
         hScanSam->GetZaxis()->SetTitle("2LLH_sam");
-
+      }
+	 
         // Scan over the parameter space
         for (int x = 0; x < n_points; ++x)
         {

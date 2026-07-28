@@ -48,7 +48,7 @@ class FitterBase {
   /// @brief Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature
   /// @param NLaps number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time
   void DragRace(const int NLaps = 100);
-
+  
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
@@ -99,6 +99,7 @@ class FitterBase {
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
+  
   /// @brief For comparison with other fitting frameworks (like P-Theta) we usually have to apply different parameter values then usual 1, 3 sigma
   ///
   /// Example YAML format:
@@ -109,6 +110,9 @@ class FitterBase {
   /// @endcode
   void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
+  //Bin edges needed for logarithmic LLH scans
+  std::vector<double> CalculateBinEdges(double lowerlimit,double upperlimit, int n_points) const;
+  
   /// The manager for configuration handling
   Manager *fitMan;
 
