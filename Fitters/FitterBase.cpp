@@ -1,5 +1,4 @@
 #include "FitterBase.h"
-#include "TMath.h"
 #include <vector>
 #include <memory>
 
@@ -8,6 +7,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
+#include "TMath.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -1009,7 +1009,7 @@ void FitterBase::Run2DLLHScan() {
       if(LLHLogarithmic){
 
 	if (lower_x < 0.0 || upper_x < 0.0){
-	  MACH3LOG_WARN("Cannot perform logarithmic scan for {} and {} "" with range [{}, {}], [{}, {}], falling back to linear scan", name_x, lower_x, upper_x);
+	  MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan", name_x, lower_x, upper_x);
 	}
 
 	else{
