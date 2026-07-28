@@ -691,19 +691,25 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
   MACH3LOG_INFO("Starting {}", __func__);
 
   TDirectory * ogdir = gDirectory;
-  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
-  // Open the ROOT file
-  int originalErrorWarning = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kFatal;
-
-  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
-  gErrorIgnoreLevel = originalErrorWarning;
-  TDirectory* ToyDir = file->GetDirectory("Toys_1DHistVar");
-  // If toys not amiable in posterior file this means they must be in output file
-  if(ToyDir == nullptr) {
+  TDirectory* ToyDir = nullptr;
+  TFile* file = nullptr;
+  if (Is_PriorPredictive) {
     ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+  } else{
+    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+    // Open the ROOT file
+    int originalErrorWarning = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+    file = TFile::Open(PosteriorFileName.c_str(), "READ");
+    gErrorIgnoreLevel = originalErrorWarning;
+
+    ToyDir = file->GetDirectory("Toys_1DHistVar");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+    }
   }
+
   // [sample], [toy], [dim]
   std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>> ProjectionToys(TotalNumberOfSamples);
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
@@ -725,7 +731,7 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
       }
     } // end loop over samples
   } // end loop over toys
-  file->Close(); delete file;
+  if(file) { file->Close(); delete file; }
   if(ogdir){ ogdir->cd(); }
 
   ProduceSpectra(ProjectionToys, SampleDirectories, "mc");
@@ -784,20 +790,27 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
 // *************************
   MACH3LOG_INFO("Starting {}", __func__);
 
-  TDirectory * ogdir = gDirectory;
-  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
-  // Open the ROOT file
-  int originalErrorWarning = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kFatal;
-
-  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
-  gErrorIgnoreLevel = originalErrorWarning;
-  TDirectory* ToyDir = file->GetDirectory("Toys_ByMode");
-  // If toys not amiable in posterior file this means they must be in output file
-  if(ToyDir == nullptr) {
+  TDirectory* ogdir = gDirectory;
+  TDirectory* ToyDir = nullptr;
+  TFile* file = nullptr;
+  if (Is_PriorPredictive) {
     ToyDir = outputFile->GetDirectory("Toys_ByMode");
+  } else{
+    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+    // Open the ROOT file
+    int originalErrorWarning = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+
+    file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+    gErrorIgnoreLevel = originalErrorWarning;
+    ToyDir = file->GetDirectory("Toys_ByMode");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_ByMode");
+    }
   }
+
   /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
   /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
   /// so we can reuse this functionality
@@ -845,7 +858,7 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
     ModeDirectory[iSample]->Close();
     delete ModeDirectory[iSample];
   }
-  file->Close(); delete file;
+  if(file){file->Close(); delete file;}
   if(ogdir){ ogdir->cd(); }
 }
 
