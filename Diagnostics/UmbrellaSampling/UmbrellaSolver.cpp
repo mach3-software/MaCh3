@@ -849,7 +849,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   if (!converged_robustness_check) {
     MACH3LOG_INFO("Starting iterative solver with convergence checks...");
   }
-
+  TRandom3 gRandom3;
   // Iterative solver
   int total_output_lines = 0; // Track total lines printed for clearing
   for (int iteration = 0; iteration < config.max_iterations; iteration++) {
@@ -940,8 +940,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         // Apply random perturbation to z_current
         std::vector<double> z_perturbed = z_current;
         for (size_t i = 0; i < z_perturbed.size(); i++) {
-          /// @todo this may not be thread safe
-          double perturbation = (rand() / RAND_MAX - 0.5) * z_perturbed[i]; // Random perturbation up to 10 times the tolerance
+          // Random perturbation up to 10 times the tolerance
+          double perturbation = gRandom3.Uniform(-0.5, 0.5) * z_perturbed[i];
           MACH3LOG_INFO("Applying perturbation of {:.6e} to z[{}] = {:.6e}", perturbation, i, z_perturbed[i]);
           z_perturbed[i] += perturbation;
           if (z_perturbed[i] < 0)
