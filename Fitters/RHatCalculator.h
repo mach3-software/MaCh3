@@ -45,48 +45,47 @@ class RHatCalculator {
     std::vector<std::string> MCMCFile;
     std::vector<bool> ValidPar;
 
-    double** Mean;
-    double** StandardDeviation;
+    std::vector<std::vector<double>> Mean;
+    std::vector<std::vector<double>> StandardDeviation;
 
-    double* MeanGlobal;
-    double* StandardDeviationGlobal;
+    std::vector<double> MeanGlobal;
+    std::vector<double> StandardDeviationGlobal;
 
-    double* BetweenChainVariance;
-    double* MarginalPosteriorVariance;
-    double* RHat;
-    double* EffectiveSampleSize;
+    std::vector<double> BetweenChainVariance;
+    std::vector<double> MarginalPosteriorVariance;
+    std::vector<double> RHat;
+    std::vector<double> EffectiveSampleSize;
 
     ///// High mem only /////
     int Ntoys;
+    std::vector<std::vector<std::vector<double>>> Draws;
+    std::vector<std::vector<std::vector<double>>> DrawsFolded;
 
-    double ***Draws;
+    std::vector<double> MedianArr;
 
-    double ***DrawsFolded;
-    double* MedianArr;
+    std::vector<std::vector<double>> MeanFolded;
+    std::vector<std::vector<double>> StandardDeviationFolded;
 
-    double** MeanFolded;
-    double** StandardDeviationFolded;
+    std::vector<double> MeanGlobalFolded;
+    std::vector<double> StandardDeviationGlobalFolded;
 
-    double* MeanGlobalFolded;
-    double* StandardDeviationGlobalFolded;
-
-    double* BetweenChainVarianceFolded;
-    double* MarginalPosteriorVarianceFolded;
-    double* RHatFolded;
-    double* EffectiveSampleSizeFolded;
+    std::vector<double> BetweenChainVarianceFolded;
+    std::vector<double> MarginalPosteriorVarianceFolded;
+    std::vector<double> RHatFolded;
+    std::vector<double> EffectiveSampleSizeFolded;
 
     ///// Low mem Only /////
-    int* Ntoys_requested;
-    int* Ntoys_filled;
+    std::vector<int> Ntoys_requested;
+    std::vector<int> Ntoys_filled;
     int TotToys;
     unsigned int NThin;
 
-    /// Sum_i^N x_i   | total
-    double* S1_global;
+    /// Sum_i^N x_i | total
+    std::vector<double> S1_global;
     /// Sum_i^N x_i^2 | total
-    double* S2_global;
-    /// Sum_i^N x_i   | for each chain
-    double** S1_chain;
+    std::vector<double> S2_global;
+    /// Sum_i^N x_i | for each chain
+    std::vector<std::vector<double>> S1_chain;
     /// Sum_i^N x_i^2 | for each chain
-    double** S2_chain;
+    std::vector<std::vector<double>> S2_chain;
 };

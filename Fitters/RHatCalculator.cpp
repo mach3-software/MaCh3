@@ -23,31 +23,6 @@ RHatCalculator::RHatCalculator(bool HighMemory, std::vector<std::string>& Inputs
 // ****************************
   SetMaCh3LoggerFormat();
 
-  Draws = nullptr;
-  Mean = nullptr;
-  StandardDeviation = nullptr;
-
-  MeanGlobal = nullptr;
-  StandardDeviationGlobal = nullptr;
-
-  BetweenChainVariance = nullptr;
-  MarginalPosteriorVariance = nullptr;
-  RHat = nullptr;
-  EffectiveSampleSize = nullptr;
-
-  DrawsFolded = nullptr;
-  MedianArr = nullptr;
-  MeanFolded = nullptr;
-  StandardDeviationFolded = nullptr;
-
-  MeanGlobalFolded = nullptr;
-  StandardDeviationGlobalFolded = nullptr;
-
-  BetweenChainVarianceFolded = nullptr;
-  MarginalPosteriorVarianceFolded = nullptr;
-  RHatFolded = nullptr;
-  EffectiveSampleSizeFolded = nullptr;
-
   HighMemoryMode = HighMemory;
 
   MCMCFile = Inputs;
@@ -63,56 +38,6 @@ RHatCalculator::RHatCalculator(bool HighMemory, std::vector<std::string>& Inputs
 // The destructor
 RHatCalculator::~RHatCalculator() {
 // ****************************
-  if (MeanGlobal) delete[] MeanGlobal;
-  if (StandardDeviationGlobal) delete[] StandardDeviationGlobal;
-  if (BetweenChainVariance) delete[] BetweenChainVariance;
-  if (MarginalPosteriorVariance) delete[] MarginalPosteriorVariance;
-  if (RHat) delete[] RHat;
-  if (EffectiveSampleSize) delete[] EffectiveSampleSize;
-
-  if (MeanGlobalFolded) delete[] MeanGlobalFolded;
-  if (StandardDeviationGlobalFolded) delete[] StandardDeviationGlobalFolded;
-  if (BetweenChainVarianceFolded) delete[] BetweenChainVarianceFolded;
-  if (MarginalPosteriorVarianceFolded) delete[] MarginalPosteriorVarianceFolded;
-  if (RHatFolded) delete[] RHatFolded;
-  if (EffectiveSampleSizeFolded) delete[] EffectiveSampleSizeFolded;
-
-  for (int m = 0; m < Nchains; m++)
-  {
-    if (S1_chain && S1_chain[m]) delete[] S1_chain[m];
-    if (S2_chain && S2_chain[m]) delete[] S2_chain[m];
-
-    for (int i = 0; i < Ntoys; i++)
-    {
-      if (Draws && Draws[m] && Draws[m][i]) delete[] Draws[m][i];
-      if (DrawsFolded && DrawsFolded[m] && DrawsFolded[m][i]) delete[] DrawsFolded[m][i];
-    }
-
-    if (Draws && Draws[m]) delete[] Draws[m];
-    if (Mean && Mean[m]) delete[] Mean[m];
-    if (StandardDeviation && StandardDeviation[m]) delete[] StandardDeviation[m];
-
-    if (DrawsFolded && DrawsFolded[m]) delete[] DrawsFolded[m];
-    if (MeanFolded && MeanFolded[m]) delete[] MeanFolded[m];
-    if (StandardDeviationFolded && StandardDeviationFolded[m]) delete[] StandardDeviationFolded[m];
-  }
-
-  if (Draws) delete[] Draws;
-  if (Mean) delete[] Mean;
-  if (StandardDeviation) delete[] StandardDeviation;
-
-  if (S1_chain) delete[] S1_chain;
-  if (S2_chain) delete[] S2_chain;
-  if (S1_global) delete[] S1_global;
-  if (S2_global) delete[] S2_global;
-
-  if (DrawsFolded) delete[] DrawsFolded;
-  if (MedianArr) delete[] MedianArr;
-  if (MeanFolded) delete[] MeanFolded;
-  if (StandardDeviationFolded) delete[] StandardDeviationFolded;
-
-  if (Ntoys_requested) delete[] Ntoys_requested;
-  if (Ntoys_filled) delete[] Ntoys_filled;
 }
 
 // *******************
@@ -168,8 +93,8 @@ void RHatCalculator::PrepareChains_HighMem() {
   std::vector<int> nBranches(Nchains);
   std::vector<unsigned int> step(Nchains);
 
-  Draws = new double**[Nchains]();
-  DrawsFolded = new double**[Nchains]();
+  Draws.resize(Nchains);
+  DrawsFolded.resize(Nchains);
 
   // Open the Chain
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
@@ -251,24 +176,18 @@ void RHatCalculator::PrepareChains_HighMem() {
     }
 
     //TN: move the Draws here, so we need to iterate over every chain only once
-    Draws[m] = new double*[Ntoys]();
-    DrawsFolded[m] = new double*[Ntoys]();
+    Draws[m].resize(Ntoys);
+    DrawsFolded[m].resize(Ntoys);
     for(int i = 0; i < Ntoys; i++)
     {
-      Draws[m][i] = new double[nDraw]();
-      DrawsFolded[m][i] = new double[nDraw]();
-      for(int j = 0; j < nDraw; j++)
-      {
-        Draws[m][i][j] = 0.;
-        DrawsFolded[m][i][j] = 0.;
-      }
+      Draws[m][i].resize(nDraw, 0.0);
+      DrawsFolded[m][i].resize(nDraw, 0.0);
     }
 
     // MJR: array to hold branch values; SetBranchAddress in every step is very
     //      expensive, so doing it once only here saves time
-    double* branch_values = new double[nDraw]();
-    for (int j = 0; j < nDraw; ++j)
-    {
+    std::vector<double> branch_values(nDraw, 0.0);
+    for (int j = 0; j < nDraw; ++j) {
       Chain->SetBranchAddress(BranchNames[j].Data(), &branch_values[j]);
     }
 
@@ -291,8 +210,7 @@ void RHatCalculator::PrepareChains_HighMem() {
 
       // If we have combined chains by hadd need to check the step in the chain
       // Note, entry is not necessarily the same as the step due to merged ROOT files, so can't choose an entry in the range BurnIn - nEntries :(
-      if (step[m] < BurnIn[m])
-      {
+      if (step[m] < BurnIn[m]) {
         i--;
         continue;
       }
@@ -311,12 +229,11 @@ void RHatCalculator::PrepareChains_HighMem() {
 
     //TN: There, we now don't need to keep the chain in memory anymore
     delete Chain;
-    delete[] branch_values;
   }
 
   //KS: Now prepare folded draws, quoting Gelman
   //"We propose to report the maximum of rank normalized split-Rb and rank normalized folded-split-Rb for each parameter"
-  MedianArr = new double[nDraw]();
+  MedianArr.resize(nDraw);
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -360,16 +277,16 @@ void RHatCalculator::PrepareChains() {
   TStopwatch clock;
   clock.Start();
 
-  Ntoys_requested = new int[Nchains]();
-  Ntoys_filled = new int[Nchains]();
+  Ntoys_requested.resize(Nchains);
+  Ntoys_filled.resize(Nchains);
   TotToys = 0;
   std::vector<unsigned int> BurnIn(Nchains);
   std::vector<unsigned int> nEntries(Nchains);
   std::vector<int> nBranches(Nchains);
   std::vector<unsigned int> step(Nchains);
 
-  S1_chain = new double*[Nchains]();
-  S2_chain = new double*[Nchains]();
+  S1_chain.resize(Nchains);
+  S2_chain.resize(Nchains);
 
 
   // Open the Chain
@@ -447,22 +364,12 @@ void RHatCalculator::PrepareChains() {
     if(m == 0) nDraw = int(BranchNames.size());
 
     // MJR: Initialize quantities needed for calculating RHat
-    S1_chain[m] = new double[nDraw]();
-    S2_chain[m] = new double[nDraw]();
+    S1_chain[m].resize(nDraw, 0);
+    S2_chain[m].resize(nDraw, 0);
     if (m == 0)
     {
-      S1_global = new double[nDraw]();
-      S2_global = new double[nDraw]();
-    }
-    for (int id = 0; id < nDraw; ++id)
-    {
-      S1_chain[m][id] = 0.0;
-      S2_chain[m][id] = 0.0;
-      if (m == 0)
-      {
-        S1_global[id] = 0.0;
-        S2_global[id] = 0.0;
-      }
+      S1_global.resize(nDraw, 0);
+      S2_global.resize(nDraw, 0);
     }
 
     //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
@@ -478,9 +385,8 @@ void RHatCalculator::PrepareChains() {
 
     // MJR: Create an array to hold branch values. Resetting branch addresses
     //      for every step is very expensive.
-    double* branch_values = new double[nDraw]();
-    for (int id = 0; id < nDraw; ++id)
-    {
+    std::vector<double> branch_values(nDraw, 0.0);
+    for (int id = 0; id < nDraw; ++id) {
       Chain->SetBranchAddress(BranchNames[id].Data(), &branch_values[id]);
     }
 
@@ -533,7 +439,6 @@ void RHatCalculator::PrepareChains() {
 
     //TN: There, we now don't need to keep the chain in memory anymore
     delete Chain;
-    delete[] branch_values;
     MACH3LOG_INFO("Finished loading chain {}!", m);
   }
 
@@ -546,71 +451,28 @@ void RHatCalculator::PrepareChains() {
 void RHatCalculator::InitialiseArrays() {
 // *******************
   MACH3LOG_INFO("Starting {}", __func__);
-  Mean = new double*[Nchains]();
-  StandardDeviation = new double*[Nchains]();
+  Mean.resize(Nchains);
+  StandardDeviation.resize(Nchains);
 
-  MeanGlobal = new double[nDraw]();
-  StandardDeviationGlobal = new double[nDraw]();
-  BetweenChainVariance = new double[nDraw]();
+  MeanGlobal.resize(nDraw, 0);
+  StandardDeviationGlobal.resize(nDraw, 0);
+  BetweenChainVariance.resize(nDraw, 0);
 
-  MarginalPosteriorVariance = new double[nDraw]();
-  RHat = new double[nDraw]();
-  EffectiveSampleSize = new double[nDraw]();
-
-  for (int m = 0; m < Nchains; ++m)
-  {
-    Mean[m] = new double[nDraw]();
-    StandardDeviation[m] = new double[nDraw]();
-
-    for (int j = 0; j < nDraw; ++j)
-    {
-      Mean[m][j] = 0.;
-      StandardDeviation[m][j] = 0.;
-
-      if(m == 0)
-      {
-        MeanGlobal[j] = 0.;
-        StandardDeviationGlobal[j] = 0.;
-        BetweenChainVariance[j] = 0.;
-        MarginalPosteriorVariance[j] = 0.;
-        RHat[j] = 0.;
-        EffectiveSampleSize[j] = 0.;
-      }
-    }
-  }
+  MarginalPosteriorVariance.resize(nDraw, 0);
+  RHat.resize(nDraw, 0);
+  EffectiveSampleSize.resize(nDraw, 0);
 
   if(HighMemoryMode){
-    MeanFolded = new double*[Nchains]();
-    StandardDeviationFolded = new double*[Nchains]();
+    MeanFolded.resize(Nchains);
+    StandardDeviationFolded.resize(Nchains);
 
-    MeanGlobalFolded = new double[nDraw]();
-    StandardDeviationGlobalFolded = new double[nDraw]();
-    BetweenChainVarianceFolded = new double[nDraw]();
+    MeanGlobalFolded.resize(nDraw, 0);
+    StandardDeviationGlobalFolded.resize(nDraw, 0);
+    BetweenChainVarianceFolded.resize(nDraw, 0);
 
-    MarginalPosteriorVarianceFolded = new double[nDraw]();
-    RHatFolded = new double[nDraw]();
-    EffectiveSampleSizeFolded = new double[nDraw]();
-
-    for (int m = 0; m < Nchains; ++m)
-    {
-      MeanFolded[m] = new double[nDraw]();
-      StandardDeviationFolded[m] = new double[nDraw]();
-      for (int j = 0; j < nDraw; ++j)
-      {
-        MeanFolded[m][j] = 0.;
-        StandardDeviationFolded[m][j] = 0.;
-        if(m == 0)
-        {
-
-          MeanGlobalFolded[j] = 0.;
-          StandardDeviationGlobalFolded[j] = 0.;
-          BetweenChainVarianceFolded[j] = 0.;
-          MarginalPosteriorVarianceFolded[j] = 0.;
-          RHatFolded[j] = 0.;
-          EffectiveSampleSizeFolded[j] = 0.;
-        }
-      }
-    }
+    MarginalPosteriorVarianceFolded.resize(nDraw, 0);
+    RHatFolded.resize(nDraw, 0);
+    EffectiveSampleSizeFolded.resize(nDraw, 0);
   }
 }
 
@@ -870,6 +732,7 @@ void RHatCalculator::CalcRhat_HighMem() {
 // *******************
 void RHatCalculator::SaveResults() {
 // *******************
+  #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
   std::string NameTemp = "";
@@ -958,7 +821,8 @@ void RHatCalculator::SaveResults() {
   if (HighMemoryMode)
   {
     //KS: We set criterium of 1.1 based on Gelman et al. (2003) Bayesian Data Analysis
-    MACH3LOG_WARN("Number of parameters which has R hat greater than 1.1 is {}({:.2f}%) while for R hat folded {}({:.2f}%)", Criterium, 100*double(Criterium)/double(nDraw), CiteriumFolded, 100*double(CiteriumFolded)/double(nDraw));
+    MACH3LOG_WARN("Number of parameters which has R hat greater than 1.1 is {}({:.2f}%) while for R hat folded {}({:.2f}%)",
+                   Criterium, 100*double(Criterium)/double(nDraw), CiteriumFolded, 100*double(CiteriumFolded)/double(nDraw));
     for(int j = 0; j < nDraw; j++)
     {
       if( (RHat[j] > 1.1 || RHatFolded[j] > 1.1) && ValidPar[j])
@@ -1018,23 +882,21 @@ void RHatCalculator::SaveResults() {
     RhatFoldedPlot->SetFillColor(kBlue);
   }
 
-  TLegend *Legend = new TLegend(0.55, 0.6, 0.9, 0.9);
-  Legend->SetTextSize(0.04);
-  Legend->SetFillColor(0);
-  Legend->SetFillStyle(0);
-  Legend->SetLineWidth(0);
-  Legend->SetLineColor(0);
+  TLegend Legend(0.55, 0.6, 0.9, 0.9);
+  Legend.SetTextSize(0.04);
+  Legend.SetFillColor(0);
+  Legend.SetFillStyle(0);
+  Legend.SetLineWidth(0);
+  Legend.SetLineColor(0);
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
-  Legend->AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
-  if(HighMemoryMode) Legend->AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
+  Legend.AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
+  Legend.AddEntry(RhatPlot, "Rhat Gelman 2013", "l");
+  if(HighMemoryMode) Legend.AddEntry(RhatFoldedPlot, "Rhat-Folded Gelman 2021", "l");
 
   RhatPlot->Draw();
-  Legend->Draw("same");
+  Legend.Draw("same");
   if(HighMemoryMode) RhatFoldedPlot->Draw("same");
   TempCanvas->Write("Rhat");
-  delete Legend;
-  Legend = nullptr;
 
   //Now R hat for log L
   RhatLogPlot->GetXaxis()->SetTitle("R hat for LogL");
@@ -1043,48 +905,47 @@ void RHatCalculator::SaveResults() {
   if(HighMemoryMode) RhatFoldedLogPlot->SetLineColor(kBlue);
   if(HighMemoryMode) RhatFoldedLogPlot->SetFillColor(kBlue);
 
-  Legend = new TLegend(0.55, 0.6, 0.9, 0.9);
-  Legend->SetTextSize(0.04);
-  Legend->SetFillColor(0);
-  Legend->SetFillStyle(0);
-  Legend->SetLineWidth(0);
-  Legend->SetLineColor(0);
+  TLegend LegendFolded(0.55, 0.6, 0.9, 0.9);
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
-  Legend->AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
-  if(HighMemoryMode) Legend->AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
+  LegendFolded.SetTextSize(0.04);
+  LegendFolded.SetFillColor(0);
+  LegendFolded.SetFillStyle(0);
+  LegendFolded.SetLineWidth(0);
+  LegendFolded.SetLineColor(0);
+
+  LegendFolded.AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
+  LegendFolded.AddEntry(RhatLogPlot, "Rhat Gelman 2013", "l");
+  if(HighMemoryMode) LegendFolded.AddEntry(RhatFoldedLogPlot, "Rhat-Folded Gelman 2021", "l");
 
   RhatLogPlot->Draw();
-  Legend->Draw("same");
+  LegendFolded.Draw("same");
   TempCanvas->Write("RhatLog");
-  delete Legend;
-  Legend = nullptr;
 
   //Now canvas for effective sample size
   EffectiveSampleSizePlot->GetXaxis()->SetTitle("S_{eff, BDA2}");
   EffectiveSampleSizePlot->SetLineColor(kRed);
   if(HighMemoryMode) EffectiveSampleSizeFoldedPlot->SetLineColor(kBlue);
 
-  Legend = new TLegend(0.45, 0.6, 0.9, 0.9);
-  Legend->SetTextSize(0.03);
-  Legend->SetFillColor(0);
-  Legend->SetFillStyle(0);
-  Legend->SetLineWidth(0);
-  Legend->SetLineColor(0);
+  TLegend LegendESS(0.45, 0.6, 0.9, 0.9);
+  LegendESS.SetTextSize(0.03);
+  LegendESS.SetFillColor(0);
+  LegendESS.SetFillStyle(0);
+  LegendESS.SetLineWidth(0);
+  LegendESS.SetLineColor(0);
 
   const double Mean1 = EffectiveSampleSizePlot->GetMean();
   const double RMS1 = EffectiveSampleSizePlot->GetRMS();
 
-  Legend->AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
-  Legend->AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
+  LegendESS.AddEntry(TempLine.get(), Form("Number of throws=%.0i, Number of chains=%.1i", TotToys, Nchains), "");
+  LegendESS.AddEntry(EffectiveSampleSizePlot, Form("S_{eff, BDA2} #mu = %.2f, #sigma = %.2f",Mean1 ,RMS1), "l");
   if (HighMemoryMode)
   {
     const double Mean2 = EffectiveSampleSizeFoldedPlot->GetMean();
     const double RMS2  = EffectiveSampleSizeFoldedPlot->GetRMS();
-    Legend->AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f", Mean2, RMS2), "l");
+    LegendESS.AddEntry(EffectiveSampleSizeFoldedPlot, Form("S_{eff, BDA2} Folded, #mu = %.2f, #sigma = %.2f", Mean2, RMS2), "l");
   }
   EffectiveSampleSizePlot->Draw();
-  Legend->Draw("same");
+  LegendESS.Draw("same");
   if(HighMemoryMode) EffectiveSampleSizeFoldedPlot->Draw("same");
   TempCanvas->Write("EffectiveSampleSize");
 
@@ -1096,7 +957,6 @@ void RHatCalculator::SaveResults() {
   delete RhatPlot;
   delete EffectiveSampleSizePlot;
 
-  delete Legend;
   delete RhatLogPlot;
 
   if (HighMemoryMode)
@@ -1114,4 +974,5 @@ void RHatCalculator::SaveResults() {
   delete DiagFile;
 
   MACH3LOG_INFO("Finished and wrote results to {}", NameTemp);
+  #pragma GCC diagnostic pop
 }
