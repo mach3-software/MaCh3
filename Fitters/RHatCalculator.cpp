@@ -454,6 +454,11 @@ void RHatCalculator::InitialiseArrays() {
   Mean.resize(Nchains);
   StandardDeviation.resize(Nchains);
 
+  for (int m = 0; m < Nchains; ++m) {
+    Mean[m].resize(nDraw, 0);
+    StandardDeviation[m].resize(nDraw, 0);
+  }
+
   MeanGlobal.resize(nDraw, 0);
   StandardDeviationGlobal.resize(nDraw, 0);
   BetweenChainVariance.resize(nDraw, 0);
