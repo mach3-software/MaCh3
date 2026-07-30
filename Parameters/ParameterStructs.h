@@ -176,8 +176,6 @@ inline std::string GetTF1(const SplineInterpolation i) {
     case SplineInterpolation::kAkima:
     case SplineInterpolation::kKochanekBartels:
     case SplineInterpolation::kSplineInterpolations:
-      MACH3LOG_ERROR("Interpolation type {} not supported for TF1!", static_cast<int>(i));
-      throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN SPLINE INTERPOLATION SPECIFIED!");
       MACH3LOG_ERROR("You gave {}", static_cast<int>(i));

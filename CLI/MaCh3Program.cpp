@@ -13,8 +13,7 @@ using std::vector, std::string, std::map;
 namespace fs = std::filesystem;
 
 namespace M3{
-
-    const bool MaCh3Program::write_file(const fs::path& path, std::string_view content) const{
+    bool MaCh3Program::write_file(const fs::path& path, std::string_view content) const{
         try {
             fs::create_directories(path.parent_path());
             std::ofstream out(path);
@@ -26,7 +25,7 @@ namespace M3{
         }
     }
 
-    const std::string MaCh3Program::detect_shell() const{
+    std::string MaCh3Program::detect_shell() const{
         const char* shell = std::getenv("SHELL");
         if (!shell) return "";
 
@@ -37,7 +36,7 @@ namespace M3{
         return "";
     }
 
-    const void MaCh3Program::install_completions() const{
+    void MaCh3Program::install_completions() const{
         const char* home = std::getenv("HOME");
         if (!home) {
             std::cerr << "Cannot determine HOME directory\n";
@@ -68,7 +67,7 @@ namespace M3{
 
     }
                 
-    const void MaCh3Program::completions(const std::string& prefix) const{
+    void MaCh3Program::completions(const std::string& prefix) const{
         for (const std::string& cmd : m_subcommands) {
             if (cmd.rfind(prefix, 0) == 0)
                 std::cout << cmd << "\n";

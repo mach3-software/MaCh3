@@ -66,7 +66,7 @@ namespace M3{
     config = m_parser->get<std::string>("config");
     auto mcmc_chain_args = m_parser->get<std::vector<std::string>>("mcmc-chain");
 
-    int nargs = mcmc_chain_args.size();
+    int nargs = static_cast<int>(mcmc_chain_args.size());
     if (nargs != 1 && nargs !=4 && nargs != 6)
     {
       MACH3LOG_ERROR("invalid number of arguments: {}", nargs);

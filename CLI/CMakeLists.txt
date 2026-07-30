@@ -8,5 +8,5 @@ add_executable(mach3
 )
 
 target_link_libraries(mach3 PRIVATE MaCh3::CLIModules MaCh3::All dl)
-
+target_link_libraries(mach3 PRIVATE MaCh3Warnings)
 install(TARGETS mach3 DESTINATION bin)
