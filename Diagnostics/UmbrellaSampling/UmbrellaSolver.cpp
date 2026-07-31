@@ -170,8 +170,8 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
 // Precompute all window evaluations once: cache[i][j][s] = window_j evaluated
 // at samples[i][s]
 // Memory heavy depending on number of steps/cores/windows
-std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector<WindowConfig> &windows, const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
-
+std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector<WindowConfig> &windows,
+                                                               const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
   int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<std::vector<double>>> cache(n_windows);
 
@@ -275,9 +275,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
 std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             const std::vector<WindowConfig> &windows,
             const std::vector<std::vector<double>> &samples,
-            const std::vector<std::vector<std::vector<double>>> &window_cache,
-            bool use_openmp = true) {
-
+            const std::vector<std::vector<std::vector<double>>> &window_cache) {
   int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
 
@@ -292,84 +290,43 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
       }
     }
   }
-
-  if (use_openmp) {
-    #ifdef MULTITHREAD
-    #pragma omp parallel for schedule(dynamic)
-    #endif
-    for (int i = 0; i < n_windows; i++) {
-      std::vector<double> denominator_cache(samples[i].size(), 0.0);
-      for (size_t s = 0; s < samples[i].size(); s++) {
-        double denominator = 0.0;
-        for (int k = 0; k < n_windows; k++) {
-          denominator += window_cache[i][k][s] * z_inv[k];
-        }
-        denominator_cache[s] = 1 / denominator;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for schedule(dynamic)
+  #endif
+  for (int i = 0; i < n_windows; i++) {
+    std::vector<double> denominator_cache(samples[i].size(), 0.0);
+    for (size_t s = 0; s < samples[i].size(); s++) {
+      double denominator = 0.0;
+      for (int k = 0; k < n_windows; k++) {
+        denominator += window_cache[i][k][s] * z_inv[k];
       }
-
-      for (int j = 0; j < n_windows; j++) {
-        double sum = 0.0;
-        int count = 0;
-
-        for (size_t s = 0; s < samples[i].size(); s++) {
-          double sample = samples[i][s];
-          double window_j = window_cache[i][j][s];
-          double denominator = denominator_cache[s];
-
-          if (denominator > 0) {
-            double integrand = (window_j * z_inv[i]) * denominator;
-            sum += integrand;
-            count++;
-          } else if (debug_mode) {
-            MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
-          }
-        }
-
-        if (debug_mode) {
-          MACH3LOG_INFO("F[{}][{}] sum: {}, count: {}", i, j, sum, count);
-        }
-
-        if (count > 0) {
-          F[i][j] = sum / count;
-        }
-      }
+      denominator_cache[s] = 1 / denominator;
     }
-  } else {
-    for (int i = 0; i < n_windows; i++) {
-      std::vector<double> denominator_cache(samples[i].size(), 0.0);
+
+    for (int j = 0; j < n_windows; j++) {
+      double sum = 0.0;
+      int count = 0;
+
       for (size_t s = 0; s < samples[i].size(); s++) {
-        double denominator = 0.0;
-        for (int k = 0; k < n_windows; k++) {
-          denominator += window_cache[i][k][s] * z_inv[k];
+        double sample = samples[i][s];
+        double window_j = window_cache[i][j][s];
+        double denominator = denominator_cache[s];
+
+        if (denominator > 0) {
+          double integrand = (window_j * z_inv[i]) * denominator;
+          sum += integrand;
+          count++;
+        } else if (debug_mode) {
+          MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
         }
-        denominator_cache[s] = 1 / denominator;
       }
 
-      for (int j = 0; j < n_windows; j++) {
-        double sum = 0.0;
-        int count = 0;
+      if (debug_mode) {
+        MACH3LOG_INFO("F[{}][{}] sum: {}, count: {}", i, j, sum, count);
+      }
 
-        for (size_t s = 0; s < samples[i].size(); s++) {
-          double sample = samples[i][s];
-          double window_j = window_cache[i][j][s];
-          double denominator = denominator_cache[s];
-
-          if (denominator > 0) {
-            double integrand = (window_j * z_inv[i]) * denominator;
-            sum += integrand;
-            count++;
-          } else if (debug_mode) {
-            MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
-          }
-        }
-
-        if (debug_mode) {
-          MACH3LOG_WARN("F[{}][{}] sum: {}, count: {}", i, j, sum, count);
-        }
-
-        if (count > 0) {
-          F[i][j] = sum / count;
-        }
+      if (count > 0) {
+        F[i][j] = sum / count;
       }
     }
   }
@@ -384,7 +341,6 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
         const std::vector<std::vector<std::vector<double>>> &window_cache,
         bool use_openmp = true, bool verbose = false,
         [[maybe_unused]] int *total_lines = nullptr) {
-
   int n_windows = static_cast<int>(windows.size());
   if (verbose && !use_openmp) {
     MACH3LOG_INFO("Using single-threaded computation for F matrix...");
@@ -393,7 +349,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
   // F matrix and update z values
   std::vector<double> z_working = z_current;
   std::vector<std::vector<double>> F =
-      calcFmatrix(z_working, windows, samples, window_cache, use_openmp);
+      calcFmatrix(z_working, windows, samples, window_cache);
 
   // if (verbose) {
   //     if (total_lines) *total_lines = 1; // Start counting from F matrix
@@ -558,7 +514,6 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
 
 // Main function to run the umbrella sampling solver
 void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
-
   MACH3LOG_INFO("=== Umbrella Sampling Z-Factor Solver ===");
   // Debug OpenMP status first
   MACH3LOG_INFO("Debugging OpenMP availability...");
@@ -871,7 +826,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
       save_matrix = false; // Disable saving if file cannot be created
     }
     // add an initial FMatrix with the initial z values for reference
-    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache, openmp_works);
+    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache);
     int n_windows = static_cast<int>(config.windows.size());
     TH2D initial_F_TH2D("F_matrix_initial", "Initial F matrix;Window j;Window i", n_windows, 0, n_windows, n_windows, 0, n_windows);
     for (int i = 0; i < n_windows; i++) {
@@ -894,7 +849,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   if (!converged_robustness_check) {
     MACH3LOG_INFO("Starting iterative solver with convergence checks...");
   }
-
+  TRandom3 gRandom3;
   // Iterative solver
   int total_output_lines = 0; // Track total lines printed for clearing
   for (int iteration = 0; iteration < config.max_iterations; iteration++) {
@@ -948,7 +903,7 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
     // plotting in root, with axes of iteration number and window index, and the
     // value being the F matrix element
     if (save_matrix && (iteration < 15 || iteration % config.print_frequency == 0)) {
-      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache, openmp_works);
+      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache);
       // convert F_matrix to Th2D for saving to root file
       int n_windows = static_cast<int>(config.windows.size());
       TH2D F_TH2D(Form("F_matrix_iter_%02d", iteration),Form("F matrix at iteration %02d;Window j;Window i", iteration), n_windows, 0, n_windows, n_windows, 0, n_windows);
@@ -985,7 +940,8 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
         // Apply random perturbation to z_current
         std::vector<double> z_perturbed = z_current;
         for (size_t i = 0; i < z_perturbed.size(); i++) {
-          double perturbation = (rand() / RAND_MAX - 0.5) * z_perturbed[i]; // Random perturbation up to 10 times the tolerance
+          // Random perturbation up to 10 times the tolerance
+          double perturbation = gRandom3.Uniform(-0.5, 0.5) * z_perturbed[i];
           MACH3LOG_INFO("Applying perturbation of {:.6e} to z[{}] = {:.6e}", perturbation, i, z_perturbed[i]);
           z_perturbed[i] += perturbation;
           if (z_perturbed[i] < 0)
