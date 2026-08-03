@@ -5,7 +5,6 @@
 #endif
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *****************************************
 //Set everything to NULL or 0
@@ -125,8 +124,8 @@ void UnbinnedSplineHandler::PrepareForGPU(std::vector<std::vector<TResponseFunct
     // Structure of MasterSpline is std::vector<std::vector<TSpline3*>>
     // A conventional iterator to count which parameter a given spline should be applied to
     for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
-      // If NULL we don't have this spline for the event, so move to next spline
-      if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
+      // If nullptr we don't have this spline for the event, so move to next spline
+      if (MasterSpline[EventCounter][ParamNumber] == nullptr) continue;
 
       if(SplineType[ParamNumber] == kTSpline3_red)
       {

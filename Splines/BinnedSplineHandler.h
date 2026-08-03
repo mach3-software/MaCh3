@@ -111,7 +111,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Variables related to determined which modes have splines and which piggy-back of other modes
     std::vector<SplineIndex> IndexVect;
     /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
-    std::map<std::tuple<int, int, int, int, int, int, int>, int> IndexVectMap;
+    std::map<std::tuple<int, int, int, int, std::vector<int>>, int> IndexVectMap;
     /// Number of coefficients for a single flat (after flattening)
     std::vector<int > coeffindexvec;
     /// Unique coefficient indices

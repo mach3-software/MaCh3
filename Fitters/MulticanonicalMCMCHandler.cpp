@@ -60,7 +60,6 @@ void MulticanonicalMCMCHandler::setDebugStream(std::ostream* os, bool enabled) {
 #endif
 
 void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<ParameterHandlerBase*>& systematics) {
-  
   bool foundDeltaCP = false;
   bool foundDelm23 = false;
 
@@ -97,7 +96,6 @@ void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<ParameterHand
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* fitMan, std::vector<ParameterHandlerBase*>& systematics) {
-
   FindOscCovParams(systematics);
 
   const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
@@ -135,8 +133,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
   // setup for spline bias mode
   if (multicanonicalSpline) {
-
-    std::string splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
+    auto splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
 
     TFile* splineFile = M3::Open(splineFileName.c_str(), "READ",__FILE__, __LINE__);
 
@@ -155,7 +152,6 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
     splineFile->Close();
     splineFile = nullptr;
-
   } else {
     // Umbrella mode with explicit bias function selection
     MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
