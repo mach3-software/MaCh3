@@ -12,6 +12,10 @@ permissions:
   packages: write
 
 jobs:
+  doxygen:
+    uses: ./.github/workflows/Doxygen.yml
+    secrets: inherit
+
   tag-doxygen:
     name: TagDoxygen
     runs-on: ubuntu-latest

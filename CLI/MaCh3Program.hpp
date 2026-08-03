@@ -41,11 +41,11 @@ namespace M3{
             void load_dynamic_plugins();
 
             /// @brief Install shell completion scripts for bash and zsh
-            const void install_completions() const;
+            void install_completions() const;
 
             /// @brief Generate completion suggestions for the given prefix
             /// @param prefix The prefix string to match against available subcommands
-            const void completions(const std::string& prefix) const;
+            void completions(const std::string& prefix) const;
 
             /// @brief Unload all dynamically loaded plugins
             void unload_dynamic_plugins();
@@ -57,13 +57,13 @@ namespace M3{
         private:
             /// @brief Detect the user's shell from the SHELL environment variable
             /// @return Shell name ("bash", "zsh", or empty string if not detected)
-            const std::string detect_shell() const;
+            std::string detect_shell() const;
 
             /// @brief Write content to a file, creating parent directories if needed
             /// @param path Filesystem path to write to
             /// @param content Content to write to the file
             /// @return true if successful, false otherwise
-            const bool write_file(const fs::path& path, std::string_view content) const;
+            bool write_file(const fs::path& path, std::string_view content) const;
 
             /// @brief Expand a plugin path (file or directory) into a list of .so files
             /// @param path Path to a plugin file or directory containing plugins
