@@ -1,5 +1,5 @@
 #include "RHatCalculator.h"
-
+#include <filesystem>
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TObjArray.h"
@@ -175,13 +175,13 @@ void RHatCalculator::PrepareChains_HighMem() {
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
   for (int m = 0; m < Nchains; m++)
   {
-    TChain* Chain = new TChain("posteriors");
-    Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    if (!Chain->GetTree()) {
-      MACH3LOG_ERROR("Could not add ROOT file: {}", MCMCFile[m]);
+    if (!std::filesystem::exists(MCMCFile[m])) {
+      MACH3LOG_ERROR("File: {}, doesn't exist", MCMCFile[m]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    TChain* Chain = new TChain("posteriors");
+    Chain->Add(MCMCFile[m].c_str());
     nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
 
     // Set the step cut to be 20%
@@ -380,13 +380,13 @@ void RHatCalculator::PrepareChains() {
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
   for (int m = 0; m < Nchains; m++)
   {
-    TChain* Chain = new TChain("posteriors");
-    Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    if (!Chain->GetTree()) {
-      MACH3LOG_ERROR("Could not add ROOT file: {}", MCMCFile[m]);
+    if (!std::filesystem::exists(MCMCFile[m])) {
+      MACH3LOG_ERROR("File: {}, doesn't exist", MCMCFile[m]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    TChain* Chain = new TChain("posteriors");
+    Chain->Add(MCMCFile[m].c_str());
 
     nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
     Ntoys_requested[m] = nEntries[m]/NThin;
