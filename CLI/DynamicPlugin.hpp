@@ -70,7 +70,7 @@ namespace M3{
 
             /// @brief Run the plugin's main functionality
             /// @return Exit code from the plugin
-            int Run() {
+            int Run() override {
                 return m_plugin->Run();
             }
 
@@ -78,7 +78,7 @@ namespace M3{
             /// @return Pointer to the plugin's argument parser
             ///
             /// pointer is owned by the shared library and will be deleted when the library is unloaded
-            MaCh3ArgumentParser* get_parser(){
+            MaCh3ArgumentParser* get_parser() override {
                 return m_parser;
             }
 
