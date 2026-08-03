@@ -178,6 +178,10 @@ void RHatCalculator::PrepareChains_HighMem() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
+    if (!Chain->GetTree()) {
+      MACH3LOG_ERROR("Could not add ROOT file: {}", MCMCFile[m]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
 
     // Set the step cut to be 20%
@@ -378,6 +382,11 @@ void RHatCalculator::PrepareChains() {
   {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
+    MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
+    if (!Chain->GetTree()) {
+      MACH3LOG_ERROR("Could not add ROOT file: {}", MCMCFile[m]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
     Ntoys_requested[m] = nEntries[m]/NThin;

@@ -15,6 +15,9 @@
 class RHatCalculator {
   public:
     /// @brief Constructor
+    /// @param HighMemory High mem is generally slower but has calculates additional info
+    /// @param Inputs vector of paths to MCMC PrepareChains
+    /// @param entries if in high mem mode this number of toys per chain, for low mem thinning setting
     RHatCalculator(bool HighMemory, std::vector<std::string>& Inputs, int entries);
     /// @brief Destroys the RHatCalculator object.
     virtual ~RHatCalculator();
