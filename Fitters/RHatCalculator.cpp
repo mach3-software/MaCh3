@@ -1,4 +1,5 @@
 #include "RHatCalculator.h"
+#include "MCMCProcessor.h"
 #include <filesystem>
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -96,6 +97,8 @@ void RHatCalculator::PrepareChains_HighMem() {
   Draws.resize(Nchains);
   DrawsFolded.resize(Nchains);
 
+  std::unique_ptr<MCMCProcessor> Processor;
+
   // Open the Chain
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
   for (int m = 0; m < Nchains; m++)
@@ -118,56 +121,66 @@ void RHatCalculator::PrepareChains_HighMem() {
     // Get the number of branches
     nBranches[m] = brlis->GetEntries();
 
-    if(m == 0) BranchNames.reserve(nBranches[m]);
+    // Set all the branches to off
+    Chain->SetBranchStatus("*", false);
+
+    std::vector<TString> SampleLLH;
+    std::vector<TString> SystLLH;
+
+    if(m == 0) {
+      Processor = std::make_unique<MCMCProcessor>(MCMCFile[m]);
+      Processor->Initialise();
+      nDraw = Processor->GetNParams();
+      SampleLLH = Processor->GetSampleBranchNames();
+      SystLLH = Processor->GetSystBranchNames();
+      nDraw = nDraw + static_cast<int>(SampleLLH.size()) + static_cast<int>(SystLLH.size());
+      BranchNames.reserve(nDraw);
+    }
 
     // Set all the branches to off
     Chain->SetBranchStatus("*", false);
 
     // Loop over the number of branches
     // Find the name and how many of each systematic we have
-    for (int i = 0; i < nBranches[m]; i++)
+    for (int i = 0; i < Processor->GetNParams(); i++)
     {
+      TString bname = Processor->GetBranchNames()[i];
+      //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(true);
+      }
+      Chain->SetBranchStatus(bname, true);
       // Get the TBranch and its name
-      TBranch* br = static_cast<TBranch *>(brlis->At(i));
-      if(!br){
-        MACH3LOG_ERROR("Invalid branch at position {}", i);
-        throw MaCh3Exception(__FILE__,__LINE__);
+      if (!Chain->GetBranch(bname)) {
+        MACH3LOG_ERROR("Branch '{}' does not exist in the TChain", bname.Data());
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
-      TString bname = br->GetName();
-
-      // Read in the step
-      if (bname == "step") {
-        Chain->SetBranchStatus(bname, true);
-        Chain->SetBranchAddress(bname, &step[m]);
-      }
-      //Count all branches
-      else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
-      {
-        continue;
-      }
-      else
-      {
-        //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
-        if(m == 0)
-        {
-          BranchNames.push_back(bname);
-          //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
-          if(bname.BeginsWith("LogL"))
-          {
-            ValidPar.push_back(false);
-          }
-          else
-          {
-            ValidPar.push_back(true);
-          }
-        }
-        Chain->SetBranchStatus(bname, true);
-        MACH3LOG_DEBUG("{}", bname);
-      }
+      MACH3LOG_DEBUG("{}", bname);
     }
 
-    if(m == 0) nDraw = int(BranchNames.size());
-
+    for (size_t i = 0; i < SampleLLH.size(); ++i) {
+      TString bname = SampleLLH[i];
+      Chain->SetBranchStatus(bname, true);
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(false);
+      }
+    }
+    for (size_t i = 0; i < SystLLH.size(); ++i) {
+      TString bname = SystLLH[i];
+      Chain->SetBranchStatus(bname, true);
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(false);
+      }
+    }
+    // Read in the step
+    Chain->SetBranchStatus("step", true);
+    Chain->SetBranchAddress("step", &step[m]);
     //TN: Qualitatively faster sanity check, with the very same outcome (all chains have the same #branches)
     if(m > 0)
     {
@@ -292,6 +305,7 @@ void RHatCalculator::PrepareChains() {
   S1_chain.resize(Nchains);
   S2_chain.resize(Nchains);
 
+  std::unique_ptr<MCMCProcessor> Processor;
 
   // Open the Chain
   //It is tempting to multithread here but unfortunately, ROOT files are not thread safe :(
@@ -321,57 +335,67 @@ void RHatCalculator::PrepareChains() {
     // Get the number of branches
     nBranches[m] = brlis->GetEntries();
 
-    if(m == 0) BranchNames.reserve(nBranches[m]);
+    // Set all the branches to off
+    Chain->SetBranchStatus("*", false);
+
+    std::vector<TString> SampleLLH;
+    std::vector<TString> SystLLH;
+
+    if(m == 0) {
+      Processor = std::make_unique<MCMCProcessor>(MCMCFile[m]);
+      Processor->Initialise();
+      nDraw = Processor->GetNParams();
+      SampleLLH = Processor->GetSampleBranchNames();
+      SystLLH = Processor->GetSystBranchNames();
+      nDraw = nDraw + static_cast<int>(SampleLLH.size()) + static_cast<int>(SystLLH.size());
+      BranchNames.reserve(nDraw);
+    }
 
     // Set all the branches to off
     Chain->SetBranchStatus("*", false);
 
     // Loop over the number of branches
     // Find the name and how many of each systematic we have
-    /// @todo KS: We could use MCMCProcessor to grab branch names
-    for (int i = 0; i < nBranches[m]; i++)
+    for (int i = 0; i < Processor->GetNParams(); i++)
     {
-      // Get the TBranch and its name
-      TBranch* br = static_cast<TBranch *>(brlis->At(i));
-      if(!br){
-        MACH3LOG_ERROR("Invalid branch at position {}", i);
-        throw MaCh3Exception(__FILE__,__LINE__);
+      TString bname = Processor->GetBranchNames()[i];
+      //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(true);
       }
-      TString bname = br->GetName();
+      Chain->SetBranchStatus(bname, true);
 
-      // Read in the step
-      if (bname == "step") {
-        Chain->SetBranchStatus(bname, true);
-        Chain->SetBranchAddress(bname, &step[m]);
+      // Get the TBranch and its name
+      if (!Chain->GetBranch(bname)) {
+        MACH3LOG_ERROR("Branch '{}' does not exist in the TChain", bname.Data());
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
-      //Count all branches
-      else if (bname.BeginsWith("PCA_") || bname.BeginsWith("accProb") || bname.BeginsWith("stepTime") )
-      {
-        continue;
-      }
-      else
-      {
-        //KS: Save branch name only for one chain, we assume all chains have the same branches, otherwise this doesn't make sense either way
-        if(m == 0)
-        {
-          BranchNames.push_back(bname);
-          //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
-          if(bname.BeginsWith("LogL"))
-          {
-            ValidPar.push_back(false);
-          }
-          else
-          {
-            ValidPar.push_back(true);
-          }
-        }
-        Chain->SetBranchStatus(bname, true);
-        MACH3LOG_DEBUG("{}", bname);
-      }
+      MACH3LOG_DEBUG("{}", bname);
     }
 
-    if(m == 0) nDraw = int(BranchNames.size());
-
+    for (size_t i = 0; i < SampleLLH.size(); ++i) {
+      TString bname = SampleLLH[i];
+      Chain->SetBranchStatus(bname, true);
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(false);
+      }
+    }
+    for (size_t i = 0; i < SystLLH.size(); ++i) {
+      TString bname = SystLLH[i];
+      Chain->SetBranchStatus(bname, true);
+      if(m == 0) {
+        BranchNames.push_back(bname);
+        //KS: We calculate R Hat also for LogL, just in case, however we plot them separately
+        ValidPar.push_back(false);
+      }
+    }
+    // Read in the step
+    Chain->SetBranchStatus("step", true);
+    Chain->SetBranchAddress("step", &step[m]);
     // MJR: Initialize quantities needed for calculating RHat
     S1_chain[m].resize(nDraw, 0);
     S2_chain[m].resize(nDraw, 0);
