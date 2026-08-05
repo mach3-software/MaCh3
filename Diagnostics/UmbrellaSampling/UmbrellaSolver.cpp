@@ -1007,14 +1007,18 @@ void UmbrellaSolver(const std::string &config_file) {
     TTree *tree = input_trees[i];
 
     Long64_t nentries = tree->GetEntries();
+
     // KS: This is to avoid warnings about missing umbrella branches...
     int oldLevel = gErrorIgnoreLevel;
     gErrorIgnoreLevel = kError;
     combined_tree->CopyAddresses(tree);
     gErrorIgnoreLevel = oldLevel;
+
     /// @todo code now assumes it is only for delta CP
     tree->SetBranchAddress("delta_cp", &delta_cp);
-
+    // KS: SetBranchAddress above decouples the input branch address, so update the
+    // copied output branch address to use the current delta_cp value.
+    combined_tree->GetBranch("delta_cp")->SetAddress(&delta_cp);
     if (z_current[i] == 0) {
       MACH3LOG_WARN("Z value for window {} is zero, skipping weighting for this window to avoid division by zero.", i);
     }
