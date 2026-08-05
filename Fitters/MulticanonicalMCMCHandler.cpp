@@ -102,7 +102,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
   // Get the multicanonical beta value from the configuration file
   // This acts as a global bias strength factor
-  multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
+  multicanonicalBeta = Get<double>(mcmcConfig["Multicanonical"]["Beta"],  __FILE__, __LINE__);
   MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 
   /// @todo DR: I realised this will fail if you set spline to true but don't
@@ -134,7 +134,6 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
   // setup for spline bias mode
   if (multicanonicalSpline) {
     auto splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
-
     TFile* splineFile = M3::Open(splineFileName.c_str(), "READ",__FILE__, __LINE__);
 
     // grab the splines and do a quick check that they are evaluatable

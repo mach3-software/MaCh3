@@ -513,7 +513,7 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
 }
 
 // Main function to run the umbrella sampling solver
-void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
+void UmbrellaSolver(const std::string &config_file) {
   MACH3LOG_INFO("=== Umbrella Sampling Z-Factor Solver ===");
   // Debug OpenMP status first
   MACH3LOG_INFO("Debugging OpenMP availability...");
@@ -1109,6 +1109,15 @@ void UmbrellaSolver(const std::string &config_file = "umbrella_config.yaml") {
   Long64_t total_entries = combined_tree->GetEntries();
 
   output_file->cd();
+
+  YAML::Node yaml_config = M3OpenConfig(config_file);
+  YAML::Node umbrella_config;
+  umbrella_config["UmbrellaSolver"] = yaml_config["UmbrellaSolver"];
+
+  // Convert YAML -> TMacro
+  TMacro UmbrellaHeader = YAMLtoTMacro(umbrella_config, "Umbrella_Config");
+  UmbrellaHeader.Write();
+
   output_file->Close();
 
   // Close input files
