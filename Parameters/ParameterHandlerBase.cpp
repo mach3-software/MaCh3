@@ -281,6 +281,18 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
     _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
+    _fParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
+    
+    std::map<std::string, double> corrMap;
+    auto corrNode = param["Systematic"]["Correlations"];
+    for (const auto& item : corrNode)
+      {
+	for (const auto& kv : item)
+	  corrMap[kv.first.as<std::string>()] = kv.second.as<double>();
+      }
+    _fCorrElement[i] = std::move(corrMap);
+    
+
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -484,6 +496,8 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fFlatPrior = std::vector<bool>(SizeVec);
   _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
+  _fParameterGroup = std::vector<std::string>(SizeVec);
+  _fCorrElement = std::vector<std::map<std::string,double>>(SizeVec);
 
   corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)

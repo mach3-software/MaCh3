@@ -893,25 +893,65 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   else
     outputFileLLH = outputFile;
 
-  TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
+  TDirectory *Total_LLH = outputFileLLH->Get<TDirectory>("Total_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
-  if(!Sample_LLH || Sample_LLH->IsZombie())
+  auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
+
+  
+  const double global_Xsec_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["XsecStepScale"],1.0, __FILE__, __LINE__);
+  const double global_Osc_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["OscStepScale"], 1.0,__FILE__, __LINE__);
+    
+  double global_par_scale;
+  if(!Total_LLH || Total_LLH->IsZombie())
   {
     MACH3LOG_WARN("Couldn't find Sample_LLH, it looks like LLH scan wasn't run, will do this now");
     RunLLHScan();
-    Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
+    Total_LLH = outputFileLLH->Get<TDirectory>("Total_LLH");
   }
-  
+
   for (ParameterHandlerBase *cov : systematics)
   {
     const int npars = cov->GetNumParams();
+
+    // Vector of parameter names correlated to given parameter, from correlation matrix
+    std::vector<std::vector<std::string>> CorrParams(npars);
     std::vector<double> StepScale(npars);
     for (int i = 0; i < npars; ++i)
     {
       std::string name = cov->GetParFancyName(i);
+
+      //Make vector of parameters which are correlated to given parameter
+      std::map<std::string, double> parCorr = cov->GetCorrElements(i);
+      for (const auto& corrMap : parCorr){
+	std::string corr_var_name = corrMap.first;
+	if (!ParamVector.empty()){
+	  if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
+	    // Only consider parameters in chosen list
+	    continue;
+	  }
+	  if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
+	    // Only consider correlation of parameters in chosen list
+	    continue;
+	  }
+
+	}
+	double corr = corrMap.second;
+	int index = cov->GetParIndex(corr_var_name);
+	// Cut on what is consider a correlated parameter
+	// Also only allow same groups correlations
+	if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
+	  CorrParams[i].push_back(corr_var_name);
+      }
       StepScale[i] = cov->GetIndivStepScale(i);
-      TH1D* LLHScan = Sample_LLH->Get<TH1D>((name+"_sam").c_str());
+     
+      if (!ParamVector.empty()){
+	if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
+        // 'name' is not in the vector, skip this iteration
+	  continue;
+	}
+      }
+      TH1D* LLHScan = Total_LLH->Get<TH1D>((name+"_full").c_str());
       if(LLHScan == nullptr)
       {
         MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
@@ -927,13 +967,35 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       const double Var = 1.;
       const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
 
+      std::string var_name = cov->GetParName(i);
+      if(cov->GetParameterGroup(i) == "XSec" || cov->GetParameterGroup(i) == "Flux")
+	global_par_scale = global_Xsec_scale;
+      else if (cov->GetParameterGroup(i) == "Osc")
+	global_par_scale = global_Osc_scale;
+      else
+	MACH3LOG_ERROR("Parameter group not recognised");
+
       // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      const double NewStepScale = approxSigma * 2.38/std::sqrt(npars);
+      const double NewStepScale = (approxSigma * 2.38/std::sqrt(npars)) /global_par_scale;
+
       StepScale[i] = NewStepScale;
       MACH3LOG_DEBUG("Sigma: {}", approxSigma);
       MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
     }
-    cov->SetIndivStepScale(StepScale);
+    std::vector<double> StepScaleCorr = StepScale;
+    for (int p = 0; p < npars; p++){
+      if(CorrParams[p].size() != 0){
+	double avg_step_scale = StepScale[p];
+	for(const auto& corrName : CorrParams[p]) {
+	  int index = cov->GetParIndex(corrName);
+	  avg_step_scale += StepScale[index];
+	}
+	avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
+	StepScaleCorr[p] = avg_step_scale;
+	MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
+      }
+    }
+    cov->SetIndivStepScale(StepScaleCorr);
     cov->SaveUpdatedMatrixConfig();
   }
   if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;

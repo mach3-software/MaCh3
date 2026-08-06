@@ -149,6 +149,12 @@ class ParameterHandlerBase {
   /// @brief Get name of input file
   std::string GetInputFile() const { return inputFile; }
 
+  /// @brief Get the group of the parameter
+  std::string GetParameterGroup(const int i) const {return _fParameterGroup[i];}
+
+  /// @brief Get a map of the correlation element for a given parameter
+  std::map<std::string, double> GetCorrElements(const int i) const {return _fCorrElement[i];}
+  
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
   double GetDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
@@ -450,7 +456,11 @@ protected:
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
-
+  /// Defines the group of the parameter
+  std::vector<std::string> _fParameterGroup;
+  /// Correlation matrix elements for given parameter
+  std::vector<std::map<std::string, double>> _fCorrElement;
+  
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
 
