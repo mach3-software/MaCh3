@@ -153,7 +153,7 @@ protected:
   /// @brief Cached I0(kappa) value for the von Mises form.
   double vonMises_I0_kappa;
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
   std::ostream* debugStream = nullptr;
   bool debugEnabled = false;
 #endif
