@@ -215,5 +215,4 @@ namespace M3{
 
         return result;
     }
-
-};
+}

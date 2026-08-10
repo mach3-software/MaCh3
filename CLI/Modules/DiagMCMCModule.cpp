@@ -62,5 +62,4 @@ namespace M3{
 
     return 0;
   }
-
-};
+}

@@ -92,4 +92,4 @@ completions=("${(@f)$(mach3 --complete "$cur" "${words[@]:1}")}")
 compadd -a completions
 )";
     };
-};
+}
