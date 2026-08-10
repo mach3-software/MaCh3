@@ -761,8 +761,10 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
         TH1D* ProjectionX = PolyProjectionX(static_cast<TH2Poly*>(hist), nameX.c_str(), XBinning, false);
         TH1D* ProjectionY = PolyProjectionY(static_cast<TH2Poly*>(hist), nameY.c_str(), YBinning, false);
 
-        ProjectionX->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
-        ProjectionY->GetXaxis()->SetTitle(hist->GetYaxis()->GetTitle());
+        auto x_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 0);
+        auto y_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 1);
+        ProjectionX->GetXaxis()->SetTitle(x_var.c_str());
+        ProjectionY->GetXaxis()->SetTitle(y_var.c_str());
         
         ProjectionX->SetDirectory(nullptr);
         ProjectionY->SetDirectory(nullptr);
