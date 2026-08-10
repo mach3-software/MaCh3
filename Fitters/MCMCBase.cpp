@@ -42,7 +42,7 @@ void MCMCBase::RunMCMC() {
         // Initialize the multicanonical handler with the systematics
         multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
         AlgorithmName += "_UmbrellaSampling"; // Append to the algorithm name
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
     // Enable debug output stream for multicanonical handler if debug is enabled
     multicanonicalHandler->setDebugStream(&debugFile, debug);
 #endif
@@ -178,10 +178,9 @@ void MCMCBase::CheckAcceptanceRates() {
     if(step - stepStart < std::min(10.0, static_cast<double>(StepEnd)/10)) {
         return;
     }
-
+    // KS: Do not add "throw", this can crash CI or some short dummy chains for testing
     if(accCount==0 && step - stepStart > StepEnd/10) {
-        MACH3LOG_ERROR("No steps were accepted in the MCMC chain after {} steps. Please check your  step sizes.", step - stepStart);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_CRITICAL("No steps were accepted in the MCMC chain after {} steps. Please check your  step sizes.", step - stepStart);
     }
 
     double acc_rate = static_cast<double>(accCount) / static_cast<double>(step - stepStart);

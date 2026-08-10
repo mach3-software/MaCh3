@@ -42,7 +42,7 @@ public:
   /// @brief Destructor
   virtual ~MulticanonicalMCMCHandler();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   /// @brief Set the optional debug output stream.
   void setDebugStream(std::ostream* os, bool enabled);
   #endif

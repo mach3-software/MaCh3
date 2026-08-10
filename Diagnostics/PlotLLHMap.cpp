@@ -215,7 +215,6 @@ int main(int argc, char *argv[]) {
         std::ostringstream os;
         os << std::scientific << std::setprecision(4) << binnie;
         binnies += " "+os.str();
-
       }
 
       MACH3LOG_INFO("Initializing 1D profiled -2LogL and marginalized L histograms of {} bins with edges{}.", binning.second.size(), binnies);
@@ -227,7 +226,6 @@ int main(int argc, char *argv[]) {
 
   for(auto p = ParamsToProfile.begin(); p != ParamsToProfile.end(); ++p)
   {
-
     // Now loop over the bins. For each bin, find the minimal Total_LLH over the rest of the parameter space.
     // TODO: Switch between different LLHs (sample, xsec, etc.)
     const int count = hProfiles1d[*p]->GetNbinsX() > 5 ? int(double(hProfiles1d[*p]->GetNbinsX())/double(5)) : 1;
@@ -371,7 +369,6 @@ int main(int argc, char *argv[]) {
         hMarginals2d[key]->Write(hMarginals2d[key]->GetName(), TObject::kOverwrite);
       } // end p2 loop
     } // end p1 loop
-
   } // end 2D plot
 
   OutFile->Close();

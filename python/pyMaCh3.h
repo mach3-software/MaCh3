@@ -23,14 +23,12 @@ class MaCh3PyBinder {
     virtual ~MaCh3PyBinder() {};
 
     void initialise(py::module &m) {
-        
         initPlotting(m);
         initFitters(m);
         initSamples(m);
         initManager(m);
         initParameters(m);
         initSplines(m);
-
     }
 
   private:
@@ -49,7 +47,6 @@ class MaCh3PyBinder {
     // they call the core init<module name> functions and then the experiment
     // specific ones
     void initPlotting(py::module &m) {
-
         auto m_plotting = m.def_submodule("plotting");
         m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library.";
 
@@ -57,7 +54,6 @@ class MaCh3PyBinder {
         initPlottingExperiment(m_plotting);
     }
     void initFitters(py::module &m) {
-
         auto m_fitters = m.def_submodule("fitters");
         m_fitters.doc() =
             "This is a Python binding of MaCh3s C++ fitters library.";
@@ -66,7 +62,6 @@ class MaCh3PyBinder {
         initFittersExperiment(m_fitters);
     }
     void initSamples(py::module &m) {
-
         auto m_samples = m.def_submodule("samples");
 
         m_samples.doc() =
@@ -76,7 +71,6 @@ class MaCh3PyBinder {
         initSamplesExperiment(m_samples);
     }
     void initManager(py::module &m) {
-
         auto m_manager = m.def_submodule("manager");
         m_manager.doc() = 
             "This is a Python binding of MaCh3s C++ based manager library.";
@@ -85,7 +79,6 @@ class MaCh3PyBinder {
         initManagerExperiment(m_manager);
     }
     void initParameters(py::module &m) {
-
         auto m_parameters = m.def_submodule("parameters");
         m_parameters.doc() =
             "This is a Python binding of MaCh3s C++ parameters library.";
@@ -94,7 +87,6 @@ class MaCh3PyBinder {
         initParametersExperiment(m_parameters);
     }
     void initSplines(py::module &m) {
-
         auto m_splines = m.def_submodule("splines");
         m_splines.doc() = 
             "This is a Python binding of MaCh3s C++ based spline library.";
@@ -102,7 +94,6 @@ class MaCh3PyBinder {
         initSplinesModule(m_splines); // <- defined in python/splines.cpp
         initSplinesExperiment(m_splines);
     }
-
 };
 
 /*! 

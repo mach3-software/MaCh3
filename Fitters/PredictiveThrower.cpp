@@ -28,6 +28,15 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
   Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
   Ntoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);
 
+  if(!Is_PriorPredictive) {
+    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+    auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
+    if(PosteriorFileName == outfile){
+      MACH3LOG_ERROR("Output file ({}) and posterior files ({}) have same name", outfile, PosteriorFileName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   ReweightWeight.resize(Ntoys);
   PenaltyTerm.resize(Ntoys);
 }
