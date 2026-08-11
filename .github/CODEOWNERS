@@ -36,7 +36,8 @@
 /Splines/BinnedSplineHandler* @dbarrow257
 /Splines/SplineMonolith* @kskwarczynski
 
-/Plotting/* @ewanwm
+/CLI/Plotting/* @ewanwm
+/Utils/Plotting/* @ewanwm
 *.py @henry-wallace-phys @ewanwm
 py* @henry-wallace-phys @ewanwm
 
