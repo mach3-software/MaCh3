@@ -9,10 +9,10 @@
 #include <vector>
 #include <string>
 
-#include "Plotting/PlottingUtils/PlottingUtils.h"
-#include "Plotting/PlottingUtils/PlottingManager.h"
-#include "Plotting/PlottingUtils/StyleManager.h"
-#include "Plotting/PlottingUtils/InputManager.h"
+#include "Utils/Plotting/PlottingUtils.h"
+#include "Utils/Plotting/PlottingManager.h"
+#include "Utils/Plotting/StyleManager.h"
+#include "Utils/Plotting/InputManager.h"
 
 namespace py = pybind11;
 
