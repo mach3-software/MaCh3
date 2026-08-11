@@ -153,11 +153,11 @@ int main(int argc, char *argv[]) {
 
   // Prepare dirs for profiled LLHs
   TDirectory* DirProfile1D = OutFile->mkdir("Profiled1D_LLH", "profile1D", true);
-  TDirectory* DirProfile2D;
+  TDirectory* DirProfile2D = nullptr;
   if (Plot2D) DirProfile2D = OutFile->mkdir("Profiled2D_LLH", "profile2D", true);
 
   TDirectory* DirMarginal1D = OutFile->mkdir("Marginal1D_L", "marginal1D", true);
-  TDirectory* DirMarginal2D;
+  TDirectory* DirMarginal2D = nullptr;
   if (Plot2D) DirMarginal2D = OutFile->mkdir("Marginal2D_L", "marginal2D", true);
 
 
