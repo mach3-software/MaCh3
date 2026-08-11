@@ -3,7 +3,7 @@
 #include <iomanip>
 
 // MACH3 PLOTTING
-#include "PlottingUtils/PlottingManager.h"
+#include "Utils/Plotting/PlottingManager.h"
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
