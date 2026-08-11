@@ -1,6 +1,6 @@
 //MaCh3 Includes
-#include "PlottingUtils/PlottingUtils.h"
-#include "PlottingUtils/PlottingManager.h"
+#include "Utils/Plotting/PlottingUtils.h"
+#include "Utils/Plotting/PlottingManager.h"
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
