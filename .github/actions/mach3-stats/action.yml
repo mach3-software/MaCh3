@@ -26,12 +26,12 @@ runs:
         PREFIX="${{ inputs.prefix }}"
 
         echo "${PREFIX}_commit_count=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
-        echo "${PREFIX}_commits_last_week=$(git rev-list --count --since='1 week ago' HEAD)" >> "$GITHUB_ENV"
+        echo "${PREFIX}_commits_last_month=$(git rev-list --count --since='1 month ago' HEAD)" >> "$GITHUB_ENV"
 
         latest_tag=$(git describe --tags --abbrev=0)
         echo "${PREFIX}_latest_tag=${latest_tag}" >> "$GITHUB_ENV"
 
-        most_active_author=$(git log --since='1 week ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
+        most_active_author=$(git log --since='1 month ago' --pretty=format:"%an" | sort | uniq -c | sort -nr | head -n 1)
 
         echo "${PREFIX}_most_active_author=${most_active_author}" >> "$GITHUB_ENV"
 
@@ -56,14 +56,14 @@ runs:
 
         number_of_PR=$(gh search prs \
           --repo "$REPO" \
-          --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+          --created ">$(date -d '1 month ago' +%Y-%m-%d)" \
           --limit 1000 --json number | jq '. | length')
 
         echo "${PREFIX}_number_of_PR=${number_of_PR}" >> "$GITHUB_ENV"
 
         most_active_pr_author=$(gh search prs \
           --repo "$REPO" \
-          --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+          --created ">$(date -d '1 month ago' +%Y-%m-%d)" \
           --limit 1000 --json author \
           | jq -r '.[] | .author.login' \
           | sort | uniq -c | sort -nr | head -n 1)
