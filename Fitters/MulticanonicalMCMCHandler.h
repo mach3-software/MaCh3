@@ -42,7 +42,7 @@ public:
   /// @brief Destructor
   virtual ~MulticanonicalMCMCHandler();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   /// @brief Set the optional debug output stream.
   void setDebugStream(std::ostream* os, bool enabled);
   #endif
@@ -153,7 +153,7 @@ protected:
   /// @brief Cached I0(kappa) value for the von Mises form.
   double vonMises_I0_kappa;
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
   std::ostream* debugStream = nullptr;
   bool debugEnabled = false;
 #endif

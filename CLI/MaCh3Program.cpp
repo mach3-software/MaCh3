@@ -125,7 +125,6 @@ namespace M3{
 
         while (std::getline(ss, path, ':')) {
             for (const auto& sofile : this->expand_plugin_path(path)) {
-
                 try{
                     std::unique_ptr<DynamicPlugin> dlplugin = std::make_unique<DynamicPlugin>(sofile);
                     MaCh3ArgumentParser* parser = dlplugin->get_parser();
@@ -215,5 +214,4 @@ namespace M3{
 
         return result;
     }
-
-};
+}
