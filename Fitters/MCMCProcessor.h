@@ -246,6 +246,11 @@ class MCMCProcessor {
     
     /// @brief Get the vector of branch names from root file
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
+    /// @brief Get the vector of each sample branch names from root file
+    const std::vector<TString>& GetSampleBranchNames() const { return SampleName_v;};
+    /// @brief Get the vector of each systematic branch names from root file
+    const std::vector<TString>& GetSystBranchNames() const { return SystName_v;};
+
     /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
@@ -481,9 +486,9 @@ class MCMCProcessor {
     // KS: For example flux or detector within matrix
     std::vector<std::string> ParameterGroup;
 
-    /// Vector of each systematic
-    std::vector<TString> SampleName_v;
     /// Vector of each sample PDF object
+    std::vector<TString> SampleName_v;
+    /// Vector of each systematic
     std::vector<TString> SystName_v;
     
     /// Name of output files
