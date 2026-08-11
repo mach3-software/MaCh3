@@ -95,4 +95,4 @@ namespace M3{
             std::unique_ptr<void, decltype(&dlcloser)> m_handle;  ///< Handle to the loaded shared library
             std::unique_ptr<IPlugin, destroy_plugin_t> m_plugin;  ///< Smart pointer to plugin with custom deleter
     };
-};
+}

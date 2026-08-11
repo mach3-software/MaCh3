@@ -922,4 +922,4 @@ namespace M3{
       Posterior->Print(canvasname);
     } //End loop over parameter
   }
-};
+}
