@@ -52,7 +52,7 @@ MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
   // Destructor
 }
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
 void MulticanonicalMCMCHandler::setDebugStream(std::ostream* os, bool enabled) {
   debugStream = os;
   debugEnabled = enabled;
@@ -298,7 +298,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   double g0 = generalisedGaussian2(deltacp, umbrellaMean, umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
   double g1 = generalisedGaussian2(deltacp, umbrellaMean - 2 * TMath::Pi(), umbrellaWidth);
   double g2 = generalisedGaussian2(deltacp, umbrellaMean + 2 * TMath::Pi(), umbrellaWidth);
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
   if (debugStream && debugEnabled) (*debugStream) << " g0: " << g0 << " g1: " << g1 << " g2: " << g2 << std::endl;
 #endif
   return -std::log(g0 + g1 + g2) * (multicanonicalBeta);

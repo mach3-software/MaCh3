@@ -833,7 +833,6 @@ void RHatCalculator::SaveResults() {
     {
       RhatLogPlot->Fill(RHat[j]);
       if(HighMemoryMode) RhatFoldedLogPlot->Fill(RHatFolded[j]);
-
     }
   }
 

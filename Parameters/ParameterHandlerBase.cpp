@@ -862,7 +862,6 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov, bool verbose) {
   if(n_attempts > 0 && verbose) {
     MACH3LOG_WARN("Covariance matrix {} was not positive-definite, made it positive-definite after {} attempts", matrixName, n_attempts);
   }
-
 }
 
 // ********************************************
