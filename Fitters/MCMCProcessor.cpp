@@ -2537,21 +2537,48 @@ void MCMCProcessor::FindInputFiles() {
   delete XsecConfig;
 
   TMacro *ReweightConfig = TempFile->Get<TMacro>("Reweight_Config");
+  TMacro *UmbrellaConfig = TempFile->Get<TMacro>("Umbrella_Config");
+
+  YAML::Node ReweightSettings;
+  YAML::Node UmbrellaSettings;
+
   if (ReweightConfig != nullptr) {
-    ReweightPosterior = true;
-    YAML::Node ReweightSettings = TMacroToYAML(*ReweightConfig);
-    for (size_t i = 0; i < ReweightNames.size(); ++i) {
-      if (ReweightSettings[ReweightNames[i]]) {
-        MACH3LOG_INFO("Found reweight config for {}", ReweightNames[i]);
-      } else {
-        MACH3LOG_WARN("Found reweight config but without field for {}", ReweightNames[i]);
-        ReweightPosterior = false;
-      }
+    ReweightSettings = TMacroToYAML(*ReweightConfig);
+  }
+
+  if (UmbrellaConfig != nullptr) {
+    UmbrellaSettings = TMacroToYAML(*UmbrellaConfig);
+  }
+
+  ReweightPosterior = true;
+  for (const auto &name : ReweightNames) {
+    bool found = false;
+    // KS: For now umbrella_weight is specialised
+    if (name == "umbrella_weight") {
+      found = UmbrellaConfig != nullptr;
+    } else {
+      found = (ReweightConfig != nullptr) && ReweightSettings[name];
     }
-    if (ReweightPosterior) {
-      MACH3LOG_INFO("Enabling reweighting with configured weights.");
+
+    if (found) {
+      MACH3LOG_INFO("Found reweight config for {}", name);
+    } else {
+      MACH3LOG_WARN("Missing reweight config for {}", name);
+      ReweightPosterior = false;
+      break;
     }
+  }
+
+  if (ReweightPosterior) {
+    MACH3LOG_INFO("Enabling reweighting with configured weights.");
+  }
+
+  if (ReweightConfig != nullptr) {
     M3::Utils::PrintConfig(ReweightSettings);
+  }
+
+  if (UmbrellaConfig != nullptr) {
+    M3::Utils::PrintConfig(UmbrellaSettings);
   }
 
   // Delete the MCMCFile pointer we're reading
