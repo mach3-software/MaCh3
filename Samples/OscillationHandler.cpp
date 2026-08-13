@@ -12,7 +12,11 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
   EqualBinningPerOscChannel = BinningPerOscChannel_;
   OscParams = OscParams_;
   NuOscNames = NuOscNames_;
-  OscParamsNuOsc.resize(OscParams.size(), M3::_BAD_DOUBLE_);
+  // KS: Be aware we might be running with double on M3 but float in NuOsc
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
+  OscParamsNuOsc.resize(OscParams.size(), static_cast<FLOAT_T>(M3::_BAD_DOUBLE_);
+  #pragma GCC diagnostic pop
   // Add first sample
   NuOscProbCalcers.resize(1);
 
