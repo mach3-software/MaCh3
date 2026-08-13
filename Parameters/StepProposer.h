@@ -73,8 +73,39 @@ struct StepProposer {
 
   struct {
     bool enabled;
-    size_t nsteps;
+    size_t nsteps = 0;
+    Eigen::VectorXd accepted_parameter_mean, last_parameter_mean;
     Eigen::MatrixXd accepted_parameter_covariance;
+    Eigen::MatrixXd M2, M2_1;
+    void update_running_estimates(Eigen::ArrayXd const &params) {
+
+      if (nsteps == 0) {
+        nsteps++;
+        last_parameter_mean = params;
+        accepted_parameter_mean = last_parameter_mean;
+
+        M2_1 = Eigen::MatrixXd::Zero(params.size(),params.size());
+        M2 = M2_1;
+        accepted_parameter_covariance = M2_1;
+      } else {
+        nsteps++;
+        // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
+        accepted_parameter_mean =
+            last_parameter_mean +
+            (params.matrix() - last_parameter_mean) / double(nsteps);
+
+        M2 = M2_1 + (params.matrix() - last_parameter_mean) *
+                        (params.matrix() - accepted_parameter_mean).transpose();
+
+        last_parameter_mean = accepted_parameter_mean;
+
+        accepted_parameter_covariance += M2 / double(nsteps - 1);
+      }
+    }
+
+    StepProposer MakeProposer() const {
+      return StepProposer(accepted_parameter_covariance * );
+    }
   } adaptive;
 
   StepProposer();
@@ -103,12 +134,12 @@ struct StepProposer {
   int GetProposalParameterIndexFromSystematicIndex(int i) const;
 
   void EnableAdaption(YAML::Node const &) {}
-  // void SetAdaptionCovariance(Eigen::MatrixXd parameter_covariance,
-  //                            size_t nsteps) {
-  //   adaptive.nsteps = nsteps;
-  //   adaptive.accepted_parameter_covariance = parameter_covariance;
-  // }
 
   Eigen::ArrayXd const &Propose();
-  void Accept() { proposal_basis.current = proposal_basis.proposed; }
+  void Accept() {
+    proposal_basis.current = proposal_basis.proposed;
+    if (adaptive.enabled) {
+      adaptive.update_running_estimates(proposal_basis.current);
+    }
+  }
 };
