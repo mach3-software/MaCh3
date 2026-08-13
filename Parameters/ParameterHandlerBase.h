@@ -461,11 +461,6 @@ class ParameterHandlerBase {
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  // /// Indices of parameters with flip symmetry
-  // std::vector<int>    FlipParameterIndex;
-  // /// Central points around which parameters are flipped
-  // std::vector<double> FlipParameterPoint;
-
   /// @brief Struct to hold information about a group of parameters that flip together at the same time
   struct FlipGroup {
     /// Indices of parameters with flip symmetry
