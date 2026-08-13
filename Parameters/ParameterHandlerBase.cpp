@@ -89,14 +89,6 @@ void ParameterHandlerBase::InitFromFile(const std::string& name, const std::stri
   }
 
   PrintLength = 35;
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
@@ -305,7 +297,7 @@ void ParameterHandlerBase::ThrowParameters() {
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        randParams[i] = M3::rand::Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + corr_throw_single);
         if (throws > 10000)
@@ -327,7 +319,7 @@ void ParameterHandlerBase::ThrowParameters() {
   }
   else
   {
-    PCAObj->ThrowParameters(random_number, throwMatrixCholDecomp,
+    PCAObj->ThrowParameters(throwMatrixCholDecomp,
                             randParams, corr_throw,
                             _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
   } // end if pca
@@ -357,7 +349,7 @@ void ParameterHandlerBase::RandomConfiguration() {
     double throwrange = sigma;
     if (paramrange < sigma) throwrange = paramrange;
 
-    _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
+    _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + M3::rand::Gaus(0, 1)*throwrange);
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
     int throws = 0;
     while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
@@ -367,7 +359,7 @@ void ParameterHandlerBase::RandomConfiguration() {
         MACH3LOG_WARN("Param: {}", _fNames[i]);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
+      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + M3::rand::Gaus(0, 1)*throwrange);
       throws++;
     }
     MACH3LOG_INFO("Setting current step in {} param {} = {} from {}", matrixName, i, _fPropVal[i], _fCurrVal[i]);
@@ -449,7 +441,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (!IsParameterFixed(i) > 0.0) {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        randParams[i] = M3::rand::Gaus(0, 1);
         // If parameter IS fixed
       } else {
         randParams[i] = 0.0;
@@ -467,7 +459,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
       if (PCAObj->IsParameterFixedPCA(i)) {
         randParams[i] = 0.0;
       } else {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
+        randParams[i] = M3::rand::Gaus(0, 1);
       }
     }
   }
@@ -535,7 +527,7 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 // *************************************
 void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
 // *************************************
-  if(random_number[0]->Uniform() < 0.5) {
+  if(M3::rand::Uniform() < 0.5) {
     _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
   }
 }

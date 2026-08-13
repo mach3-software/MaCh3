@@ -397,9 +397,6 @@ class ParameterHandlerBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
 
-  /// KS: Set Random numbers for each thread so each thread has different seed
-  std::vector<std::unique_ptr<TRandom3>> random_number;
-
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
   /// Result of multiplication of Cholesky matrix and randParams
