@@ -1017,8 +1017,8 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     // aim is to build energy/cosz arrays per oscillation channel so that
     // NuOscillator can decide on the binning
     std::vector<std::map<std::pair<int, int>, std::vector<M3::float_t>>>
-        channel_energy_array(GetNSamples(), {}),
-        channel_cosz_array(GetNSamples(), {});
+        channel_energy_array(GetNSamples()),
+        channel_cosz_array(GetNSamples());
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
       if (MCEvents[iEvent].NominalSample <
           0) { // skip events marked as sampleless
@@ -1064,13 +1064,22 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       // loop through channels and check they were defined in config, or add
       // them if not
       for (auto const &[osc_flavs, energies] : channel_energy_array[iSample]) {
-        if (osc_flavs.first == SampleDetails[iSample].OscChannels[i].InitPDG &&
-            osc_flavs.second ==
-                SampleDetails[iSample].OscChannels[i].FinalPDG) {
-          continue; // already have this channel defined.
+        bool found = false;
+        for (size_t i = 0; i < SampleDetails[iSample].OscChannels.size();
+             ++i) {
+          if (osc_flavs.first ==
+                  SampleDetails[iSample].OscChannels[i].InitPDG &&
+              osc_flavs.second ==
+                  SampleDetails[iSample].OscChannels[i].FinalPDG) {
+            found = true;
+            break;
+          }
+        }
+        if(found){ // already have this channel defined.
+          continue;
         }
 
-        static constexpr std::map<int, std::pair<std::string, std::string>>
+        static const std::map<int, std::pair<std::string, std::string>>
             spec_defnames = {
                 {12, {"nue", "#nu_{e}"}},
                 {-12, {"nueb", "#bar{#nu}_{e}"}},
@@ -1083,12 +1092,12 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
         OscChannelInfo oci;
         oci.InitPDG = osc_flavs.first;
         oci.FinalPDG = osc_flavs.second;
-        oci.flavourName = Form("%s_x_%s", spec_defnames[osc_flavs.first].first,
-                               spec_defnames[osc_flavs.second].first);
+        oci.flavourName = fmt::format("{}_x_{}", spec_defnames.at(osc_flavs.first).first,
+                               spec_defnames.at(osc_flavs.second).first);
         oci.flavourName_Latex =
-            Form("%s #rightarrow %s", spec_defnames[osc_flavs.first].secon,
-                 spec_defnames[osc_flavs.second].secon);
-        oci.ChannelIndex = SampleDetails[iSample].OscChannels.size();
+            fmt::format("{} #rightarrow {}", spec_defnames.at(osc_flavs.first).second,
+                 spec_defnames.at(osc_flavs.second).second);
+        oci.ChannelIndex = double(SampleDetails[iSample].OscChannels.size());
 
         SampleDetails[iSample].OscChannels.push_back(oci);
       }
@@ -1103,7 +1112,7 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       }
 
       // set oscillator binning
-      for (auto const &[osc_flavs, energies] : channel_energy_array[iSample]) {
+      for (auto &[osc_flavs, energies] : channel_energy_array[iSample]) {
         auto iChannel = GetOscChannel(SampleDetails[iSample].OscChannels,
                                       osc_flavs.first, osc_flavs.second);
 
