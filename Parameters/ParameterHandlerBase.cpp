@@ -118,14 +118,26 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
   doSpecialStepProposal = true;
 
   bool CircEnabled = false;
+  std::pair<double, double> circular_bounds;
+
   bool FlipEnabled = false;
+  std::string flip_group;
+  double flip_point;
 
   if (param["CircularBounds"]) {
     CircEnabled = true;
+    circular_bounds = Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__);
   }
 
   if (param["FlipParameter"]) {
     FlipEnabled = true;
+    // grab flip group if it exists, otherwise use the parameter name as the group
+    if (param["FlipGroup"]) {
+      flip_group = Get<std::string>(param["FlipGroup"], __FILE__, __LINE__);
+    } else {
+      flip_group = GetParFancyName(Index);
+    }
+    flip_point = Get<double>(param["FlipParameter"], __FILE__, __LINE__);
   }
 
   if (!CircEnabled && !FlipEnabled) {
@@ -135,15 +147,15 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (CircEnabled) {
     CircularBoundsIndex.push_back(Index);
-    CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));
+    CircularBoundsValues.push_back(circular_bounds);
     MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
                   GetParFancyName(Index),
-                  CircularBoundsValues.back().first,
-                  CircularBoundsValues.back().second);
+                  circular_bounds.first,
+                  circular_bounds.second);
     // KS: Make sure circular bounds are within physical bounds. If we are outside of physics bound MCMC will never explore such phase space region
-    if (CircularBoundsValues.back().first < _fLowBound.at(Index) || CircularBoundsValues.back().second > _fUpBound.at(Index)) {
+    if (circular_bounds.first < _fLowBound.at(Index) || circular_bounds.second > _fUpBound.at(Index)) {
       MACH3LOG_ERROR("Circular bounds [{}, {}] for parameter {} exceed physical bounds [{}, {}]",
-                     CircularBoundsValues.back().first, CircularBoundsValues.back().second,
+                     circular_bounds.first, circular_bounds.second,
                      GetParFancyName(Index),
                      _fLowBound.at(Index), _fUpBound.at(Index));
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -158,32 +170,35 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
   }
 
   if (FlipEnabled) {
-    FlipParameterIndex.push_back(Index);
-    FlipParameterPoint.push_back(Get<double>(param["FlipParameter"], __FILE__, __LINE__));
-    MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
+    FlipGroup& group = FlipGroups[flip_group];
+    group.FlipParameterIndex.push_back(Index);
+    group.FlipParameterPoint.push_back(flip_point);
+
+    MACH3LOG_INFO("Enabling Flipping for parameter {} in group {} with value {}",
                   GetParFancyName(Index),
-                  FlipParameterPoint.back());
+                  flip_group,
+                  flip_point);
   }
 
   if (CircEnabled && FlipEnabled) {
-    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+    if (flip_point < circular_bounds.first || flip_point > circular_bounds.second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+                     flip_point, GetParFancyName(Index), circular_bounds.first, circular_bounds.second);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    const double low = CircularBoundsValues.back().first;
-    const double high = CircularBoundsValues.back().second;
+    const double low = circular_bounds.first;
+    const double high = circular_bounds.second;
 
     // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
-    const double flipped_low = 2 * FlipParameterPoint.back() - low;
-    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double flipped_low = 2 * flip_point - low;
+    const double flipped_high = 2 * flip_point - high;
     const double min_flip = std::min(flipped_low, flipped_high);
     const double max_flip = std::max(flipped_low, flipped_high);
 
     if (min_flip < low || max_flip > high) {
       MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
+                     flip_point, GetParFancyName(Index), low, high);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
@@ -427,11 +442,9 @@ void ParameterHandlerBase::SpecialStepProposal() {
       CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
-  // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    const int index = FlipParameterIndex[i];
-    if(!IsParameterFixed(index))
-      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+  // // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  for (const auto& [group_name, group] : FlipGroups) {
+    FlipParameterGroup(group_name);
   }
 }
 
@@ -533,12 +546,20 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 }
 
 // *************************************
-void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
+void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
 // *************************************
   if(random_number[0]->Uniform() < 0.5) {
-    _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
+    for (size_t i = 0; i < FlipGroups[group].FlipParameterIndex.size(); ++i) {
+      const int index = FlipGroups[group].FlipParameterIndex[i];
+      if(!IsParameterFixed(index)) {
+        const double flip_point = FlipGroups[group].FlipParameterPoint[i];
+        _fPropVal[index] = static_cast<M3::float_t>(2 * flip_point - _fPropVal[index]);
+      }
+    }
   }
 }
+
+
 #pragma GCC diagnostic pop
 // ********************************************
 // Function to print the prior values
@@ -964,13 +985,15 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::SanitizeAdaption() const {
 // ********************************************
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    const int index = FlipParameterIndex[i];
-    if(!param_skip_adapt_flags[index]) {
-      MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
-      MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
-      MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
-      throw MaCh3Exception(__FILE__, __LINE__);
+  for (const auto& [_, group] : FlipGroups) {
+    for (size_t i = 0; i < group.FlipParameterIndex.size(); ++i) {
+      const int index = group.FlipParameterIndex[i];
+      if(!param_skip_adapt_flags[index]) {
+        MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
+        MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
+        MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     }
   }
 
