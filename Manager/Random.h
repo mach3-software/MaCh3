@@ -80,7 +80,10 @@ class Random
 
   /// @brief Generate an integer Poisson-distributed random number with the given mean.
   int Poisson(const double mean) {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
     return Engine()->Poisson(mean);
+    #pragma GCC diagnostic pop
   }
  private:
   /// @brief Constructor.
