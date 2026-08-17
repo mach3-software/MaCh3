@@ -42,8 +42,7 @@ class Random
     fEngines.reserve(nThreads);
 
     for (int thread = 0; thread < nThreads; ++thread) {
-      fEngines.emplace_back(
-        std::make_unique<TRandom3>(MakeThreadSeed(fSeed, thread)));
+      fEngines.emplace_back(std::make_unique<TRandom3>(fSeed));
     }
   }
 
@@ -73,6 +72,16 @@ class Random
               const double sigma = 1.0) {
     return Engine()->Gaus(mean, sigma);
   }
+
+  /// @brief Generate a double-precision Poisson-distributed random number with the given mean.
+  double PoissonD(const double mean) {
+    return Engine()->PoissonD(mean);
+  }
+
+  /// @brief Generate an integer Poisson-distributed random number with the given mean.
+  int Poisson(const double mean) {
+    return Engine()->Poisson(mean);
+  }
  private:
   /// @brief Constructor.
   Random() {
@@ -88,20 +97,7 @@ class Random
     #endif
   }
 
-  /// @brief Generate a deterministic, unique seed for each thread.
-  static std::uint64_t MakeThreadSeed(const std::uint64_t seed,
-                                      const std::size_t thread) {
-    std::uint64_t x =
-    seed + 0x9e3779b97f4a7c15ULL * (thread + 1);
-
-    // SplitMix64 mixing.
-    x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9ULL;
-    x = (x ^ (x >> 27)) * 0x94d049bb133111ebULL;
-    x = x ^ (x >> 31);
-
-    return x;
-  }
-
+  /// The global seed.
   std::uint64_t fSeed = 0;
 
   /// @brief One random generator per thread.
@@ -117,6 +113,16 @@ class Random
   inline double Uniform(const double min = 0.0,
                         const double max = 1.0) {
     return Random::Instance().Uniform(min, max);
+  }
+
+  /// @brief Generate a Poisson-distributed integer with the given mean.
+  inline int Poisson(const double mean) {
+    return Random::Instance().Poisson(mean);
+  }
+
+  /// @brief Generate a Poisson-distributed random number with the given mean.
+  inline double PoissonD(const double mean) {
+    return Random::Instance().PoissonD(mean);
   }
 
   /// @brief Generate a uniform random integer in [min, max].

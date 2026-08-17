@@ -2176,16 +2176,16 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH1D *FluctHist, TH1D* PolyHist){
 // ****************
-  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist, rnd.get());
-  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist, rnd.get());
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
 }
 
 // ****************
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
 void SampleSummary::MakeFluctuatedHistogram(TH2Poly *FluctHist, TH2Poly* PolyHist){
 // ****************
-  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist, rnd.get());
-  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist, rnd.get());
+  if(StandardFluctuation) MakeFluctuatedHistogramStandard(FluctHist, PolyHist);
+  else MakeFluctuatedHistogramAlternative(FluctHist, PolyHist);
 }
 
 
