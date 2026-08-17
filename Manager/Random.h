@@ -1,14 +1,25 @@
 #pragma once
 
 #include <cstdint>
-#include <random>
 #include <vector>
 
 #include "Manager/Core.h"
 #include "Manager/Monitor.h"
 
+_MaCh3_Safe_Include_Start_ //{
+// ROOT include
+#include "TRandom3.h"
+_MaCh3_Safe_Include_End_ //}
+
 namespace M3::rand
 {
+/// @brief Universal random number generator for MaCh3.
+///
+/// @note STL random-number generators were also benchmarked, but ROOT's
+///       TRandom3 was faster for the tested workloads. The implementation
+///       can be switched to an STL engine if needed.
+///
+/// @author Kamil Skwarczynski
 class Random
 {
  public:
@@ -27,10 +38,12 @@ class Random
   {
     fSeed = seed;
     const auto nThreads = GetNThreads();
-    fEngines.resize(nThreads);
+    fEngines.clear();
+    fEngines.reserve(nThreads);
 
     for (int thread = 0; thread < nThreads; ++thread) {
-      fEngines[thread].seed(MakeThreadSeed(fSeed, thread));
+      fEngines.emplace_back(
+        std::make_unique<TRandom3>(MakeThreadSeed(fSeed, thread)));
     }
   }
 
@@ -40,29 +53,25 @@ class Random
   }
 
   /// @brief Get the random generator associated with the current thread.
-  std::mt19937_64& Engine()
-  {
-    return fEngines[ThreadID()];
+  TRandom3* Engine() {
+    return fEngines[ThreadID()].get();
   }
 
   /// @brief Generate a uniform random number in [min, max).
   double Uniform(const double min = 0.0,
-                  const double max = 1.0) {
-    std::uniform_real_distribution<double> dist(min, max);
-    return dist(Engine());
+                 const double max = 1.0) {
+    return Engine()->Uniform(min, max);
   }
 
   /// @brief Generate a uniform random integer in [min, max].
   int UniformInt(const int min, const int max) {
-    std::uniform_int_distribution<int> dist(min, max);
-    return dist(Engine());
+    return Engine()->Integer(max - min + 1) + min;
   }
 
   /// @brief Generate a Gaussian random number.
   double Gaus(const double mean = 0.0,
               const double sigma = 1.0) {
-    std::normal_distribution<double> dist(mean, sigma);
-    return dist(Engine());
+    return Engine()->Gaus(mean, sigma);
   }
  private:
   /// @brief Constructor.
@@ -96,8 +105,8 @@ class Random
   std::uint64_t fSeed = 0;
 
   /// @brief One random generator per thread.
-  std::vector<std::mt19937_64> fEngines;
-  };
+  std::vector<std::unique_ptr<TRandom3>> fEngines;
+};
 
   /// @brief Set the global random seed.
   inline void SetSeed(const std::uint64_t seed) {
