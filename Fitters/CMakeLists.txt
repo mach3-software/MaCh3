@@ -9,7 +9,6 @@ set(HEADERS
     MCMCProcessor.h
     OscProcessor.h
     RHatCalculator.h
-    SampleSummary.h
     MaCh3Factory.h
     PredictiveThrower.h
     StatisticalUtils.h
@@ -28,7 +27,6 @@ add_library(Fitters SHARED
     MCMCProcessor.cpp
     OscProcessor.cpp
     RHatCalculator.cpp
-    SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
     PredictiveThrower.cpp
