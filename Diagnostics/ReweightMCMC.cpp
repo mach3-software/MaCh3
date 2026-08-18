@@ -34,7 +34,7 @@ _MaCh3_Safe_Include_End_ //}
 struct ReweightConfig {
     std::string key;       // The YAML key for this reweight
     std::string name;
-    std::string type;  // "Gaussian", "TGraph2D"
+    std::string type;  // "Gaussian", "TGraph", "TGraph1D", "TGraph2D"
     int dimension;     // 1 or 2
     std::vector<std::string> paramNames;
     std::vector<std::vector<double>> priorValues; // Changed to handle multiple [mean, sigma] pairs
@@ -49,6 +49,12 @@ struct ReweightConfig {
     std::unique_ptr<TGraph> graph_1D;
     double graph1D_xmin = 0.0;
     double graph1D_xmax = 0.0;
+    std::unique_ptr<TGraph> graph_NO_1D;
+    std::unique_ptr<TGraph> graph_IO_1D;
+    double graphNO_1D_xmin = 0.0;
+    double graphNO_1D_xmax = 0.0;
+    double graphIO_1D_xmin = 0.0;
+    double graphIO_1D_xmax = 0.0;
 
     // For TGraph2D
     std::string hierarchyType; // "NO", "IO", or "auto"
@@ -207,50 +213,88 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
                                    reweightKey, paramNames.size(), allPriorValues.size());
                     continue;
                 }
-            } else if (reweightConfig.type == "TGraph") {
+            } else if (reweightConfig.type == "TGraph" || reweightConfig.type == "TGraph1D") {
                 // For TGraph reweights, we need the parameter name and the TGraph file and name
                 auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
-                std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
-                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "");
+                auto priorNode = reweightConfigNode["ReweightPrior"];
+                std::string fileName = GetFromManager<std::string>(priorNode["file"], "");
+                std::string graphName = GetFromManager<std::string>(priorNode["graph_name"], "");
+                std::string graphNameNO = GetFromManager<std::string>(priorNode["graph_name_no"], "");
+                std::string graphNameIO = GetFromManager<std::string>(priorNode["graph_name_io"], "");
                 reweightConfig.paramNames = paramNames;
                 reweightConfig.fileName = fileName;
                 reweightConfig.graphName = graphName;
 
-                if (paramNames.empty() || paramNames.size() != 1 || fileName.empty() || graphName.empty()) {
+                if (paramNames.empty() || paramNames.size() != 1 || fileName.empty()) {
                     MACH3LOG_ERROR("Invalid TGraph reweight configuration for {}", reweightKey);
                     continue;
                 }
 
                 // Load the 1D graph
-                MACH3LOG_INFO("Loading 1D constraint from file: {} (graph: {})", reweightConfig.fileName, reweightConfig.graphName);
+                MACH3LOG_INFO("Loading 1D constraint from file: {}", reweightConfig.fileName);
                 auto constraintFile = std::unique_ptr<TFile>(TFile::Open(reweightConfig.fileName.c_str(), "READ"));
                 if (!constraintFile || constraintFile->IsZombie()) {
                     MACH3LOG_ERROR("Failed to open constraint file: {}", reweightConfig.fileName);
                     continue;
                 }
 
-                std::unique_ptr<TGraph> graph(constraintFile->Get<TGraph>(reweightConfig.graphName.c_str()));
-                if (graph) {
-                    // Create a completely independent copy
-                    auto cloned_graph = static_cast<TGraph*>(graph->Clone());
-                    cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
-                    reweightConfig.graph_1D = std::unique_ptr<TGraph>(cloned_graph);
+                const bool useHierarchyGraphs = !graphNameNO.empty() && !graphNameIO.empty();
+                if (useHierarchyGraphs) {
+                    std::unique_ptr<TGraph> graphNO(constraintFile->Get<TGraph>(graphNameNO.c_str()));
+                    std::unique_ptr<TGraph> graphIO(constraintFile->Get<TGraph>(graphNameIO.c_str()));
 
-                    // Cache graph bounds once to avoid per-event bound scans.
-                    double xmin = 999999999;
-                    double xmax = -999999999;
-                    for (int i = 0; i < reweightConfig.graph_1D->GetN(); ++i) {
-                        const double x = reweightConfig.graph_1D->GetX()[i];
-                        if (x < xmin) xmin = x;
-                        if (x > xmax) xmax = x;
+                    if (!graphNO || !graphIO) {
+                        MACH3LOG_ERROR("Failed to load 1D NO/IO graphs: NO='{}', IO='{}'", graphNameNO, graphNameIO);
+                        continue;
                     }
-                    reweightConfig.graph1D_xmin = xmin;
-                    reweightConfig.graph1D_xmax = xmax;
 
-                    MACH3LOG_INFO("Loaded 1D graph: {}", reweightConfig.graphName);
+                    auto clonedGraphNO = static_cast<TGraph*>(graphNO->Clone());
+                    clonedGraphNO->SetBit(kCanDelete, true);
+                    reweightConfig.graph_NO_1D = std::unique_ptr<TGraph>(clonedGraphNO);
+                    reweightConfig.graphNO_1D_xmin = 999999999;
+                    reweightConfig.graphNO_1D_xmax = -999999999;
+                    for (int i = 0; i < reweightConfig.graph_NO_1D->GetN(); ++i) {
+                        const double x = reweightConfig.graph_NO_1D->GetX()[i];
+                        if (x < reweightConfig.graphNO_1D_xmin) reweightConfig.graphNO_1D_xmin = x;
+                        if (x > reweightConfig.graphNO_1D_xmax) reweightConfig.graphNO_1D_xmax = x;
+                    }
+
+                    auto clonedGraphIO = static_cast<TGraph*>(graphIO->Clone());
+                    clonedGraphIO->SetBit(kCanDelete, true);
+                    reweightConfig.graph_IO_1D = std::unique_ptr<TGraph>(clonedGraphIO);
+                    reweightConfig.graphIO_1D_xmin = 999999999;
+                    reweightConfig.graphIO_1D_xmax = -999999999;
+                    for (int i = 0; i < reweightConfig.graph_IO_1D->GetN(); ++i) {
+                        const double x = reweightConfig.graph_IO_1D->GetX()[i];
+                        if (x < reweightConfig.graphIO_1D_xmin) reweightConfig.graphIO_1D_xmin = x;
+                        if (x > reweightConfig.graphIO_1D_xmax) reweightConfig.graphIO_1D_xmax = x;
+                    }
+
+                    MACH3LOG_INFO("Loaded 1D NO graph: {}", graphNameNO);
+                    MACH3LOG_INFO("Loaded 1D IO graph: {}", graphNameIO);
                 } else {
-                    MACH3LOG_ERROR("Failed to load graph: {}", reweightConfig.graphName);
-                    continue;
+                    if (graphName.empty()) {
+                        MACH3LOG_ERROR("Invalid TGraph reweight configuration for {}: missing graph_name or graph_name_no/graph_name_io", reweightKey);
+                        continue;
+                    }
+
+                    std::unique_ptr<TGraph> graph(constraintFile->Get<TGraph>(reweightConfig.graphName.c_str()));
+                    if (graph) {
+                        auto clonedGraph = static_cast<TGraph*>(graph->Clone());
+                        clonedGraph->SetBit(kCanDelete, true);
+                        reweightConfig.graph_1D = std::unique_ptr<TGraph>(clonedGraph);
+                        reweightConfig.graph1D_xmin = 999999999;
+                        reweightConfig.graph1D_xmax = -999999999;
+                        for (int i = 0; i < reweightConfig.graph_1D->GetN(); ++i) {
+                            const double x = reweightConfig.graph_1D->GetX()[i];
+                            if (x < reweightConfig.graph1D_xmin) reweightConfig.graph1D_xmin = x;
+                            if (x > reweightConfig.graph1D_xmax) reweightConfig.graph1D_xmax = x;
+                        }
+                        MACH3LOG_INFO("Loaded 1D graph: {}", reweightConfig.graphName);
+                    } else {
+                        MACH3LOG_ERROR("Failed to load graph: {}", reweightConfig.graphName);
+                        continue;
+                    }
                 }
             } else {
                 MACH3LOG_ERROR("Unknown 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
@@ -572,9 +616,17 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
                         weight *= (newPrior / oldPrior);
                     }
                 } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
-                    if (rwConfig.type == "TGraph") {
+                    if (rwConfig.type == "TGraph" || rwConfig.type == "TGraph1D") {
                         double paramValue = paramValues[rwConfig.paramNames[0]];
-                        weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
+                        if (rwConfig.graph_NO_1D && rwConfig.graph_IO_1D) {
+                            if (paramValue >= 0.0) {
+                                weight = Graph_interpolate1D(rwConfig.graph_NO_1D.get(), paramValue, rwConfig.graphNO_1D_xmin, rwConfig.graphNO_1D_xmax);
+                            } else {
+                                weight = Graph_interpolate1D(rwConfig.graph_IO_1D.get(), paramValue, rwConfig.graphIO_1D_xmin, rwConfig.graphIO_1D_xmax);
+                            }
+                        } else {
+                            weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
+                        }
                     } else {
                         MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
                     }
@@ -871,8 +923,13 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
 
     // Warm up ROOT interpolation internals before entering parallel region.
     for (const auto& rwConfig : reweightConfigs) {
-        if (rwConfig.dimension == 1 && rwConfig.type == "TGraph") {
-            if (rwConfig.graph_1D && rwConfig.graph_1D->GetN() > 0) {
+        if (rwConfig.dimension == 1 && (rwConfig.type == "TGraph" || rwConfig.type == "TGraph1D")) {
+            if (rwConfig.graph_NO_1D && rwConfig.graph_IO_1D) {
+                const double noMid = 0.5 * (rwConfig.graphNO_1D_xmin + rwConfig.graphNO_1D_xmax);
+                const double ioMid = 0.5 * (rwConfig.graphIO_1D_xmin + rwConfig.graphIO_1D_xmax);
+                (void)Graph_interpolate1D(rwConfig.graph_NO_1D.get(), noMid, rwConfig.graphNO_1D_xmin, rwConfig.graphNO_1D_xmax);
+                (void)Graph_interpolate1D(rwConfig.graph_IO_1D.get(), ioMid, rwConfig.graphIO_1D_xmin, rwConfig.graphIO_1D_xmax);
+            } else if (rwConfig.graph_1D && rwConfig.graph_1D->GetN() > 0) {
                 (void)Graph_interpolate1D(rwConfig.graph_1D.get(), rwConfig.graph_1D->GetX()[0], rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
             }
         } else if (rwConfig.dimension == 2 && rwConfig.type == "TGraph2D") {
@@ -955,11 +1012,19 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                             weight *= (newPrior / oldPrior);
                         }
                     } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
-                        if (rwConfig.type == "TGraph") {
+                        if (rwConfig.type == "TGraph" || rwConfig.type == "TGraph1D") {
                             const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
                             if (mapIt != paramMapping.end()) {
                                 const double paramValue = cachedParamValues.at(mapIt->second)[static_cast<size_t>(local)];
-                                weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
+                                if (rwConfig.graph_NO_1D && rwConfig.graph_IO_1D) {
+                                    if (paramValue >= 0.0) {
+                                        weight = Graph_interpolate1D(rwConfig.graph_NO_1D.get(), paramValue, rwConfig.graphNO_1D_xmin, rwConfig.graphNO_1D_xmax);
+                                    } else {
+                                        weight = Graph_interpolate1D(rwConfig.graph_IO_1D.get(), paramValue, rwConfig.graphIO_1D_xmin, rwConfig.graphIO_1D_xmax);
+                                    }
+                                } else {
+                                    weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue, rwConfig.graph1D_xmin, rwConfig.graph1D_xmax);
+                                }
                             } else {
                                 weight = 0.0;
                             }
