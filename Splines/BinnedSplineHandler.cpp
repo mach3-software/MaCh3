@@ -316,27 +316,39 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
       int nModesInSyst = static_cast<int>(SplineModeVecs[iSample][iSyst].size());
       for (int iMode = 0; iMode < nModesInSyst; ++iMode)
       {
-        const int nBins1 = SplineBinning[iSample][iOscChan][0]->GetNbins();
-        const int nBins2 = SplineBinning[iSample][iOscChan][1]->GetNbins();
-        const int nBins3 = SplineBinning[iSample][iOscChan][2]->GetNbins();
-        for (int iVar1 = 0; iVar1 < nBins1; ++iVar1) {
-          for (int iVar2 = 0; iVar2 < nBins2; ++iVar2) {
-            for (int iVar3 = 0; iVar3 < nBins3; ++iVar3) {
-              SplineIndex entry;
-              entry.value    = -1;
-              entry.iSample  = iSample;
-              entry.iOscChan = iOscChan;
-              entry.iSyst    = iSyst;
-              entry.iMode    = iMode;
-              entry.iVar = {iVar1, iVar2, iVar3};
-              IndexVect.push_back(entry);
-              IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, std::vector<int>{iVar1, iVar2, iVar3})] = static_cast<int>(IndexVect.size() - 1);
-            }
-          }
+        const int nDims = static_cast<int>(SplineBinning[iSample][iOscChan].size());
+        std::vector<int> nBins(nDims);
+        for (int iDim = 0; iDim < nDims; ++iDim) {
+          nBins[iDim] = SplineBinning[iSample][iOscChan][iDim]->GetNbins();
         }
-      }
-    }
-  }
+        // Current bin index for each dimension, e.g. {0,0,0} for a 3D spline.
+        std::vector<int> iVar(nDims, 0);
+        // Loop over every possible combination of kinematic bins.
+        while (true)
+        {
+          SplineIndex entry;
+          entry.value    = -1;
+          entry.iSample  = iSample;
+          entry.iOscChan = iOscChan;
+          entry.iSyst    = iSyst;
+          entry.iMode    = iMode;
+          entry.iVar     = iVar;
+
+          IndexVect.push_back(entry);
+          IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar)] = static_cast<int>(IndexVect.size() - 1);
+
+          int iDim = nDims - 1;
+          while (iDim >= 0 && ++iVar[iDim] == nBins[iDim]) {
+            iVar[iDim] = 0;
+            --iDim;
+          }
+
+          if (iDim < 0)
+            break;
+        } // Over kinematic variables
+      } // Over modes
+    } // Over systs
+  } // Over channels
 }
 
 //****************************************

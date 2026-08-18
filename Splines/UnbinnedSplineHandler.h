@@ -125,10 +125,10 @@ class UnbinnedSplineHandler : public SplineBase {
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SplineMonoStruct* cpu_spline_handler;
+    SplineMonoStruct* cpu_monolith;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SplineMonolithGPU* gpu_spline_handler;
+    SplineMonolithGPU* gpu_monolith;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;
