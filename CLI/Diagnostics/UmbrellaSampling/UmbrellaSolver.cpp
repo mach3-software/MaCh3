@@ -94,7 +94,6 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
         config.windows.push_back(window);
       }
     }
-
   } catch (const YAML::Exception &e) {
     MACH3LOG_ERROR("Error parsing YAML file {}: {}", filename, e.what());
     throw MaCh3Exception(__FILE__, __LINE__);
