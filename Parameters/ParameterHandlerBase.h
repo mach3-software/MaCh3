@@ -366,10 +366,10 @@ class ParameterHandlerBase {
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
-  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
-  /// @param index parameter index you want to flip
-  /// @param FlipPoint Value around which flipping is done
-  void FlipParameterValue(const int index, const double FlipPoint);
+
+  /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
+  /// @param group Name of the flip group
+  void FlipParameterGroup(std::string group);
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -461,10 +461,17 @@ class ParameterHandlerBase {
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  /// Indices of parameters with flip symmetry
-  std::vector<int>    FlipParameterIndex;
-  /// Central points around which parameters are flipped
-  std::vector<double> FlipParameterPoint;
+  /// @brief Struct to hold information about a group of parameters that flip together at the same time
+  struct FlipGroup {
+    /// Indices of parameters with flip symmetry
+    std::vector<int> FlipParameterIndex;  
+    /// Central points around which parameters are flipped
+    std::vector<double> FlipParameterPoint; 
+  };
+
+  /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
+  std::map<std::string, FlipGroup> FlipGroups;
+
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
