@@ -214,7 +214,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
