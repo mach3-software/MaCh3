@@ -46,7 +46,7 @@ set_target_properties(Fitters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Fitters)
 
-target_link_libraries(Fitters PUBLIC Samples)
+target_link_libraries(Fitters PUBLIC Samples ROOT::ROOTDataFrame)
 target_link_libraries(Fitters PRIVATE MaCh3Warnings)
 
 target_include_directories(Fitters PUBLIC
