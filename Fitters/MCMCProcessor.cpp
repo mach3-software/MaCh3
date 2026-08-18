@@ -196,10 +196,16 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 void MCMCProcessor::MakeOutputFile() {
 // ***************
   //KS: ROOT hates me... but we can create several instances of MCMC Processor, each with own TCanvas ROOT is mad and will delete if there is more than one canvas with the same name, so we add random number to avoid issue
+  // KS: Update, now we also check if such canvas already exist, hence while/do loop
   auto rand = std::make_unique<TRandom3>(0);
-  const int uniform = int(rand->Uniform(0, 10000));
+  std::string name = "";
+  do {
+    const int uniform = int(rand->Uniform(0, 10000));
+    name = "Posterior" + std::to_string(uniform);
+  } while (gROOT->GetListOfCanvases()->FindObject(name.c_str()) != nullptr);
+
   // Open a TCanvas to write the posterior onto
-  Posterior = std::make_unique<TCanvas>(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+  Posterior = std::make_unique<TCanvas>(name.c_str(), name.c_str(), 0, 0, 1024, 1024);
   //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
