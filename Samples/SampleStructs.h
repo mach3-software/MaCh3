@@ -177,14 +177,15 @@ struct KinematicCut {
 
 // ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
+/// @note members are assigned in order code access them, be careful in changing order
 struct BinShiftLookup {
 // ***************************
   /// lower to check if shift has moved the event to different bin
   double lower_binedge = M3::_BAD_DOUBLE_;
-  /// lower to check if shift has moved the event to different bin
-  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_binedge = M3::_BAD_DOUBLE_;
+  /// lower to check if shift has moved the event to different bin
+  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_upper_binedge = M3::_BAD_DOUBLE_;
 };
@@ -256,7 +257,7 @@ struct SampleBinningInfo {
   bool Uniform = true;
   /// Bins used only for non-uniform
   std::vector<BinInfo> Bins;
-  /// This grid tells what bins are associated with with what BinEdges of Grid Binnins
+  /// This grid tells what bins are associated with with what BinEdges of Grid Binnings
   std::vector<std::vector<int>> BinGridMapping;
 
   /// @brief Initialise Uniform Binning
