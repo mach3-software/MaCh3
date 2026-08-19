@@ -537,7 +537,6 @@ bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, 
   return M3::CaseInsensitiveMatchAny(ParamName, SkipVector);
 }
 
-
 // *************************
 void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
                                        double& lower, double& upper, const int n_points, const std::string& suffix) const {
@@ -561,7 +560,7 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
   if (std::abs(CentralValue - prior) > 1e-10) {
-    MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
+    MACH3LOG_INFO("For {} scanning around value {:.4f} rather than prior {:.4f}", name, CentralValue, prior);
   }
 
   // Get the covariance matrix and do the +/- nSigma
@@ -1213,9 +1212,9 @@ void FitterBase::RunLLHMap() {
 
   // TN: Waiting for C++ 20 std::format() function
   MACH3LOG_INFO("In total, looping over {} points, from {} parameters. Estimates for run time:", TotalPoints, ParamsCovIDs.size());
-  MACH3LOG_INFO("   1 s per point = {} hours", double(TotalPoints)/3600.);
-  MACH3LOG_INFO(" 0.1 s per point = {} hours", double(TotalPoints)/36000.);
-  MACH3LOG_INFO("0.01 s per point = {} hours", double(TotalPoints)/360000.);
+  MACH3LOG_INFO("   1 s per point = {:.4f} hours", double(TotalPoints)/3600.);
+  MACH3LOG_INFO(" 0.1 s per point = {:.4f} hours", double(TotalPoints)/36000.);
+  MACH3LOG_INFO("0.01 s per point = {:.4f} hours", double(TotalPoints)/360000.);
   MACH3LOG_INFO("==================================================================================");
 
   const int countwidth = int(double(TotalPoints)/double(20));

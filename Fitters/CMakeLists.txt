@@ -9,7 +9,6 @@ set(HEADERS
     MCMCProcessor.h
     OscProcessor.h
     RHatCalculator.h
-    SampleSummary.h
     MaCh3Factory.h
     PredictiveThrower.h
     StatisticalUtils.h
@@ -28,7 +27,6 @@ add_library(Fitters SHARED
     MCMCProcessor.cpp
     OscProcessor.cpp
     RHatCalculator.cpp
-    SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
     PredictiveThrower.cpp
@@ -46,7 +44,7 @@ set_target_properties(Fitters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Fitters)
 
-target_link_libraries(Fitters PUBLIC Samples)
+target_link_libraries(Fitters PUBLIC Samples ROOT::ROOTDataFrame)
 target_link_libraries(Fitters PRIVATE MaCh3Warnings)
 
 target_include_directories(Fitters PUBLIC

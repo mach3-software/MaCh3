@@ -34,7 +34,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
     virtual void FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames);
     /// @brief Return the splines which affect a given event
-    std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, const std::vector<double>& VarVals);
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     /// @note now is empty but once we add GPU support it will actually do something
     void SynchroniseMemTransfer() const final {return;}
@@ -138,7 +138,7 @@ class BinnedSplineHandler : public SplineBase {
 
     /// pointer to MaCh3 Mode from which we get spline suffix
     MaCh3Modes* Modes;
-    enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
+    enum TokenOrdering{kSystToken,kModeToken,kVarBinToken};
     /// @brief Extract metadata tokens encoded in a spline name.
     /// allows experiment to have different formats of splines
     virtual std::vector<std::string> GetTokensFromSplineName(const std::string& FullSplineName) = 0;

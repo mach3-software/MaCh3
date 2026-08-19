@@ -4,6 +4,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
 #include "TVirtualFFT.h"
+#include "ROOT/RDataFrame.hxx"
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
@@ -195,9 +196,16 @@ void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 void MCMCProcessor::MakeOutputFile() {
 // ***************
   //KS: ROOT hates me... but we can create several instances of MCMC Processor, each with own TCanvas ROOT is mad and will delete if there is more than one canvas with the same name, so we add random number to avoid issue
-  const int uniform = M3::rand::UniformInt(0, 9999);
+  // KS: Update, now we also check if such canvas already exist, hence while/do loop
+  auto rand = std::make_unique<TRandom3>(0);
+  std::string name = "";
+  do {
+    const int uniform = M3::rand::UniformInt(0, 9999);
+    name = "Posterior" + std::to_string(uniform);
+  } while (gROOT->GetListOfCanvases()->FindObject(name.c_str()) != nullptr);
+
   // Open a TCanvas to write the posterior onto
-  Posterior = std::make_unique<TCanvas>(("Posterior" + std::to_string(uniform)).c_str(), ("Posterior" + std::to_string(uniform)).c_str(), 0, 0, 1024, 1024);
+  Posterior = std::make_unique<TCanvas>(name.c_str(), name.c_str(), 0, 0, 1024, 1024);
   //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
@@ -953,44 +961,73 @@ void MCMCProcessor::MakeViolin() {
   Posterior->SetBottomMargin(BottomMargin);
 }
 
+
 // *********************
 // Make the post-fit covariance matrix in all dimensions
 void MCMCProcessor::MakeCovariance() {
 // *********************
   if (OutputFile == nullptr) MakeOutputFile();
 
-  bool HaveMadeDiagonal = false;
   MACH3LOG_INFO("Making post-fit covariances...");
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
     if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
-      HaveMadeDiagonal = false;
       MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
+      MakePostfit();
       break;
-    } else {
-      HaveMadeDiagonal = true;
     }
   }
 
-  if (HaveMadeDiagonal == false) {
-    MakePostfit();
-  }
+  TStopwatch clock;
+  clock.Start();
 
   TDirectory *PostHistDir = OutputFile->mkdir("Post_2d_hists");
   PostHistDir->cd();
   gStyle->SetPalette(55);
+
+
+  // Define RDataFrame
+  ROOT::RDataFrame df(*Chain);
+
+  // Apply selection once
+  ROOT::RDF::RNode dfToUse = df.Filter(StepCut);
+
+  // Apply reweighting once
+  if (ReweightPosterior)
+  {
+    TString WeightExpression = "1.0";
+    for (const auto &name : ReweightNames) {
+      WeightExpression = "(" + WeightExpression + ")*(" + name + ")";
+    }
+    dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
+  }
+
+  struct CovarianceHistogram {
+    int i, j;
+    TString Title_i, Title_j, DrawMe;
+    ROOT::RDF::RResultPtr<TH2D> Histogram;
+  };
+
+  std::vector<CovarianceHistogram> Histograms;
+
+  // Number of covariance elements
+  const int nCov = nDraw * (nDraw - 1) / 2;
+  Histograms.reserve(nCov);
+
+  MACH3LOG_INFO("Booking {} 2D histograms...", nCov);
+
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < nDraw; ++i)
   {
-    if (i % (nDraw/5) == 0)
-      M3::Utils::PrintProgressBar(i, nDraw);
-
     TString Title_i = "";
     double Prior_i, PriorError;
 
     GetNthParameter(i, Prior_i, PriorError, Title_i);
     
+    double xmin = hpost[i]->GetXaxis()->GetXmin();
+    double xmax = hpost[i]->GetXaxis()->GetXmax();
+
     // Loop over the other parameters to get the correlations
     for (int j = 0; j <= i; ++j) {
       // Skip the diagonal elements which we've already done above
@@ -1009,59 +1046,81 @@ void MCMCProcessor::MakeCovariance() {
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
 
-      OutputFile->cd();
+      TString DrawMe = BranchNames[j] + ":" + BranchNames[i];
+      double ymin = hpost[j]->GetXaxis()->GetXmin();
+      double ymax = hpost[j]->GetXaxis()->GetXmax();
 
-      // The draw which we want to perform
-      TString DrawMe = BranchNames[j]+":"+BranchNames[i];
+      ROOT::RDF::RResultPtr<TH2D> hpost_2D;
 
-      // TH2F to hold the Correlation 
-      auto hpost_2D = new TH2D(DrawMe, DrawMe,
-                      nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
-                      nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
-      hpost_2D->SetMinimum(0);
-      hpost_2D->GetXaxis()->SetTitle(Title_i);
-      hpost_2D->GetYaxis()->SetTitle(Title_j);
-      hpost_2D->GetZaxis()->SetTitle("Steps");
-
-      std::string SelectionStr = StepCut;
-      if (ReweightPosterior) {
-        for (const auto& name : ReweightNames) {
-          SelectionStr = "(" + StepCut + ")*(" + name + ")";
-        }
-      }
-      // The draw command we want, i.e. draw param j vs param i
-      Chain->Project(DrawMe, DrawMe, SelectionStr.c_str());
-      
-      if(ApplySmoothing) hpost_2D->Smooth();
-      // Get the Covariance for these two parameters
-      (*Covariance)(i,j) = hpost_2D->GetCovariance();
-      (*Covariance)(j,i) = (*Covariance)(i,j);
-
-      (*Correlation)(i,j) = hpost_2D->GetCorrelationFactor();
-      (*Correlation)(j,i) = (*Correlation)(i,j);
-
-      if(printToPDF)
+      // Book unweighted histogram
+      if (!ReweightPosterior)
       {
-        //KS: Skip Flux Params
-        if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
-        {
-          if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
-          {
-            Posterior->cd();
-            hpost_2D->Draw("colz");
-            Posterior->SetName(hpost_2D->GetName());
-            Posterior->SetTitle(hpost_2D->GetTitle());
-            Posterior->Print(CanvasName);
-            hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
-          }
-        }
+        hpost_2D = dfToUse.Histo2D({DrawMe.Data(), DrawMe.Data(),
+                                    nBins, xmin, xmax, nBins, ymin, ymax},
+                                    BranchNames[i].Data(), BranchNames[j].Data());
       }
-      // Write it to root file
-      //OutputFile->cd();
-      //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) hpost_2D->Write();
-      delete hpost_2D;
+      else // Book weighted histogram[
+      {
+        hpost_2D = dfToUse.Histo2D({DrawMe.Data(), DrawMe.Data(),
+                        nBins, xmin, xmax, nBins, ymin, ymax},
+                        BranchNames[i].Data(), BranchNames[j].Data(), "MCMC_RDF_WEIGHT");
+      }
+      Histograms.push_back({i, j, Title_i, Title_j, DrawMe, hpost_2D});
     } // End j loop
   } // End i loop
+  MACH3LOG_INFO("Finished booking {} histograms. Now executing RDF event loop...", Histograms.size());
+
+  // The first GetPtr() triggers the RDF event loop.
+  //
+  // Because ALL histograms have already been booked, RDF fills
+  // all of them in the same event loop.
+  if (!Histograms.empty()) {
+    TH2D *dummy = Histograms[0].Histogram.GetPtr();
+    (void)dummy;
+  }
+
+  clock.Stop();
+
+  MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries",
+                clock.RealTime(), nEntries);
+  TStopwatch processingClock;
+  processingClock.Start();
+
+  for (auto &Entry : Histograms)
+  {
+    const int i = Entry.i;
+    const int j = Entry.j;
+
+    TH2D *hpost_2D = Entry.Histogram.GetPtr();
+    hpost_2D->SetMinimum(0);
+    hpost_2D->GetXaxis()->SetTitle(Entry.Title_i);
+    hpost_2D->GetYaxis()->SetTitle(Entry.Title_j);
+    hpost_2D->GetZaxis()->SetTitle("Steps");
+
+    if (ApplySmoothing) hpost_2D->Smooth();
+    // Get the Covariance for these two parameters
+    (*Covariance)(i,j) = hpost_2D->GetCovariance();
+    (*Covariance)(j,i) = (*Covariance)(i,j);
+    (*Correlation)(i,j) = hpost_2D->GetCorrelationFactor();
+    (*Correlation)(j,i) = (*Correlation)(i,j);
+
+    if(printToPDF)
+    {
+      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+      {
+        Posterior->cd();
+        hpost_2D->Draw("colz");
+        Posterior->SetName(hpost_2D->GetName());
+        Posterior->SetTitle(hpost_2D->GetTitle());
+        Posterior->Print(CanvasName);
+        hpost_2D->Write(hpost_2D->GetTitle());
+      }
+    }
+  }
+  processingClock.Stop();
+
+  MACH3LOG_INFO("Processing covariance histograms took {:.2f}s", processingClock.RealTime());
+
   PostHistDir->Close();
   delete PostHistDir;
   OutputFile->cd();
@@ -1198,20 +1257,16 @@ void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
     
   if(!CacheMCMC) CacheSteps();
   
-  bool HaveMadeDiagonal = false;    
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
     if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
-      HaveMadeDiagonal = false;
       MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
+      MakePostfit();
       break;
-    } else {
-      HaveMadeDiagonal = true;
     }
   }
     
-  if (HaveMadeDiagonal == false) MakePostfit();
   TStopwatch clock;
   TDirectory *PostHistDir = nullptr;
   if(!Mute)
