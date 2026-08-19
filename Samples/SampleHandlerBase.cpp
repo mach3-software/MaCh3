@@ -156,7 +156,7 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
     OscInfo.flavourName_Latex = Get<std::string>(osc_channel["LatexName"], __FILE__ , __LINE__);
     OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"], 0, __FILE__,__LINE__);
     OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"], 0, __FILE__,__LINE__);
-    OscInfo.ChannelIndex      = OscChannelCounter;
+    OscInfo.ChannelIndex      = OscChannelCounter++;
 
     for (const auto& Existing : SingleSample.OscChannels) {
       if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
@@ -177,7 +177,6 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
     SingleSample.OscChannels.push_back(std::move(OscInfo));
     SingleSample.mc_files.push_back(MCFileNames);
     SingleSample.spline_files.push_back(SplinePrefix+osc_channel["splinefile"].as<std::string>()+SplineSuffix);
-    OscChannelCounter++;
   }
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleSettings["SelectionCuts"]) {
@@ -985,65 +984,146 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       EqualBinningPerOscChannel = false;
     }
   }
-  // get osc params for sample 0, later we check all have same number
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
-  if (OscParams.empty()) {
-    MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
-    MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
-    throw MaCh3Exception(__FILE__, __LINE__);
+
+  std::vector<const M3::float_t *> OscParams{};
+  for (int iSample = 0; iSample < GetNSamples(); iSample++) {
+    auto sample_osc_pars =
+        ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
+    if (!iSample) {
+      if (sample_osc_pars.empty()) {
+        MACH3LOG_ERROR("OscParams is empty for SampleHandler/Sample {}/{}.",
+                       GetName(), GetSampleName(iSample));
+        MACH3LOG_ERROR(
+            "This indicates an error in your oscillation YAML configuration.");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      OscParams = sample_osc_pars;
+    } else {
+      if (sample_osc_pars.size() != OscParams.size()) {
+        MACH3LOG_ERROR("SampleHandler/Sample {}/{} has {} osc params while "
+                       "Sample {} has {}",
+                       GetName(), GetSampleName(iSample),
+                       sample_osc_pars.size(), 0, GetSampleName(0));
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
   }
 
-  for(int iSample = 1; iSample < GetNSamples(); iSample++) {
-    auto OscParamsCrossCheck = ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
-    if (OscParamsCrossCheck.size() != OscParams.size()) {
-      MACH3LOG_ERROR("Sample {} has {} osc params while sample {} has {}",
-                     GetSampleTitle(iSample), OscParamsCrossCheck.size(), 0, GetSampleTitle(0));
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
-  // Add samples only if we don't use same binning
-  if(!EqualBinningPerOscChannel) {
-    // KS: Start from 1 because sample 0 already added
-    for(int iSample = 1; iSample < GetNSamples(); iSample++) {
-      Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
-    }
-    for(int iSample = 0; iSample < GetNSamples(); iSample++) {
-      for(int iChannel = 0; iChannel < GetNOscChannels(iSample); iChannel++) {
-        std::vector<M3::float_t> EnergyArray;
-        std::vector<M3::float_t> CosineZArray;
+  if (EqualBinningPerOscChannel) {
+    Oscillator = std::make_shared<OscillationHandler>(
+        NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams);
+  } else {
+
+    // aim is to build energy/cosz arrays per oscillation channel so that
+    // NuOscillator can decide on the binning
+    std::vector<std::map<std::pair<int, int>, std::vector<M3::float_t>>>
+        channel_energy_array(GetNSamples()),
+        channel_cosz_array(GetNSamples());
+    for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+      if (MCEvents[iEvent].NominalSample <
+          0) { // skip events marked as sampleless
+        continue;
+      }
+      if (MCEvents[iEvent].NominalSample >= GetNSamples()) {
+        MACH3LOG_ERROR("Encountered Event with NominalSample: {}, but "
+                       "SampleHandler {} only has {} samples.",
+                       MCEvents[iEvent].NominalSample, GetName(),
+                       GetNSamples());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      if (MCEvents[iEvent].isNC) { // skip NC events
+        continue;
+      }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-        for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-          if(MCEvents[iEvent].NominalSample != iSample) continue;
-          // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-          const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
-          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-          if (!MCEvents[iEvent].isNC && Channel == iChannel) {
-            EnergyArray.push_back(M3::float_t(MCEvents[iEvent].enu_true));
-          }
-        }
-        std::sort(EnergyArray.begin(),EnergyArray.end());
+      channel_energy_array[MCEvents[iEvent].NominalSample] // sample
+                          [std::make_pair(MCEvents[iEvent].nupdgUnosc,
+                                          MCEvents[iEvent].nupdg)] // osc chan
+                              .push_back(M3::float_t(
+                                  MCEvents[iEvent].enu_true)); // energy
 
-        //============================================================================
-        //DB Atmospheric only part, can only happen if truecz has been initialised within the experiment specific code
-        if (MCEvents[0].coszenith_true != M3::_BAD_DOUBLE_) {
-          for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-            if(MCEvents[iEvent].NominalSample != iSample) continue;
-            // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-            const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
-            //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-            if (!MCEvents[iEvent].isNC && Channel == iChannel) {
-              CosineZArray.push_back(M3::float_t(MCEvents[iEvent].coszenith_true));
-            }
-          }
-          std::sort(CosineZArray.begin(),CosineZArray.end());
-        }
+      // DB Atmospheric only part, can only happen if truecz has been
+      // initialised within the experiment specific code
+      if (MCEvents[0].coszenith_true != M3::_BAD_DOUBLE_) {
+        channel_cosz_array[MCEvents[iEvent].NominalSample] // sample
+                          [std::make_pair(MCEvents[iEvent].nupdgUnosc,
+                                          MCEvents[iEvent].nupdg)] // osc chan
+                              .push_back(M3::float_t(
+                                  MCEvents[iEvent].coszenith_true)); // cosz
+      }
 #pragma GCC diagnostic pop
-        Oscillator->SetOscillatorBinning(iSample, iChannel, EnergyArray, CosineZArray);
-      } // end loop over channels
-    } // end loop over samples
+    }
+
+    for (int iSample = 0; iSample < GetNSamples(); iSample++) {
+      if (!channel_energy_array[iSample].size()) { // sample had no events
+        continue;
+      }
+
+      // loop through channels and check they were defined in config, or add
+      // them if not
+      for (auto const &[osc_flavs, energies] : channel_energy_array[iSample]) {
+        bool found = false;
+        for (size_t i = 0; i < SampleDetails[iSample].OscChannels.size();
+             ++i) {
+          if (osc_flavs.first ==
+                  SampleDetails[iSample].OscChannels[i].InitPDG &&
+              osc_flavs.second ==
+                  SampleDetails[iSample].OscChannels[i].FinalPDG) {
+            found = true;
+            break;
+          }
+        }
+        if(found){ // already have this channel defined.
+          continue;
+        }
+
+        static const std::map<int, std::pair<std::string, std::string>>
+            spec_defnames = {
+                {12, {"nue", "#nu_{e}"}},
+                {-12, {"nueb", "#bar{#nu}_{e}"}},
+                {14, {"numu", "#nu_{#mu}"}},
+                {-14, {"nuemub", "#bar{#nu}_{#mu}"}},
+                {16, {"nutau", "#nu_{#tau}"}},
+                {-16, {"nutaub", "#bar{#nu}_{#tau}"}},
+            };
+
+        OscChannelInfo oci;
+        oci.InitPDG = osc_flavs.first;
+        oci.FinalPDG = osc_flavs.second;
+        oci.flavourName = fmt::format("{}_x_{}", spec_defnames.at(osc_flavs.first).first,
+                               spec_defnames.at(osc_flavs.second).first);
+        oci.flavourName_Latex =
+            fmt::format("{} #rightarrow {}", spec_defnames.at(osc_flavs.first).second,
+                 spec_defnames.at(osc_flavs.second).second);
+        oci.ChannelIndex = double(SampleDetails[iSample].OscChannels.size());
+
+        SampleDetails[iSample].OscChannels.push_back(oci);
+      }
+
+      // set up oscillator for this sample
+      if (!Oscillator) {
+        Oscillator = std::make_shared<OscillationHandler>(
+            NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams,
+            GetNOscChannels(iSample));
+      } else {
+        Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
+      }
+
+      // set oscillator binning
+      for (auto &[osc_flavs, energies] : channel_energy_array[iSample]) {
+        auto iChannel = GetOscChannel(SampleDetails[iSample].OscChannels,
+                                      osc_flavs.first, osc_flavs.second);
+
+        std::sort(energies.begin(), energies.end());
+        std::sort(channel_cosz_array[iSample][osc_flavs].begin(),
+                  channel_cosz_array[iSample][osc_flavs].end());
+        Oscillator->SetOscillatorBinning(
+            iSample, iChannel, energies,
+            channel_cosz_array[iSample][osc_flavs]);
+      }
+    }
   }
 }
 
