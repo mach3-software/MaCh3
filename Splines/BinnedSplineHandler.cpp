@@ -549,10 +549,10 @@ void BinnedSplineHandler::PrepForReweight() {
     if (FoundNonFlatSpline) {
       UniqueSystNames.push_back(SystName);
     } else {
-      MACH3LOG_INFO("{} syst has no response in sample {}", SystName, entry.iSample);
-      MACH3LOG_INFO("Whilst this isn't necessarily a problem, it seems odd");
+      MACH3LOG_DEBUG("{} syst has no response in sample {}", SystName, entry.iSample);
+      MACH3LOG_DEBUG("Whilst this isn't necessarily a problem, it seems odd");
     }
-  }  // end loop over indices
+  } // end loop over indices
   nParams = static_cast<short int>(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
@@ -635,10 +635,9 @@ void BinnedSplineHandler::GetSplineCoeff_SepMany(int splineindex, M3::float_t* &
   splinevec_Monolith[splineindex] = nullptr;
 }
 
-
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const {
 //****************************************
   for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
     if (SampleTitle == SampleTitles[iSample]) {
@@ -717,8 +716,7 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 
 //****************************************
 std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
-                                                              int iOscChan, int EventMode, double Var1Val,
-                                                              double Var2Val, double Var3Val) {
+                                                              int iOscChan, int EventMode, const std::vector<double>& VarVals) {
 //****************************************
   std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
@@ -736,9 +734,8 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
   }
 
   std::vector<int> var_bins;
-  std::vector<double> vars = {Var1Val, Var2Val, Var3Val};
-  for (size_t i = 0; i < vars.size(); ++i) {
-    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(vars[i]) - 1;
+  for (size_t i = 0; i < VarVals.size(); ++i) {
+    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(VarVals[i]) - 1;
     if (bin < 0 || bin >= SplineBinning[SampleIndex][iOscChan][i]->GetNbins()) {
       return ReturnVec;
     }
@@ -846,18 +843,15 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       SplineFileNames.insert(FullSplineName);
 
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
-
-      if (Tokens.size() != kNTokens) {
-        MACH3LOG_ERROR("Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()", static_cast<int>(kNTokens));
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
       
       TString Syst = Tokens[kSystToken];
       TString Mode = Tokens[kModeToken];
-      int Var1Bin = std::stoi(Tokens[kVar1BinToken]);
-      int Var2Bin = std::stoi(Tokens[kVar2BinToken]);
-      int Var3Bin = std::stoi(Tokens[kVar3BinToken]);
-      std::vector<int> VarBins = {Var1Bin, Var2Bin, Var3Bin};
+      std::vector<int> VarBins;
+      VarBins.reserve(Tokens.size() - kVarBinToken);
+      for (std::size_t i = kVarBinToken; i < Tokens.size(); ++i) {
+        VarBins.push_back(std::stoi(Tokens.at(i)));
+      }
+
       int SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
         if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
@@ -881,8 +875,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       }
 
       if (ModeNum == -1) {
-      //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
-      //     Therefore include as debug warning and continue instead
+        //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+        //     Therefore include as debug warning and continue instead
         MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
         continue;
       }
