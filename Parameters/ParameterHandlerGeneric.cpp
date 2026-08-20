@@ -567,6 +567,7 @@ OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAM
 // ********************************************
   OscillationParameter OscParamInfo;
   GetBaseParameter(param, Index, OscParamInfo);
+  OscParamInfo.NuOscName = Get<std::string>(param["NuOscName"], __FILE__ , __LINE__);
 
   return OscParamInfo;
 }
@@ -583,6 +584,13 @@ const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalPar
 const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
   return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Osc parameters for the relevant SampleName
+const std::vector<OscillationParameter> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kOsc], OscParams, SampleName);
 }
 
 // ********************************************
@@ -847,15 +855,22 @@ void ParameterHandlerGeneric::PrintOscillationParams() const {
 // ********************************************
   MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:40}│", "#", "Global #", "Name", "NuOscName");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────────────────────────┤");
+
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
     auto &OscIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│{3:40}│",
+                  std::to_string(OscIndex),
+                  GlobalIndex,
+                  GetParFancyName(GlobalIndex),
+                  OscParams[OscIndex].NuOscName);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────────────────────────┘");
 }
 
 // ********************************************
@@ -1020,20 +1035,6 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
     if(IsParFromGroup(i, Group)) Counter++;
   }
   return Counter;
-}
-
-// ********************************************
-// DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
-// ********************************************
-  std::vector<const M3::float_t*> returnVec;
-  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
-    const auto& globalIndex = pair.second;
-    if (AppliesToSample(globalIndex, SampleName)) {
-      returnVec.push_back(RetPointer(globalIndex));
-    }
-  }
-  return returnVec;
 }
 
 // ********************************************

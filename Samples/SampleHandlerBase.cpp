@@ -986,11 +986,18 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     }
   }
   // get osc params for sample 0, later we check all have same number
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
+  auto OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<const M3::float_t*> OscParamsValues(OscParams.size());
+  std::vector<std::string> NuOscName(OscParams.size());
+  for(size_t ij = 0; ij < OscParams.size(); ij++){
+    OscParamsValues[ij] = ParHandler->RetPointer(OscParams[ij].index);
+    NuOscName[ij] = OscParams[ij].NuOscName;
   }
 
   for(int iSample = 1; iSample < GetNSamples(); iSample++) {
@@ -1001,7 +1008,8 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParamsValues,
+                                                    NuOscName, GetNOscChannels(0));
   // Add samples only if we don't use same binning
   if(!EqualBinningPerOscChannel) {
     // KS: Start from 1 because sample 0 already added
