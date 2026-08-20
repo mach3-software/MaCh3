@@ -74,6 +74,26 @@ void StyleManager::setTH1Style(TH1 *hist, const std::string& styleName) const {
   hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1, __FILE__, __LINE__));
 }
 
+void StyleManager::setTH1XRange(TH1 *hist) const {
+  YAML::Node ranges = _styleConfig["HistogramRange"];
+  if (!ranges) {
+    return;
+  }
+  const auto name = hist->GetXaxis()->GetTitle();
+  YAML::Node rangeNode = ranges[name];
+  if (!rangeNode) {
+    return;
+  }
+
+  auto range = Get<std::vector<double>>(rangeNode, __FILE__, __LINE__);
+  if (range.size() != 2) {
+    return;
+  }
+
+  MACH3LOG_TRACE("Setting range for kinem: {} with range: [{}, {}]", name, range[0], range[1]);
+  hist->GetXaxis()->SetRangeUser(range[0], range[1]);
+}
+
 double StyleManager::getBinWidthScale(const std::string &Name) const {
   constexpr const double DefaultScalingFactor = 10;
   if(!_styleConfig["BinWidthScaleFactor"]) return DefaultScalingFactor;

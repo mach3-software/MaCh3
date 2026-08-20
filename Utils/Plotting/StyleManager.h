@@ -79,6 +79,9 @@ public:
   /// @param styleName The name of the style you want to use, as it appears in the config file
   void setTH1Style(TH1 *hist, const std::string& styleName) const;
 
+  /// @brief Set plotting range for histogram
+  /// @param hist The TH1 that you wish to modify
+  void setTH1XRange(TH1 *hist) const;
 private:
   YAML::Node _styleConfig;
 

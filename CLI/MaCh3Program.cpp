@@ -64,7 +64,6 @@ namespace M3{
                 std::cout << "Installed zsh completions → " << path << "\n";
             return;
         }
-
     }
                 
     void MaCh3Program::completions(const std::string& prefix) const{
@@ -162,7 +161,6 @@ namespace M3{
     ///
     /// @return Exit code from the executed module (0 on success)
     int MaCh3Program::Run(){
-        
         const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
         
         if (sub_parser){

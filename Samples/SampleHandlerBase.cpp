@@ -1161,10 +1161,10 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
   std::vector< SplineIndex > EventSplines;
   switch(GetNDim(SampleIndex)) {
     case 1:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), 0.);
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), 0.});
       break;
     case 2:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
     default:
       if(ThrowCrititcal) {
@@ -1172,7 +1172,7 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
         MACH3LOG_CRITICAL("Will use 2D like approach");
         ThrowCrititcal = false;
       }
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
   }
   return EventSplines;

@@ -316,27 +316,39 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
       int nModesInSyst = static_cast<int>(SplineModeVecs[iSample][iSyst].size());
       for (int iMode = 0; iMode < nModesInSyst; ++iMode)
       {
-        const int nBins1 = SplineBinning[iSample][iOscChan][0]->GetNbins();
-        const int nBins2 = SplineBinning[iSample][iOscChan][1]->GetNbins();
-        const int nBins3 = SplineBinning[iSample][iOscChan][2]->GetNbins();
-        for (int iVar1 = 0; iVar1 < nBins1; ++iVar1) {
-          for (int iVar2 = 0; iVar2 < nBins2; ++iVar2) {
-            for (int iVar3 = 0; iVar3 < nBins3; ++iVar3) {
-              SplineIndex entry;
-              entry.value    = -1;
-              entry.iSample  = iSample;
-              entry.iOscChan = iOscChan;
-              entry.iSyst    = iSyst;
-              entry.iMode    = iMode;
-              entry.iVar = {iVar1, iVar2, iVar3};
-              IndexVect.push_back(entry);
-              IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, std::vector<int>{iVar1, iVar2, iVar3})] = static_cast<int>(IndexVect.size() - 1);
-            }
-          }
+        const int nDims = static_cast<int>(SplineBinning[iSample][iOscChan].size());
+        std::vector<int> nBins(nDims);
+        for (int iDim = 0; iDim < nDims; ++iDim) {
+          nBins[iDim] = SplineBinning[iSample][iOscChan][iDim]->GetNbins();
         }
-      }
-    }
-  }
+        // Current bin index for each dimension, e.g. {0,0,0} for a 3D spline.
+        std::vector<int> iVar(nDims, 0);
+        // Loop over every possible combination of kinematic bins.
+        while (true)
+        {
+          SplineIndex entry;
+          entry.value    = -1;
+          entry.iSample  = iSample;
+          entry.iOscChan = iOscChan;
+          entry.iSyst    = iSyst;
+          entry.iMode    = iMode;
+          entry.iVar     = iVar;
+
+          IndexVect.push_back(entry);
+          IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar)] = static_cast<int>(IndexVect.size() - 1);
+
+          int iDim = nDims - 1;
+          while (iDim >= 0 && ++iVar[iDim] == nBins[iDim]) {
+            iVar[iDim] = 0;
+            --iDim;
+          }
+
+          if (iDim < 0)
+            break;
+        } // Over kinematic variables
+      } // Over modes
+    } // Over systs
+  } // Over channels
 }
 
 //****************************************
@@ -537,10 +549,10 @@ void BinnedSplineHandler::PrepForReweight() {
     if (FoundNonFlatSpline) {
       UniqueSystNames.push_back(SystName);
     } else {
-      MACH3LOG_INFO("{} syst has no response in sample {}", SystName, entry.iSample);
-      MACH3LOG_INFO("Whilst this isn't necessarily a problem, it seems odd");
+      MACH3LOG_DEBUG("{} syst has no response in sample {}", SystName, entry.iSample);
+      MACH3LOG_DEBUG("Whilst this isn't necessarily a problem, it seems odd");
     }
-  }  // end loop over indices
+  } // end loop over indices
   nParams = static_cast<short int>(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
@@ -623,10 +635,9 @@ void BinnedSplineHandler::GetSplineCoeff_SepMany(int splineindex, M3::float_t* &
   splinevec_Monolith[splineindex] = nullptr;
 }
 
-
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const {
 //****************************************
   for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
     if (SampleTitle == SampleTitles[iSample]) {
@@ -705,8 +716,7 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 
 //****************************************
 std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
-                                                              int iOscChan, int EventMode, double Var1Val,
-                                                              double Var2Val, double Var3Val) {
+                                                              int iOscChan, int EventMode, const std::vector<double>& VarVals) {
 //****************************************
   std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
@@ -724,9 +734,8 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
   }
 
   std::vector<int> var_bins;
-  std::vector<double> vars = {Var1Val, Var2Val, Var3Val};
-  for (size_t i = 0; i < vars.size(); ++i) {
-    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(vars[i]) - 1;
+  for (size_t i = 0; i < VarVals.size(); ++i) {
+    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(VarVals[i]) - 1;
     if (bin < 0 || bin >= SplineBinning[SampleIndex][iOscChan][i]->GetNbins()) {
       return ReturnVec;
     }
@@ -834,18 +843,15 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       SplineFileNames.insert(FullSplineName);
 
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
-
-      if (Tokens.size() != kNTokens) {
-        MACH3LOG_ERROR("Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()", static_cast<int>(kNTokens));
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
       
       TString Syst = Tokens[kSystToken];
       TString Mode = Tokens[kModeToken];
-      int Var1Bin = std::stoi(Tokens[kVar1BinToken]);
-      int Var2Bin = std::stoi(Tokens[kVar2BinToken]);
-      int Var3Bin = std::stoi(Tokens[kVar3BinToken]);
-      std::vector<int> VarBins = {Var1Bin, Var2Bin, Var3Bin};
+      std::vector<int> VarBins;
+      VarBins.reserve(Tokens.size() - kVarBinToken);
+      for (std::size_t i = kVarBinToken; i < Tokens.size(); ++i) {
+        VarBins.push_back(std::stoi(Tokens.at(i)));
+      }
+
       int SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
         if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
@@ -869,8 +875,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       }
 
       if (ModeNum == -1) {
-      //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
-      //     Therefore include as debug warning and continue instead
+        //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+        //     Therefore include as debug warning and continue instead
         MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
         continue;
       }
