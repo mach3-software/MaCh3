@@ -13,7 +13,7 @@ jobs:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
+          #"ghcr.io/mach3-software/mach3:rocky9cudalatest"
         ]
     container:
       image: ${{ matrix.container }}
@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake ../ -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DOscProb_ENABLED=ON
           make
 
       - name: Perform CodeQL Analysis
