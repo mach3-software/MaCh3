@@ -366,10 +366,17 @@ class ParameterHandlerBase {
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
+
+    struct FunctionalFlipProposal;
+
   /// @brief KS: Flip parameter around given value, for example mass ordering around 0
   /// @param index parameter index you want to flip
   /// @param FlipPoint Value around which flipping is done
   void FlipParameterValue(const int index, const double FlipPoint);
+
+  /// @brief Evaluate a formula-driven flip for a target parameter.
+  /// @param flip Functional flip configuration.
+    void FlipParameterValue(const FunctionalFlipProposal& flip);
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -378,9 +385,29 @@ class ParameterHandlerBase {
   /// @brief Enable special proposal
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
 
+  /// @brief Parse and register a functional flip defined in YAML.
+  void AddFunctionalFlip(const YAML::Node& param, const int index);
+
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
   void SpecialStepProposal();
+
+  /// @brief Configuration for a formula-based functional flip.
+  struct FunctionalFlipProposal {
+    int target_index = M3::_BAD_INT_;
+    std::vector<int> argument_indices;
+    std::vector<std::string> argument_names;
+    std::string formula;
+    double probability = 0.5;
+    std::unique_ptr<TF1> evaluator;
+
+    FunctionalFlipProposal() = default;
+    FunctionalFlipProposal(FunctionalFlipProposal&&) noexcept = default;
+    FunctionalFlipProposal& operator=(FunctionalFlipProposal&&) noexcept = default;
+
+    FunctionalFlipProposal(const FunctionalFlipProposal&) = delete;
+    FunctionalFlipProposal& operator=(const FunctionalFlipProposal&) = delete;
+  };
 
   /// Check if any of special step proposal were enabled
   bool doSpecialStepProposal;
@@ -465,6 +492,8 @@ class ParameterHandlerBase {
   std::vector<int>    FlipParameterIndex;
   /// Central points around which parameters are flipped
   std::vector<double> FlipParameterPoint;
+  /// Functional flips which depend on the current proposed state of other parameters.
+  std::vector<FunctionalFlipProposal> FunctionalFlipParameters;
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)

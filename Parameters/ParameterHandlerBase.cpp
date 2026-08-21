@@ -119,6 +119,7 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   bool CircEnabled = false;
   bool FlipEnabled = false;
+  bool FunctionalFlipEnabled = false;
 
   if (param["CircularBounds"]) {
     CircEnabled = true;
@@ -128,8 +129,17 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     FlipEnabled = true;
   }
 
-  if (!CircEnabled && !FlipEnabled) {
+  if (param["FunctionalFlip"]) {
+    FunctionalFlipEnabled = true;
+  }
+
+  if (!CircEnabled && !FlipEnabled && !FunctionalFlipEnabled) {
     MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (FlipEnabled && FunctionalFlipEnabled) {
+    MACH3LOG_ERROR("Parameter {} enables both FlipParameter and FunctionalFlip; choose exactly one flip type", GetParFancyName(Index));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
@@ -165,6 +175,10 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
                   FlipParameterPoint.back());
   }
 
+  if (FunctionalFlipEnabled) {
+    AddFunctionalFlip(param["FunctionalFlip"], Index);
+  }
+
   if (CircEnabled && FlipEnabled) {
     if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
@@ -187,6 +201,61 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
+}
+
+// ********************************************
+void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int index) {
+// ********************************************
+  if (!param["Formula"]) {
+    MACH3LOG_ERROR("FunctionalFlip for parameter {} is missing Formula", GetParFancyName(index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if (!param["Parameters"]) {
+    MACH3LOG_ERROR("FunctionalFlip for parameter {} is missing Parameters list", GetParFancyName(index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  FunctionalFlipProposal flip;
+  flip.target_index = index;
+  flip.formula = Get<std::string>(param["Formula"], __FILE__, __LINE__);
+  flip.argument_names = Get<std::vector<std::string>>(param["Parameters"], __FILE__, __LINE__);
+  flip.probability = GetFromManager<double>(param["Probability"], 0.5, __FILE__, __LINE__);
+
+  if (flip.probability < 0.0 || flip.probability > 1.0) {
+    MACH3LOG_ERROR("FunctionalFlip probability for parameter {} must be in [0, 1], got {}",
+                   GetParFancyName(index), flip.probability);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  for (const auto& name : flip.argument_names) {
+    const int argument_index = GetParIndex(name);
+    if (argument_index == M3::_BAD_INT_) {
+      MACH3LOG_ERROR("FunctionalFlip for parameter {} refers to unknown parameter {}", 
+                      GetParFancyName(index), name);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    flip.argument_indices.push_back(argument_index);
+  }
+
+  const std::string flip_name = fmt::format("{}_functional_flip_{}", matrixName, FunctionalFlipParameters.size());
+  flip.evaluator = std::make_unique<TF1>(flip_name.c_str(), flip.formula.c_str(), 0.0, 1.0);
+
+  if (!flip.evaluator || flip.evaluator->IsZombie()) {
+    MACH3LOG_ERROR("Failed to parse FunctionalFlip formula for parameter {}: {}",
+                   GetParFancyName(index), flip.formula);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (flip.evaluator->GetNpar() != static_cast<int>(flip.argument_names.size())) {
+    MACH3LOG_ERROR("FunctionalFlip formula for parameter {} expects {} auxiliary parameters, but {} names were provided",
+                   GetParFancyName(index), flip.evaluator->GetNpar(), flip.argument_names.size());
+    MACH3LOG_ERROR("Use x for the target parameter and [0], [1], ... for the listed Parameters entries");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  MACH3LOG_INFO("Enabling FunctionalFlip for parameter {} with formula '{}'",
+                GetParFancyName(index), flip.formula);
+  FunctionalFlipParameters.push_back(std::move(flip));
 }
 
 // ********************************************
@@ -427,6 +496,13 @@ void ParameterHandlerBase::SpecialStepProposal() {
       CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
+  // Functional flips need to see the post-circular, pre-simple-flip state.
+  for (const auto& flip : FunctionalFlipParameters) {
+    if (!IsParameterFixed(flip.target_index)) {
+      FlipParameterValue(flip);
+    }
+  }
+
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
   for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
     const int index = FlipParameterIndex[i];
@@ -538,6 +614,23 @@ void ParameterHandlerBase::FlipParameterValue(const int index, const double Flip
   if(random_number[0]->Uniform() < 0.5) {
     _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
   }
+}
+
+// *************************************
+void ParameterHandlerBase::FlipParameterValue(const ParameterHandlerBase::FunctionalFlipProposal& flip) {
+// *************************************
+  if (random_number[0]->Uniform() >= flip.probability) {
+    return;
+  }
+
+  std::vector<double> parameter_values(flip.argument_indices.size(), 0.0);
+  for (size_t i = 0; i < flip.argument_indices.size(); ++i) {
+    parameter_values[i] = _fPropVal[flip.argument_indices[i]];
+  }
+
+  const double target_value = _fPropVal[flip.target_index];
+  const double flipped_value = flip.evaluator->EvalPar(&target_value, parameter_values.data());
+  _fPropVal[flip.target_index] = static_cast<M3::float_t>(flipped_value);
 }
 #pragma GCC diagnostic pop
 // ********************************************
@@ -971,6 +1064,16 @@ void ParameterHandlerBase::SanitizeAdaption() const {
       MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
       MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
       MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  for (const auto& flip : FunctionalFlipParameters) {
+    if (!param_skip_adapt_flags[flip.target_index]) {
+      MACH3LOG_ERROR("You enabled adaption for parameter which has enabled functional flipping ({})",
+                     _fFancyNames[flip.target_index]);
+      MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config",
+                     _fFancyNames[flip.target_index]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
