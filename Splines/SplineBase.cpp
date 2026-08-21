@@ -15,6 +15,7 @@ SplineBase::SplineBase() {
   gpu_monolith = nullptr;
   #endif
 
+  NSplines_valid = 0;
   nParams = 0;
   _max_knots = 0;
   SplineSegments = nullptr;

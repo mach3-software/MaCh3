@@ -325,8 +325,8 @@ __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Unbinned(
 __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Binned(
   M3::float_t *manycoeff_arr,
   M3::float_t *xcoeff_arr,
-  std::vector<short int> uniquesplinevec_Monolith,
-  std::vector<unsigned int> coeffindexvec,
+  const std::vector<short int>& uniquesplinevec_Monolith,
+  const std::vector<unsigned int>& coeffindexvec,
 
   const int n_params,
   const unsigned int n_splines,
@@ -625,7 +625,8 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
   // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
   cudaMemcpy(cpu_tmp_weights.data(), gpu_weights, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
   CudaCheckError();
-  // KS: we need to performa conversion from float (this is what GPU uses) to M3::float_t
+  // KS: we need to perform conversion from float (this is what GPU uses) to M3::float_t
+  /// @todo add maybe some ifdef to avoid doing this when we actually have float
   for (unsigned int i = 0; i < cpu_n_splines; ++i) {
     cpu_spline_weights[i] = static_cast<M3::float_t>(cpu_tmp_weights[i]);
   }

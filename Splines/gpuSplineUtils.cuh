@@ -136,8 +136,8 @@ class SplineMonolithGPU
     __host__ void CopyToGPU_SplineMonolith_Binned(
       M3::float_t *manycoeff_arr,
       M3::float_t *xcoeff_arr,
-      std::vector<short int> uniquesplinevec_Monolith,
-      std::vector<unsigned int> coeffindexvec,
+      const std::vector<short int>& uniquesplinevec_Monolith,
+      const std::vector<unsigned int>& coeffindexvec,
 
       const int n_params,
       const unsigned int n_splines,

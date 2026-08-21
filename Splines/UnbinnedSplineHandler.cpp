@@ -15,8 +15,6 @@ void UnbinnedSplineHandler::Initialise() {
   nKnots = 0;
   nTF1coeff = 0;
   NEvents = 0;
-
-  NSplines_valid = 0;
   NTF1_valid = 0;
 
   cpu_weights_spline_var = nullptr;
@@ -718,7 +716,7 @@ void UnbinnedSplineHandler::CalcSplineWeights() {
       const short int segment_X = short(Param*_max_knots+segment);
 
       //KS: Find knot position in out monolithical structure
-      const unsigned int CurrentKnotPos = cpu_monolith->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
+      const unsigned int CurrentKnotPos = (cpu_monolith->nKnots_arr[splineNum] + segment) * _nCoeff_;
 
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith

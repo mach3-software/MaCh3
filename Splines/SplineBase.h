@@ -86,6 +86,8 @@ class SplineBase {
     short int nParams;
     /// Max knots for production
     short int _max_knots;
+    /// Number of valid splines
+    unsigned int NSplines_valid;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonolithGPU* gpu_monolith;

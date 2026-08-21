@@ -92,8 +92,6 @@ class UnbinnedSplineHandler : public SplineBase {
     /// Number of events
     unsigned int NEvents;
 
-    /// Number of valid splines
-    unsigned int NSplines_valid;
     /// Number of valid TF1
     unsigned int NTF1_valid;
 
