@@ -22,7 +22,7 @@ class UnbinnedSplineHandler : public SplineBase {
     /// @brief Destructor for UnbinnedSplineHandler class.
     virtual ~UnbinnedSplineHandler();
 
-    /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
+    /// @copydoc SplineBase::Evaluate
     void Evaluate() final;
 
     /// @brief Get class name
@@ -39,10 +39,9 @@ class UnbinnedSplineHandler : public SplineBase {
       for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
-    /// @brief KS: Prepare spline file that can be used for fast loading
+    /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    /// @copydoc SplineBase::LoadSplineFile
     void LoadSplineFile(std::string FileName) final;
   private:
     /// @brief KS: Set everything to null etc.
@@ -84,7 +83,7 @@ class UnbinnedSplineHandler : public SplineBase {
     /// @param manyArray Array holding coefficients for each knot
     void GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray) const;
 
-    /// @brief CPU based code which eval weight for each spline
+    /// @copydoc SplineBase::CalcSplineWeights
     void CalcSplineWeights() final;
     /// @brief Calc total event weight
     void CalcTotalEventWeight();

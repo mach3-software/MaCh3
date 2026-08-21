@@ -56,6 +56,33 @@ class SplineBase {
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     void FindSplineSegment();
     /// @brief CPU based code which eval weight for each spline
+    ///
+    /// @details
+    ///
+    /// Splines are stored using a flat monolithic structure.
+    /// The monolith is organised as follows:
+    /// @code
+    ///   Spline 0
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///
+    ///   Spline 1
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///
+    ///   Spline 2
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///     ...
+    /// @endcode
+    ///
+    /// Once coefficient are grabbed we calculate weight using:
+    /// @code
+    /// weight = Y + B*dx + C*dx^2 + D*dx^3;
+    /// @endcode
     virtual void CalcSplineWeights() = 0;
 
     /// @brief KS: Prepare Fast Spline Info within SplineFile

@@ -382,16 +382,11 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle) {
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName,
+                                                            const std::string& SampleTitle) {
 //****************************************
   int iSample = GetSampleIndex(SampleTitle);
-
-  //Try declaring these outside of TFile so they aren't owned by File
-  constexpr int nDummyBins = 1;
-  constexpr double DummyEdges[2] = {-1e15, 1e15};
-  TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
-  TH2F* Hist2D = nullptr;
-  TH3F* Hist3D = nullptr;
+  TH1* Axis_Hist = nullptr;
 
   auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
@@ -436,39 +431,29 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
       MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    Hist2D = File->Get<TH2F>(TemplateName.c_str());
+    Axis_Hist = File->Get<TH2F>(TemplateName.c_str());
   }
 
   if (isHist3D)
   {
-    Hist3D = File->Get<TH3F>((TemplateName.c_str()));
-    if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
+    Axis_Hist = File->Get<TH3F>((TemplateName.c_str()));
+    if (Dimensions[iSample] != 3 && Axis_Hist->GetZaxis()->GetNbins() != 1)
     {
       MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
+  /// @todo KS: we should remove this hardcoding in future.
+  std::vector<TAxis*> ReturnVec(3);
+  ReturnVec[0] = static_cast<TAxis*>(Axis_Hist->GetXaxis()->Clone());
+  ReturnVec[1] = static_cast<TAxis*>(Axis_Hist->GetYaxis()->Clone());
 
-  std::vector<TAxis*> ReturnVec;
-  // KS: Resize to reduce impact of push back and memory fragmentation
-  ReturnVec.resize(3);
-  if (Dimensions[iSample] == 2) {
-    if (isHist2D) {
-      ReturnVec[0] = static_cast<TAxis*>(Hist2D->GetXaxis()->Clone());
-      ReturnVec[1] = static_cast<TAxis*>(Hist2D->GetYaxis()->Clone());
-      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
-    } else if (isHist3D) {
-      ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
-      ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
-      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
-    }
-  } else if (Dimensions[iSample] == 3) {
-    ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
-    ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
-    ReturnVec[2] = static_cast<TAxis*>(Hist3D->GetZaxis()->Clone());
+  if (Dimensions[iSample] == 3) {
+    ReturnVec[2] = static_cast<TAxis*>(Axis_Hist->GetZaxis()->Clone());
   } else {
-    MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
-    throw MaCh3Exception(__FILE__, __LINE__);
+    // creating dummy binning
+    constexpr double DummyEdges[2] = {-1e15, 1e15};
+    ReturnVec[2] = new TAxis(1, DummyEdges);
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis) {
@@ -476,8 +461,6 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
   }
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
-  delete DummyAxis;
-
   return ReturnVec;
 }
 

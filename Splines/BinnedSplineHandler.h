@@ -15,9 +15,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Destructor
     virtual ~BinnedSplineHandler();
 
-    /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
-    /// to store the weights; probably the best one here! Same thing but pass parameter
-    /// spline segments instead of variations
+    /// @copydoc SplineBase::Evaluate
     void Evaluate() final;
 
     /// @brief add oscillation channel to spline monolith
@@ -40,14 +38,13 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* RetPointer(const SplineIndex& Variables) const;
-    /// @brief KS: Prepare spline file that can be used for fast loading
+    /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    /// @copydoc SplineBase::LoadSplineFile
     void LoadSplineFile(std::string FileName) final;
 
   protected:
-    /// @brief CPU based code which eval weight for each spline
+    /// @copydoc SplineBase::CalcSplineWeights
     void CalcSplineWeights() final;
     /// @brief Initialise flat structure
     void PrepForReweight();
