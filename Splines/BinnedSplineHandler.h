@@ -35,9 +35,6 @@ class BinnedSplineHandler : public SplineBase {
     virtual void FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames);
     /// @brief Return the splines which affect a given event
     std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, const std::vector<double>& VarVals);
-    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    /// @note now is empty but once we add GPU support it will actually do something
-    void SynchroniseMemTransfer() const final {return;}
     /// @brief Count how many splines we have
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0) const;
 
@@ -113,7 +110,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
     std::map<std::tuple<int, int, int, int, std::vector<int>>, int> IndexVectMap;
     /// Number of coefficients for a single flat (after flattening)
-    std::vector<int > coeffindexvec;
+    std::vector<unsigned int> coeffindexvec;
     /// Unique coefficient indices
     std::vector<int> uniquecoeffindices;
 
@@ -132,9 +129,9 @@ class BinnedSplineHandler : public SplineBase {
     M3::float_t *manycoeff_arr;
 
     /// Stores weight from spline evaluation for each single spline
-    std::vector<M3::float_t> weightvec_Monolith;
+    std::vector<M3::float_t> cpu_spline_weights;
     /// Maps single spline object with single parameter
-    std::vector<int> uniquesplinevec_Monolith;
+    std::vector<short int> uniquesplinevec_Monolith;
 
     /// pointer to MaCh3 Mode from which we get spline suffix
     MaCh3Modes* Modes;
@@ -144,9 +141,10 @@ class BinnedSplineHandler : public SplineBase {
     virtual std::vector<std::string> GetTokensFromSplineName(const std::string& FullSplineName) = 0;
 
   private:
+    /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
+    void MoveToGPU();
     /// @brief This function will find missing splines in file
     void InvestigateMissingSplines() const;
-
     /// @brief KS: Load preprocessed Settings
     /// @param SplineFile File from which we load new tree
     void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);

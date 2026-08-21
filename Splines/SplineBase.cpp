@@ -1,12 +1,22 @@
 #include "Splines/SplineBase.h"
 
+#ifdef MaCh3_CUDA
+#include "Splines/gpuSplineUtils.cuh"
+#endif
+
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *****************************************
 SplineBase::SplineBase() {
 // *****************************************
+  #ifdef MaCh3_CUDA
+  MACH3LOG_INFO("Using GPU version event by event monolith");
+  gpu_monolith = nullptr;
+  #endif
+
   nParams = 0;
+  _max_knots = 0;
   SplineSegments = nullptr;
   ParamValues = nullptr;
 }
@@ -188,4 +198,33 @@ void SplineBase::LoadFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile) {
       SplineInfoArray[i].xPts[k] = xtemp[k];
     }
   }
+}
+
+// *****************************************
+void SplineBase::SetupSegments() {
+// *****************************************
+  //KS: Since we are going to copy it each step use fancy CUDA memory allocation
+  #ifdef MaCh3_CUDA
+  gpu_monolith->InitGPU_Segments(&SplineSegments);
+  gpu_monolith->InitGPU_Vals(&ParamValues);
+  #else
+  SplineSegments = new short int[nParams]();
+  ParamValues = new float[nParams]();
+  #endif
+  //ETA - let this just be set as the first segment by default
+  for (M3::int_t j = 0; j < nParams; j++)
+  {
+    SplineSegments[j] = 0;
+    ParamValues[j] = -999;
+  }
+}
+
+//*********************************************************
+//KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+void SplineBase::SynchroniseMemTransfer() const {
+//*********************************************************
+  #ifdef MaCh3_CUDA
+  SynchroniseSplines();
+  CudaCheckError();
+  #endif
 }

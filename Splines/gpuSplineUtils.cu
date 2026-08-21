@@ -108,8 +108,6 @@ SplineMonolithGPU::~SplineMonolithGPU() {
 // *******************************************
 // Initialiser when using the x array and combined y,b,c,d array
 __host__ void SplineMonolithGPU::InitGPU_SplineMonolith(
-                          M3::float_t **cpu_total_weights,
-                          int n_events,
                           unsigned int total_nknots,
                           unsigned int n_splines,
                           unsigned int n_tf1,
@@ -142,22 +140,6 @@ __host__ void SplineMonolithGPU::InitGPU_SplineMonolith(
   cudaMalloc((void **) &gpu_paramNo_TF1_arr, n_tf1*sizeof(short int));
   CudaCheckError();
 
-  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
-  cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(M3::float_t));
-  CudaCheckError();
-
-  //KS: Allocate memory for the array of total weights to be returned to CPU
-  cudaMalloc((void **) &gpu_total_weights, n_events*sizeof(M3::float_t));
-  CudaCheckError();
-  
-  //KS: Allocate memory for the map keeping track how many splines each parameter has
-  cudaMalloc((void **) &gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
-  CudaCheckError();
-  
-  //KS: Allocate memory for the map keeping track how many TF1 each parameter has
-  cudaMalloc((void **) &gpu_nParamPerEvent_TF1, 2*n_events*sizeof(unsigned int));
-  CudaCheckError();
-
   // Print allocation info to user
   printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n",
          n_splines, static_cast<double>(sizeof(short int) * n_splines + sizeof(unsigned int) * n_splines) / 1.0e6);
@@ -171,6 +153,28 @@ __host__ void SplineMonolithGPU::InitGPU_SplineMonolith(
   //KS: Ask CUDA about memory usage
   checkGpuMem();
   PrintNdevices();
+}
+
+// *******************************************
+__host__ void SplineMonolithGPU::InitGPU_Unbinned_SplineMonolith(
+    M3::float_t **cpu_total_weights,
+    int n_events) {
+// *******************************************
+  //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
+  cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(M3::float_t));
+  CudaCheckError();
+
+  //KS: Allocate memory for the array of total weights to be returned to CPU
+  cudaMalloc((void **) &gpu_total_weights, n_events*sizeof(M3::float_t));
+  CudaCheckError();
+
+  //KS: Allocate memory for the map keeping track how many splines each parameter has
+  cudaMalloc((void **) &gpu_nParamPerEvent, 2*n_events*sizeof(unsigned int));
+  CudaCheckError();
+
+  //KS: Allocate memory for the map keeping track how many TF1 each parameter has
+  cudaMalloc((void **) &gpu_nParamPerEvent_TF1, 2*n_events*sizeof(unsigned int));
+  CudaCheckError();
 }
 
 // *******************************************
@@ -197,7 +201,7 @@ __host__ void SplineMonolithGPU::InitGPU_Vals(float **vals) {
 
 // ******************************************************
 // Copy to GPU for x array and separate ybcd array
-__host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith(
+__host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Unbinned(
                             const SplineMonoStruct* cpu_spline_handler,
 
                             // TFI related now
@@ -313,6 +317,69 @@ __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith(
 
   //Finally create texture object
   cudaCreateTextureObject(&text_nParamPerEvent_TF1, &resDesc_nParamPerEvent_tf1, &texDesc_nParamPerEvent_tf1, nullptr);
+  CudaCheckError();
+}
+
+// ******************************************************
+// Copy to GPU for x array and separate ybcd array
+__host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Binned(
+  M3::float_t *manycoeff_arr,
+  M3::float_t *xcoeff_arr,
+  std::vector<short int> uniquesplinevec_Monolith,
+  std::vector<unsigned int> coeffindexvec,
+
+  const int n_params,
+  const unsigned int n_splines,
+  const short int spline_size,
+  const unsigned int total_nknots) {
+// ******************************************************
+  // Write to the global statics (h_* denotes host stored variable)
+  cpu_n_params  = n_params;
+  // Total number of valid splines for all loaded events
+  cpu_n_splines = n_splines;
+  /// Size of splines living
+  cpu_spline_size = spline_size;
+
+  cpu_tmp_weights.resize(cpu_n_splines);
+  //CW: Allocate memory for the frequently copied objects
+  cudaMalloc(&gpu_par_val, n_params * sizeof(float));
+  cudaMalloc(&gpu_spline_segment, n_params * sizeof(short int));
+
+  // Convert M3::float_t -> float for GPU
+  std::vector<float> coeff_many_float(manycoeff_arr, manycoeff_arr + total_nknots * _nCoeff_);
+  std::vector<float> coeff_x_float(xcoeff_arr, xcoeff_arr + spline_size * n_params);
+
+  // Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies
+  cudaMemcpy(gpu_coeff_many, coeff_many_float.data(), sizeof(float)*total_nknots*_nCoeff_, cudaMemcpyHostToDevice);
+  CudaCheckError();
+
+  cudaMemcpy(gpu_coeff_x, coeff_x_float.data(), sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
+  CudaCheckError();
+
+  //KS: Bind our texture with the GPU variable
+  //KS: Tried also moving gpu_many_array to texture memory it only worked with restricted number of MC runs, most likely hit texture memory limit :(
+  struct cudaResourceDesc resDesc_coeff_x;
+  memset(&resDesc_coeff_x, 0, sizeof(resDesc_coeff_x));
+  resDesc_coeff_x.resType = cudaResourceTypeLinear;
+  resDesc_coeff_x.res.linear.devPtr = gpu_coeff_x;
+  resDesc_coeff_x.res.linear.desc = cudaCreateChannelDesc<float>();
+  resDesc_coeff_x.res.linear.sizeInBytes = sizeof(float)*spline_size*n_params;
+
+  // Specify texture object parameters
+  struct cudaTextureDesc texDesc_coeff_x;
+  memset(&texDesc_coeff_x, 0, sizeof(texDesc_coeff_x));
+  texDesc_coeff_x.readMode = cudaReadModeElementType;
+
+  // Create texture object
+  cudaCreateTextureObject(&text_coeff_x, &resDesc_coeff_x, &texDesc_coeff_x, nullptr);
+  CudaCheckError();
+
+  // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
+  cudaMemcpy(gpu_paramNo_arr, uniquesplinevec_Monolith.data(), n_splines*sizeof(short int), cudaMemcpyHostToDevice);
+  CudaCheckError();
+
+  // Also copy the knot map for each spline onto the GPU;
+  cudaMemcpy(gpu_nKnots_arr, coeffindexvec.data(), n_splines*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
 }
 
@@ -440,7 +507,7 @@ __global__ void EvalOnGPU_TotWeight(
 // Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 // Pass the segment and the parameter values
 // (binary search already performed in SplineBase::FindSplineSegment()
-__host__ void SplineMonolithGPU::RunGPU_SplineMonolith(
+__host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Unbinned(
     M3::float_t* cpu_total_weights,
     // Holds the changes in parameters
     float *vals,
@@ -513,12 +580,68 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith(
   #endif
 }
 
+// *****************************************
+// Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
+// Pass the segment and the parameter values
+// (binary search already performed in SplineBase::FindSplineSegment()
+__host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
+  M3::float_t* cpu_spline_weights,
+  // Holds the changes in parameters
+  float *vals,
+  // Holds the segments for parameters
+  short int *segment) {
+// *****************************************
+  dim3 block_size;
+  dim3 grid_size;
+
+  block_size.x = _BlockSize_;
+  grid_size.x = (cpu_n_splines / block_size.x) + 1;
+
+  // Copy the segment values to the GPU (segment_gpu), which is cpu_n_params long
+  cudaMemcpy(gpu_spline_segment, segment, cpu_n_params * sizeof(short int), cudaMemcpyHostToDevice);
+  CudaCheckError();
+
+  // Copy the parameter values values to the GPU (vals_gpu), which is cpu_n_params long
+  cudaMemcpy(gpu_par_val, vals, cpu_n_params * sizeof(float), cudaMemcpyHostToDevice);
+  CudaCheckError();
+
+  // KS: Consider asynchronous kernel call, this might help EvalOnGPU_Splines and EvalOnGPU_TF1 are independent
+  // Set the cache config to prefer L1 for the kernel
+  //cudaFuncSetCacheConfig(EvalOnGPU_Splines, cudaFuncCachePreferL1);
+  EvalOnGPU_Splines<<<grid_size, block_size>>>(
+    cpu_n_splines,
+    cpu_spline_size,
+    gpu_paramNo_arr,
+    gpu_nKnots_arr,
+    gpu_coeff_many,
+    gpu_par_val,
+    gpu_spline_segment,
+
+    gpu_weights,
+    text_coeff_x
+  );
+  CudaCheckError();
+
+  // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
+  cudaMemcpy(cpu_tmp_weights.data(), gpu_weights, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
+  CudaCheckError();
+  // KS: we need to performa conversion from float (this is what GPU uses) to M3::float_t
+  for (unsigned int i = 0; i < cpu_n_splines; ++i) {
+    cpu_spline_weights[i] = static_cast<M3::float_t>(cpu_tmp_weights[i]);
+  }
+
+  #ifdef MACH3_DEBUG
+  printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
+  printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
+  #endif
+}
+
 // *******************************************
 /// Clean up pinned variables at CPU
 __host__ void SplineMonolithGPU::CleanupPinnedMemory(M3::float_t *cpu_total_weights,
                                                      short int *segment, float *vals) {
 // *******************************************
-  cudaFreeHost(cpu_total_weights);
+  if(cpu_total_weights != nullptr) cudaFreeHost(cpu_total_weights);
   cudaFreeHost(segment);
   cudaFreeHost(vals);
 
