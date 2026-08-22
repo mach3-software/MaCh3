@@ -241,9 +241,10 @@ class SplineMonolithGPU
     int cpu_n_params;
     /// Number of events living on CPU
     int cpu_n_events;
-
+    #ifndef _LOW_MEMORY_STRUCTS_
     /// Temporary weight needed for conversion from float to double
     std::vector<float> cpu_tmp_weights;
+    #endif
 
     // ******************************************
     // TEXTURES

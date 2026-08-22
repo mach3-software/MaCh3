@@ -340,11 +340,12 @@ __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Binned(
   /// Size of splines living
   cpu_spline_size = spline_size;
 
-  cpu_tmp_weights.resize(cpu_n_splines);
+
   //CW: Allocate memory for the frequently copied objects
   cudaMalloc(&gpu_par_val, n_params * sizeof(float));
   cudaMalloc(&gpu_spline_segment, n_params * sizeof(short int));
-
+  #ifndef _LOW_MEMORY_STRUCTS_
+  cpu_tmp_weights.resize(cpu_n_splines);
   // Convert M3::float_t -> float for GPU
   std::vector<float> coeff_many_float(manycoeff_arr, manycoeff_arr + total_nknots * _nCoeff_);
   std::vector<float> coeff_x_float(xcoeff_arr, xcoeff_arr + spline_size * n_params);
@@ -355,7 +356,14 @@ __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Binned(
 
   cudaMemcpy(gpu_coeff_x, coeff_x_float.data(), sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
   CudaCheckError();
+  #else
+  // Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies
+  cudaMemcpy(gpu_coeff_many, manycoeff_arr, sizeof(float)*total_nknots*_nCoeff_, cudaMemcpyHostToDevice);
+  CudaCheckError();
 
+  cudaMemcpy(gpu_coeff_x, xcoeff_arr, sizeof(float)*spline_size*n_params, cudaMemcpyHostToDevice);
+  CudaCheckError();
+  #endif
   //KS: Bind our texture with the GPU variable
   //KS: Tried also moving gpu_many_array to texture memory it only worked with restricted number of MC runs, most likely hit texture memory limit :(
   struct cudaResourceDesc resDesc_coeff_x;
@@ -622,6 +630,7 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
   );
   CudaCheckError();
 
+  #ifndef _LOW_MEMORY_STRUCTS_
   // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
   cudaMemcpy(cpu_tmp_weights.data(), gpu_weights, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
   CudaCheckError();
@@ -630,6 +639,12 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
   for (unsigned int i = 0; i < cpu_n_splines; ++i) {
     cpu_spline_weights[i] = static_cast<M3::float_t>(cpu_tmp_weights[i]);
   }
+  #else
+  // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
+  /// @todo KS: Make cpu_spline_weight pinned for faster load
+  cudaMemcpy(cpu_spline_weights, gpu_weights, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
+  CudaCheckError();
+  #endif
 
   #ifdef MACH3_DEBUG
   printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
