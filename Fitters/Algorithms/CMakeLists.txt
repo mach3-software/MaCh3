@@ -6,13 +6,8 @@ set(HEADERS
     LikelihoodFit.h
     MinuitFit.h
     PSO.h
-    MCMCProcessor.h
-    OscProcessor.h
-    RHatCalculator.h
     MaCh3Factory.h
     PredictiveThrower.h
-    StatisticalUtils.h
-    gpuMCMCProcessorUtils.cuh
     MulticanonicalMCMCHandler.h
 )
 
@@ -24,27 +19,16 @@ add_library(Fitters SHARED
     LikelihoodFit.cpp
     $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
-    MCMCProcessor.cpp
-    OscProcessor.cpp
-    RHatCalculator.cpp
-    MaCh3Factory.cpp
-    StatisticalUtils.cpp
     PredictiveThrower.cpp
     MulticanonicalMCMCHandler.cpp
-    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
+    MaCh3Factory.cpp
 )
-
-if(MaCh3_GPU_ENABLED)
-    set_target_properties(Fitters PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    #KS: In cmake 3.18 this is no longer needed https://cmake.org/cmake/help/latest/variable/CMAKE_CUDA_ARCHITECTURES.html#cmake-cuda-architectures
-    set_property(TARGET Fitters PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
-endif()
 
 set_target_properties(Fitters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Fitters)
 
-target_link_libraries(Fitters PUBLIC Samples ROOT::ROOTDataFrame)
+target_link_libraries(Fitters PUBLIC MaCh3::Samples MaCh3::FitProcessing ROOT::ROOTDataFrame)
 target_link_libraries(Fitters PRIVATE MaCh3Warnings)
 
 target_include_directories(Fitters PUBLIC

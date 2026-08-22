@@ -167,7 +167,7 @@ add_subdirectory(Utils)
 add_subdirectory(CLI)
 add_subdirectory(python)
 
-foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
   set_property(
     TARGET
     ${lib}

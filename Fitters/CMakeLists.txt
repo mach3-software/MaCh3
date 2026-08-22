@@ -1,2 +1,2 @@
-add_subdirectory(FitProcessing)
+add_subdirectory(Processing)
 add_subdirectory(Algorithms)
