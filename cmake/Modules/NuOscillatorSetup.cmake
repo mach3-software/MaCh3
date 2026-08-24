@@ -51,6 +51,11 @@ IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
 SwitchLogic(DAN_DOUBLE)
 
+# Override: If MaCh3_NuOsc_DOUBLE_ENABLED is explicitly set, use it to override DAN_DOUBLE
+if(DEFINED MaCh3_NuOsc_DOUBLE_ENABLED)
+  IsTrue(MaCh3_NuOsc_DOUBLE_ENABLED DAN_DOUBLE)
+endif()
+
 # Disable GPU at NuOsc
 if(NOT MaCh3_NuOsc_GPU_ENABLED)
   set(DAN_USE_GPU 0)
