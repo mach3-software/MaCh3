@@ -318,6 +318,8 @@ namespace M3{
       hLogL[i] = std::make_unique<TH1D>(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0, AllEvents);
       hLogL[i]->SetLineColor(kBlue);
     }
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Walloca"
     for(int n = 0; n < AllEvents; ++n)
     {
       if(n%10000 == 0) M3::Utils::PrintProgressBar(n, AllEvents);
@@ -354,7 +356,7 @@ namespace M3{
         hLogL[k]->SetBinContent(n, logL_array[k]);
       }
     } //End loop over steps
-
+    #pragma GCC diagnostic pop
     // Directory for posteriors
     std::string OutputName = inputFile + "_PenaltyTerm" +".root";
     TFile *OutputFile = M3::Open(OutputName, "recreate", __FILE__, __LINE__);
