@@ -324,7 +324,7 @@ namespace M3{
       Chain->GetEntry(n);
 
       std::vector<double> logL(NSets, 0.0);
-      double* logL_array = logL.data();
+      double* _restrict_ logL_array = logL.data();
       #ifdef MULTITHREAD
       #pragma omp parallel for reduction(+:logL_array[:NSets])
       #endif
