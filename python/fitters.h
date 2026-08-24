@@ -7,11 +7,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // MaCh3 includes
-#include "Fitters/FitterBase.h"
-#include "Fitters/MR2T2.h"
-#include "Fitters/DelayedMR2T2.h"
-#include "Fitters/MinuitFit.h"
-#include "Fitters/PSO.h"
+#include "Fitters/Algorithms/FitterBase.h"
+#include "Fitters/Algorithms/MR2T2.h"
+#include "Fitters/Algorithms/DelayedMR2T2.h"
+#include "Fitters/Algorithms/MinuitFit.h"
+#include "Fitters/Algorithms/PSO.h"
 
 namespace py = pybind11;
 
