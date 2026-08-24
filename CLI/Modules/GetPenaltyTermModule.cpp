@@ -318,58 +318,16 @@ namespace M3{
       hLogL[i] = std::make_unique<TH1D>(NameTemp.c_str(), NameTemp.c_str(), AllEvents, 0, AllEvents);
       hLogL[i]->SetLineColor(kBlue);
     }
-    std::vector<double> logL(NSets, 0.0);
     for(int n = 0; n < AllEvents; ++n)
     {
       if(n%10000 == 0) M3::Utils::PrintProgressBar(n, AllEvents);
-        
       Chain->GetEntry(n);
 
-      for(int k = 0; k < NSets; ++k) logL[k] = 0.;
-  #ifdef MULTITHREAD
-      // The per-thread array
-      double *logL_private = nullptr;
-
-      // Declare the omp parallel region
-      // The parallel region needs to stretch beyond the for loop!
-      #pragma omp parallel private(logL_private)
-      {
-        logL_private = new double[NSets];
-        for(int k = 0; k < NSets; ++k) logL_private[k] = 0.;
-
-        #pragma omp for
-        for (int i = 0; i < nParams; i++)
-        {
-          for (int j = 0; j <= i; ++j)
-          {
-            //check if flat prior
-            if (!isFlat[i] && !isFlat[j])
-            {
-              for(int k = 0; k < NSets; ++k)
-              {
-                //Check if parameter is relevant for this set
-                if (isRelevantParam[k][i] && isRelevantParam[k][j])
-                {
-                  //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-                  int scale = 1;
-                  if(i != j) scale = 2;
-                  logL_private[k] += scale * 0.5*(fParProp[i] - Prior[i])*(fParProp[j] - Prior[j])*invCovMatrix[i][j];
-                }
-              }
-            }
-          }
-        }
-        // Now we can write the individual arrays from each thread to the main array
-        for(int k = 0; k < NSets; ++k)
-        {
-          #pragma omp atomic
-          logL[k] += logL_private[k];
-        }
-        //Delete private arrays
-        delete[] logL_private;
-      }//End omp range
-
-  #else
+      std::vector<double> logL(NSets, 0.0);
+      double* logL_array = logL.data();
+      #ifdef MULTITHREAD
+      #pragma omp parallel for reduction(+:logL_array[:NSets])
+      #endif
       for (int i = 0; i < nParams; i++)
       {
         for (int j = 0; j <= i; ++j)
@@ -385,18 +343,17 @@ namespace M3{
                 //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
                 int scale = 1;
                 if(i != j) scale = 2;
-                logL[k] += scale * 0.5*(fParProp[i] - Prior[i])*(fParProp[j] - Prior[j])*invCovMatrix[i][j];
+                logL_array[k] += scale * 0.5*(fParProp[i] - Prior[i])*(fParProp[j] - Prior[j])*invCovMatrix[i][j];
               }
             }
           }
         }
-      }
-  #endif // end MULTITHREAD
+      } // end loop over params
       for(int k = 0; k < NSets; ++k)
       {
-        hLogL[k]->SetBinContent(n, logL[k]);
+        hLogL[k]->SetBinContent(n, logL_array[k]);
       }
-    }//End loop over steps
+    } //End loop over steps
 
     // Directory for posteriors
     std::string OutputName = inputFile + "_PenaltyTerm" +".root";
