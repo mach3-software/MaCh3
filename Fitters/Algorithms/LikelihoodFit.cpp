@@ -1,4 +1,4 @@
-#include "LikelihoodFit.h"
+#include "Fitters/Algorithms/LikelihoodFit.h"
 
 // *******************
 // Run the Markov chain with all the systematic objects added

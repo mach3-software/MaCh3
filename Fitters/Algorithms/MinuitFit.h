@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "Fitters/LikelihoodFit.h"
+#include "Fitters/Algorithms/LikelihoodFit.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

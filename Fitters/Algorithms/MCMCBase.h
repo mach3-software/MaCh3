@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Fitters/FitterBase.h"
-#include "Fitters/MulticanonicalMCMCHandler.h"
+#include "Fitters/Algorithms/FitterBase.h"
+#include "Fitters/Algorithms/MulticanonicalMCMCHandler.h"
 /// @brief Base class for MCMC fitting algorithms
 /// @details Inherits from `FitterBase` and defines the interface for MCMC-based fitting, including chain management and step handling.
 /// @author Asher Kaboth

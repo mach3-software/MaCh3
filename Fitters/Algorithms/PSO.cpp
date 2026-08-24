@@ -1,4 +1,4 @@
-#include "PSO.h"
+#include "Fitters/Algorithms/PSO.h"
 
 #include <cmath>
 

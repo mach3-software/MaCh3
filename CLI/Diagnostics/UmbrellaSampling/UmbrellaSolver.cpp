@@ -4,9 +4,9 @@
 /// @author David Riley
 
 #include <filesystem>
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Manager/Manager.h"
-#include "Fitters/MulticanonicalMCMCHandler.h"
+#include "Fitters/Algorithms/MulticanonicalMCMCHandler.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TSystem.h"

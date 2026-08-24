@@ -1,4 +1,4 @@
-#include "MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
@@ -9,7 +9,7 @@ _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
 #ifdef MaCh3_CUDA
-#include "Fitters/gpuMCMCProcessorUtils.cuh"
+#include "Fitters/Processing/gpuMCMCProcessorUtils.cuh"
 #endif
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now

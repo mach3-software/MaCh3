@@ -1,4 +1,4 @@
-#include "Fitters/DelayedMR2T2.h"
+#include "Fitters/Algorithms/DelayedMR2T2.h"
 
 // *************************
 DelayedMR2T2::DelayedMR2T2(Manager* const FitManager) : MR2T2(FitManager) {

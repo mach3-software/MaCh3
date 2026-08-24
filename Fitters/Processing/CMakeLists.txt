@@ -24,7 +24,7 @@ set_target_properties(FitProcessing PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME FitProcessing)
 
-target_link_libraries(FitProcessing PUBLIC Parameters ROOT::ROOTDataFrame)
+target_link_libraries(FitProcessing PUBLIC Samples ROOT::ROOTDataFrame)
 target_link_libraries(FitProcessing PRIVATE MaCh3Warnings)
 
 target_include_directories(FitProcessing PUBLIC

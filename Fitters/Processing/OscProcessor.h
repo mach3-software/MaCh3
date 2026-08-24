@@ -1,9 +1,13 @@
 #pragma once
 
 // MaCh3 includes
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
+// ROOT includes
 #include "TComplex.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski

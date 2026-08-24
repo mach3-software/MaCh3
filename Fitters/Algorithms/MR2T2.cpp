@@ -1,4 +1,4 @@
-#include "Fitters/MR2T2.h"
+#include "Fitters/Algorithms/MR2T2.h"
 
 
 // ***************
