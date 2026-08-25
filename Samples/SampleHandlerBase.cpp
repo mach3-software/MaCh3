@@ -485,7 +485,7 @@ void SampleHandlerBase::FillArray_MP() {
 
 // **************************************************
 // Helper function to reset the data and MC histograms
-void SampleHandlerBase::ResetHistograms() {
+void SampleHandlerBase::ResetHistograms() _noexcept_ {
 // **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
@@ -1346,8 +1346,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
     SetSplinePointers();
 
     BinnedSplines->CleanUpMemory();
-  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
-    (void) UnbinnedSpline;
+  } else if ([[maybe_unused]] auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     SetSplinePointers();
   } else {
     MACH3LOG_ERROR("Unsupported spline type encountered.");

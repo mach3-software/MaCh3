@@ -116,8 +116,7 @@ nlohmann::json NuDockServerBase::setParameters(const nlohmann::json &request) {
 // ***************************************************************************
 /// @copydoc NuDockServerBase::setAsimovPoint
 // ***************************************************************************
-nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
-  (void)request;
+nlohmann::json NuDockServerBase::setAsimovPoint([[maybe_unused]] const nlohmann::json &request) {
   // reweight sample and add to data
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     samples[ipdf]->Reweight();
@@ -207,8 +206,7 @@ void TH2toResponse(const TH2* mc_hist, const std::string& sample_title, nlohmann
 // ***************************************************************************
 /// @copydoc NuDockServerBase::getMCSpectrum
 // ***************************************************************************
-nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
-  (void)request;
+nlohmann::json NuDockServerBase::getMCSpectrum([[maybe_unused]] const nlohmann::json &request) {
   nlohmann::json response;
 
   std::vector<std::string> sample_titles = {};
@@ -243,8 +241,7 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
 // ***************************************************************************
 /// @copydoc NuDockServerBase::getDataSpectrum
 // ***************************************************************************
-nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) {
-  (void)request;
+nlohmann::json NuDockServerBase::getDataSpectrum([[maybe_unused]] const nlohmann::json &request) {
   nlohmann::json response;
 
   std::vector<std::string> sample_titles = {};
@@ -279,8 +276,7 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
 // ***************************************************************************
 /// @copydoc NuDockServerBase::getParametersNames
 // ***************************************************************************
-nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &request) {
-  (void)request;
+nlohmann::json NuDockServerBase::getParametersNames([[maybe_unused]] const nlohmann::json &request) {
   std::vector<std::string> syst_par_names;
 
   for (size_t s = 0; s < systematics.size(); ++s) {
@@ -301,7 +297,7 @@ nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &reques
 // ***************************************************************************
 /// @copydoc NuDockServerBase::getParameters
 // ***************************************************************************
-nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
+nlohmann::json NuDockServerBase::getParameters([[maybe_unused]] const nlohmann::json &request) {
   std::map<std::string, double> osc_params;
   std::map<std::string, double> syst_params;
 
@@ -320,7 +316,6 @@ nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
       }
     }
   }
-  (void)request;
   // Convert maps to json
   nlohmann::json response;
   response["sys_pars"] = syst_params;
@@ -331,8 +326,7 @@ nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
 // ***************************************************************************
 /// @copydoc NuDockServerBase::get2NLL
 // ***************************************************************************
-nlohmann::json NuDockServerBase::get2NLL(const nlohmann::json &request) {
-  (void)request;
+nlohmann::json NuDockServerBase::get2NLL([[maybe_unused]] const nlohmann::json &request) {
   nlohmann::json response;
   response["log_likelihood"] = 2*getLogLikelihood();
   return response;
