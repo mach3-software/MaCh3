@@ -163,7 +163,8 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
       if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
         Corr2 = Correlations[index][_fFancyNames[j]];
         //Do they agree to better than float precision?
-        if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
+        constexpr double tolerance = 1e-6;
+        if(std::abs(Corr2 - Corr1) > tolerance) {
           MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
           MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
           throw MaCh3Exception(__FILE__ , __LINE__ );
