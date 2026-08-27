@@ -115,7 +115,7 @@ public:
   virtual nlohmann::json getDataSpectrum(const nlohmann::json &request);
 
   /// @brief No-op implementation --- the server does not run own MCMC.
-  void RunMCMC() override {(void)0; /* do nothing */};
+  void RunMCMC() override {return; /* do nothing */};
 
 protected:
   /// @brief Flag controlling verbose logging of server operations.

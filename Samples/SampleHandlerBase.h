@@ -380,7 +380,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void FillArray();
 
   /// @brief Helper function to reset histograms
-  void ResetHistograms();
+  void ResetHistograms() _noexcept_;
   /// @brief Setup spline handler (both binned or unbinned)
   void InitialiseSplineObject();
 
