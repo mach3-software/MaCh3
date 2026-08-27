@@ -77,6 +77,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParamCentral.resize(kNParameterEnum);
   ParamErrors.resize(kNParameterEnum);
   ParamFlat.resize(kNParameterEnum);
+  ParamCircular.resize(kNParameterEnum);
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
@@ -2731,6 +2732,11 @@ void MCMCProcessor::ReadModelFile() {
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__));
 
+    if(CheckNodeExists(param["Systematic"],"SpecialProposal", "CircularBounds")) {
+      ParamCircular[kXSecPar].push_back(true);
+    } else {
+      ParamCircular[kXSecPar].push_back(false);
+    }
     ParameterGroup.push_back(Group);
 
     nParam[kXSecPar]++;
@@ -2769,6 +2775,7 @@ void MCMCProcessor::ReadNDFile() {
     ParamNames[kNDPar].push_back( Form("ND Det %i", i) );
     //KS: Currently we can only set it via config, change it in future
     ParamFlat[kNDPar].push_back( false );
+    ParamCircular[kNDPar].push_back( false );
   }
 
   TIter next(BinningDirectory->GetListOfKeys());
@@ -2807,6 +2814,7 @@ void MCMCProcessor::ReadFDFile() {
 
     //KS: Currently we can only set it via config, change it in future
     ParamFlat[kFDDetPar].push_back( false );
+    ParamCircular[kFDDetPar].push_back( false );
   }
   //KS: The last parameter is p scale
   //ETA: we need to be careful here, this is only true for SK in the T2K beam analysis...
@@ -3193,6 +3201,15 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
+
+    ParameterEnum ParType = ParamType[ParamNo];
+    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
+    auto isCircular = ParamCircular[ParType][ParamTemp];
+    if(isCircular) {
+      MACH3LOG_ERROR("Trying to apply smearing for param {}, which has circular prior", Names[k]);
+      MACH3LOG_ERROR("Please implement me or ask gently someone");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
 
     Param.push_back(ParamNo);
   }
