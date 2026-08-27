@@ -1273,14 +1273,14 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
       for (size_t iPar = 0; iPar < FancyNames.size(); ++iPar) {
         if(GetParFancyName(i) == FancyNames[iPar]) {
           MACH3LOG_DEBUG("Matched name {} in config", FancyNames[iPar]);
-          PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
-          PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
+          PosteriorFile->SetBranchStatus(BranchNames[iPar].c_str(), true);
+          PosteriorFile->SetBranchAddress(BranchNames[iPar].c_str(), &BranchValues[i]);
           matched = true;
           break;
         }
       }
       if(!matched) {
-        MACH3LOG_WARN("Didn't match param {} is this what you want?", GetParFancyName(i));
+        MACH3LOG_WARN("Didn't match param {}, is this what you want?", GetParFancyName(i));
       }
     }
   } else {
@@ -1288,8 +1288,8 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     for (int i = 0; i < GetNumParams(); ++i) {
       BranchNames[i] = GetParName(i);
       if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
-        MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!", BranchNames[i]);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_WARN("Branch '{}' does not exist in the TTree, is this what you want?", BranchNames[i]);
+        continue;
       }
       PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
       PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
