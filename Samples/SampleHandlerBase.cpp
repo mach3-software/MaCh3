@@ -9,19 +9,19 @@
 #include <numeric>
 
 // ************************************************
-SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                                      const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerInterface() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerBase object");
 
-  //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov) {
+  //ETA - safety feature so you can't pass a NULL _ParHandler
+  if(!_ParHandler) {
     MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
-  ParHandler = xsec_cov;
-
-  nSamples = 1;
+  ParHandler = _ParHandler;
+  nEvents = 0;
+  nSamples = 0;
 
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerBase object - this will be used for all oscillation channels");
@@ -51,8 +51,9 @@ SampleHandlerBase::~SampleHandlerBase() {
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
-void SampleHandlerBase::ReadConfig()
-{
+// ************************************************
+void SampleHandlerBase::ReadConfig() {
+// ************************************************
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(getenv("MACH3")+std::string("/") + ModeName);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
@@ -60,7 +61,7 @@ void SampleHandlerBase::ReadConfig()
 
   fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
-    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
+    UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false, __FILE__ , __LINE__);
   }
 
   if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
@@ -128,8 +129,28 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   int NChannels = static_cast<M3::int_t>(SampleSettings["OscChannels"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  YAML::Node OscChannelsConfig;
+  // KS: We first check whether OscChannel are defined individually for this sample or taken from list
+  if(SampleSettings["OscChannels"].IsScalar()) {
+    auto PredeterminedChannelsName = Get<std::string>(SampleSettings["OscChannels"], __FILE__, __LINE__);
+    if(!SampleManager->raw()["OscChannels"]) {
+      MACH3LOG_ERROR("Trying to use Predetermined OscChannels however such field doesn't exist in config for SampleHandler: {}", GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if(!SampleManager->raw()["OscChannels"][PredeterminedChannelsName]) {
+      MACH3LOG_ERROR("I didn't find PredeterminedChannelsName called: {}", PredeterminedChannelsName);
+      MACH3LOG_ERROR("However I have PredeterminedChannelsName known as:");
+      for (const auto& item : SampleManager->raw()["OscChannels"]) {
+        MACH3LOG_ERROR("{}", item.first.as<std::string>());
+      }
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    OscChannelsConfig = SampleManager->raw()["OscChannels"][PredeterminedChannelsName];
+  } else {
+    OscChannelsConfig = SampleSettings["OscChannels"];
+  }
   int OscChannelCounter = 0;
-  for (auto const &osc_channel : SampleSettings["OscChannels"]) {
+  for (auto const &osc_channel : OscChannelsConfig) {
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = Get<std::string>(osc_channel["Name"], __FILE__ , __LINE__);
     OscInfo.flavourName_Latex = Get<std::string>(osc_channel["LatexName"], __FILE__ , __LINE__);
@@ -199,7 +220,7 @@ void SampleHandlerBase::Initialise() {
   MACH3LOG_INFO("Setting up Normalisation Pointers..");
   SetupNormParameters();
   MACH3LOG_INFO("Setting up Functional Pointers..");
-  SetupFunctionalParameters();
+  RegisterFunctionalParameters();
   MACH3LOG_INFO("Setting up Additional Weight Pointers..");
   AddAdditionalWeightPointers();
   MACH3LOG_INFO("Setting up Kinematic Map..");
@@ -209,6 +230,7 @@ void SampleHandlerBase::Initialise() {
   MACH3LOG_INFO("Initialising Data");
   InititialiseData();
   MACH3LOG_INFO("=======================================================");
+  CheckEmptyBins();
 }
 
 // ************************************************
@@ -335,69 +357,25 @@ void SampleHandlerBase::Reweight() {
   // Calculate weight coming from all splines if we initialised handler
   if(SplineHandler) SplineHandler->Evaluate();
 
+  //update the list of parameter values passed to shift functionals
+  functional.update_vals();
   // Update the functional parameter values to the latest proposed values
   PrepFunctionalParameters();
 
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
 
-  #ifdef MULTITHREAD
-  // Call entirely different routine if we're running with openMP
-  FillArray_MP();
-  #else
+  // Here we fill weights to MC predictions weights for splines and osc already have been filled
   FillArray();
-  #endif
 
   //KS: If you want to not update W2 wights then uncomment this line
   if(!UpdateW2) FirstTimeW2 = false;
 }
 
-//************************************************
-// Function which does the core reweighting. This assumes that oscillation weights have
-// already been calculated and stored in SampleHandlerBase.osc_w[iEvent]. This
-// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerBase
-// array array which is binned to match the sample binning, such that bin[1][1] is the
-// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
-void SampleHandlerBase::FillArray() {
-//************************************************
-  //DB Reset which cuts to apply
-  Selection = StoredSelection;
-
-  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    ApplyShifts(iEvent);
-    const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
-
-    if (!IsEventSelected(MCEvent->NominalSample, iEvent)) {
-      continue;
-    }
-
-    // Virtual by default does nothing, has to happen before CalcWeightTotal
-    CalcWeightFunc(iEvent);
-
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
-    if (totalweight <= 0.){
-      continue;
-    }
-
-    //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
-
-    //DB Fill relevant part of thread array
-    if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandler_array[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandler_array_w2[GlobalBin] += totalweight*totalweight;
-    }
-  }
-}
-
-#ifdef MULTITHREAD
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloca"
 // ************************************************
-/// Multithreaded version of fillArray @see fillArray()
-void SampleHandlerBase::FillArray_MP() {
+void SampleHandlerBase::FillArray() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
@@ -416,13 +394,14 @@ void SampleHandlerBase::FillArray_MP() {
   // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandler_array_class[yBin][xBin]
   //
   // We will hit <0.1 s/step eventually! :D
-  const auto TotalBins = Binning->GetNBins();
+  [[maybe_unused]] const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
-
+  #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
+  #endif
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -457,11 +436,10 @@ void SampleHandlerBase::FillArray_MP() {
   }
 }
 #pragma GCC diagnostic pop
-#endif
 
 // **************************************************
 // Helper function to reset the data and MC histograms
-void SampleHandlerBase::ResetHistograms() {
+void SampleHandlerBase::ResetHistograms() _noexcept_ {
 // **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
@@ -472,100 +450,11 @@ void SampleHandlerBase::ResetHistograms() {
   }
 } // end function
 
-void SampleHandlerBase::RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
-  // Add protections to not add the same functional parameter twice
-  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
-    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
-    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
-    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  funcParsNamesMap[fpName] = fpEnum;
-  funcParsNamesVec.push_back(fpName);
-  funcParsFuncMap[fpEnum] = fpFunc;
-}
-
-// **************************************************
-void SampleHandlerBase::SetupFunctionalParameters() {
-// **************************************************
-  funcParsGrid.resize(GetNEvents());
-  if(ParHandler == nullptr) return;
-  funcParsVec.resize(GetNSamples());
-  for(int iSample = 0; iSample < GetNSamples(); iSample++){
-    funcParsVec[iSample] = ParHandler->GetFunctionalParametersFromSampleName(GetSampleName(iSample));
-  }
-  // RegisterFunctionalParameters is implemented in experiment-specific code,
-  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
-  RegisterFunctionalParameters();
-  funcParsMap.resize(funcParsNamesMap.size());
-
-  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (auto& funcParsSubVec : funcParsVec) {
-    // For every FunctionalParameter in the sub-vector
-    for (FunctionalParameter& fp : funcParsSubVec) {
-      auto it = funcParsNamesMap.find(fp.name);
-      // If we don't find a match, we need to throw an error
-      if (it == funcParsNamesMap.end()) {
-        MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-      const std::size_t key = static_cast<std::size_t>(it->second);
-      MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}",fp.name, key);
-
-      const int ikey = it->second;
-      fp.funcPtr = &funcParsFuncMap[ikey];
-
-      funcParsMap[key].valuePtr = fp.valuePtr;
-      funcParsMap[key].funcPtr  = fp.funcPtr;
-    }
-  }
-
-  // Mostly the same as CalcNormsBins
-  // For each event, make a vector of pointers to the functional parameters
-  for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(GetNEvents()); ++iEvent) {
-    const auto SampleId = MCEvents[iEvent].NominalSample;
-    // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
-    for (std::vector<FunctionalParameter>::iterator it = funcParsVec[SampleId].begin(); it != funcParsVec[SampleId].end(); ++it) {
-      // Check whether the interaction modes match
-      const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", static_cast<int>(iEvent))));
-      bool ModeMatch = MatchCondition(it->modes, Mode);
-      if (!ModeMatch) {
-        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, Mode, it->name);
-        continue;
-      }
-      // Now check whether within kinematic bounds
-      bool IsSelected = PassesSelection((*it), iEvent);
-      // Need to then break the event loop
-      if(!IsSelected){
-        MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, it->name);
-        continue;
-      }
-      const std::size_t key = static_cast<std::size_t>(funcParsNamesMap[it->name]);
-      funcParsGrid[iEvent].push_back(&funcParsMap[key]);
-    }
-  }
-  MACH3LOG_INFO("Finished setting up functional parameters");
-
-  /// @todo KS: Instead of clearing it they should not be class members, so we must fix it in future
-  CleanVector(funcParsNamesVec);
-
-  funcParsNamesMap.clear();
-  funcParsNamesMap.rehash(0);
-}
-
 // ***************************************************************************
 void SampleHandlerBase::ApplyShifts(const int iEvent) {
 // ***************************************************************************
-  const auto& shifts = funcParsGrid[iEvent];
-  const auto nShifts = shifts.size();
   // KS: If there are no shifts then there is no point in resetting which can be costly.
-  if(nShifts == 0) {
+  if(!functional.event_shifts.size() || !functional.event_shifts[iEvent].size()) {
     return;
   }
 
@@ -573,9 +462,9 @@ void SampleHandlerBase::ApplyShifts(const int iEvent) {
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  for (std::size_t iShift = 0; iShift < nShifts; ++iShift) {
-    const auto* _restrict_ fp = shifts[iShift];
-    (*fp->funcPtr)(fp->valuePtr, iEvent);
+  for (auto const &iShift : functional.event_shifts[iEvent]) {
+    auto & shift = functional.shifts[iShift];
+    shift.apply(shift.par_vals, iEvent);
   }
 
   FinaliseShifts(iEvent);
@@ -1051,11 +940,18 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     }
   }
   // get osc params for sample 0, later we check all have same number
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
+  auto OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<const M3::float_t*> OscParamsValues(OscParams.size());
+  std::vector<std::string> NuOscName(OscParams.size());
+  for(size_t ij = 0; ij < OscParams.size(); ij++){
+    OscParamsValues[ij] = ParHandler->RetPointer(OscParams[ij].index);
+    NuOscName[ij] = OscParams[ij].NuOscName;
   }
 
   for(int iSample = 1; iSample < GetNSamples(); iSample++) {
@@ -1066,7 +962,8 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParamsValues,
+                                                    NuOscName, GetNOscChannels(0));
   // Add samples only if we don't use same binning
   if(!EqualBinningPerOscChannel) {
     // KS: Start from 1 because sample 0 already added
@@ -1202,7 +1099,7 @@ M3::float_t SampleHandlerBase::GetEventWeight(const int iEntry) {
 }
 
 // ************************************************
-std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
+std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
 // ************************************************
   const int SampleIndex = MCEvents[Event].NominalSample;
   const auto SampleTitle = GetSampleTitle(SampleIndex);
@@ -1215,13 +1112,13 @@ std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, Binn
                                                          MCEvents[Event].nupdgUnosc, MCEvents[Event].nupdg);
   const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", Event)));
   const double Etrue = MCEvents[Event].enu_true;
-  std::vector< std::vector<int> > EventSplines;
+  std::vector< SplineIndex > EventSplines;
   switch(GetNDim(SampleIndex)) {
     case 1:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), 0.);
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), 0.});
       break;
     case 2:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
     default:
       if(ThrowCrititcal) {
@@ -1229,7 +1126,7 @@ std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, Binn
         MACH3LOG_CRITICAL("Will use 2D like approach");
         ThrowCrititcal = false;
       }
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
   }
   return EventSplines;
@@ -1254,7 +1151,7 @@ void SampleHandlerBase::SetSplinePointers() {
       w_pointers.reserve(w_pointers.size() + NSplines);
       const auto SampleId = MCEvents[j].NominalSample;
       for(int spline = 0; spline < NSplines; spline++) {
-        int SystIndex = EventSplines[spline][2];
+        int SystIndex = EventSplines[spline].iSyst;
 
         bool IsSelected = PassesSelection(SplineParsVec[SampleId][SystIndex], j);
         // Need to then break the event loop
@@ -1263,10 +1160,7 @@ void SampleHandlerBase::SetSplinePointers() {
           continue;
         }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                      EventSplines[spline][2], EventSplines[spline][3],
-                                                      EventSplines[spline][4], EventSplines[spline][5],
-                                                      EventSplines[spline][6]));
+        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline]));
       } // end loop over splines
       w_pointers.shrink_to_fit();
     } // end loop over events
@@ -1405,9 +1299,8 @@ void SampleHandlerBase::InitialiseSplineObject() {
 
     SetSplinePointers();
 
-    BinnedSplines->cleanUpMemory();
-  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
-    (void) UnbinnedSpline;
+    BinnedSplines->CleanUpMemory();
+  } else if ([[maybe_unused]] auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     SetSplinePointers();
   } else {
     MACH3LOG_ERROR("Unsupported spline type encountered.");
@@ -1513,7 +1406,8 @@ std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHist(const int iSample,
                                                      const std::string& ProjectionVar_StrX,
                                                      const std::string& ProjectionVar_StrY,
                                                      const std::vector< KinematicCut >& EventSelectionVec,
-                                                     const int WeightStyle, const std::vector< KinematicCut >& SubEventSelectionVec) {
+                                                     const int WeightStyle,
+                                                     const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1705,10 +1599,11 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
   std::vector<double> BinningVect;
   // We first check if binning for a sample has been specified
   auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
+  bool found_range_specifier = false;
   if(BinningConfig[GetSampleTitle(Sample)] && BinningConfig[GetSampleTitle(Sample)][KinematicParameter]){
-    BinningVect = Get<std::vector<double>>(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], __FILE__, __LINE__);
+    BinningVect = BuildBinEdgesFromNode(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], found_range_specifier);
   } else {
-    BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
+    BinningVect = BuildBinEdgesFromNode(BinningConfig[KinematicParameter], found_range_specifier);
   }
 
   // Ensure binning is increasing
@@ -1723,9 +1618,11 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
 
   if (!IsIncreasing(BinningVect)) {
     MACH3LOG_ERROR("Binning for {} is not increasing [{}]", KinematicParameter, fmt::join(BinningVect, ", "));
-    throw MaCh3Exception(__FILE__,__LINE__);
+    if(found_range_specifier){
+      MACH3LOG_ERROR("A bin range specifier was found. Please carefully check the number of square brackets used.");
+    }
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-
   return BinningVect;
 }
 
@@ -1743,7 +1640,6 @@ bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) const {
   }
   return false;
 }
-// ===============================================================
 
 // ************************************************
 std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const {
@@ -1798,7 +1694,7 @@ std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int
 
 // ************************************************
 std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-    const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
+                                                                     const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
 // ************************************************
   auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
   return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle);
@@ -1847,9 +1743,10 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim(iSample) == 1) {
-      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0),1,i,WeightStyle);
+      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0), SamplePlotType::kOscChannelPlot, i, WeightStyle);
     } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),1,i,WeightStyle));
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),
+                                                                      SamplePlotType::kOscChannelPlot, i, WeightStyle));
     }
   }
 
@@ -1956,8 +1853,24 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 }
 
 // ************************************************
+int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const {
+// ************************************************
+  switch (TypeEnum) {
+    case SamplePlotType::kModePlot:
+      return Modes->GetNModes();
+      break;
+    case SamplePlotType::kOscChannelPlot:
+      return GetNOscChannels(iSample);
+      break;
+    default:
+      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", static_cast<int>(TypeEnum));
+      throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+// ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                            const int Selection1, const int Selection2, const int WeightStyle) {
+                                                                              const SamplePlotType Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH1>> hHistList;
   std::string legendEntry;
@@ -1965,27 +1878,16 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
   if (THStackLeg != nullptr) {delete THStackLeg;}
   THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
 
-  int iMax = -1;
-  if (Selection1 == FDPlotType::kModePlot) {
-    iMax = Modes->GetNModes();
-  }
-  if (Selection1 == FDPlotType::kOscChannelPlot) {
-    iMax = GetNOscChannels(iSample);
-  }
-  if (iMax == -1) {
-    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  const int iMax = GetRangeForPlotType(Selection1, iSample);
   for (int i=0;i<iMax;i++) {
-    if (Selection1 == FDPlotType::kModePlot) {
+    if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle));
       THStackLeg->AddEntry(hHistList[i].get(), (Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
-    if (Selection1 == FDPlotType::kOscChannelPlot) {
+    if (Selection1 == SamplePlotType::kOscChannelPlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,Selection2,i,WeightStyle));
       THStackLeg->AddEntry(hHistList[i].get(),(GetFlavourName(iSample, i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
@@ -1996,28 +1898,17 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
 
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                                                              const std::string& KinematicProjectionY, const int Selection1,
+                                                                              const std::string& KinematicProjectionY, const SamplePlotType Selection1,
                                                                               const int Selection2, const int WeightStyle) {
 // ************************************************
   std::vector<std::unique_ptr<TH2>> hHistList;
 
-  int iMax = -1;
-  if (Selection1 == FDPlotType::kModePlot) {
-    iMax = Modes->GetNModes();
-  }
-  if (Selection1 == FDPlotType::kOscChannelPlot) {
-    iMax = GetNOscChannels(iSample);
-  }
-  if (iMax == -1) {
-    MACH3LOG_ERROR("You've passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  const int iMax = GetRangeForPlotType(Selection1, iSample);
   for (int i=0;i<iMax;i++) {
-    if (Selection1 == FDPlotType::kModePlot) {
+    if (Selection1 == SamplePlotType::kModePlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle));
     }
-    if (Selection1 == FDPlotType::kOscChannelPlot) {
+    if (Selection1 == SamplePlotType::kOscChannelPlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle));
     }
   }
@@ -2027,7 +1918,7 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                         int Selection1, int Selection2, int WeightStyle) {
+                                                                           const SamplePlotType Selection1, int Selection2, int WeightStyle) {
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
@@ -2047,6 +1938,25 @@ const double* SampleHandlerBase::GetPointerToOscChannel(const int iEvent) const 
 }
 
 // ***************************************************************************
+void SampleHandlerBase::CheckEmptyBins() const {
+// ***************************************************************************
+  const auto TotalBins = Binning->GetNBins();
+  int iCounter = 0;
+  for(int iBin = 0; iBin < TotalBins; iBin++) {
+    if(SampleHandler_array[iBin] == 0) {
+      iCounter++;
+      MACH3LOG_DEBUG("Bin {}, for sample {}, has 0 entries",
+                     Binning->GetBinName(iBin), GetSampleTitle(Binning->GetSampleIndex(iBin)));
+    }
+  }
+
+  if(iCounter > 0){
+    MACH3LOG_WARN("Found in total {} ({:.2f}%) empty bins for SampleHandler: {}",
+                  iCounter, 100.0 * static_cast<double>(iCounter) / TotalBins, GetName());
+  }
+}
+
+// ***************************************************************************
 // Helper function to print rates for the samples with LLH
 void SampleHandlerBase::PrintRates(const bool DataOnly) {
 // ***************************************************************************
@@ -2057,13 +1967,13 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
   MACH3LOG_INFO("Printing for {}", GetName());
 
   if (!DataOnly) {
-    const std::string sep_full(71, '-');
+    const std::string sep_full(81, '-');
     MACH3LOG_INFO("{}", sep_full);
-    MACH3LOG_INFO("{:<40}{:<10}{:<10}{:<10}|", "Sample", "Data", "MC", "-LLH");
+    MACH3LOG_INFO("{:<40}{:<15}{:<15}{:<10}|", "Sample", "Data", "MC", "-LLH");
   } else {
-    const std::string sep_data(51, '-');
+    const std::string sep_data(56, '-');
     MACH3LOG_INFO("{}", sep_data);
-    MACH3LOG_INFO("{:<40}{:<10}|", "Sample", "Data");
+    MACH3LOG_INFO("{:<40}{:<15}|", "Sample", "Data");
   }
 
   double sumData = 0.0;
@@ -2081,19 +1991,19 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
       sumMC += mcIntegral;
       likelihood = GetSampleLikelihood(iSample);
 
-      MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
+      MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
     } else {
-      MACH3LOG_INFO("{:<40}{:<10.2f}|", name, dataIntegral);
+      MACH3LOG_INFO("{:<40}{:<15.2f}|", name, dataIntegral);
     }
   }
   if (!DataOnly) {
     likelihood = GetLikelihood();
-    MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
-    const std::string sep_full(71, '-');
+    MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
+    const std::string sep_full(81, '-');
     MACH3LOG_INFO("{}", sep_full);
   } else {
-    MACH3LOG_INFO("{:<40}{:<10.2f}|", "Total", sumData);
-    const std::string sep_data(51, '-');
+    MACH3LOG_INFO("{:<40}{:<20.2f}|", "Total", sumData);
+    const std::string sep_data(56, '-');
     MACH3LOG_INFO("{}", sep_data);
   }
 }
@@ -2116,37 +2026,4 @@ std::vector<double> SampleHandlerBase::GetArrayForSample(const int Sample, std::
   const int End   = Binning->GetSampleEndBin(Sample);
 
   return std::vector<double>(array.begin() + Start, array.begin() + End);
-}
-
-// ***************************************************************************
-template <typename ParT>
-bool SampleHandlerBase::PassesSelection(const ParT& Par, std::size_t iEvent) {
-// ***************************************************************************
-  bool IsSelected = true;
-  if (Par.hasKinBounds) {
-    const auto& kinVars = Par.KinematicVarStr;
-    const auto& selection = Par.Selection;
-
-    for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-      const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
-
-      bool passedAnyBound = false;
-      const auto& boundsList = selection[iKinPar];
-
-      for (const auto& bounds : boundsList) {
-        if (kinVal > bounds[0] && kinVal <= bounds[1]) {
-          passedAnyBound = true;
-          break;
-        }
-      }
-
-      if (!passedAnyBound) {
-        MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                       iEvent, kinVars[iKinPar], Par.name);
-        IsSelected = false;
-        break;
-      }
-    }
-  }
-  return IsSelected;
 }

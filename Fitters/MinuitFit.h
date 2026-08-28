@@ -3,10 +3,12 @@
 //MaCh3 includes
 #include "Fitters/LikelihoodFit.h"
 
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Implementation of Minuit fitting algorithm
 /// @cite James:2004xla

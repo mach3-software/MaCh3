@@ -43,7 +43,7 @@ install(TARGETS Splines
         PUBLIC_HEADER DESTINATION include/Splines)
 
 add_library(MaCh3::Splines ALIAS Splines)
-
+target_link_libraries(MaCh3 INTERFACE Splines)
 
 # KS: Now we generate root dictionary, we can't add it to above as ROOT is bit dumb and things will fail due to MaCh3Warnings etc
 add_library(SplineDict SHARED MaCh3SplineDict.cxx)

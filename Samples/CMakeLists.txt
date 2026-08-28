@@ -2,6 +2,8 @@ set(HEADERS
     BinningHandler.h
     SampleHandlerInterface.h
     SampleHandlerBase.h
+    SampleHandlerBase.txx
+    SampleHandlerFunctional.h
     SampleStructs.h
     HistogramUtils.h
     SampleInfo.h
@@ -25,11 +27,6 @@ target_include_directories(Samples PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-if(MaCh3_GPU_ENABLED)
-    set_target_properties(Samples PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    set_property(TARGET Samples PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
-endif()
-
 set_target_properties(Samples PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Samples)
@@ -39,4 +36,6 @@ install(TARGETS Samples
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/Samples)
 
+
 add_library(MaCh3::Samples ALIAS Samples)
+target_link_libraries(MaCh3 INTERFACE Samples)

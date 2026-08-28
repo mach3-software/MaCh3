@@ -4,9 +4,35 @@
 // ETA - YAML constructor
 // this will replace the root file constructor but let's keep it in
 // to do some validations
-ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
-               : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
+ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name,
+                                                 double threshold, int FirstPCA, int LastPCA) {
 // ********************************************
+  MACH3LOG_INFO("Constructing instance of ParameterHandler using");
+  inputFile = YAMLFile[0];
+  matrixName = name;
+  pca = true;
+
+  doSpecialStepProposal = false;
+  // Not using adaptive by default
+  use_adaptive = false;
+  for(unsigned int i = 0; i < YAMLFile.size(); i++)
+  {
+    MACH3LOG_INFO("{}", YAMLFile[i]);
+  }
+  MACH3LOG_INFO("as an input");
+
+  if (threshold < 0 || threshold >= 1) {
+    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
+    MACH3LOG_INFO("Please specify a number between 0 and 1");
+    MACH3LOG_INFO("You specified: ");
+    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
+    pca = false;
+  }
+
+  InitialiseFromConfig(YAMLFile);
+  // Call the innocent helper function
+  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
+
   InitParametersTypeFromConfig();
 
   //ETA - again this really doesn't need to be hear...
@@ -17,9 +43,241 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>&
   } // end the for loop
 
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
-  InitParams();
+  InitParameters();
   // Print
   Print();
+}
+
+// ********************************************
+void ParameterHandlerGeneric::LoadAndMergeYAML(const std::vector<std::string>& YAMLFile,
+                                               std::map<std::pair<int,int>, std::unique_ptr<TMatrixDSym>>& ThrowSubMatrixOverrides) {
+// ********************************************
+  int running_num_file_pars = 0;
+
+  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < YAMLFile.size(); i++)
+  {
+    YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
+
+    if (YAMLDocTemp["ThrowMatrixOverride"]) { // LP: this allows us to put in
+      // proposal matrix overrides per
+      // parameter-containing file, add
+      // the block diagonal proposal
+      // matrix to a list and overwrite
+      // the throw matrix after set up.
+      auto filename =
+      YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
+      TFile *submatrix_file = TFile::Open(filename.c_str());
+
+      auto matrixname =
+      YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
+      std::unique_ptr<TMatrixDSym> submatrix{
+        submatrix_file->Get<TMatrixDSym>(matrixname.c_str())};
+        if (!submatrix) {
+          MACH3LOG_CRITICAL("Covariance matrix {} doesn't exist in file: {}",
+                            matrixname, filename);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        auto numrows = submatrix->GetNrows();
+        // LP: the -1 here is because we specify the last index for consistency
+        // with PCAHandler, not the first index after the end as is more common
+        // throughout computer science...
+        ThrowSubMatrixOverrides[{running_num_file_pars,
+          running_num_file_pars + (numrows - 1)}] = std::move(submatrix);
+
+          // LP: check names by default, but have option to disable check if you
+          // know what you're doing
+          if (!bool(YAMLDocTemp["ThrowMatrixOverride"]["check_names"]) ||
+            YAMLDocTemp["ThrowMatrixOverride"]["check_names"].as<bool>()) {
+            auto nametree = submatrix_file->Get<TTree>("param_names");
+          if (!nametree) {
+            MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
+            "ThrowMatrixOverride: {{ check_names: False }} to "
+            "disable this check.",
+            filename);
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          std::string *param_name = nullptr;
+          nametree->SetBranchAddress("name", &param_name);
+
+          if (nametree->GetEntries() != int(YAMLDocTemp["Systematics"].size())) {
+            MACH3LOG_CRITICAL("TTree param_names in file: {} has {} entries, but "
+            "the corresponding yaml file only declares {} "
+            "parameters. Set ThrowMatrixOverride: {{ "
+              "check_names: False }} to disable this check.",
+              filename, nametree->GetEntries(),
+                              YAMLDocTemp["Systematics"].size());
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+
+          int pit = 0;
+          for (const auto &param : YAMLDocTemp["Systematics"]) {
+            nametree->GetEntry(pit++);
+            auto yaml_pname = Get<std::string>(
+              param["Systematic"]["Names"]["FancyName"], __FILE__, __LINE__);
+            if ((*param_name) != yaml_pname) {
+              MACH3LOG_CRITICAL(
+                "TTree param_names in file: {} at entry {} has parameter {}, "
+                "but "
+                "the corresponding yaml parameter is named {}. Set "
+                "ThrowMatrixOverride: {{ "
+                  "check_names: False }} to disable this check.",
+                  filename, pit, (*param_name), yaml_pname);
+              throw MaCh3Exception(__FILE__, __LINE__);
+            }
+          }
+            }
+            submatrix_file->Close();
+    }
+
+    for (const auto& item : YAMLDocTemp["Systematics"]) {
+      _fYAMLDoc["Systematics"].push_back(item);
+      running_num_file_pars++;
+    }
+  }
+}
+
+// ********************************************
+void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std::string,double>>& Correlations,
+                                                        std::map<std::string, int>& CorrNamesMap) {
+// ********************************************
+  // ETA Now that we've been through all systematic let's fill the covmatrix
+  //This makes the root TCov from YAML
+  TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
+  for(int j = 0; j < _fNumPar; j++) {
+    (*_fCovMatrix)(j, j) = _fError[j]*_fError[j];
+    //Get the map of parameter name to correlation from the Correlations object
+    for (auto const& pair : Correlations[j]) {
+      auto const& key = pair.first;
+      auto const& val = pair.second;
+      int index = -1;
+      //If you found the parameter name then get the index
+      if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
+        index = CorrNamesMap[key];
+      } else {
+        MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+      double Corr1 = val;
+      double Corr2 = 0;
+      if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
+        Corr2 = Correlations[index][_fFancyNames[j]];
+        //Do they agree to better than float precision?
+        constexpr double tolerance = 1e-6;
+        if(std::abs(Corr2 - Corr1) > tolerance) {
+          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
+          MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
+      } else {
+        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[j], key);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+      (*_fCovMatrix)(j, index)= (*_fCovMatrix)(index, j) = Corr1*_fError[j]*_fError[index];
+    }
+  }
+
+  //Now make positive definite
+  MakePosDef(_fCovMatrix);
+  SetCovMatrix(_fCovMatrix);
+}
+
+// ********************************************
+// ETA An init function for the YAML constructor
+// All you really need from the YAML file is the number of Systematics
+void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string>& YAMLFile) {
+// ********************************************
+  std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
+  LoadAndMergeYAML(YAMLFile, ThrowSubMatrixOverrides);
+
+  const int nThreads = M3::GetNThreads();
+  //KS: set Random numbers for each thread so each thread has different seed
+  //or for one thread if without MULTITHREAD
+  random_number.reserve(nThreads);
+  for (int iThread = 0; iThread < nThreads; iThread++) {
+    random_number.emplace_back(std::make_unique<TRandom3>(0));
+  }
+  PrintLength = 35;
+
+  // Set the covariance matrix
+  _fNumPar = int(_fYAMLDoc["Systematics"].size());
+
+  ReserveMemory(_fNumPar);
+
+  int i = 0;
+  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
+  std::map<std::string, int> CorrNamesMap;
+
+  //ETA - read in the systematics. Would be good to add in some checks to make sure
+  //that there are the correct number of entries i.e. are the _fNumPar for Names,
+  //PreFitValues etc etc.
+  for (auto const &param : _fYAMLDoc["Systematics"])
+  {
+    _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
+    _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
+    _fParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
+
+    _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
+    if(_fError[i] <= 0) {
+      MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    //ETA - a bit of a fudge but works
+    auto TempBoundsVec = GetBounds(param["Systematic"]["ParameterBounds"]);
+    _fLowBound[i] = TempBoundsVec[0];
+    _fUpBound[i] = TempBoundsVec[1];
+
+    //ETA - now for parameters which are optional and have default values
+    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
+
+    // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
+    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
+      SetFixParameter(_fFancyNames[i]);
+    }
+
+    if(param["Systematic"]["SpecialProposal"]) {
+      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i);
+    }
+
+    //Fill the map to get the correlations later as well
+    CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
+
+    //Also loop through the correlations
+    if(param["Systematic"]["Correlations"]) {
+      for(unsigned int Corr_i = 0; Corr_i < param["Systematic"]["Correlations"].size(); ++Corr_i){
+        for (YAML::const_iterator it = param["Systematic"]["Correlations"][Corr_i].begin(); it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
+          Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
+        }
+      }
+    }
+    i++;
+  } // end loop over para
+  if(i != _fNumPar) {
+    MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  // load correlation
+  LoadCorrelationFromConfig(Correlations, CorrNamesMap);
+  if (_fNumPar <= 0) {
+    MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  for(auto const & matovr : ThrowSubMatrixOverrides){
+    SetSubThrowMatrix(matovr.first.first, matovr.first.second, *matovr.second);
+  }
+
+  Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
+
+  MACH3LOG_INFO("Created covariance matrix from files: ");
+  for(const auto &file : YAMLFile){
+    MACH3LOG_INFO("{} ", file);
+  }
+  MACH3LOG_INFO("----------------");
+  MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
+  MACH3LOG_INFO("----------------");
 }
 
 // ********************************************
@@ -29,6 +287,7 @@ void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
 
   _fParamType = std::vector<SystType>(_fNumPar);
   _ParameterGroup = std::vector<std::string>(_fNumPar);
+  _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
   //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
   NormParams.reserve(_fNumPar);
@@ -44,6 +303,7 @@ void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
     _ParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
+    _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
 
     //Fill the map to get the correlations later as well
     auto ParamType = Get<std::string>(param["Systematic"]["Type"], __FILE__ , __LINE__);
@@ -103,7 +363,7 @@ ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 
 // ********************************************
 // DB Grab the Spline Names for the relevant SampleName
-const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) {
+const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector<std::string> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -117,7 +377,7 @@ const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSa
 }
 
 // ********************************************
-const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) {
+const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector<SplineInterpolation> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
@@ -133,7 +393,7 @@ const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpo
 
 // ********************************************
 // DB Grab the Spline Modes for the relevant SampleName
-const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) {
+const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) const {
 // ********************************************
   std::vector< std::vector<int> > returnVec;
   //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
@@ -150,7 +410,7 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
 
 // ********************************************
 // Get Norm params
-NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
+NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) const {
 // ********************************************
   NormParameter norm;
 
@@ -175,7 +435,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
 
 // ********************************************
 // Get Base Param
-void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) const {
 // ********************************************
   Parameter.name = GetParFancyName(Index);
 
@@ -218,7 +478,7 @@ void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const in
 // ********************************************
 // Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -247,8 +507,8 @@ const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const
 }
 
 // ********************************************
-// Get Norm params
-SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) {
+// Get Spline params
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) const {
 // ********************************************
   SplineParameter Spline;
 
@@ -264,7 +524,7 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
     Spline._SplineInterpolationType = kTSpline3;
   }
 
-  Spline._fSplineNames = SplinePar["SplineName"].as<std::string>();
+  Spline._fSplineNames = Get<std::string>(SplinePar["SplineName"], __FILE__ , __LINE__);
   Spline._SplineKnotUpBound = GetFromManager<double>(SplinePar["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
   Spline._SplineKnotLowBound = GetFromManager<double>(SplinePar["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
 
@@ -279,24 +539,38 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
 }
 
 // ********************************************
+bool ParameterHandlerGeneric::AppliesToSample(const int SystIndex, const std::string& SampleName) const {
+// ********************************************
+  // Empty means apply to all
+  if (_fSampleNames[SystIndex].size() == 0) return true;
+
+  // Check for unsupported wildcards in SampleName
+  if (SampleName.find('*') != std::string::npos) {
+    MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  return M3::CaseInsensitiveMatchAny(SampleName, _fSampleNames[SystIndex]);
+}
+
+// ********************************************
 // Get Func params
-FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
+FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) const {
 // ********************************************
   FunctionalParameter func;
   GetBaseParameter(param, Index, func);
 
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
-  func.valuePtr = RetPointer(Index);
   return func;
 }
 
 // ********************************************
 // Get Osc params
-OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) {
+OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) const {
 // ********************************************
   OscillationParameter OscParamInfo;
   GetBaseParameter(param, Index, OscParamInfo);
+  OscParamInfo.NuOscName = Get<std::string>(param["NuOscName"], __FILE__ , __LINE__);
 
   return OscParamInfo;
 }
@@ -316,6 +590,13 @@ const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleN
 }
 
 // ********************************************
+// KS Grab the Osc parameters for the relevant SampleName
+const std::vector<OscillationParameter> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kOsc], OscParams, SampleName);
+}
+
+// ********************************************
 // KS Grab the Spline parameters for the relevant SampleName
 const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
@@ -324,7 +605,8 @@ const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSam
 
 // ********************************************
 template<typename ParamT>
-std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap,
+                                                                         const std::vector<ParamT>& params, const std::string& SampleName) const {
 // ********************************************
   std::vector<ParamT> returnVec;
   for (const auto& pair : indexMap) {
@@ -339,7 +621,7 @@ std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const s
 
 // ********************************************
 // DB Grab the number of parameters for the relevant SampleName
-int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) {
+int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   int returnVal = 0;
   IterateOverParams(SampleName,
@@ -351,7 +633,7 @@ int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& Sampl
 
 // ********************************************
 // DB Grab the parameter names for the relevant SampleName
-const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<std::string> returnVec;
   IterateOverParams(SampleName,
@@ -363,7 +645,7 @@ const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleNa
 
 // ********************************************
 // DB DB Grab the parameter indices for the relevant SampleName
-const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   IterateOverParams(SampleName,
@@ -375,7 +657,7 @@ const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const
 
 // ********************************************
 template <typename FilterFunc, typename ActionFunc>
-void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
+void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) const {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     if ((AppliesToSample(i, SampleName)) && filter(i)) { // Common filter logic
@@ -385,7 +667,7 @@ void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, F
 }
 
 // ********************************************
-void ParameterHandlerGeneric::InitParams() {
+void ParameterHandlerGeneric::InitParameters() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
     //ETA - set the name to be param_% as this is what ProcessorMCMC expects
@@ -576,15 +858,22 @@ void ParameterHandlerGeneric::PrintOscillationParams() const {
 // ********************************************
   MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:40}│", "#", "Global #", "Name", "NuOscName");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────────────────────────┤");
+
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
     auto &OscIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│{3:40}│",
+                  std::to_string(OscIndex),
+                  GlobalIndex,
+                  GetParFancyName(GlobalIndex),
+                  OscParams[OscIndex].NuOscName);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────────────────────────┘");
 }
 
 // ********************************************
@@ -696,26 +985,10 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
 }
 
 // ********************************************
-// Toggle fix/free to parameters of a given group
-void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::string& Group) {
-// ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
-    if(IsParFromGroup(i, Group)) ToggleFixParameter(i);
-}
-
-// ********************************************
-// Toggle fix/free to parameters of several groups
-void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
-// ********************************************
-  for(size_t i = 0; i < Groups.size(); i++)
-    ToggleFixGroupOnlyParameters(Groups[i]); 
-}
-
-// ********************************************
 // Set parameters to be fixed in a given group
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group) {
 // ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParFromGroup(i, Group)) SetFixParameter(i);
 }
 
@@ -724,14 +997,14 @@ void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
   for(size_t i = 0; i < Groups.size(); i++)
-    SetFixGroupOnlyParameters(Groups[i]); 
+    SetFixGroupOnlyParameters(Groups[i]);
 }
 
 // ********************************************
 // Set parameters to be free in a given group
 void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::string& Group) {
 // ********************************************
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParFromGroup(i, Group)) SetFreeParameter(i);
 }
 
@@ -740,7 +1013,7 @@ void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::string& Grou
 void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
   for(size_t i = 0; i < Groups.size(); i++)
-    SetFreeGroupOnlyParameters(Groups[i]); 
+    SetFreeGroupOnlyParameters(Groups[i]);
 }
 
 // ********************************************
@@ -765,20 +1038,6 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
     if(IsParFromGroup(i, Group)) Counter++;
   }
   return Counter;
-}
-
-// ********************************************
-// DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
-// ********************************************
-  std::vector<const M3::float_t*> returnVec;
-  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
-    const auto& globalIndex = pair.second;
-    if (AppliesToSample(globalIndex, SampleName)) {
-      returnVec.push_back(RetPointer(globalIndex));
-    }
-  }
-  return returnVec;
 }
 
 // ********************************************

@@ -22,6 +22,15 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+///
+/// @details It serves as basic interface for fit running, as well as other functionalities like llh scan, sigma var or even posterior predictive distribution.
+/// Concrete implementations of this interface are responsible for defining
+/// the specific structure of samples, event selections, and histogram filling.
+///
+/// The interface operates in terms of samples and sample histograms, without direct knowledge of
+/// individual events. This abstraction supports event-by-event reweighting and may allow fully
+/// binned reweighting in future implementations.
+///
 /// @ingroup CoreClasses
 ///
 /// @author Asher Kaboth
@@ -34,25 +43,34 @@ class SampleHandlerInterface
   /// @brief destructor
   virtual ~SampleHandlerInterface();
 
-  virtual inline M3::int_t GetNSamples(){ return nSamples; };
-  virtual std::string GetSampleTitle(const int Sample) const = 0;
+  /// @brief returns total number of samples
+  virtual M3::int_t GetNSamples(){ return nSamples; };
+  /// @brief Get fancy title for specified samples
+  /// @param iSample Sample enumerator
+  virtual std::string GetSampleTitle(const int iSample) const = 0;
+  /// @brief Get name for Sample Handler
   virtual std::string GetName() const = 0;
-  virtual double GetSampleLikelihood(const int isample) const = 0;
+  /// @brief Get likelihood (-logL) for a single sample
+  /// @param iSample Sample enumerator
+  virtual double GetSampleLikelihood(const int iSample) const = 0;
   /// @brief Allow to clean not used memory before fit starts
   virtual void CleanMemoryBeforeFit() = 0;
-  /// @brief Store additional info in a chan
-  virtual void SaveAdditionalInfo(TDirectory* Dir) {(void) Dir;};
+  /// @brief Store additional info in a chain
+  /// @param Dir directory to which we save additional info
+  virtual void SaveAdditionalInfo([[maybe_unused]] TDirectory* Dir) {};
   /// @brief Return pointer to MaCh3 modes
   MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
-      
+  /// @brief main routine modifying MC prediction based on proposed parameter values
   virtual void Reweight()=0;
+  /// @brief Return likelihood (-LogL) for all samples
   virtual double GetLikelihood() const = 0;
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
   virtual void PrintRates(const bool DataOnly = false) = 0;
 
-  unsigned int GetNEvents() const {return nEvents;}
+  /// @brief Get number of oscillation channels for a single sample
+  /// @param iSample Sample enumerator
   virtual int GetNOscChannels(const int iSample) const = 0;
 
   /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
@@ -61,28 +79,63 @@ class SampleHandlerInterface
   virtual std::string GetKinVarName(const int iSample, const int Dimension) const = 0;
 
   /// @brief Get Data histogram
+  /// @param Sample Sample enumerator
   virtual const TH1* GetDataHist(const int Sample) = 0;
   /// @brief Get MC histogram
+  /// @param Sample Sample enumerator
   virtual const TH1* GetMCHist(const int Sample) = 0;
   /// @brief Get W2 histogram
+  /// @param Sample Sample enumerator
   virtual const TH1* GetW2Hist(const int Sample) = 0;
 
-  /// @brief DB Function to differentiate 1D or 2D binning
+  /// @brief DB Get what dimensionality binning for given sample has
+  /// @param Sample Number of sample
   virtual int GetNDim(const int Sample) const = 0;
+  /// @brief Get the flavour name for a given sample and oscillation channel.
+  /// @param iSample Index of the sample.
+  /// @param iChannel Index of the oscillation channel within the sample.
   virtual std::string GetFlavourName(const int iSample, const int iChannel) const = 0;
 
   /// @brief Return the binning used to draw a kinematic parameter
+  /// @param iSample Index of the sample.
+  /// @param KinematicParameter name of variable
   virtual std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const = 0;
 
+  /// @brief Build a 1D histogram for a given variable, optionally filtered by mode and channel.
+  /// @param iSample Index of the sample.
+  /// @param ProjectionVar_Str Name of the variable to project onto.
+  /// @param kModeToFill Interaction mode to select (-1 means all modes).
+  /// @param kChannelToFill Oscillation channel to select (-1 means all channels).
+  /// @param WeightStyle Weighting scheme (e.g. 0 = nominal weights, 1 = unit weights).
   virtual std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                                             const int kModeToFill = -1, const int kChannelToFill = -1,
                                                             const int WeightStyle = 0) = 0;
+  /// @brief Build a 2D histogram for given variables, optionally filtered by mode and channel.
+  /// @param iSample Index of the sample.
+  /// @param ProjectionVar_StrX Name of the variable for the X axis.
+  /// @param ProjectionVar_StrY Name of the variable for the Y axis.
+  /// @param kModeToFill Interaction mode to select (-1 means all modes).
+  /// @param kChannelToFill Oscillation channel to select (-1 means all channels).
+  /// @param WeightStyle Weighting scheme (e.g. 0 = nominal weights, 1 = unit weights).
   virtual std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                                             const std::string& ProjectionVar_StrY, int kModeToFill = -1,
                                                             const int kChannelToFill = -1, const int WeightStyle = 0) = 0;
+  /// @brief Return 1D projection of MC into given 1D variable (doesn't have to be variable used in the fit)
+  /// @param iSample Index of the sample.
+  /// @param ProjectionVar name of variable
+  /// @param EventSelectionVec Vector of additional cuts like cut on interaction mode
+  /// @param WeightStyle Alow to modify weight for example if equal to 1 all weights are set to 1
+  /// @param SubEventSelectionVec Vector of additional cuts for sub event (particle, ring etc.)
   virtual std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                                             const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                                             const std::vector<KinematicCut> &SubEventSelectionVec = {}) = 0;
+  /// @brief Build a 2D projection of MC events into specified variables.
+  /// @param iSample Index of the sample.
+  /// @param ProjectionVarX Name of the variable for the X axis.
+  /// @param ProjectionVarY Name of the variable for the Y axis.
+  /// @param EventSelectionVec Vector of event-level selection cuts.
+  /// @param WeightStyle Weighting scheme (e.g. 0 = nominal weights, 1 = unit weights).
+  /// @param SubEventSelectionVec Vector of sub-event selection cuts.
   virtual std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX,
                                             const std::string& ProjectionVarY,
                                             const std::vector< KinematicCut >& EventSelectionVec = {},
@@ -210,9 +263,6 @@ protected:
 
   /// Contains how many samples we've got
   M3::int_t nSamples;
-
-  /// Number of MC events are there
-  unsigned int nEvents;
 
   /// Holds information about used Generator and MaCh3 modes
   std::unique_ptr<MaCh3Modes> Modes;

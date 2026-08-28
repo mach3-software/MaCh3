@@ -36,9 +36,8 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
 /// KS: Base case for recursion
 template<typename T>
-bool CheckNodeExistsHelper(const T& node) {
+bool CheckNodeExistsHelper([[maybe_unused]] const T& node) {
 // **********************
-  (void)node;
   return true; // Node exists, return true
 }
 
@@ -288,7 +287,7 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 /// @param File name of file in which function is being called to make better error message
 /// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type Get(const YAML::Node& node, const std::string File, const int Line) {
+Type Get(const YAML::Node& node, const std::string& File, const int Line) {
 // **********************
   try {
     // Attempt to convert the node to the expected type
@@ -326,7 +325,7 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
 /// @param File name of file in which function is being called to make better error message
 /// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, const Type defval, const std::string File = "", const int Line = 1) {
+Type GetFromManager(const YAML::Node& node, const Type defval, const std::string& File, const int Line) {
 // **********************
   if (!node) {
     return defval;
@@ -358,7 +357,8 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
   // KS: YAML can be dumb and not throw error if you pass toml for example...
   if (!(filename.length() >= 5 && filename.compare(filename.length() - 5, 5, ".yaml") == 0) &&
       !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
-      MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
+      MACH3LOG_ERROR("Invalid file extension: {}", filename);
+      MACH3LOG_ERROR("I was expecting .yaml or .yml");
       throw MaCh3Exception(File, Line);
   }
 

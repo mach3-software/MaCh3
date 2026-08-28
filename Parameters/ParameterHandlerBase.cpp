@@ -1,5 +1,4 @@
 #include "Parameters/ParameterHandlerBase.h"
-
 #include "Samples/HistogramUtils.h"
 
 #include <regex>
@@ -10,6 +9,8 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   doSpecialStepProposal = false;
+  // Not using adaptive by default
+  use_adaptive = false;
   if (threshold < 0 || threshold >= 1) {
     MACH3LOG_INFO("NOTE: {} {}", name, file);
     MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
@@ -18,32 +19,9 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
     MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
     pca = false;
   }
-  Init(name, file);
 
-  // Call the innocent helper function
-  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
-}
-// ********************************************
-ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
-                     : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
-// ********************************************
-  MACH3LOG_INFO("Constructing instance of ParameterHandler using");
-  doSpecialStepProposal = false;
-  for(unsigned int i = 0; i < YAMLFile.size(); i++)
-  {
-    MACH3LOG_INFO("{}", YAMLFile[i]);
-  }
-  MACH3LOG_INFO("as an input");
+  InitFromFile(name, file);
 
-  if (threshold < 0 || threshold >= 1) {
-    MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
-    MACH3LOG_INFO("Please specify a number between 0 and 1");
-    MACH3LOG_INFO("You specified: ");
-    MACH3LOG_INFO("Am instead calling the usual non-PCA constructor...");
-    pca = false;
-  }
-
-  Init(YAMLFile);
   // Call the innocent helper function
   if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
@@ -74,8 +52,8 @@ void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstP
 
   PCAObj = std::make_unique<PCAHandler>();
   //Check whether first and last pcadpar are set and if not just PCA everything
-  if(FirstPCAdpar == -999 || LastPCAdpar == -999){
-    if(FirstPCAdpar == -999 && LastPCAdpar == -999){
+  if(FirstPCAdpar == -999 || LastPCAdpar == -999) {
+    if(FirstPCAdpar == -999 && LastPCAdpar == -999) {
       FirstPCAdpar = 0;
       LastPCAdpar = covMatrix->GetNrows()-1;
     }
@@ -92,7 +70,7 @@ void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstP
 }
 
 // ********************************************
-void ParameterHandlerBase::Init(const std::string& name, const std::string& file) {
+void ParameterHandlerBase::InitFromFile(const std::string& name, const std::string& file) {
 // ********************************************
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file.c_str(), "READ");
@@ -119,29 +97,13 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
   for (int iThread = 0; iThread < nThreads; iThread++) {
     random_number.emplace_back(std::make_unique<TRandom3>(0));
   }
-  // Not using adaptive by default
-  use_adaptive = false;
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
-  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  // Set the defaults to true
-  for(int i = 0; i < _fNumPar; i++) {
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++) {
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
+  ReserveMemory(_fNumPar);
   SetName(name);
   MakePosDef(CovMat);
   SetCovMatrix(CovMat);
-  if (_fNumPar <= 0) {
-    MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", GetName(), _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  ReserveMemory(_fNumPar);
 
   infile->Close();
 
@@ -151,258 +113,31 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
 }
 
 // ********************************************
-// ETA An init function for the YAML constructor
-// All you really need from the YAML file is the number of Systematics
-void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
-// ********************************************
-  std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
-  int running_num_file_pars = 0;
-
-  _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < YAMLFile.size(); i++)
-  {
-    YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
-
-    if (YAMLDocTemp["ThrowMatrixOverride"]) { // LP: this allows us to put in
-                                              // proposal matrix overrides per
-                                              // parameter-containing file, add
-                                              // the block diagonal proposal
-                                              // matrix to a list and overwrite
-                                              // the throw matrix after set up.
-      auto filename =
-          YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
-      TFile *submatrix_file = TFile::Open(filename.c_str());
-
-      auto matrixname =
-          YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
-      std::unique_ptr<TMatrixDSym> submatrix{
-          submatrix_file->Get<TMatrixDSym>(matrixname.c_str())};
-      if (!submatrix) {
-        MACH3LOG_CRITICAL("Covariance matrix {} doesn't exist in file: {}",
-                          matrixname, filename);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-      auto numrows = submatrix->GetNrows();
-      // LP: the -1 here is because we specify the last index for consistency
-      // with PCAHandler, not the first index after the end as is more common
-      // throughout computer science...
-      ThrowSubMatrixOverrides[{running_num_file_pars,
-                               running_num_file_pars + (numrows - 1)}] =
-          std::move(submatrix);
-
-      // LP: check names by default, but have option to disable check if you
-      // know what you're doing
-      if (!bool(YAMLDocTemp["ThrowMatrixOverride"]["check_names"]) ||
-          YAMLDocTemp["ThrowMatrixOverride"]["check_names"].as<bool>()) {
-        auto nametree = submatrix_file->Get<TTree>("param_names");
-        if (!nametree) {
-          MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
-                            "ThrowMatrixOverride: {{ check_names: False }} to "
-                            "disable this check.",
-                            filename);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-        std::string *param_name = nullptr;
-        nametree->SetBranchAddress("name", &param_name);
-
-        if (nametree->GetEntries() != int(YAMLDocTemp["Systematics"].size())) {
-          MACH3LOG_CRITICAL("TTree param_names in file: {} has {} entries, but "
-                            "the corresponding yaml file only declares {} "
-                            "parameters. Set ThrowMatrixOverride: {{ "
-                            "check_names: False }} to disable this check.",
-                            filename, nametree->GetEntries(),
-                            YAMLDocTemp["Systematics"].size());
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-
-        int pit = 0;
-        for (const auto &param : YAMLDocTemp["Systematics"]) {
-          nametree->GetEntry(pit++);
-          auto yaml_pname = Get<std::string>(
-              param["Systematic"]["Names"]["FancyName"], __FILE__, __LINE__);
-          if ((*param_name) != yaml_pname) {
-            MACH3LOG_CRITICAL(
-                "TTree param_names in file: {} at entry {} has parameter {}, "
-                "but "
-                "the corresponding yaml parameter is named {}. Set "
-                "ThrowMatrixOverride: {{ "
-                "check_names: False }} to disable this check.",
-                filename, pit, (*param_name), yaml_pname);
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
-        }
-      }
-      submatrix_file->Close();
-    }
-
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
-      _fYAMLDoc["Systematics"].push_back(item);
-      running_num_file_pars++;
-    }
-  }
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
-  PrintLength = 35;
-
-  // Set the covariance matrix
-  _fNumPar = int(_fYAMLDoc["Systematics"].size());
-
-  use_adaptive = false;
-
-  InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
-  throwMatrixCholDecomp = new double*[_fNumPar]();
-  for(int i = 0; i < _fNumPar; i++) {
-    throwMatrixCholDecomp[i] = new double[_fNumPar]();
-    for (int j = 0; j < _fNumPar; j++) {
-      throwMatrixCholDecomp[i][j] = 0.;
-    }
-  }
-  ReserveMemory(_fNumPar);
-
-  TMatrixDSym* _fCovMatrix = new TMatrixDSym(_fNumPar);
-  int i = 0;
-  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
-  std::map<std::string, int> CorrNamesMap;
-
-  //ETA - read in the systematics. Would be good to add in some checks to make sure
-  //that there are the correct number of entries i.e. are the _fNumPar for Names,
-  //PreFitValues etc etc.
-
-  for (auto const &param : _fYAMLDoc["Systematics"])
-  {
-    _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
-    _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
-    _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
-    _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
-    _fParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
-    
-    std::map<std::string, double> corrMap;
-    auto corrNode = param["Systematic"]["Correlations"];
-    for (const auto& item : corrNode)
-      {
-	for (const auto& kv : item)
-	  corrMap[kv.first.as<std::string>()] = kv.second.as<double>();
-      }
-    _fCorrElement[i] = std::move(corrMap);
-    
-
-    if(_fError[i] <= 0) {
-      MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
-    //ETA - a bit of a fudge but works
-    auto TempBoundsVec = GetBounds(param["Systematic"]["ParameterBounds"]);
-    _fLowBound[i] = TempBoundsVec[0];
-    _fUpBound[i] = TempBoundsVec[1];
-
-    //ETA - now for parameters which are optional and have default values
-    _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
-
-    // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
-    if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
-      ToggleFixParameter(_fFancyNames[i]);
-    }
-
-    if(param["Systematic"]["SpecialProposal"]) {
-      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i);
-    }
-
-    //Fill the map to get the correlations later as well
-    CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
-
-    //Also loop through the correlations
-    if(param["Systematic"]["Correlations"]) {
-      for(unsigned int Corr_i = 0; Corr_i < param["Systematic"]["Correlations"].size(); ++Corr_i){
-        for (YAML::const_iterator it = param["Systematic"]["Correlations"][Corr_i].begin(); it!=param["Systematic"]["Correlations"][Corr_i].end();++it) {
-          Correlations[i][it->first.as<std::string>()] = it->second.as<double>();
-        }
-      }
-    }
-    i++;
-  } // end loop over para
-  if(i != _fNumPar) {
-    MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  // ETA Now that we've been through all systematic let's fill the covmatrix
-  //This makes the root TCov from YAML
-  for(int j = 0; j < _fNumPar; j++) {
-    (*_fCovMatrix)(j, j) = _fError[j]*_fError[j];
-    //Get the map of parameter name to correlation from the Correlations object
-    for (auto const& pair : Correlations[j]) {
-      auto const& key = pair.first;
-      auto const& val = pair.second;
-      int index = -1;
-      //If you found the parameter name then get the index
-      if (CorrNamesMap.find(key) != CorrNamesMap.end()) {
-        index = CorrNamesMap[key];
-      } else {
-        MACH3LOG_ERROR("Parameter {} not in list! Check your spelling?", key);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-      double Corr1 = val;
-      double Corr2 = 0;
-      if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
-        Corr2 = Correlations[index][_fFancyNames[j]];
-        //Do they agree to better than float precision?
-        if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
-          MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
-          MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
-          throw MaCh3Exception(__FILE__ , __LINE__ );
-        }
-      } else {
-        MACH3LOG_ERROR("Correlation does not appear reciprocally between {} and {}", _fFancyNames[j], key);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-      (*_fCovMatrix)(j, index)= (*_fCovMatrix)(index, j) = Corr1*_fError[j]*_fError[index];
-    }
-  }
-
-  //Now make positive definite
-  MakePosDef(_fCovMatrix);
-  SetCovMatrix(_fCovMatrix);
-
-  if (_fNumPar <= 0) {
-    MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  for(auto const & matovr : ThrowSubMatrixOverrides){
-    SetSubThrowMatrix(matovr.first.first, matovr.first.second, *matovr.second);
-  }
-
-  Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
-
-  MACH3LOG_INFO("Created covariance matrix from files: ");
-  for(const auto &file : YAMLFile){
-    MACH3LOG_INFO("{} ", file);
-  }
-  MACH3LOG_INFO("----------------");
-  MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
-  MACH3LOG_INFO("----------------");
-}
-
-// ********************************************
 void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const int Index){
 // ********************************************
   doSpecialStepProposal = true;
 
   bool CircEnabled = false;
+  std::pair<double, double> circular_bounds;
+
   bool FlipEnabled = false;
+  std::string flip_group;
+  double flip_point;
 
   if (param["CircularBounds"]) {
     CircEnabled = true;
+    circular_bounds = Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__);
   }
 
   if (param["FlipParameter"]) {
     FlipEnabled = true;
+    // grab flip group if it exists, otherwise use the parameter name as the group
+    if (param["FlipGroup"]) {
+      flip_group = Get<std::string>(param["FlipGroup"], __FILE__, __LINE__);
+    } else {
+      flip_group = GetParFancyName(Index);
+    }
+    flip_point = Get<double>(param["FlipParameter"], __FILE__, __LINE__);
   }
 
   if (!CircEnabled && !FlipEnabled) {
@@ -412,48 +147,58 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (CircEnabled) {
     CircularBoundsIndex.push_back(Index);
-    CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));
+    CircularBoundsValues.push_back(circular_bounds);
     MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
                   GetParFancyName(Index),
-                  CircularBoundsValues.back().first,
-                  CircularBoundsValues.back().second);
+                  circular_bounds.first,
+                  circular_bounds.second);
     // KS: Make sure circular bounds are within physical bounds. If we are outside of physics bound MCMC will never explore such phase space region
-    if (CircularBoundsValues.back().first < _fLowBound.at(Index) || CircularBoundsValues.back().second > _fUpBound.at(Index)) {
+    if (circular_bounds.first < _fLowBound.at(Index) || circular_bounds.second > _fUpBound.at(Index)) {
       MACH3LOG_ERROR("Circular bounds [{}, {}] for parameter {} exceed physical bounds [{}, {}]",
-                     CircularBoundsValues.back().first, CircularBoundsValues.back().second,
+                     circular_bounds.first, circular_bounds.second,
                      GetParFancyName(Index),
                      _fLowBound.at(Index), _fUpBound.at(Index));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    // KS: Make sure CircularPrior is applied only to param with flat prior. Sadly doesn't work with Gaussian
+    if(GetFlatPrior(Index) == false) {
+      MACH3LOG_ERROR("Enabled CircularPrior for parameter {}, which has gaussian prior", GetParFancyName(Index));
+      MACH3LOG_ERROR("This is not supported, CircularPrior only works with flat prior");
+      MACH3LOG_ERROR("Change FlatPrior in Parameter config to true");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 
   if (FlipEnabled) {
-    FlipParameterIndex.push_back(Index);
-    FlipParameterPoint.push_back(Get<double>(param["FlipParameter"], __FILE__, __LINE__));
-    MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
+    FlipGroup& group = FlipGroups[flip_group];
+    group.FlipParameterIndex.push_back(Index);
+    group.FlipParameterPoint.push_back(flip_point);
+
+    MACH3LOG_INFO("Enabling Flipping for parameter {} in group {} with value {}",
                   GetParFancyName(Index),
-                  FlipParameterPoint.back());
+                  flip_group,
+                  flip_point);
   }
 
   if (CircEnabled && FlipEnabled) {
-    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+    if (flip_point < circular_bounds.first || flip_point > circular_bounds.second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+                     flip_point, GetParFancyName(Index), circular_bounds.first, circular_bounds.second);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    const double low = CircularBoundsValues.back().first;
-    const double high = CircularBoundsValues.back().second;
+    const double low = circular_bounds.first;
+    const double high = circular_bounds.second;
 
     // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
-    const double flipped_low = 2 * FlipParameterPoint.back() - low;
-    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double flipped_low = 2 * flip_point - low;
+    const double flipped_high = 2 * flip_point - high;
     const double min_flip = std::min(flipped_low, flipped_high);
     const double max_flip = std::max(flipped_low, flipped_high);
 
     if (min_flip < low || max_flip > high) {
       MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
+                     flip_point, GetParFancyName(Index), low, high);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
@@ -485,19 +230,20 @@ void ParameterHandlerBase::SetCovMatrix(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
-  _fNames = std::vector<std::string>(SizeVec);
-  _fFancyNames = std::vector<std::string>(SizeVec);
-  _fPreFitValue = std::vector<double>(SizeVec);
-  _fError = std::vector<double>(SizeVec);
-  _fCurrVal = std::vector<double>(SizeVec);
-  _fPropVal = std::vector<M3::float_t>(SizeVec);
-  _fLowBound = std::vector<double>(SizeVec);
-  _fUpBound = std::vector<double>(SizeVec);
-  _fFlatPrior = std::vector<bool>(SizeVec);
-  _fIndivStepScale = std::vector<double>(SizeVec);
-  _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
+  if (SizeVec <= 0) {
+    MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", GetName(), SizeVec);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  _fPreFitValue     = std::vector<double>(SizeVec, 1.0);
+  _fError           = std::vector<double>(SizeVec, 1.0);
+  _fCurrVal         = std::vector<double>(SizeVec, 0.0);
+  _fPropVal         = std::vector<M3::float_t>(SizeVec, 0.0);
+  _fLowBound        = std::vector<double>(SizeVec, -999.99);
+  _fUpBound         = std::vector<double>(SizeVec, 999.99);
+  _fFlatPrior       = std::vector<bool>(SizeVec, false);
+  _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
   _fParameterGroup = std::vector<std::string>(SizeVec);
-  _fCorrElement = std::vector<std::map<std::string,double>>(SizeVec);
 
   corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)
@@ -505,16 +251,18 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 
   // Set the defaults to true
   for(int i = 0; i < SizeVec; i++) {
-    _fPreFitValue.at(i) = 1.;
-    _fError.at(i) = 1.;
-    _fCurrVal.at(i) = 0.;
-    _fPropVal.at(i) = 0.;
-    _fLowBound.at(i) = -999.99;
-    _fUpBound.at(i) = 999.99;
-    _fFlatPrior.at(i) = false;
-    _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
     randParams[i] = 0.0;
+  }
+
+  InvertCovMatrix.resize(SizeVec, std::vector<double>(SizeVec, 0.0));
+  throwMatrixCholDecomp = new double*[SizeVec]();
+  // Set the defaults to true
+  for(int i = 0; i < SizeVec; i++) {
+    throwMatrixCholDecomp[i] = new double[SizeVec]();
+    for (int j = 0; j < SizeVec; j++) {
+      throwMatrixCholDecomp[i][j] = 0.;
+    }
   }
 
   _fGlobalStepScale = 1.0;
@@ -692,11 +440,9 @@ void ParameterHandlerBase::SpecialStepProposal() {
       CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
-  // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    const int index = FlipParameterIndex[i];
-    if(!IsParameterFixed(index))
-      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+  // // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  for (const auto& [group_name, group] : FlipGroups) {
+    FlipParameterGroup(group_name);
   }
 }
 
@@ -790,23 +536,28 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
 void ParameterHandlerBase::CircularParBounds(const int index, const double LowBound, const double UpBound) {
 // *************************************
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wuseless-cast"
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = static_cast<M3::float_t>(LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound));
   } else if (_fPropVal[index] < LowBound) {
     _fPropVal[index] = static_cast<M3::float_t>(UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound));
   }
-  #pragma GCC diagnostic pop
 }
 
 // *************************************
-void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
+void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
 // *************************************
   if(random_number[0]->Uniform() < 0.5) {
-    _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
+    for (size_t i = 0; i < FlipGroups[group].FlipParameterIndex.size(); ++i) {
+      const int index = FlipGroups[group].FlipParameterIndex[i];
+      if(!IsParameterFixed(index)) {
+        const double flip_point = FlipGroups[group].FlipParameterPoint[i];
+        _fPropVal[index] = static_cast<M3::float_t>(2 * flip_point - _fPropVal[index]);
+      }
+    }
   }
 }
+
+
 #pragma GCC diagnostic pop
 // ********************************************
 // Function to print the prior values
@@ -814,7 +565,7 @@ void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParInit(i));
+    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParPreFit(i));
   }
 }
 
@@ -869,13 +620,11 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:NOutside)
-  #endif
-  for (int i = 0; i < _fNumPar; ++i){
-    if(_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]){
-      NOutside++;
-    }
+  for (int i = 0; i < _fNumPar; ++i) {
+    // KS: Count how many parameters are outside bounds using branchless logic
+    // faster by at least factor two
+    // Do not multithread even with 5k params no gains
+    NOutside += (_fPropVal[i] > _fUpBound[i]) | (_fPropVal[i] < _fLowBound[i]);
   }
   return NOutside;
 }
@@ -905,7 +654,7 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
     }
     // If not empty, set the parameters to the specified
   } else {
-    if (pars.size() != size_t(_fNumPar)) {
+    if (pars.size() != static_cast<size_t>(_fNumPar)) {
       MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
@@ -1027,14 +776,6 @@ void ParameterHandlerBase::SetFreeParameter(const std::string& name) {
 }
 
 // ********************************************
-void ParameterHandlerBase::ToggleFixAllParameters() {
-// ********************************************
-  // toggle fix/free all parameters
-  if(!pca) for (int i = 0; i < _fNumPar; i++) ToggleFixParameter(i);
-  else PCAObj->ToggleFixAllParameters(_fNames);
-}
-
-// ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
@@ -1064,7 +805,6 @@ void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
     ToggleFixParameter(Index);
     return;
   }
-
   MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
 }
 
@@ -1102,7 +842,7 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {
 // ********************************************
-  if (int(stepscale.size()) != _fNumPar)
+  if (static_cast<int>(stepscale.size()) != _fNumPar)
   {
     MACH3LOG_WARN("Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
@@ -1129,23 +869,24 @@ void ParameterHandlerBase::PrintIndivStepScale() const {
 
 // ********************************************
 //Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
-void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
+void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov, bool verbose) {
 // ********************************************
   if(cov == nullptr){
     cov = &*covMatrix;
     MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);
   }
 
-  M3::MakeMatrixPosDef(cov);
+  int n_attempts = M3::MakeMatrixPosDef(cov);
+
+  if(n_attempts > 0 && verbose) {
+    MACH3LOG_WARN("Covariance matrix {} was not positive-definite, made it positive-definite after {} attempts", matrixName, n_attempts);
+  }
 }
 
 // ********************************************
 void ParameterHandlerBase::ResetIndivStepScale() {
 // ********************************************
-  std::vector<double> stepScales(_fNumPar);
-  for (int i = 0; i <_fNumPar; i++) {
-    stepScales[i] = 1.;
-  }
+  std::vector<double> stepScales(_fNumPar, 1.0);
   _fGlobalStepScale = 1.0;
   SetIndivStepScale(stepScales);
 }
@@ -1169,9 +910,8 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
-void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
+void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
 // ********************************************
-
    if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1186,7 +926,11 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
-  else MakePosDef(throwMatrix);
+  else {
+    // HW: Prevent spam from adaptive handler
+    bool verbose = AdaptiveHandler ? AdaptiveHandler->GetTotalSteps() < 2 : true;
+    MakePosDef(throwMatrix, verbose);
+  }
 
   auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
 
@@ -1202,6 +946,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
     }
   }
 }
+
 // ********************************************
 void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
                                              TMatrixDSym const &subcov) {
@@ -1234,6 +979,41 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
   SetThrowMatrix(cov);
 }
 
+
+// ********************************************
+void ParameterHandlerBase::SanitizeAdaption() const {
+// ********************************************
+  for (const auto& [_, group] : FlipGroups) {
+    for (size_t i = 0; i < group.FlipParameterIndex.size(); ++i) {
+      const int index = group.FlipParameterIndex[i];
+      if(!param_skip_adapt_flags[index]) {
+        MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
+        MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
+        MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+  }
+
+  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
+  // We don't want to change one parameter while keeping the other fixed as this would
+  // lead to weird penalty terms in the prior after adapting
+  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
+  for (int i = 0; i < _fNumPar; ++i) {
+    for (int j = 0; j <= i; ++j) {
+      // The symmetry should have been checked during the Init phase
+      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
+        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
+        if(std::fabs(corr) > max_correlation) {
+          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
+                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    }
+  }
+}
+
 // ********************************************
 // HW : Here be adaption
 void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
@@ -1253,43 +1033,23 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   _fGlobalStepScaleInitial = _fGlobalStepScale;
 
   // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
-  std::vector<std::string> params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
+  auto params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {}, __FILE__ , __LINE__);
   // Build a list of skip flags
   param_skip_adapt_flags.resize(_fNumPar, false);
   for (int i = 0; i <_fNumPar; ++i) {
-    for (const auto& name : params_to_skip) {
-      if(name == _fFancyNames[i]) {
-        param_skip_adapt_flags[i] = true;
-        break;
-      }
-    }
+    param_skip_adapt_flags[i] = M3::CaseInsensitiveMatchAny(_fFancyNames[i], params_to_skip);
   }
-  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
-  // We don't want to change one parameter while keeping the other fixed as this would
-  // lead to weird penalty terms in the prior after adapting
-  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
-  for (int i = 0; i < _fNumPar; ++i) {
-    for (int j = 0; j <= i; ++j) {
-      // The symmetry should have been checked during the Init phase
-      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
-        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
-        if(std::fabs(corr) > max_correlation) {
-          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
-                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-      }
-    }
-  }
+
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName,
     &_fFancyNames, &_fCurrVal, &_fError,
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
   if (success) {
+    // Ensure there is no misconfiguration in adaption config
+    SanitizeAdaption();
     AdaptiveHandler->Print();
-  }
-  else {
+  } else {
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 
@@ -1344,7 +1104,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
   }
 
   /// Need to adjust the scale every step
-  if(AdaptiveHandler->GetUseRobbinsMonro()){
+  if(AdaptiveHandler->GetStartRobbinsMonro()){
     bool verbose=false;
     #ifdef MACH3_DEBUG
     verbose=true;
@@ -1425,7 +1185,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 
 // ********************************************
 // KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
-TH2D* ParameterHandlerBase::GetCorrelationMatrix() {
+TH2D* ParameterHandlerBase::GetCorrelationMatrix() const {
 // ********************************************
   TH2D* hMatrix = new TH2D(GetName().c_str(), GetName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
   hMatrix->SetDirectory(nullptr);
@@ -1468,52 +1228,13 @@ void ParameterHandlerBase::SaveUpdatedMatrixConfig() {
   for (YAML::Node param : copyNode["Systematics"])
   {
     //KS: Feel free to update it, if you need updated prefit value etc
-    param["Systematic"]["StepScale"]["MCMC"] = M3::Utils::FormatDouble(_fIndivStepScale[i], 4);
+    param["Systematic"]["StepScale"] = M3::Utils::FormatDouble(_fIndivStepScale[i], 4);
     i++;
   }
   // Save the modified node to a file
   std::ofstream fout("Modified_Matrix.yaml");
   fout << copyNode;
   fout.close();
-}
-
-// ********************************************
-bool ParameterHandlerBase::AppliesToSample(const int SystIndex, const std::string& SampleName) const {
-// ********************************************
-  // Empty means apply to all
-  if (_fSampleNames[SystIndex].size() == 0) return true;
-
-  // Make a copy and to lower case to not be case sensitive
-  std::string SampleNameCopy = SampleName;
-  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);
-
-  // Check for unsupported wildcards in SampleNameCopy
-  if (SampleNameCopy.find('*') != std::string::npos) {
-    MACH3LOG_ERROR("Wildcards ('*') are not supported in sample name: '{}'", SampleName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  bool Applies = false;
-
-  for (size_t i = 0; i < _fSampleNames[SystIndex].size(); i++) {
-    // Convert to low case to not be case sensitive
-    std::string pattern = _fSampleNames[SystIndex][i];
-    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
-
-    // Replace '*' in the pattern with '.*' for regex matching
-    std::string regexPattern = "^" + std::regex_replace(pattern, std::regex("\\*"), ".*") + "$";
-    try {
-      std::regex regex(regexPattern);
-      if (std::regex_match(SampleNameCopy, regex)) {
-        Applies = true;
-        break;
-      }
-    } catch (const std::regex_error& e) {
-      // Handle regex error (for invalid patterns)
-      MACH3LOG_ERROR("Regex error: {}", e.what());
-    }
-  }
-  return Applies;
 }
 
 // ********************************************
@@ -1550,14 +1271,14 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
       for (size_t iPar = 0; iPar < FancyNames.size(); ++iPar) {
         if(GetParFancyName(i) == FancyNames[iPar]) {
           MACH3LOG_DEBUG("Matched name {} in config", FancyNames[iPar]);
-          PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
-          PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
+          PosteriorFile->SetBranchStatus(BranchNames[iPar].c_str(), true);
+          PosteriorFile->SetBranchAddress(BranchNames[iPar].c_str(), &BranchValues[i]);
           matched = true;
           break;
         }
       }
       if(!matched) {
-        MACH3LOG_WARN("Didn't match param {} is this what you want?", GetParFancyName(i));
+        MACH3LOG_WARN("Didn't match param {}, is this what you want?", GetParFancyName(i));
       }
     }
   } else {
@@ -1565,8 +1286,8 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     for (int i = 0; i < GetNumParams(); ++i) {
       BranchNames[i] = GetParName(i);
       if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
-        MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!", BranchNames[i]);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_WARN("Branch '{}' does not exist in the TTree, is this what you want?", BranchNames[i]);
+        continue;
       }
       PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
       PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);

@@ -63,14 +63,14 @@ void InitialiseNuDockObj(Manager *man,
     MACH3LOG_INFO("Setting up NuDock server.");
   }
 
-  bool useDebug = GetFromManager(man->raw()[nudock_conf_name]["Debug"], false);
+  bool useDebug = GetFromManager(man->raw()[nudock_conf_name]["Debug"], false, __FILE__, __LINE__);
   std::string schemaLocation = GetFromManager<std::string>(
-      man->raw()[nudock_conf_name]["SchemaLocation"], "");
+      man->raw()[nudock_conf_name]["SchemaLocation"], "", __FILE__, __LINE__);
   std::string commTypeStr = GetFromManager<std::string>(
-      man->raw()[nudock_conf_name]["CommunicationType"], "LOCALHOST");
-  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234);
+      man->raw()[nudock_conf_name]["CommunicationType"], "LOCALHOST", __FILE__, __LINE__);
+  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234, __FILE__, __LINE__);
   std::string verbosity =
-      GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO");
+      GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO", __FILE__, __LINE__);
 
   CommunicationType commType;
   if (CommunicationTypeMap.find(commTypeStr) != CommunicationTypeMap.end()) {
@@ -104,12 +104,12 @@ void InitialiseNuDockObj(Manager *man,
 
 void FormatOscParsForNuDock(const std::string &param_name, double &param_value) {
   if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
-    param_value = asin(sqrt(param_value));
+    param_value = std::asin(std::sqrt(param_value));
   }
 }
 
 void FormatOscParsForMaCh3(const std::string &param_name, double &param_value) {
   if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
-    param_value = sin(param_value) * sin(param_value);
+    param_value = std::sin(param_value) * std::sin(param_value);
   }
 }

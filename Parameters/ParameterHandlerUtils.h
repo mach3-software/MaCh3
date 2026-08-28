@@ -39,6 +39,39 @@ _MaCh3_Safe_Include_End_ //}
 
 namespace M3
 {
+/// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
+/// @param Text    Input string to test.
+/// @param Pattern Wildcard pattern to match against.
+inline bool CaseInsentiveMatch(std::string Text, std::string Pattern) {
+  // Make a copy and to lower case to not be case sensitive
+  std::transform(Text.begin(), Text.end(), Text.begin(), ::tolower);
+
+  // Convert to low case to not be case sensitive
+  std::transform(Pattern.begin(), Pattern.end(), Pattern.begin(), ::tolower);
+  try {
+    // Replace '*' in the Pattern with '.*' for regex matching
+    std::string RegexPattern = "^" + std::regex_replace(Pattern, std::regex("\\*"), ".*") + "$";
+    std::regex Regex(RegexPattern);
+    return std::regex_match(Text, Regex);
+  }
+  catch (const std::regex_error& e) {
+    MACH3LOG_ERROR("Regex error: {}", e.what());
+    return false;
+  }
+}
+
+/// @brief Matches a string against a simple wildcard Pattern using regex. Is not case sensitive
+/// @param Text    Input string to test.
+/// @param Patterns Collection wildcard patterns to match against.
+inline bool CaseInsensitiveMatchAny(std::string Text, const std::vector<std::string>& Patterns) {
+  for (size_t i = 0; i < Patterns.size(); i++) {
+    if (M3::CaseInsentiveMatch(Text, Patterns[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /// @brief CW: Multi-threaded matrix multiplication
 inline double* MatrixMult(double *A, double *B, int n) {
   //CW: First transpose to increse cache hits
@@ -330,7 +363,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node& syst_i = it_i->second;
 
       syst_i["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
-      syst_i["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+      syst_i["Error"] = M3::Utils::FormatDouble(Errors[i], 4);
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < FancyNames.size(); ++j) {
@@ -358,7 +391,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       }
 
       syst["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
-      syst["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+      syst["Error"] = M3::Utils::FormatDouble(Errors[i], 4);
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < Correlation[i].size(); ++j) {
@@ -516,7 +549,7 @@ inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
 
 // *************************************
 /// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
-inline void MakeMatrixPosDef(TMatrixDSym *cov) {
+inline int MakeMatrixPosDef(TMatrixDSym *cov) {
 // *************************************
   //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
   //Means we no longer need to overload
@@ -528,16 +561,31 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
   const int matrixSize = cov->GetNrows();
   int iAttempt = 0;
   bool CanDecomp = false;
+  
+  // HW: We'll store the diagonal first to prevent inflating the matrix too much!
+  std::vector<double> original_diagonal(matrixSize, 0.0);
+  for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+    original_diagonal[iVar] = (*cov)(iVar, iVar);
+  }
+
+  int attempts = 0;
 
   for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
     if (CanDecomposeMatrix(*cov)) {
       CanDecomp = true;
+      attempts = iAttempt;
       break;
-    } else {
+    }
+    else {
       #ifdef MULTITHREAD
       #pragma omp parallel for
-      #endif
+      #endif 
       for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+        if( (*cov)(iVar, iVar)/10 > original_diagonal[iVar]) {
+          MACH3LOG_DEBUG("Diagonal element {} has been shifted too much (> original value/10). Stopping further shifts.", iVar);
+          original_diagonal[iVar] = 0; // Prevent further shifts for this element
+          continue;
+        }
         (*cov)(iVar, iVar) += 1e-9;
       }
     }
@@ -551,6 +599,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
 
   //DB Resetting warning level
   gErrorIgnoreLevel = originalErrorWarning;
+  return attempts;
 }
 
 

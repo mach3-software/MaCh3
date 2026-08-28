@@ -28,7 +28,7 @@ struct MaCh3ModeInfo {
   /// Spline suffix
   std::string SplineSuffix;
   /// @brief KS: Checks MaCh3 modes is associated with a given generator mode
-  inline bool IsMode(const int GenMode) const {
+  bool IsMode(const int GenMode) const {
     bool exists = std::find(GeneratorMaping.begin(), GeneratorMaping.end(), GenMode) != GeneratorMaping.end();
     return exists;
   }
@@ -129,6 +129,13 @@ struct MaCh3ModeInfo {
 /// @note If you attempt to access a mode outside the defined range, the class
 /// will return the `UNKNOWN_BAD` category instead of throwing.
 ///
+/// @section SplineSuffix Spline Suffix
+///
+/// To allow for finer granularity, each MaCh3 mode can be assigned a spline suffix.
+/// This functionality is used exclusively by @ref BinnedSplineHandler.
+///
+/// Multiple MaCh3 modes may share the same spline suffix; in such cases,
+/// a single spline mode represents a combination of those MaCh3 modes.
 ///
 /// @author Kamil Skwarczynski
 /// @author Daniel Barrow
@@ -145,26 +152,31 @@ class MaCh3Modes {
   void Print() const;
 
   /// @brief KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category
-  inline int GetNModes() const {return NModes;}
+  int GetNModes() const {return NModes;}
   /// @brief KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD
   /// @name of MaCh3 mode
   MaCh3Modes_t GetMode(const std::string& name) const;
   /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
+  /// @param Index MaCh3 mode enumerator
   std::string GetMaCh3ModeName(const int Index) const;
   /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
+  /// @param Index MaCh3 mode enumerator
   int GetMaCh3ModePlotColor(const int Index) const;
   /// @brief KS: Get fancy name of mode, if mode not known you will get UNKNOWN_BAD
+  /// @param Index MaCh3 mode enumerator
   std::string GetMaCh3ModeFancyName(const int Index) const;
   /// @brief DB: Get IsNC (a check whether the given MaCh3 corresponds to a Neutral Current mode)
   bool IsMaCh3ModeNC(const int Index) const;
-  /// @brief DB: Get binned spline mode suffic from MaCh3 Mode
+  /// @brief DB: Get binned spline mode suffix from MaCh3 Mode
+  /// @param Index MaCh3 mode enumerator
   std::string GetSplineSuffixFromMaCh3Mode(const int Index);
   /// @brief KS: Get MaCh3 mode from generator mode
+  /// @param Index Generator mode enumerator
   MaCh3Modes_t GetModeFromGenerator(const int Index) const;
   /// @brief Get class name
-  inline std::string GetName() const {return "MaCh3Modes";};
+  std::string GetName() const {return "MaCh3Modes";};
   /// @brief Return count of CC modes
-  inline int GetNCCModes() const {return nCCModes;};
+  int GetNCCModes() const {return nCCModes;};
 
  private:
   /// @brief KS: Initialise MaCh3 modes based on provided config

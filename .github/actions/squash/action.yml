@@ -1,0 +1,31 @@
+---
+name: "Squash Branch"
+description: "Squash all commits in a branch into a single commit"
+inputs:
+  branch:
+    description: "Branch to squash"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout branch
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      with:
+        ref: ${{ inputs.branch }}
+        fetch-depth: 0
+
+    - name: Squash commits
+      shell: bash
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+        # Reset to first commit
+        git reset --soft "$(git rev-list --max-parents=0 HEAD)"
+
+        # Create single commit
+        git commit --amend -m "Squashed all commits into one"
+
+        # Force push
+        git push origin ${{ inputs.branch }} --force

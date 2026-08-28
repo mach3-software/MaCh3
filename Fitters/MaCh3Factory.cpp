@@ -6,7 +6,7 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
 // ********************************************
   std::unique_ptr<FitterBase> MaCh3Fitter = nullptr;
 
-  auto Algorithm = GetFromManager<std::string>(fitMan->raw()["General"]["FittingAlgorithm"], "MCMC");
+  auto Algorithm = GetFromManager<std::string>(fitMan->raw()["General"]["FittingAlgorithm"], "MCMC", __FILE__ , __LINE__);
 
   if(Algorithm == "MCMC" || Algorithm == "MR2T2") 
   {
@@ -47,19 +47,24 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  // Check if we are using --override mode
-  if (argc >= 4 && std::string(argv[2]) == "--override") {
-    const std::string overrideFile = argv[3];
-      MACH3LOG_INFO("Merging configuration files: base config '{}', override config '{}'. "
-                "Options in '{}' will take precedence over '{}'.",
-                argv[1], overrideFile, overrideFile, argv[1]);
+  std::string arg2;
+  if (argc > 2) {
+    arg2 = argv[2];
+  }
+  // Check if we are using --override mode, or for some CLI whether we simply passed .yaml
+  if ((argc == 4 && arg2 == "--override") ||
+      (argc == 3 && arg2.size() >= 5 && arg2.compare(arg2.size() - 5, 5, ".yaml") == 0)) {
+    std::string overrideFile;
 
-    if(argc > 4) {
-      MACH3LOG_ERROR("Too many arguments provided when using '--override'. "
-                   "Expected only two config files. "
-                   "If using override feature, you cannot provide any additional arguments.");
-      throw MaCh3Exception(__FILE__, __LINE__);
+    if (arg2 == "--override") {
+      overrideFile = argv[3];
+    } else {
+      overrideFile = arg2;
     }
+    MACH3LOG_INFO("Merging configuration files: base config '{}', override config '{}'. "
+                  "Options in '{}' will take precedence over '{}'.",
+                  argv[1], overrideFile, overrideFile, argv[1]);
+
     // Load the two YAML files
     YAML::Node config1 = M3OpenConfig(argv[1]);
     YAML::Node config2 = M3OpenConfig(overrideFile);
@@ -80,6 +85,8 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
         Name.find("Samples") != std::string::npos)
     {
       MACH3LOG_CRITICAL("You are overwriting settings ({}) that are highly likely intended to be committed.", Name);
+      /// @todo DL: Should probably replace this with something that doesn't require modifying core code
+      MACH3LOG_CRITICAL("If you're sure you want to do this, e.g. for testing or step size tuning, you can remove the throw that lives here:");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   };
@@ -125,6 +132,28 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
       SanityOverwrite(key);
       SanityOverwrite(key2);
       FitManager->OverrideSettings(section, key, key2, value);
+    } else if (colonCount == 4) {
+      const size_t firstColon = arg.find(':');
+      const size_t secondColon = arg.find(':', firstColon + 1);
+      const size_t thirdColon = arg.find(':', secondColon + 1);
+      const size_t fourthColon = arg.find(':', thirdColon + 1);
+
+      const std::string section = arg.substr(0, firstColon);
+      const std::string key = arg.substr(firstColon + 1, secondColon - firstColon - 1);
+      const std::string key2 = arg.substr(secondColon + 1, thirdColon - secondColon - 1);
+      const std::string key3 = arg.substr(thirdColon + 1, fourthColon - thirdColon - 1);
+      const std::string value = arg.substr(fourthColon + 1);
+
+      MACH3LOG_INFO(
+        "Overriding setting: Section={}, Key={}, Key={}, Key={}, Value={}",
+        section, key, key2, key3, value);
+
+      SanityOverwrite(section);
+      SanityOverwrite(key);
+      SanityOverwrite(key2);
+      SanityOverwrite(key3);
+
+      FitManager->OverrideSettings(section, key, key2, key3, value);
     } else {
       MACH3LOG_ERROR("Invalid override argument format: {}", arg);
       MACH3LOG_ERROR("Expected format:Section:Key:Key:Value, Section:Key:Value or Section:Value");

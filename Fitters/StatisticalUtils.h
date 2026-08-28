@@ -18,12 +18,14 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLine.h"
 #include "TROOT.h"
 #include "TStyle.h"
+#include "TGraphAsymmErrors.h"
 _MaCh3_Safe_Include_End_ //}
+
+class TGraphAsymmErrors;
 
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3
 /// @author Kamil Skwarczynski
-
 
 namespace M3 {
   /// @brief KS: Different Information Criterion tests mostly based Gelman paper
@@ -156,6 +158,12 @@ double GetIQR(TH1D *Hist);
 
 /// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
 ///
+/// @param Data Vector of data entries.
+/// @param MC Vector of MC entries.
+/// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
+double ComputeKLDivergence(const std::vector<double>& Data, const std::vector<double>& MC);
+/// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
+///
 /// @param DataPoly Pointer to the data histogram (TH2Poly).
 /// @param PolyMC Pointer to the Monte Carlo histogram (TH2Poly).
 /// @return The Kullback-Leibler divergence value. Returns 0 if the data or MC integral is zero.
@@ -166,6 +174,17 @@ double ComputeKLDivergence(TH2Poly* DataPoly, TH2Poly* PolyMC);
 /// @param pvalues A vector of individual p-values to combine.
 /// @return The combined p-value, representing the overall significance.
 double FisherCombinedPValue(const std::vector<double>& pvalues);
+
+/// @brief Convert a posterior probability histogram into a \f$\Delta\chi^2\f$ distribution. Using
+/// the likelihood-ratio definition:
+///
+/// \f[
+///   \Delta\chi^2 = -2 \ln\left(\frac{L}{L_{\max}}\right)
+/// \f]
+///
+/// @param posterior_probability_hist Pointer to a TH1D histogram containing posterior probabilities
+/// @note based on CompareMaCh3PThetaDeltaChi2.C
+std::unique_ptr<TH1D> GetDeltaChi2(TH1D* posterior_probability_hist);
 
 /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
 ///
@@ -206,5 +225,17 @@ double GetModeError(TH1D* hpost);
 /// @warning The canvas is saved to the current ROOT file using `TempCanvas->Write()`.
 void Get2DBayesianpValue(TH2D *Histogram);
 
-
+/// @brief Propagate numerator uncertainties to a ratio histogram.
 void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist);
+
+/// @brief Create a TGraphAsymmErrors from a histogram using exact Poisson
+///        confidence intervals instead of symmetric sqrt(N) uncertainties.
+/// @author Yashwanth S Prabhu
+std::unique_ptr<TGraphAsymmErrors> PoissonGraph(const TH1D* h, double cl = 0.683);
+
+/// @brief Create a TGraphAsymmErrors from a histogram using exact Poisson
+///        confidence intervals instead of symmetric sqrt(N) uncertainties.
+///        Assume bin width scaling
+/// @author Yashwanth S Prabhu
+std::unique_ptr<TGraphAsymmErrors> PoissonGraphScaled(const TH1D* h, double scale = 1.0, double cl = 0.683);
+

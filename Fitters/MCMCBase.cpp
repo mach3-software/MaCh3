@@ -16,7 +16,7 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
+    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
     if (AnnealTemp < 0)
         anneal = false;
     else
@@ -31,6 +31,23 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
 // Run the Markov chain with all the systematic objects added
 void MCMCBase::RunMCMC() {
 // *******************
+    // Multicanonical method toggle from yaml config
+    multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"]["Enabled"], false, __FILE__, __LINE__);
+    MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
+
+    if (multicanonical) {
+        /// Initialise the multicanonical handler
+        multicanonicalHandler = std::make_unique<MulticanonicalMCMCHandler>();
+    
+        // Initialize the multicanonical handler with the systematics
+        multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
+        AlgorithmName += "_UmbrellaSampling"; // Append to the algorithm name
+#ifdef MACH3_DEBUG
+    // Enable debug output stream for multicanonical handler if debug is enabled
+    multicanonicalHandler->setDebugStream(&debugFile, debug);
+#endif
+    }
+
     // Save the settings into the output file
     SaveSettings();
 
@@ -48,6 +65,11 @@ void MCMCBase::RunMCMC() {
         // Reconfigure the samples, systematics and oscillation for first weight
         // ProposeStep sets logLProp
         ProposeStep();
+
+        // Initialise the value of the multicanonical parameter to the centres of the umbrellas
+        if (multicanonical){
+            multicanonicalHandler->InitializeMulticanonicalParams(systematics);
+        }
         // Set the current logL to the proposed logL for the 0th step
         // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
         logLCurr = logLProp;
@@ -96,6 +118,7 @@ void MCMCBase::PreStepProcess() {
     // Print 10 steps in total
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
+        CheckAcceptanceRates();
         PrintProgress();
     }
 }
@@ -146,6 +169,30 @@ void MCMCBase::PrintProgress(bool StepsPrint) {
 }
 
 // *******************
+// Handles warnings for low acceptance rates
+void MCMCBase::CheckAcceptanceRates() {
+// *******************
+    const auto StepEnd = stepStart + chainLength;
+
+    // Skip check for reallllly early steps
+    if(step - stepStart < std::min(10.0, static_cast<double>(StepEnd)/10)) {
+        return;
+    }
+    // KS: Do not add "throw", this can crash CI or some short dummy chains for testing
+    if(accCount==0 && step - stepStart > StepEnd/10) {
+        MACH3LOG_CRITICAL("No steps were accepted in the MCMC chain after {} steps. Please check your  step sizes.", step - stepStart);
+    }
+
+    double acc_rate = static_cast<double>(accCount) / static_cast<double>(step - stepStart);
+
+    if (acc_rate < 0.01) {
+        MACH3LOG_WARN("Acceptance rate is very low: {:.4f}. This may indicate that the proposal distribution is not well-tuned. Consider reducing the step size.", acc_rate);
+    } else if (acc_rate > 0.5) {
+        MACH3LOG_WARN("Acceptance rate is very high: {:.4f}. This may indicate that the proposal distribution is too narrow. Consider increasing the step sizes.", acc_rate);
+    }
+}
+
+// *******************
 void MCMCBase::StartFromPreviousFit(const std::string &FitName) {
 // *******************
     // Use base class
@@ -161,11 +208,9 @@ void MCMCBase::StartFromPreviousFit(const std::string &FitName) {
 
     stepStart = step_val;
     // KS: Also update number of steps if using adaption
-    for (unsigned int i = 0; i < systematics.size(); ++i)
-    {
-        if (systematics[i]->GetDoAdaption())
-        {
-            systematics[i]->SetNumberOfSteps(step_val);
+    for (unsigned int i = 0; i < systematics.size(); ++i) {
+        if (systematics[i]->GetDoAdaption()) {
+            systematics[i]->SetNumberOfSteps(stepStart);
         }
     }
     infile->Close();

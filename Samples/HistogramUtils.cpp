@@ -63,7 +63,7 @@ double NoOverflowIntegral(TH2Poly* poly) {
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the X axis
-TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<double>& xbins, const bool computeErrors) {
+TH1D* PolyProjectionX(TObject* poly, const std::string& TempName, const std::vector<double>& xbins, const bool computeErrors) {
 // **************************************************
   TH1D* hProjX = new TH1D((TempName+"_x").c_str(),(TempName+"_x").c_str(), int(xbins.size()-1), &xbins[0]);
 
@@ -131,7 +131,7 @@ TH1D* PolyProjectionX(TObject* poly, std::string TempName, const std::vector<dou
 
 // **************************************************
 //WP: Helper function for projecting TH2Poly onto the Y axis
-TH1D* PolyProjectionY(TObject* poly, std::string TempName, const std::vector<double>& ybins, const bool computeErrors) {
+TH1D* PolyProjectionY(TObject* poly, const std::string& TempName, const std::vector<double>& ybins, const bool computeErrors) {
 // **************************************************
   TH1D* hProjY = new TH1D((TempName+"_y").c_str(),(TempName+"_y").c_str(),int(ybins.size()-1),&ybins[0]);
   //KS: Temp Histogram to store error, use double as this is thread safe
@@ -658,6 +658,123 @@ std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra,
   h1->GetYaxis()->SetTitle("Events");
 
   return h1;
+}
+
+// ************************************************
+std::vector<double> BinRangeToBinEdges(YAML::Node const &bin_range) {
+// ************************************************
+  bool is_lin = true;
+  YAML::Node bin_range_specifier;
+  if (bin_range["linspace"]) {
+    bin_range_specifier = bin_range["linspace"];
+  } else if (bin_range["logspace"]) {
+    is_lin = false;
+    bin_range_specifier = bin_range["logspace"];
+  } else {
+    std::stringstream ss;
+    ss << bin_range;
+    MACH3LOG_ERROR("When parsing binning, expected bin range specifier with "
+                   "key linspace or logspace, but found,\n{}",
+                   ss.str());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  auto nb = Get<int>(bin_range_specifier["nb"], __FILE__, __LINE__);
+  auto low = Get<double>(bin_range_specifier["low"], __FILE__, __LINE__);
+  auto up = Get<double>(bin_range_specifier["up"], __FILE__, __LINE__);
+
+  std::vector<double> edges(nb + 1, low);
+  // force the last bin to be exactly as parsed to avoid numerical instabilities
+  // not quite lining back up with the end of the range, which could
+  // cause spurious errors or infinitesimally small bins for specifications
+  // like: [ { logspace: { nb: 10, 1E-1, 10}, 10, 11} ]
+  edges.back() = up;
+
+  if (is_lin) {
+    double bw = (up - low) / nb;
+    for (int i = 0; i < (nb - 1); ++i) {
+      edges[i + 1] = edges[i] + bw;
+    }
+  } else {
+    double llow = std::log10(low);
+    double lup = std::log10(up);
+    double lbw = (lup - llow) / nb;
+    for (int i = 0; i < (nb - 1); ++i) {
+      edges[i + 1] = std::pow(10, llow + (i + 1) * lbw);
+    }
+  }
+
+  return edges;
+}
+
+// ************************************************
+/// @brief Builds a single dimension's bin edges from YAML::Node
+/// @details
+/// BinEdges:  [ <dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge> ] BinEdges:  { linspace: { nb: 100, low: 0, up: 10} }
+/// BinEdges:  { logspace: { nb: 100, low: 1E-1, up: 10} }
+/// BinEdges:  [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: {
+/// nb: 5, low: 15, up: 100} } ]
+std::vector<double> BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
+                           bool &found_range_specifier) {
+// ************************************************
+  if (bin_edges_node.IsMap()) {
+    found_range_specifier = true;
+    return BinRangeToBinEdges(bin_edges_node);
+  }
+  std::vector<double> edges_builder;
+  if (!bin_edges_node.IsSequence()) {
+    std::stringstream ss;
+    ss << bin_edges_node;
+    MACH3LOG_ERROR(
+        "When parsing binning, expected to find a YAML map or sequence, "
+        "but found:\n{}",
+        ss.str());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  for (auto const &it : bin_edges_node) {
+    if (it.IsScalar()) {
+      edges_builder.push_back(it.as<double>());
+    } else if (it.IsMap()) {
+      found_range_specifier = true;
+      auto range_edges = BinRangeToBinEdges(it);
+      std::copy(range_edges.begin(), range_edges.end(),
+                std::back_inserter(edges_builder));
+    } else {
+      std::stringstream ss;
+      ss << bin_edges_node;
+      MACH3LOG_ERROR(
+          "When parsing binning, expected elements in outer sequence to all be "
+          "either scalars or maps, but found:\n{}",
+          ss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // Check for duplicates or out-of-order bins
+  std::vector<double> edges;
+  for (size_t eb_it = 0; eb_it < edges_builder.size(); ++eb_it) {
+    if (edges.size()) {
+      if (edges_builder[eb_it] == edges.back()) { // remove duplicate edges
+        continue;
+      } else if (edges_builder[eb_it] < edges.back()) {
+        std::stringstream ss;
+        ss << "[ ";
+        for(auto const & e : edges_builder){
+          ss << fmt::format("{:.3g} ", e);
+        }
+        ss << "]";
+        MACH3LOG_ERROR(
+            "When parsing binning, found edges that were not monotonically "
+            "increasing, problem bin at index: {}:\n{}",
+            eb_it, ss.str());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+    edges.push_back(edges_builder[eb_it]);
+  }
+
+  return edges;
 }
 
 namespace M3 {

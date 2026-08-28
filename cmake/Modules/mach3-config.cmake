@@ -2,13 +2,12 @@ SET(MACH3_LIB_LIST "-libParameters -libManager -libFitters -libSamples -libSplin
 
 SET(MACH3_FEATURES_LIST)
 
-LIST(APPEND ALL_FEATURES_CONFIG
-  MULTITHREAD
-  GPU
-  DEBUG
-  PYTHON
-  NATIVE
-  )
+set(ALL_FEATURES_CONFIG ${ALL_FEATURES})
+# KS: Oscillator and Fitter aren't features but actual list of features so they are handled differently
+list(REMOVE_ITEM ALL_FEATURES_CONFIG
+  Oscillator
+  Fitter
+)
 foreach(f IN LISTS ALL_FEATURES_CONFIG)
   if(MaCh3_${f}_ENABLED)
     list(APPEND MACH3_FEATURES_LIST "${f}")

@@ -78,9 +78,9 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
   auto CovMatrixFile = Get<std::vector<std::string>>(Settings[std::string(PreFix) + "CovFile"], __FILE__, __LINE__);
 
   // PCA threshold, -1 means no pca
-  auto PCAThreshold = GetFromManager<int>(Settings[std::string(PreFix) + "PCAThreshold"], -1);
+  auto PCAThreshold = GetFromManager<int>(Settings[std::string(PreFix) + "PCAThreshold"], -1, __FILE__ , __LINE__);
   // do we pca whole matrix or only submatrix
-  auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999});
+  auto PCAParamRegion = GetFromManager<std::vector<int>>(Settings[std::string(PreFix) + "PCAParams"], {-999, -999}, __FILE__ , __LINE__);
 
   auto CovObject = std::make_unique<CovType>(CovMatrixFile, CovMatrixName, PCAThreshold, PCAParamRegion[0], PCAParamRegion[1]);
 
@@ -88,16 +88,14 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
   // should _ALWAYS_ be done before overriding with fix or flat
   CovObject->SetParameters();
 
-  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "Fix"], {});
+  auto FixParams = GetFromManager<std::vector<std::string>>(Settings[std::string(PreFix) + "Fix"], {}, __FILE__ , __LINE__);
 
   // Fixed CovObject parameters loop
   if (FixParams.size() == 1 && FixParams.at(0) == "All") {
-    for (int j = 0; j < CovObject->GetNumParams(); j++) {
-      CovObject->ToggleFixParameter(j);
-    }
+    CovObject->SetFixAllParameters();
   } else {
     for (unsigned int j = 0; j < FixParams.size(); j++) {
-      CovObject->ToggleFixParameter(FixParams.at(j));
+      CovObject->SetFixParameter(FixParams.at(j));
     }
   }
 

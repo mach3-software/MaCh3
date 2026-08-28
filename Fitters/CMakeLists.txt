@@ -8,11 +8,12 @@ set(HEADERS
     PSO.h
     MCMCProcessor.h
     OscProcessor.h
-    SampleSummary.h
+    RHatCalculator.h
     MaCh3Factory.h
     PredictiveThrower.h
     StatisticalUtils.h
     gpuMCMCProcessorUtils.cuh
+    MulticanonicalMCMCHandler.h
 )
 
 add_library(Fitters SHARED
@@ -25,10 +26,11 @@ add_library(Fitters SHARED
     PSO.cpp
     MCMCProcessor.cpp
     OscProcessor.cpp
-    SampleSummary.cpp
+    RHatCalculator.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
     PredictiveThrower.cpp
+    MulticanonicalMCMCHandler.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 
@@ -42,7 +44,7 @@ set_target_properties(Fitters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Fitters)
 
-target_link_libraries(Fitters PUBLIC Samples)
+target_link_libraries(Fitters PUBLIC Samples ROOT::ROOTDataFrame)
 target_link_libraries(Fitters PRIVATE MaCh3Warnings)
 
 target_include_directories(Fitters PUBLIC
@@ -56,3 +58,4 @@ install(TARGETS Fitters
         PUBLIC_HEADER DESTINATION include/Fitters)
 
 add_library(MaCh3::Fitters ALIAS Fitters)
+target_link_libraries(MaCh3 INTERFACE Fitters)

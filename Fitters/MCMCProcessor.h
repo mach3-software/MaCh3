@@ -179,14 +179,8 @@ class MCMCProcessor {
                           const std::string& Title,
                           const double EvaluationPoint) const ;
 
-    /// @brief Reweight Prior by giving new central value and new error
-    /// @param Names Parameter names for which we do reweighting
-    /// @param NewCentral New central value for which we reweight
-    /// @param NewError New error used for calculating weight
-    void ReweightPrior(const std::vector<std::string>& Names,
-                       const std::vector<double>& NewCentral,
-                       const std::vector<double>& NewError);
-    
+    /// @brief Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
+    void ProduceChi2(const std::string& GroupName) const;
 
     /// @brief Smear chain contours
     /// @param Names Parameter names for which we do smearing
@@ -252,10 +246,17 @@ class MCMCProcessor {
     
     /// @brief Get the vector of branch names from root file
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
+    /// @brief Get the vector of each sample branch names from root file
+    const std::vector<TString>& GetSampleBranchNames() const { return SampleName_v;};
+    /// @brief Get the vector of each systematic branch names from root file
+    const std::vector<TString>& GetSystBranchNames() const { return SystName_v;};
+
     /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string& Name) const;
+    /// @brief Get whether param has flat prior or not
+    bool GetParamFlat(const int iParam) const;
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
     Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
@@ -284,6 +285,8 @@ class MCMCProcessor {
       MACH3LOG_WARN("This may behave not as expected when using merged multiple chains");
       nEntries = NewEntries;
     }
+    /// @brief Set reweight branch names
+    void SetReweightNames(std::vector<std::string> NewName) { ReweightNames = NewName; }
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
     void SetStepCut(const std::string& Cuts);
@@ -327,7 +330,9 @@ class MCMCProcessor {
 
   protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
-      std::unique_ptr<TH1D> MakePrefit();
+    std::unique_ptr<TH1D> MakePrefit();
+    /// @brief Perform plot of 1d marginalised posterior with HPD etc.
+    void DrawPosterior(const int i, TDirectory* PostDir, TDirectory* PostHistDir);
     /// @brief prepare output root file and canvas to which we will save EVERYTHING
     void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
@@ -418,6 +423,8 @@ class MCMCProcessor {
     /// @param Legend Pointer to the TLegend object to modify
     /// @param size The text size to set for the legend
     void SetLegendStyle(TLegend* Legend, const double size) const;
+    /// @brief Get Min/Max ranges for single parameter
+    std::pair<double, double> GetHistRange(const int iParam) const;
 
     /// Name of MCMC file
     std::string MCMCFile;
@@ -460,7 +467,7 @@ class MCMCProcessor {
     std::vector<std::string> ExcludedGroups;
 
     /// Is the ith parameter varied
-    std::vector<bool> IamVaried;
+    std::vector<bool> ParamVaried;
     /// Name of parameters which we are going to analyse
     std::vector<std::vector<TString>> ParamNames;
     /// Parameters central values which we are going to analyse
@@ -479,9 +486,9 @@ class MCMCProcessor {
     // KS: For example flux or detector within matrix
     std::vector<std::string> ParameterGroup;
 
-    /// Vector of each systematic
-    std::vector<TString> SampleName_v;
     /// Vector of each sample PDF object
+    std::vector<TString> SampleName_v;
+    /// Vector of each systematic
     std::vector<TString> SystName_v;
     
     /// Name of output files
@@ -593,7 +600,7 @@ class MCMCProcessor {
     /// Whether to apply reweighting weight or not
     bool ReweightPosterior;
     /// Name of branch used for chain reweighting
-    std::string ReweightName;
+    std::vector<std::string> ReweightNames;
     /// Stores value of weight for each step
     double* WeightValue;
 

@@ -7,28 +7,31 @@
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
 
-/// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
+/// @brief Base class for handling systematic uncertainty parameters.
+/// @details Provides core functionality for managing systematic parameters,
+/// including likelihood evaluation and covariance handling.
+///
+/// How parameters are loaded (e.g. from configuration files or ROOT inputs)
+/// is left to derived classes.
+///
+/// In the context of MCMC, the class may also be responsible for proposing
+/// parameter steps. Proposal strategies may include PCA-based sampling or
+/// adaptive proposal matrices.
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
 /// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
-  /// @brief ETA - constructor for a YAML file
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  /// @param name Matrix name
-  /// @param threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
-  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
-  /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
   /// @param file Path to matrix root file
   ParameterHandlerBase(std::string name, std::string file, double threshold = -1, int FirstPCAdpar = -999, int LastPCAdpar = -999);
+  ParameterHandlerBase() = default;
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
@@ -90,7 +93,7 @@ class ParameterHandlerBase {
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
   /// @brief KS: In case someone really want to change this
-  inline void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
+  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -146,14 +149,12 @@ class ParameterHandlerBase {
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   std::string GetParFancyName(const int i) const {return _fFancyNames[i];}
-  /// @brief Get name of input file
-  std::string GetInputFile() const { return inputFile; }
 
   /// @brief Get the group of the parameter
   std::string GetParameterGroup(const int i) const {return _fParameterGroup[i];}
 
   /// @brief Get a map of the correlation element for a given parameter
-  std::map<std::string, double> GetCorrElements(const int i) const {return _fCorrElement[i];}
+  std::map<std::string, double> GetCorrElements(const int i) const {return Correlations[i];}
   
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
@@ -178,7 +179,7 @@ class ParameterHandlerBase {
   /// @brief Do we adapt or not
   bool GetDoAdaption() const {return use_adaptive;}
   /// @brief Use new throw matrix, used in adaptive MCMC
-  void SetThrowMatrix(TMatrixDSym *cov);
+  void SetThrowMatrix(const TMatrixDSym *cov);
   void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
@@ -197,7 +198,7 @@ class ParameterHandlerBase {
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
   /// @return A pointer to a TH2D object representing the correlation matrix
-  TH2D* GetCorrelationMatrix();
+  TH2D* GetCorrelationMatrix() const;
 
   /// @brief DB Pointer return to param position
   ///
@@ -208,7 +209,7 @@ class ParameterHandlerBase {
   /// push_back then the pointer is no longer valid... maybe need a better
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
-  const M3::float_t* RetPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
+  const M3::float_t* RetPointer(const int iParam) const {return &(_fPropVal.data()[iParam]);}
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()
@@ -231,7 +232,7 @@ class ParameterHandlerBase {
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  double GetParInit(const int i) const { return _fPreFitValue[i]; }
+  double GetParPreFit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   double GetUpperBound(const int i) const { return _fUpBound[i];}
@@ -288,14 +289,6 @@ class ParameterHandlerBase {
   /// @param name Name of the parameter to be treated as free
   void SetFreeParameter(const std::string& name);
 
-  /// @brief Toggle fixing parameters at prior values
-  void ToggleFixAllParameters();
-  /// @brief Toggle fixing parameter at prior values
-  /// @param i Parameter index
-  void ToggleFixParameter(const int i);
-  /// @brief Toggle fixing parameter at prior values
-  /// @param name Name of parameter you want to fix
-  void ToggleFixParameter(const std::string& name);
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
@@ -332,7 +325,7 @@ class ParameterHandlerBase {
   void SetTune(const std::string& TuneName);
 
   /// @brief Get pointer for PCAHandler
-  inline PCAHandler* GetPCAHandler() const {
+  PCAHandler* GetPCAHandler() const {
     if (!pca) {
       MACH3LOG_ERROR("Am not running in PCA mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -357,20 +350,17 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
                                 const std::vector<std::string>& FancyNames = {});
-
-protected:
+ protected:
   /// @brief Initialisation of the class using matrix from root file
-  void Init(const std::string& name, const std::string& file);
-  /// @brief Initialisation of the class using config
-  /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
-  void Init(const std::vector<std::string>& YAMLFile);
+  void InitFromFile(const std::string& name, const std::string& file);
   /// @brief Initialise vectors with parameters information
   /// @param size integer telling size to which we will resize all vectors/allocate memory
   void ReserveMemory(const int size);
 
   /// @brief Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix
   /// @param cov Matrix which we evaluate Positive Definitiveness
-  void MakePosDef(TMatrixDSym *cov = nullptr);
+  /// @param verbose Do we want it to print warning if it was not positive definite and we had to fix it
+  void MakePosDef(TMatrixDSym *cov = nullptr, bool verbose = true);
 
   /// @brief HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm)
   void MakeClosestPosDef(TMatrixDSym *cov);
@@ -380,16 +370,12 @@ protected:
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
+  /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
+  void SanitizeAdaption() const;
 
-  /// @brief Check if parameter is affecting given sample name
-  /// @param SystIndex number of parameter
-  /// @param SampleName The Sample name used to filter parameters.
-  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
-
-  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
-  /// @param index parameter index you want to flip
-  /// @param FlipPoint Value around which flipping is done
-  void FlipParameterValue(const int index, const double FlipPoint);
+  /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
+  /// @param group Name of the flip group
+  void FlipParameterGroup(std::string group);
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -406,7 +392,7 @@ protected:
   bool doSpecialStepProposal;
 
   /// The input root file we read in
-  const std::string inputFile;
+  std::string inputFile;
 
   /// Name of cov matrix
   std::string matrixName;
@@ -454,8 +440,6 @@ protected:
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
-  /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fSampleNames;
   /// Defines the group of the parameter
   std::vector<std::string> _fParameterGroup;
   /// Correlation matrix elements for given parameter
@@ -487,12 +471,27 @@ protected:
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  /// Indices of parameters with flip symmetry
-  std::vector<int>    FlipParameterIndex;
-  /// Central points around which parameters are flipped
-  std::vector<double> FlipParameterPoint;
+  /// @brief Struct to hold information about a group of parameters that flip together at the same time
+  struct FlipGroup {
+    /// Indices of parameters with flip symmetry
+    std::vector<int> FlipParameterIndex;  
+    /// Central points around which parameters are flipped
+    std::vector<double> FlipParameterPoint; 
+  };
+
+  /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
+  std::map<std::string, FlipGroup> FlipGroups;
+
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
+
+ private:
+  /// @brief Toggle fixing parameter at prior values
+  /// @param i Parameter index
+  void ToggleFixParameter(const int i);
+  /// @brief Toggle fixing parameter at prior values
+  /// @param name Name of parameter you want to fix
+  void ToggleFixParameter(const std::string& name);
 };

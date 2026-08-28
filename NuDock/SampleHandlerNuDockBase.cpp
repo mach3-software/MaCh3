@@ -11,7 +11,7 @@ SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, Paramet
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
   ParHandler = xsec_cov;
   SampleManager = std::make_unique<Manager>(configFile.c_str());
-  verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false);
+  verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false, __FILE__, __LINE__);
 
   // ReadConfig();
   // SetupReweightArrays();
@@ -59,7 +59,10 @@ void SampleHandlerNuDockBase::Reweight() {
   }
 
   // Loop over NuDockOscNameMap_r to get osc params
-  for (auto const& [paramNameM3, paramNameNuDock] : NuDockOscNameMap_r) {
+  for (auto const& pair : NuDockOscNameMap_r) {
+    auto const& paramNameM3 = pair.first;
+    auto const& paramNameNuDock = pair.second;
+    
     int iParam = ParHandler->GetParIndex(paramNameM3);
     double paramValue = ParHandler->GetParProp(iParam);
     // Convert sin2_theta to theta
@@ -90,7 +93,7 @@ double SampleHandlerNuDockBase::GetLikelihood() const {
   auto response = nudock_ptr->send_request("/log_likelihood", request);
   try {
     llh_value = response["log_likelihood"].get<double>();
-    llh_value /= 2; // NuDock returns 2NLL, so we divide by 2 to be consistent with M3's definition of LLH. 
+    llh_value /= 2; // NuDock returns 2NLL, so we divide by 2 to be consistent with M3's definition of LLH.
     return llh_value;
   } catch (const std::exception &e) {
     MACH3LOG_ERROR("Error retrieving log-likelihood from NuDock response: {}", e.what());

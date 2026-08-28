@@ -22,6 +22,9 @@ class TDirectory;
 /// @details This class wraps MaCh3 classes like @ref SampleHandlerInterface and @ref ParameterHandlerBase.
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
+///
+/// @author Asher Kaboth
+/// @author Kamil Skwarczynski
 /// @ingroup CoreClasses
 class FitterBase {
  public:
@@ -45,7 +48,7 @@ class FitterBase {
   /// @brief Calculates the required time for each sample or covariance object in a drag race simulation. Inspired by Dan's feature
   /// @param NLaps number of laps, every part of Fitter will be tested with given number of laps and you will get total and average time
   void DragRace(const int NLaps = 100);
-
+  
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
@@ -54,6 +57,7 @@ class FitterBase {
   void RunLLHMap();
 
   /// @brief LLH scan is good first estimate of step scale
+  /// @param filename by default empty, however if specified it will allow to load LLH scan from external file
   void GetStepScaleBasedOnLLHScan(const std::string& filename = "");
 
   /// @brief Perform a 2D likelihood scan.
@@ -68,7 +72,7 @@ class FitterBase {
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
-  inline std::string GetName() const {return AlgorithmName;};
+  std::string GetName() const {return AlgorithmName;};
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
@@ -95,6 +99,7 @@ class FitterBase {
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
+  
   /// @brief For comparison with other fitting frameworks (like P-Theta) we usually have to apply different parameter values then usual 1, 3 sigma
   ///
   /// Example YAML format:
@@ -105,6 +110,9 @@ class FitterBase {
   /// @endcode
   void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
+  //Bin edges needed for logarithmic LLH scans
+  std::vector<double> CalculateBinEdges(double lowerlimit,double upperlimit, int n_points) const;
+  
   /// The manager for configuration handling
   Manager *fitMan;
 

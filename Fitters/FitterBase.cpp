@@ -1,10 +1,13 @@
 #include "FitterBase.h"
+#include <vector>
+#include <memory>
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
+#include "TMath.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -136,7 +139,7 @@ void FitterBase::SaveSettings() {
   for(unsigned int i = 0; i < samples.size(); ++i) {
     MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNSamples());
     for(int iSam = 0; iSam < samples[i]->GetNSamples(); ++iSam) {
-      MACH3LOG_INFO("   {}: Sample name: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
+      MACH3LOG_INFO("   {}: Sample title: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
     }
   }
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
@@ -276,9 +279,9 @@ void FitterBase::AddSampleHandler(SampleHandlerInterface* const sample) {
 
   for (const auto &s : samples) {
     if (s->GetName() == sample->GetName()) {
-      MACH3LOG_WARN("SampleHandler with name '{}' already exists!", sample->GetName());
-      MACH3LOG_WARN("Is it intended?");
-      //throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetName());
+      MACH3LOG_ERROR("Is it intended?");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   // Save additional info from samples
@@ -323,7 +326,7 @@ void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
   CovFolder->cd();
   std::vector<double> n_vec(cov->GetNumParams());
   for (int i = 0; i < cov->GetNumParams(); ++i) {
-    n_vec[i] = cov->GetParInit(i);
+    n_vec[i] = cov->GetParPreFit(i);
   }
   cov->GetCovMatrix()->Write(cov->GetName().c_str());
 
@@ -348,9 +351,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
   MACH3LOG_INFO("Getting starting position from {}", FitName);
   TFile *infile = M3::Open(FitName, "READ", __FILE__, __LINE__);
   TTree *posts = infile->Get<TTree>("posteriors");
-  unsigned int step_val = 0;
   double log_val = M3::_LARGE_LOGL_;
-  posts->SetBranchAddress("step",&step_val);
   posts->SetBranchAddress("LogL",&log_val);
 
   for (size_t s = 0; s < systematics.size(); ++s)
@@ -371,7 +372,6 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
         MACH3LOG_ERROR("Yaml configs in previous chain (from path {}) and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-
       delete ConfigCov;
     }
 
@@ -389,22 +389,17 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
     systematics[s]->PrintPreFitCurrPropValues();
 
-    // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
+    // Resetting branch addressed to nullptr as we don't want to write into a deleted vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
     }
   }
   logLCurr = log_val;
   logLProp = log_val;
+
   delete posts;
   infile->Close();
   delete infile;
-
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    if(systematics[s]->GetDoAdaption()){ //Use separate throw matrix for xsec
-      systematics[s]->SetNumberOfSteps(step_val);
-    }
-  }
 }
 
 // *******************
@@ -540,18 +535,8 @@ bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRa
 // *************************
 bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const {
 // *************************
-  bool skip = false;
-  for(unsigned int is = 0; is < SkipVector.size(); ++is)
-  {
-    if(ParamName.substr(0, SkipVector[is].length()) == SkipVector[is])
-    {
-      skip = true;
-      break;
-    }
-  }
-  return skip;
+  return M3::CaseInsensitiveMatchAny(ParamName, SkipVector);
 }
-
 
 // *************************
 void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
@@ -572,11 +557,11 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   CentralValue = cov->GetParProp(i);
   if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-  double prior = cov->GetParInit(i);
+  double prior = cov->GetParPreFit(i);
   if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
   if (std::abs(CentralValue - prior) > 1e-10) {
-    MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
+    MACH3LOG_INFO("For {} scanning around value {:.4f} rather than prior {:.4f}", name, CentralValue, prior);
   }
 
   // Get the covariance matrix and do the +/- nSigma
@@ -615,6 +600,22 @@ void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const in
   MACH3LOG_INFO("Scanning {} {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", suffix, name, n_points, lower, upper, CentralValue);
 }
 
+// *************************                                                                      
+// Calculate bin edges for logarithmic LLH scans
+std::vector<double>FitterBase::CalculateBinEdges(double lowerlimit, double upperlimit, int n_points) const {
+// *************************
+  std::vector<double> binEdges(n_points + 1);
+
+  double logLower = std::log10(lowerlimit);
+  double logUpper = std::log10(upperlimit);
+
+  for (int j = 0; j <= n_points; ++j) {
+    binEdges[j] = std::pow(10.0, logLower + (logUpper - logLower) * double(j) / double(n_points));
+  }
+
+  return binEdges;
+}
+
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -627,7 +628,9 @@ void FitterBase::RunLLHScan() {
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);
-
+  //Do we want a logarithmic LLH scan                                    
+  bool LLHLogarithmic = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHLogarithmic"], false, __FILE__ , __LINE__);
+  
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
@@ -686,8 +689,24 @@ void FitterBase::RunLLHScan() {
       // Get the parameter central and bounds
       double CentralValue, lower, upper;
       GetParameterScanRange(cov, i, CentralValue, lower, upper, n_points);
-      // Make the TH1D
-      auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+      // Define the TH1D 
+      std::unique_ptr<TH1D> hScan;
+      // See if we want to do it logarithmically
+      if(LLHLogarithmic){
+        //negative values break it
+        if (lower < 0.0 || upper < 0.0) {
+          MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan",name, lower, upper);
+          hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+        } else {
+          auto binEdges = CalculateBinEdges(lower, upper, n_points);
+          hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, binEdges.data());
+        }
+      }
+      //If not then just do the normal thing
+      else {
+        hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
+      }
+       
       hScan->SetTitle((std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
       hScan->SetDirectory(nullptr);
 
@@ -735,8 +754,9 @@ void FitterBase::RunLLHScan() {
           }
         }
       }
-
+      
       // Scan over the parameter space
+       
       for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
@@ -889,124 +909,122 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   if(outputFileName != ""){
     outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
     ownsfile = true;
-  }
-  else
+  } else {
     outputFileLLH = outputFile;
-  MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
-  auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
+    MACH3LOG_INFO("MENAI  Starting Get Step Scale Based On LLHScan");
+
+    auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
   
-  std::string LLH_type = "Sample_LLH";
-  const std::string llhType = GetFromManager<std::string>(fitMan->raw()["LLHScan"]["LLHType"], {}, __FILE__ , __LINE__);
-  if(!llhType.empty()){
-    LLH_type = llhType;
-  }
+    std::string LLH_type = "Sample_LLH";
+    const std::string llhType = GetFromManager<std::string>(fitMan->raw()["LLHScan"]["LLHType"], {}, __FILE__ , __LINE__);
+    if(!llhType.empty()){
+      LLH_type = llhType;
+    }
   
-  TDirectory *LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
-  MACH3LOG_INFO("Using LLHScans of type {}",LLH_type);
+    TDirectory *LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
+    MACH3LOG_INFO("Using LLHScans of type {}",LLH_type);
 
-  if(!LLHScans || LLHScans->IsZombie())
-  {
-    MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
-    RunLLHScan();
-    LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
-  }
-
-  for (ParameterHandlerBase *cov : systematics)
-  {
-    const int npars = cov->GetNumParams();
-    const double GlobalScale = cov->GetGlobalStepScale();
-
-    // Vector of parameter names correlated to given parameter, from correlation matrix
-    std::vector<std::vector<std::string>> CorrParams(npars);
-    std::vector<double> StepScale(npars);
-    for (int i = 0; i < npars; ++i)
-    {
-      std::string name = cov->GetParFancyName(i);
-
-      //Make vector of parameters which are correlated to given parameter
-      std::map<std::string, double> parCorr = cov->GetCorrElements(i);
-      for (const auto& corrMap : parCorr){
-	std::string corr_var_name = corrMap.first;
-	if (!ParamVector.empty()){
-	  if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
-	    // Only create vector if parameter is in chosen list from config file
-	    continue;
-	  }
-	  if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
-	    // Only consider correlation of parameters in chosen list 
-	    continue;
-	  }
-
-	}
-	double corr = corrMap.second;
-	int index = cov->GetParIndex(corr_var_name);
-	// Cut on what is consider a correlated parameter
-	// Also only allow same groups correlations
-	if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
-	  CorrParams[i].push_back(corr_var_name);
-      }
-      StepScale[i] = cov->GetIndivStepScale(i);
-     
-      if (!ParamVector.empty()){
-	if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
-        // 'name' is not in the vector, skip this iteration
-	  continue;
-	}
-      }
-
-      TH1D* LLHScan = nullptr;
-      if(LLH_type == "Total_LLH")
-	LLHScan = LLHScans->Get<TH1D>((name+"_full").c_str());
-      else
-	LLHScan = LLHScans->Get<TH1D>((name+"_sam").c_str());
-      
-      if(LLHScan == nullptr)
+    if(!LLHScans || LLHScans->IsZombie())
       {
-        MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
-        continue;
+	MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
+	RunLLHScan();
+	LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
       }
-      const double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
-      //If there is no sensitivity leave it
-      if(LLH_val < 0.001) continue;
 
-      // EM: assuming that the likelihood is gaussian, approximate sigma value is given by variation/sqrt(-2LLH)
-      // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
-      // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
-      const double Var = 1.;
-      const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
+    for (ParameterHandlerBase *cov : systematics)
+      {
+	const int npars = cov->GetNumParams();
 
-      std::string var_name = cov->GetParName(i);
-      else
-	MACH3LOG_ERROR("Parameter group not recognised");
+	// Vector of parameter names correlated to given parameter, from correlation matrix
+	std::vector<std::vector<std::string>> CorrParams(npars);
+	std::vector<double> StepScale(npars);
+	for (int i = 0; i < npars; ++i)
+	  {
+	    std::string name = cov->GetParFancyName(i);
 
-      // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      const double NewStepScale = (approxSigma * 2.38/std::sqrt(npars)) /GlobalScale;
+	    //Make vector of parameters which are correlated to given parameter
+	    std::map<std::string, double> parCorr = cov->GetCorrElements(i);
+	    for (const auto& corrMap : parCorr){
+	      std::string corr_var_name = corrMap.first;
+	      if (!ParamVector.empty()){
+		if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
+		  // Only create vector if parameter is in chosen list from config file
+		  continue;
+		}
+		if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
+		  // Only consider correlation of parameters in chosen list 
+		  continue;
+		}
 
-      StepScale[i] = NewStepScale;
-      MACH3LOG_DEBUG("Sigma: {}", approxSigma);
-      MACH3LOG_DEBUG("optimal Step Size: {}", NewStepScale);
-    }
-    std::vector<double> StepScaleCorr = StepScale;
-    for (int p = 0; p < npars; p++){
-      //Adjust parameter step scale if correlated parameters exist
-      if(CorrParams[p].size() != 0){
-	double avg_step_scale = StepScale[p];
-	for(const auto& corrName : CorrParams[p]) {
-	  int index = cov->GetParIndex(corrName);
-	  avg_step_scale += StepScale[index];
+	      }
+	      double corr = corrMap.second;
+	      int index = cov->GetParIndex(corr_var_name);
+	      // Cut on what is consider a correlated parameter
+	      // Also only allow same groups correlations
+	      if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
+		CorrParams[i].push_back(corr_var_name);
+	    }
+	    StepScale[i] = cov->GetIndivStepScale(i);
+     
+	    if (!ParamVector.empty()){
+	      if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
+		// 'name' is not in the vector, skip this iteration
+		continue;
+	      }
+	    }
+
+	    TH1D* LLHScan = nullptr;
+	    if(LLH_type == "Total_LLH")
+	      LLHScan = LLHScans->Get<TH1D>((name+"_full").c_str());
+	    else
+	      LLHScan = LLHScans->Get<TH1D>((name+"_sam").c_str());
+      
+	    if(LLHScan == nullptr)
+	      {
+		MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
+		continue;
+	      }
+	    const double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
+	    //If there is no sensitivity leave it
+	    if(LLH_val < 0.001) continue;
+
+	    // EM: assuming that the likelihood is gaussian, approximate sigma value is given by variation/sqrt(-2LLH)
+	    // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
+	    // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
+	    const double Var = 1.;
+	    const double approxSigma = std::abs(Var)/std::sqrt(LLH_val);
+	    const double GlobalScale = cov->GetGlobalStepScale();
+	    // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
+	    const double TargetStep = approxSigma * 2.38 / std::sqrt(npars);
+	    // KS: Need to divide by currently used gloalStepScale
+	    const double NewStepScale = TargetStep / GlobalScale;
+
+	    StepScale[i] = NewStepScale;
+	    MACH3LOG_DEBUG("Sigma: {}", approxSigma);
+	    MACH3LOG_DEBUG("Target Step Size (before accounting for global step size): {}", TargetStep);
+	    MACH3LOG_DEBUG("Optimal Step Size: {}", NewStepScale);
+	  }
+	std::vector<double> StepScaleCorr = StepScale;
+	for (int p = 0; p < npars; p++){
+	  //Adjust parameter step scale if correlated parameters exist
+	  if(CorrParams[p].size() != 0){
+	    double avg_step_scale = StepScale[p];
+	    for(const auto& corrName : CorrParams[p]) {
+	      int index = cov->GetParIndex(corrName);
+	      avg_step_scale += StepScale[index];
+	    }
+	    //Determine average step scale for correlated parameters
+	    avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
+	    StepScaleCorr[p] = avg_step_scale;
+	    MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
+	  }
 	}
-	//Determine average step scale for correlated parameters
-	avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
-	StepScaleCorr[p] = avg_step_scale;
-	MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
+	cov->SetIndivStepScale(StepScaleCorr);
+	cov->SaveUpdatedMatrixConfig();
       }
-    }
-    cov->SetIndivStepScale(StepScaleCorr);
-    cov->SaveUpdatedMatrixConfig();
+    if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
   }
-  if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
-}
 
 // *************************
 // Run 2D LLH scan
@@ -1019,7 +1037,10 @@ void FitterBase::Run2DLLHScan() {
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
-
+  
+  //Do we want a logarithmic LLH scan                                    
+  bool LLHLogarithmic = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHLogarithmic"], false, __FILE__ , __LINE__);
+  
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["2DLLHScanPoints"], 20, __FILE__ , __LINE__);
   // We print 5 reweights
@@ -1041,10 +1062,19 @@ void FitterBase::Run2DLLHScan() {
       // Get the parameter central and bounds
       double central_x, lower_x, upper_x;
       GetParameterScanRange(cov, i, central_x, lower_x, upper_x, n_points, "X");
-
+      std::vector<double> binEdges_x;
+       
+      //Logarithmic scan 
+      if(LLHLogarithmic){
+        if (lower_x < 0.0 || upper_x < 0.0){
+          MACH3LOG_WARN("Cannot perform logarithmic scan for {} "" with range [{}, {}], falling back to linear scan", name_x, lower_x, upper_x);
+        } else {
+          binEdges_x = CalculateBinEdges(lower_x, upper_x, n_points);
+        }
+      }
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name_x)) continue;
-
+            
       for (int j = 0; j < i; ++j)
       {
         std::string name_y = cov->GetParFancyName(j);
@@ -1052,16 +1082,32 @@ void FitterBase::Run2DLLHScan() {
         // KS: Check if we want to skip this parameter
         if(CheckSkipParameter(SkipVector, name_y)) continue;
 
+        std::unique_ptr<TH2D> hScanSam;
         // Get the parameter central and bounds
         double central_y, lower_y, upper_y;
         GetParameterScanRange(cov, j, central_y, lower_y, upper_y, n_points, "Y");
-
-        auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
-                                                n_points, lower_x, upper_x, n_points, lower_y, upper_y);
-        hScanSam->SetDirectory(nullptr);
-        hScanSam->GetXaxis()->SetTitle(name_x.c_str());
-        hScanSam->GetYaxis()->SetTitle(name_y.c_str());
-        hScanSam->GetZaxis()->SetTitle("2LLH_sam");
+        if(LLHLogarithmic){
+          //negative values break it
+          if (lower_x < 0.0 || upper_x < 0.0 || lower_y < 0.0 || upper_y < 0.0 ) {
+            MACH3LOG_WARN("Cannot perform logarithmic scan for {} and {} "" with range [{}, {}], [{}, {}], falling back to linear scan", name_x, lower_x, upper_x, name_y, lower_y, upper_y);
+            hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+            hScanSam->SetDirectory(nullptr);
+            hScanSam->GetXaxis()->SetTitle(name_x.c_str());
+            hScanSam->GetYaxis()->SetTitle(name_y.c_str());
+            hScanSam->GetZaxis()->SetTitle("2LLH_sam");
+          } else {
+            auto binEdges_y = CalculateBinEdges(lower_y, upper_y, n_points);
+            hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, binEdges_x.data(), n_points, binEdges_y.data());
+          }
+        }
+        //If not then just do the normal thing
+        else {
+          hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(), n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+          hScanSam->SetDirectory(nullptr);
+          hScanSam->GetXaxis()->SetTitle(name_x.c_str());
+          hScanSam->GetYaxis()->SetTitle(name_y.c_str());
+          hScanSam->GetZaxis()->SetTitle("2LLH_sam");
+        }
 
         // Scan over the parameter space
         for (int x = 0; x < n_points; ++x)
@@ -1193,7 +1239,7 @@ void FitterBase::RunLLHMap() {
     if (IsPCA)
       CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
-    double prior = cov->GetParInit(i);
+    double prior = cov->GetParPreFit(i);
     if (IsPCA)
       prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
@@ -1221,9 +1267,9 @@ void FitterBase::RunLLHMap() {
     if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanRanges"))
       ParamsRanges[name].second = GetFromManager<std::pair<double,double>>(fitMan->raw()["LLHScan"]["ScanRanges"][name], ParamsRanges[name].second, __FILE__, __LINE__);
 
-    MACH3LOG_INFO("{} from {:.4f} to {:.4f} with a {:.5f} step ({} points total)",
+    MACH3LOG_INFO("{} from {:.4f} (lower bin edge) to {:.4f} (upper bin edge) with a {:.5f} step ({} points total)",
                   name, ParamsRanges[name].second.first, ParamsRanges[name].second.second,
-                  (ParamsRanges[name].second.second - ParamsRanges[name].second.first)/(ParamsRanges[name].first - 1.),
+                  (ParamsRanges[name].second.second - ParamsRanges[name].second.first)/(ParamsRanges[name].first),
                   ParamsRanges[name].first);
 
     TotalPoints *= ParamsRanges[name].first;
@@ -1231,9 +1277,9 @@ void FitterBase::RunLLHMap() {
 
   // TN: Waiting for C++ 20 std::format() function
   MACH3LOG_INFO("In total, looping over {} points, from {} parameters. Estimates for run time:", TotalPoints, ParamsCovIDs.size());
-  MACH3LOG_INFO("   1 s per point = {} hours", double(TotalPoints)/3600.);
-  MACH3LOG_INFO(" 0.1 s per point = {} hours", double(TotalPoints)/36000.);
-  MACH3LOG_INFO("0.01 s per point = {} hours", double(TotalPoints)/360000.);
+  MACH3LOG_INFO("   1 s per point = {:.4f} hours", double(TotalPoints)/3600.);
+  MACH3LOG_INFO(" 0.1 s per point = {:.4f} hours", double(TotalPoints)/36000.);
+  MACH3LOG_INFO("0.01 s per point = {:.4f} hours", double(TotalPoints)/360000.);
   MACH3LOG_INFO("==================================================================================");
 
   const int countwidth = int(double(TotalPoints)/double(20));
@@ -1305,8 +1351,8 @@ void FitterBase::RunLLHMap() {
       if (n > 0)
         idx[n] = idx[n] / ( dev / points );
 
-      // Parameter test value = low + ( high - low ) * idx / ( #points - 1 )
-      ParamsValues[n] = low + (high-low) * double(idx[n])/double(points-1);
+      // Parameter test value = low + ( high - low ) * idx / #points
+      ParamsValues[n] = low +  (2 * double(idx[n]) + 1) * (high-low) / (2 * double(points));
 
       // Now set the covariance objects
       // Auxiliary
@@ -1464,8 +1510,8 @@ void FitterBase::RunSigmaVar() {
   // Save the settings into the output file
   SaveSettings();
 
-  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false);
-  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false);
+  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false, __FILE__ , __LINE__);
+  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false, __FILE__ , __LINE__);
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["SigmaVar"]["SkipVector"], {}, __FILE__ , __LINE__);
 
   if (plot_by_mode) MACH3LOG_INFO("Plotting by sample and mode");
@@ -1496,7 +1542,7 @@ void FitterBase::RunSigmaVar() {
       ParamDir->cd();
 
       const double ParamCentralValue = systematics[s]->GetParProp(i);
-      const double Prior = systematics[s]->GetParInit(i);
+      const double Prior = systematics[s]->GetParPreFit(i);
       const double ParamLower = systematics[s]->GetLowerBound(i);
       const double ParamUpper = systematics[s]->GetUpperBound(i);
 

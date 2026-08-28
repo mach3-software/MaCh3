@@ -25,13 +25,12 @@ class UnbinnedSplineHandler : public SplineBase {
     /// @brief Destructor for UnbinnedSplineHandler class.
     virtual ~UnbinnedSplineHandler();
 
-    /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
+    /// @copydoc SplineBase::Evaluate
     void Evaluate() final;
 
     /// @brief Get class name
     std::string GetName() const override {return "SplineMonolith";};
-
-    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+    /// @copydoc SplineBase::SynchroniseMemTransfer
     void SynchroniseMemTransfer() const final;
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
@@ -41,14 +40,13 @@ class UnbinnedSplineHandler : public SplineBase {
     
     /// @brief KS: Set pointers to spline params
     /// @param spline_ParsPointers Vector of pointers to spline params
-    void setSplinePointers(std::vector< const M3::float_t* > spline_ParsPointers) {
+    void SetSplinePointers(std::vector< const M3::float_t* > spline_ParsPointers) {
       for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
-    /// @brief KS: Prepare spline file that can be used for fast loading
+    /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    /// @copydoc SplineBase::LoadSplineFile
     void LoadSplineFile(std::string FileName) final;
   private:
     /// @brief KS: Set everything to null etc.
@@ -91,7 +89,7 @@ class UnbinnedSplineHandler : public SplineBase {
     /// @param manyArray Array holding coefficients for each knot
     void GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray) const;
 
-    /// @brief CPU based code which eval weight for each spline
+    /// @copydoc SplineBase::CalcSplineWeights
     void CalcSplineWeights() final;
     /// @brief Calc total event weight
     void CalcTotalEventWeight();
@@ -125,10 +123,10 @@ class UnbinnedSplineHandler : public SplineBase {
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SplineMonoStruct* cpu_spline_handler;
+    SplineMonoStruct* cpu_monolith;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SplineMonolithGPU* gpu_spline_handler;
+    SplineMonolithGPU* gpu_monolith;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;

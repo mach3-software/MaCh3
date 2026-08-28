@@ -28,6 +28,15 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
   Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
   Ntoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);
 
+  if(!Is_PriorPredictive) {
+    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+    auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
+    if(PosteriorFileName == outfile){
+      MACH3LOG_ERROR("Output file ({}) and posterior files ({}) have same name", outfile, PosteriorFileName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   ReweightWeight.resize(Ntoys);
   PenaltyTerm.resize(Ntoys);
 }
@@ -36,7 +45,6 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // Destructor:
 PredictiveThrower::~PredictiveThrower() {
 // *************************
-
 }
 
 // *************************
@@ -65,7 +73,7 @@ void PredictiveThrower::SetParamters(std::vector<std::string>& ParameterGroupsNo
     for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
       // KS: If parameter is in map then we are skipping this, otherwise for params that we don't want to vary we simply set it to prior
       if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
-        ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
+        ModelSystematic->SetParProp(i, ModelSystematic->GetParPreFit(i));
       }
     }
   }
@@ -161,10 +169,10 @@ void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGr
   if (ModelSystematic) {
     auto ThrowParamGroupOnly = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowParamGroupOnly"], {}, __FILE__, __LINE__);
     auto UniqueParamGroup = ModelSystematic->GetUniqueParameterGroups();
-    auto ParameterOnlyToVaryString = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowSinlgeParams"], {}, __FILE__, __LINE__);
+    auto ParameterOnlyToVaryString = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowSingleParams"], {}, __FILE__, __LINE__);
 
     if (!ThrowParamGroupOnly.empty() && !ParameterOnlyToVaryString.empty()) {
-      MACH3LOG_ERROR("Can't use ThrowParamGroupOnly and ThrowSinlgeParams at the same time");
+      MACH3LOG_ERROR("Can't use ThrowParamGroupOnly and ThrowSingleParams at the same time");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
@@ -420,6 +428,35 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
+void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
+                                        const int iToy) {
+// *************************
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
+  {
+    auto* SampleHandler = samples[iPDF];
+    auto* modes = SampleHandler->GetMaCh3Modes();
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
+    {
+      ByModeDirectory->cd();
+
+      auto SampleName = SampleHandler->GetSampleTitle(iSample);
+      for (int iMode = 0; iMode < modes->GetNModes()+1; ++iMode) {
+        auto ModeName = modes->GetMaCh3ModeName(iMode);
+        for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
+          std::string ProjectionName = SampleHandler->GetKinVarName(iSample, iDim);
+          std::string PlotSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+
+          auto hist = SampleHandler->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          hist->SetTitle((SampleName + PlotSuffix).c_str());
+          hist->SetName((SampleName + PlotSuffix).c_str());
+          hist->Write();
+        } // end loop over dimension
+      } // end loop over mode
+    } // end loop over sample
+  } // end loop over sample handler objects
+}
+
+// *************************
 bool CheckBounds(const std::vector<const M3::float_t*>& BoundValuePointer,
                  const std::vector<std::pair<double,double>>& ParamBounds) {
 // *************************
@@ -458,7 +495,7 @@ void PredictiveThrower::ProduceToys() {
   MACH3LOG_INFO("Starting {}", __func__);
 
   outputFile->cd();
-  double Penalty = 0, Weight = 1;
+  double Penalty = 0, Weight = 1.;
   int Draw = 0;
 
   TTree *ToyTree = new TTree("ToySummary", "ToySummary");
@@ -511,6 +548,14 @@ void PredictiveThrower::ProduceToys() {
 
   TDirectory* Toy_1DDirectory = outputFile->mkdir("Toys_1DHistVar");
   TDirectory* Toy_2DDirectory = outputFile->mkdir("Toys_2DHistVar");
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
+  TDirectory* ByModeDirectory = nullptr;
+  if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
+  auto ReweightNames = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ReweightNames"],
+                                                                {"Weight"}, __FILE__, __LINE__);
+  bool doReweight = false;
+  std::vector<double> reweight_weight(ReweightNames.size(), 1.0);
+
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
@@ -525,12 +570,16 @@ void PredictiveThrower::ProduceToys() {
     PosteriorFile->Add(PosteriorFileName.c_str());
 
     PosteriorFile->SetBranchAddress("step", &Step);
-    if (PosteriorFile->GetBranch("Weight")) {
-      PosteriorFile->SetBranchStatus("Weight", true);
-      PosteriorFile->SetBranchAddress("Weight", &Weight);
-    } else {
-      MACH3LOG_WARN("Not applying reweighting weight");
-      Weight = 1.0;
+    doReweight = true;
+    for (size_t i = 0; i < ReweightNames.size(); ++i) {
+      const auto& name = ReweightNames[i];
+      if (PosteriorFile->GetBranch(name.c_str())) {
+        PosteriorFile->SetBranchStatus(name.c_str(), true);
+        PosteriorFile->SetBranchAddress(name.c_str(), &reweight_weight[i]);
+      } else {
+        MACH3LOG_WARN("Missing reweight branch '{}' -> disabling ALL reweighting", name);
+        doReweight = false;
+      }
     }
 
     for (size_t s = 0; s < systematics.size(); ++s) {
@@ -606,6 +655,12 @@ void PredictiveThrower::ProduceToys() {
     }
 
     PenaltyTerm[i] = Penalty;
+    Weight = 1.;
+    if(doReweight) {
+      for (size_t iWeight = 0; iWeight < reweight_weight.size(); ++iWeight) {
+        Weight *= reweight_weight[iWeight];
+      }
+    }
     ReweightWeight[i] = Weight;
 
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
@@ -613,6 +668,7 @@ void PredictiveThrower::ProduceToys() {
     }
     // Save histograms to file
     WriteToy(ToyDirectory, Toy_1DDirectory, Toy_2DDirectory, i);
+    if(doByMode) WriteByModeToys(ByModeDirectory, i);
 
     // Fill parameter value so we know throw values
     for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
@@ -627,6 +683,10 @@ void PredictiveThrower::ProduceToys() {
   ToyDirectory->Close(); delete ToyDirectory;
   Toy_1DDirectory->Close(); delete Toy_1DDirectory;
   Toy_2DDirectory->Close(); delete Toy_2DDirectory;
+  if(doByMode){
+    ByModeDirectory->Close();
+    delete ByModeDirectory;
+  }
 
   outputFile->cd();
   ToyTree->Write(); delete ToyTree;
@@ -640,19 +700,25 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
   MACH3LOG_INFO("Starting {}", __func__);
 
   TDirectory * ogdir = gDirectory;
+  TDirectory* ToyDir = nullptr;
+
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-
   TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
   gErrorIgnoreLevel = originalErrorWarning;
-  TDirectory* ToyDir = file->GetDirectory("Toys_1DHistVar");
-  // If toys not amiable in posterior file this means they must be in output file
-  if(ToyDir == nullptr) {
+
+  if (file == nullptr || file->IsZombie()) {
     ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+  } else {
+    ToyDir = file->GetDirectory("Toys_1DHistVar");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+    }
   }
+
   // [sample], [toy], [dim]
   std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>> ProjectionToys(TotalNumberOfSamples);
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
@@ -674,7 +740,7 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
       }
     } // end loop over samples
   } // end loop over toys
-  file->Close(); delete file;
+  if(file) { file->Close(); delete file; }
   if(ogdir){ ogdir->cd(); }
 
   ProduceSpectra(ProjectionToys, SampleDirectories, "mc");
@@ -704,6 +770,11 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
         TH1D* ProjectionX = PolyProjectionX(static_cast<TH2Poly*>(hist), nameX.c_str(), XBinning, false);
         TH1D* ProjectionY = PolyProjectionY(static_cast<TH2Poly*>(hist), nameY.c_str(), YBinning, false);
 
+        auto x_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 0);
+        auto y_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 1);
+        ProjectionX->GetXaxis()->SetTitle(x_var.c_str());
+        ProjectionY->GetXaxis()->SetTitle(y_var.c_str());
+        
         ProjectionX->SetDirectory(nullptr);
         ProjectionY->SetDirectory(nullptr);
 
@@ -729,9 +800,86 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
 }
 
 // *************************
+void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>& SampleDirectories) const {
+// *************************
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  TDirectory* ogdir = gDirectory;
+  TDirectory* ToyDir = nullptr;
+
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  gErrorIgnoreLevel = originalErrorWarning;
+
+  if (file == nullptr || file->IsZombie()) {
+    ToyDir = outputFile->GetDirectory("Toys_ByMode");
+  } else {
+    ToyDir = file->GetDirectory("Toys_ByMode");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_ByMode");
+    }
+  }
+
+  /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
+  /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
+  /// so we can reuse this functionality
+  auto* mode = SampleInfo[0].SamHandler->GetMaCh3Modes();
+  auto NModes = mode->GetNModes()+1;
+  // [mode], [sample], [toy], [dim]
+  std::vector<std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>> ProjectionToys(NModes);
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    ProjectionToys[iMode].resize(TotalNumberOfSamples);
+    for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+      ProjectionToys[iMode][sample].resize(Ntoys);
+      const int nDims = SampleInfo[sample].Dimenstion;
+      for (int iToy = 0; iToy < Ntoys; ++iToy) {
+        ProjectionToys[iMode][sample][iToy].resize(nDims);
+      }
+    }
+  }
+
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    if (iToy % 100 == 0) MACH3LOG_INFO("   Loaded Projection toys {}", iToy);
+    for(int iMode = 0; iMode < NModes; iMode++) {
+      auto ModeName = mode->GetMaCh3ModeName(iMode);
+      for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+        const int nDims = SampleInfo[sample].Dimenstion;
+        for(int iDim = 0; iDim < nDims; iDim ++) {
+          std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
+          TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleInfo[sample].Name + ProjectionSuffix).c_str()));
+          ProjectionToys[iMode][sample][iToy][iDim] = M3::Clone(MCHist1D);
+        }
+      }
+    } // end loop over samples
+  } // end loop over toys
+
+  // ByMode directory
+  std::vector<TDirectory*> ModeDirectory(TotalNumberOfSamples);
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample] = SampleDirectories[iSample]->mkdir("ByMode");
+  }
+  // Produce By Mode Spectra
+  for(int iMode = 0; iMode < NModes; iMode++) {
+    auto ModeName = mode->GetMaCh3ModeName(iMode);
+    ProduceSpectra(ProjectionToys[iMode], ModeDirectory, ModeName, false);
+  }
+  for(int iSample = 0; iSample < TotalNumberOfSamples; iSample++) {
+    ModeDirectory[iSample]->Close();
+    delete ModeDirectory[iSample];
+  }
+  if(file){file->Close(); delete file;}
+  if(ogdir){ ogdir->cd(); }
+}
+
+// *************************
 void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
                                        const std::vector<TDirectory*>& SampleDirectories,
-                                       const std::string suffix) const {
+                                       const std::string suffix,
+                                       const bool DoSummary) const {
 // *************************
   std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
 
@@ -812,7 +960,7 @@ void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector
     for (long unsigned int dim = 0; dim < Spectra[sample].size(); dim++) {
       Spectra[sample][dim]->Write();
       // For case of 2D make additional histograms
-      if(nDims == 2) {
+      if(nDims == 2 && DoSummary) {
         const std::string name = SampleInfo[sample].Name + "_" + suffix+ "_PostPred_dim" + std::to_string(dim);
         auto Summary = MakeSummaryFromSpectra(Spectra[sample][dim].get(), name);
         Summary->Write();
@@ -1023,7 +1171,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   TempClock.Start();
 
   auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
-  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
+  auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
@@ -1036,6 +1184,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 
   // Produce Violin style spectra
   Study1DProjections(SampleDirectories);
+  // Produce Post pred by each mode individually
+  if(doByMode) StudyByMode1DProjections(SampleDirectories);
   // Produce posterior predictive distribution for mc
   auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
   // Produce posterior predictive distribution for w2
@@ -1047,14 +1197,20 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   // Check how number of events changed
   RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
-  // Studying information criterion
-  StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
-
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample]->Close();
     delete SampleDirectories[sample];
   }
+
+  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
+  auto StudyInfoCriterion = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyInformationCriterion"], true, __FILE__, __LINE__);
+  auto StudyCorr = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyCorrelations"], true, __FILE__, __LINE__);
+
+  // Studying information criterion
+  if(StudyInfoCriterion) StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
+  // Study Prior/Posterior correlations between samples etc.
+  if(StudyCorr) StudyCorrelations(PredictiveDir, MC_Hist_Toy, DebugHistograms);
   // Perform beta analysis for mc statical uncertainty
   if(StudyBeta) StudyBetaParameters(PredictiveDir);
 
@@ -1425,6 +1581,109 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   PredictiveDir->cd();
 }
 
+// ****************
+// Study Prior/Posterior correlations between samples etc.
+void PredictiveThrower::StudyCorrelations(TDirectory* PredictiveDir,
+                                          const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                          const bool DebugHistograms) const {
+// ****************
+  MACH3LOG_INFO("Startin {}", __func__);
+
+  // Make a new directory
+  TDirectory *CorrDir = PredictiveDir->mkdir("Correlations");
+  CorrDir->cd();
+
+  std::vector<double> minVals(TotalNumberOfSamples, std::numeric_limits<double>::max());
+  std::vector<double> maxVals(TotalNumberOfSamples, std::numeric_limits<double>::lowest());
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (const auto& toyHist : Toys[i])
+    {
+      const double val = toyHist->Integral();
+      if (val < minVals[i]) minVals[i] = val;
+      if (val > maxVals[i]) maxVals[i] = val;
+    }
+  }
+  auto hSamCorr = std::make_unique<TH2D>("Sample Correlation", "Sample Correlation", TotalNumberOfSamples, 0,
+                                         TotalNumberOfSamples, TotalNumberOfSamples, 0, TotalNumberOfSamples);
+  hSamCorr->SetDirectory(nullptr);
+  hSamCorr->GetZaxis()->SetTitle("Correlation");
+  hSamCorr->SetMinimum(-1);
+  hSamCorr->SetMaximum(1);
+  hSamCorr->GetXaxis()->SetLabelSize(0.015);
+  hSamCorr->GetYaxis()->SetLabelSize(0.015);
+  // Loop over the Covariance matrix entries
+  for (int i = 0; i < TotalNumberOfSamples; ++i) {
+    hSamCorr->SetBinContent(i+1, i+1, 1.0);
+    hSamCorr->GetXaxis()->SetBinLabel(i+1, SampleInfo[i].Name.c_str());
+    for (int j = 0; j < TotalNumberOfSamples; ++j) {
+      hSamCorr->GetYaxis()->SetBinLabel(j+1, SampleInfo[j].Name.c_str());
+    }
+  }
+
+  std::vector<std::vector<std::unique_ptr<TH2D>>> SamCorr(TotalNumberOfSamples);
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    SamCorr[i].resize(TotalNumberOfSamples);
+    const double Min_i = minVals[i];
+    const double Max_i = maxVals[i];
+    for (int j = 0; j < TotalNumberOfSamples; ++j)
+    {
+      const double Min_j = minVals[j];
+      const double Max_j = maxVals[j];
+      // TH2D to hold the Correlation
+      std::string name  = "SamCorr_" + std::to_string(i) + "_" + std::to_string(j);
+      SamCorr[i][j] = std::make_unique<TH2D>(name.c_str(), name.c_str(), 70, Min_i, Max_i, 70, Min_j, Max_j);
+      SamCorr[i][j]->SetDirectory(nullptr);
+      SamCorr[i][j]->SetMinimum(0);
+      SamCorr[i][j]->GetXaxis()->SetTitle(SampleInfo[i].Name.c_str());
+      SamCorr[i][j]->GetYaxis()->SetTitle(SampleInfo[j].Name.c_str());
+      SamCorr[i][j]->GetZaxis()->SetTitle("Events");
+    }
+  }
+
+  // Now we are sure we have the diagonal elements, let's make the off-diagonals
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      // Skip the diagonal elements which we've already done above
+      if (j == i) continue;
+
+      for (int iToy = 0; iToy < Ntoys; ++iToy)
+      {
+        SamCorr[i][j]->Fill(Toys[i][iToy]->Integral(), Toys[j][iToy]->Integral());
+      }
+      SamCorr[i][j]->Smooth();
+
+      // The value of the Covariance
+      const double corr = SamCorr[i][j]->GetCorrelationFactor();
+      hSamCorr->SetBinContent(i+1, j+1, corr);
+      hSamCorr->SetBinContent(j+1, i+1, corr);
+    }// End j loop
+  }// End i loop
+
+  hSamCorr->Draw("colz");
+  hSamCorr->Write("Sample_Corr");
+
+  if(DebugHistograms) {
+    for (int i = 0; i < TotalNumberOfSamples; ++i){
+      for (int j = 0; j <= i; ++j) {
+        // Skip the diagonal elements which we've already done above
+        if (j == i) continue;
+        SamCorr[i][j]->Write();
+      }// End j loop
+    }// End i loop
+  } // end if debugHist
+
+  PredictiveDir->cd();
+}
 
 // ****************
 // Calculate the LLH for TH1, set the LLH to title of MCHist

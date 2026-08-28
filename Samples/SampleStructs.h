@@ -176,26 +176,16 @@ struct KinematicCut {
 };
 
 // ***************************
-/// @brief Small struct used for applying shifts due to functional params
-/// @author Hank Hua
-struct FunctionalShifter {
-// ***************************
-  /// Pointer to parameter value
-  const M3::float_t* valuePtr = nullptr;
-  /// Pointer to shifting function
-  FuncParFuncType* funcPtr = nullptr;
-};
-
-// ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
+/// @note members are assigned in order code access them, be careful in changing order
 struct BinShiftLookup {
 // ***************************
   /// lower to check if shift has moved the event to different bin
   double lower_binedge = M3::_BAD_DOUBLE_;
-  /// lower to check if shift has moved the event to different bin
-  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_binedge = M3::_BAD_DOUBLE_;
+  /// lower to check if shift has moved the event to different bin
+  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_upper_binedge = M3::_BAD_DOUBLE_;
 };
@@ -267,7 +257,7 @@ struct SampleBinningInfo {
   bool Uniform = true;
   /// Bins used only for non-uniform
   std::vector<BinInfo> Bins;
-  /// This grid tells what bins are associated with with what BinEdges of Grid Binnins
+  /// This grid tells what bins are associated with with what BinEdges of Grid Binnings
   std::vector<std::vector<int>> BinGridMapping;
 
   /// @brief Initialise Uniform Binning
@@ -581,7 +571,7 @@ struct SampleBinningInfo {
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
-  int FindBin(const int Dimension, const double Var, const int NomBin) const {
+  int FindBin(const int Dimension, const double Var, const int NomBin) const _noexcept_ {
     return FindBin(Var, NomBin, AxisNBins[Dimension], BinEdges[Dimension], BinLookup[Dimension]);
   }
 
@@ -597,7 +587,7 @@ struct SampleBinningInfo {
               const int NomBin,
               const int N_Bins,
               const std::vector<double>& Bin_Edges,
-              const std::vector<BinShiftLookup>& Bin_Lookup) const {
+              const std::vector<BinShiftLookup>& Bin_Lookup) const _noexcept_ {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
     if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {
@@ -745,8 +735,7 @@ namespace Utils {
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
-  /// @todo this could be constexpr in c++17
-  inline double GetMassFromPDG(const int PDG) {
+  inline constexpr double GetMassFromPDG(const int PDG) {
   // *****************************
     switch (abs(PDG)) {
       // Leptons
@@ -764,18 +753,31 @@ namespace Utils {
       case 211: return 0.13957039; // pi_+/-
       case 111: return 0.1349768;  // pi_0
       case 221: return 0.547862;   // eta
+      case 331: return 0.95778;    // eta'
       case 311:                    // K_0
       case 130:                    // K_0_L
       case 310:                    // K_0_S
         return 0.497611;
       case 321: return 0.493677;   // K_+/-
+      case 113: return 0.77526;    // rho_0
+      case 213: return 0.77511;    // rho_+/-
+      case 223: return 0.78266;    // omega
+      case 411: return 1.86966;    // D_+/-
+      case 421: return 1.86484;    // D_0
+      case 431: return 1.96835;    // D_s+/-
       // Baryons
       case 2112: return 0.939565; // n
       case 2212: return 0.938272; // p
-      case 3122: return 1.115683; // lambda
-      case 3222: return 1.118937; // sig_+
-      case 3112: return 1.197449; // sig_-
-      case 3212: return 1.192642; // sig_0
+      case 3122: return 1.115683; // Lambda
+      case 3222: return 1.118937; // Sig_+
+      case 3112: return 1.197449; // Sig_-
+      case 3212: return 1.192642; // Sig_0
+      case 3312: return 1.32171;  // Xi_+/-
+      case 3322: return 1.31486;  // Xi_0
+      case 3334: return 1.67245;  // Omega_+/-
+      case 4122: return 2.28646;  // Lambda_c+
+      case 4212: return 2.45265;  // Sigma_c+
+      case 4222: return 2.45397;  // Sigma_c++
       // Nuclei
       case 1000050110: return 10.255103; // Boron-11
       case 1000060120: return 11.177929; // Carbon-12

@@ -19,17 +19,17 @@ jobs:
       matrix:
         include:
           - name: Find Package Alma9
-            container: ghcr.io/mach3-software/mach3:alma9v2.2.1
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
+            container: ghcr.io/mach3-software/mach3:alma9v2.6.1
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
 
           - name: Find Package Rocky9 CUDA
-            container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
+            container: ghcr.io/mach3-software/mach3:rocky9cudav2.6.1
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPULinear_ENABLED=ON
 
     name: ${{ matrix.name }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
     # KS: Free some space, as some MaCh3 containers can be heavy...
     - uses: ./.github/actions/free-disk-space

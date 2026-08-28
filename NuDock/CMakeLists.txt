@@ -18,7 +18,7 @@ set_target_properties(MaCh3NuDock PROPERTIES
 CPMAddPackage(
     NAME NuDock
     GITHUB_REPOSITORY "NuDock/nudock"
-    GIT_TAG "0eef1a49df06b3a714ed2a9fc1cbed6f3151144d"
+    GIT_TAG "v0.0.2-mach3"
     GIT_SHALLOW NO
     GIT_SUBMODULES_RECURSE ON
 )
@@ -34,6 +34,7 @@ else()
 endif()
 
 target_link_libraries(MaCh3NuDock PUBLIC Fitters ${NUDOCK_TARGET})
+target_link_libraries(MaCh3NuDock PRIVATE MaCh3Warnings)
 
 target_include_directories(MaCh3NuDock PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
@@ -49,3 +50,4 @@ install(TARGETS MaCh3NuDock
         PUBLIC_HEADER DESTINATION include/MaCh3NuDock)
 
 add_library(MaCh3::MaCh3NuDock ALIAS MaCh3NuDock)
+target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)

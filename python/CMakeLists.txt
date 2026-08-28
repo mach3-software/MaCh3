@@ -1,4 +1,5 @@
 set(HEADERS
+  histutils.h
   plotting.h
   fitters.h
   samples.h

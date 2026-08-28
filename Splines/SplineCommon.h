@@ -29,6 +29,32 @@ enum SplineSegmentCoeffs
 };
 
 // *******************
+/// @brief Flat representation of a spline index entry
+struct SplineIndex {
+// *******************
+  /// @brief destructor
+  virtual ~SplineIndex() = default;
+
+  /// Index into the flattened spline weight vector
+  int value    = 0;
+  /// Sample index
+  int iSample  = 0;
+  /// Oscillation channel index
+  int iOscChan = 0;
+  /// Systematic parameter index
+  int iSyst    = 0;
+  /// Mode index within a systematic
+  int iMode    = 0;
+  /// Kinematic bins index, assumed to be size of 3 for now
+  std::vector<int> iVar{0, 0, 0};
+
+  #ifndef __CUDACC__
+  // Include ClassDef macro for ROOT dictionary generation, but only in C++ code
+  ClassDef(SplineIndex, 1);
+  #endif
+};
+
+// *******************
 /// @brief KS: Struct storing information for spline monolith
 /// @details This structure holds the X coefficients, other spline coefficients,
 /// the number of knots per spline, and the number of points per spline on the CPU.

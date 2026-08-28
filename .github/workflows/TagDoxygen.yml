@@ -10,8 +10,13 @@ on:
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
+  doxygen:
+    uses: ./.github/workflows/Doxygen.yml
+    secrets: inherit
+
   tag-doxygen:
     name: TagDoxygen
     runs-on: ubuntu-latest
@@ -19,14 +24,14 @@ jobs:
     steps:
       # Checkout gh-pages (source of docs)
       - name: Checkout gh-pages branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: gh-pages
           path: gh-pages
 
       # Checkout gh-pages-archive (destination)
       - name: Checkout gh-pages-archive branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: gh-pages-archive
           path: gh-pages-archive

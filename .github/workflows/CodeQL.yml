@@ -13,7 +13,7 @@ jobs:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
+          #"ghcr.io/mach3-software/mach3:rocky9cudalatest"
         ]
     container:
       image: ${{ matrix.container }}
@@ -24,10 +24,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81  # v4.37.3
         with:
           languages: c-cpp
           build-mode: manual
@@ -36,8 +36,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake ../ -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DOscProb_ENABLED=ON
           make
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81  # v4.37.3

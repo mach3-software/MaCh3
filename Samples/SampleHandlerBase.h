@@ -9,13 +9,25 @@
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
 #include "Samples/BinningHandler.h"
+#include "Samples/SampleHandlerFunctional.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "THStack.h"
 #include "TLegend.h"
 _MaCh3_Safe_Include_End_ //}
 
+enum SamplePlotType {
+  kModePlot = 0,
+  kOscChannelPlot = 1
+};
+
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+///
+/// @details This class manages samples used in the analysis. It supports event-by-event reweighting and allows
+/// kinematic shifts to be applied at the event level, which may cause migration between analysis bins.
+///
+/// The likelihood calculation is performed in binned space.
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 ///
@@ -26,42 +38,41 @@ class SampleHandlerBase :  public SampleHandlerInterface
   //######################################### Functions #########################################
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+  SampleHandlerBase(std::string ConfigFileName, ParameterHandlerGeneric* _ParHandler,
                   const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  /// @brief DB Get what dimensionality binning for given sample has
-  /// @param Sample Number of sample
+  /// @copydoc SampleHandlerInterface::GetNDim
   int GetNDim(const int Sample) const final { return SampleDetails[Sample].nDimensions; }
-  /// @brief Get name for Sample Handler
+  /// @copydoc SampleHandlerInterface::GetName
   std::string GetName() const final;
-  /// @brief Get fancy title for specified samples
+  /// @copydoc SampleHandlerInterface::GetSampleTitle
   std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
   /// @brief Sample name tag used only for getting relevant uncertainties
+  /// @param Sample Index of the sample.
   std::string GetSampleName(const int Sample) const {return SampleDetails[Sample].SampleName;}
-  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
-  /// @param iSample Sample index
-  /// @param Dimension Dimension index
+  /// @copydoc SampleHandlerInterface::GetKinVarName
   std::string GetKinVarName(const int iSample, const int Dimension) const final;
 
   /// @brief Computes and prints the integral breakdown of all modes and oscillation channels for a given sample.
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
 
-  //===============================================================================
-  // DB Reweighting and Likelihood functions
-
-  //ETA - abstract these to SampleHandlerBase
-  //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
+  /// @brief DB: Add data for a given sample from a ROOT histogram.
+  /// @param Sample Index of the sample.
+  /// @param Data Pointer to a TH1 containing the data to be stored.
   void AddData(const int Sample, TH1* Data);
+
+  /// @brief ETA:  Add data for a given sample from a raw array.
+  /// @param Sample Index of the sample.
+  /// @param Data_Array Vector containing the data values.
   void AddData(const int Sample, const std::vector<double>& Data_Array);
 
-  /// @brief Helper function to print rates for the samples with LLH
-  /// @param DataOnly whether to print data only rates
+  /// @copydoc SampleHandlerInterface::PrintRates
   void PrintRates(const bool DataOnly = false) final;
-  /// @brief DB Multi-threaded GetLikelihood
+  /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
-  /// @brief Get likelihood for single sample
+  /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
 
@@ -69,27 +80,32 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @param SampleTitle The title of the sample to search for.
   int GetSampleIndex(const std::string& SampleTitle) const;
 
-  /// @brief Get Data histogram
+  /// @copydoc SampleHandlerInterface::GetDataHist
   const TH1* GetDataHist(const int Sample) final;
+  /// @brief Get Data histogram by sample name
+  /// @param Sample Sample title
   const TH1* GetDataHist(const std::string& Sample);
 
-  /// @brief Get MC histogram
+  /// @copydoc SampleHandlerInterface::GetMCHist
   const TH1* GetMCHist(const int Sample) final;
+  /// @brief Get MC histogram by sample title
+  /// @param Sample Sample name
   const TH1* GetMCHist(const std::string& Sample);
 
-  /// @brief Get W2 histogram
+  /// @copydoc SampleHandlerInterface::GetW2Hist
   const TH1* GetW2Hist(const int Sample) final;
+  /// @brief Get W2 histogram by sample name
+  /// @param Sample Sample title
   const TH1* GetW2Hist(const std::string& Sample);
-  /// @brief main routine modifying MC prediction based on proposed parameter values
+  /// @copydoc SampleHandlerInterface::Reweight
   void Reweight() override;
   /// @brief Computes the total event weight for a given entry.
-  M3::float_t GetEventWeight(const int iEntry);
+  /// @param iEvent Event enumerator
+  M3::float_t GetEventWeight(const int iEvent);
 
-  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
-
-  /// @brief Get number of oscillation channels for a single sample
+  /// @copydoc SampleHandlerInterface::GetNOscChannels
   int GetNOscChannels(const int iSample) const final {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
-
+  /// @copydoc SampleHandlerInterface::GetFlavourName
   std::string GetFlavourName(const int iSample, const int iChannel) const final {
     if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
@@ -97,52 +113,56 @@ class SampleHandlerBase :  public SampleHandlerInterface
     }
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
+  /// @copydoc SampleHandlerInterface::Get1DVarHist
   std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                                     const std::vector<KinematicCut> &SubEventSelectionVec = {}) final;
+  /// @copydoc SampleHandlerInterface::Get2DVarHist
   std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                                     const std::vector< KinematicCut >& EventSelectionVec = {},
                                     int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
+  /// @brief Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc.
+  /// @param Sample Index of the sample.
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
-
+  /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
                           int WeightStyle=0);
+  /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill2DSubEventHist(const int iSample, TH2* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
-
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
   std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                                     const int kModeToFill = -1, const int kChannelToFill = -1,
                                                     const int WeightStyle = 0) final;
+  /// @copydoc SampleHandlerInterface::Get2DVarHistByModeAndChannel
   std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                                     const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
 
-  std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
-    return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
-  }
-  std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
-    return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
-  }
+  /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
+  /// @param TypeEnum Plot type enumerator see @ref SamplePlotType
+  /// @param iSample Sample enumerator
+  int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                             const int Selection1, const int Selection2 = -1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const int Selection1, const int Selection2=-1,
+                                                             const SamplePlotType Selection1, const int Selection2 = -1,
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
+                                          const SamplePlotType Selection1, const int Selection2 = -1, const int WeightStyle = 0);
   /// @brief Return the legend used for stacked histograms with sample info
   const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
-  /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @brief ETA function to generically convert a string from param handler to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
-  /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @brief ETA function to generically convert a kinematic type from param handler to a string
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
-  /// @brief Store additional info in a chan
+  /// @copydoc SampleHandlerInterface::SaveAdditionalInfo
   void SaveAdditionalInfo(TDirectory* Dir) final;
 
   /// @brief JM: Convert a kinematic vector name to its corresponding integer ID.
@@ -151,6 +171,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
   /// @brief JM: Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr) const;
+
+  /// @brief Return total number of events
+  unsigned int GetNEvents() const {return nEvents;}
 
   /// @brief Return array storing data entries for every bin
   auto GetDataArray() const {
@@ -168,21 +191,29 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetArrayForSample(const int Sample, std::vector<double> const & array) const;
 
   /// @brief Return array storing data entries for every bin
+  /// @param Sample Sample index
   std::vector<double> GetDataArray(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_data);
   }
   /// @brief Return array storing MC entries for every bin
+  /// @param Sample Sample index
   std::vector<double> GetMCArray(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array);
   }
   /// @brief Return array storing W2 entries for single sample
+  /// @param Sample Sample index
   std::vector<double> GetW2Array(const int Sample) const {
     return GetArrayForSample(Sample, SampleHandler_array_w2);
   }
+  /// @brief Loop over bins and checks if there are any which have 0 entries
+  void CheckEmptyBins() const;
 
  protected:
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
+  /// @brief Get pointer to NuOscillator weight for a given event
+  /// @param iEvent Event enumerator
+  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
   /// @brief Initialise pointer to oscillation weight to NuOscillator object
   void SetupNuOscillatorPointers();
   /// @brief Load information about sample handler and corresponding samples from config file
@@ -197,7 +228,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetupKinematicMap();
 
   /// @todo abstract the spline initialisation completely to core
-  /// @brief initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up
+  /// @brief initialise your splineXX object and then use InitialiseSplineObject to conveniently setup everything up
   virtual void SetupSplines() = 0;
 
   //DB Require all objects to have a function which reads in the MC
@@ -215,20 +246,15 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
 
-  /// @brief Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
-  std::unique_ptr<SplineBase> SplineHandler;
-
-  /// @brief Contains oscillator handling calculating oscillation probabilities
-  std::shared_ptr<OscillationHandler> Oscillator;
   //===============================================================================
   /// @brief Set pointers for each event to appropriate weights, for unbinned based on event number
   /// while for binned based on other kinematical properties
   void SetSplinePointers();
   /// @brief Retrieve the spline bin indices associated with a given event.
   /// @warning ThrowCrititcal argument will be eventually removed
-  std::vector< std::vector<int> > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
+  std::vector< SplineIndex > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
 
-  //Functions which find the nominal bin and bin edges
+  /// @brief Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges();
 
   /// @brief set the binning for 2D sample used for the likelihood calculation
@@ -238,50 +264,60 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetupReweightArrays();
   //===============================================================================
 
-  // ----- Functional Parameters -----
-  /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters();
-  /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
+  // ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
-  virtual void RegisterFunctionalParameters() = 0;
-  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
+  virtual void RegisterFunctionalParameters(){};
+  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in FillArray
   virtual void PrepFunctionalParameters(){};
+
+  /// @brief LP - Registration template function for multi-dimensional functional shifts
+  /// @details This method is templated over the EventType and the response
+  ///          function type because the response function type is a function
+  ///          of the event type. The implementation checks via static assert
+  ///          that the passed function object has the correct call signature.
+  ///          The experiment class event vector is passed so that the function
+  ///          objects that are used to apply the shifts are able to access the
+  ///          full event information from the experiment class, rather than
+  ///          only being able to respond to event properties defined in
+  ///          Samples/EventInfo.h
+  ///          A vector of input parameter names that should be consumed by the
+  ///          functional shift is also passed. For a 1D version of this method,
+  ///          see below.
+  ///          This function might be used like below:
+  ///
+  ///          RegisterIndividualFunctionalParameter(ExptEventInfo, {"par1", "par2"},
+  ///            [](std::vector<double> const & par_vals, ExptEventType & ev){
+  ///              constexpr static const double a = 1.2345;
+  ///              ev.property += par_vals[0] * a + par_vals[1];
+  ///          });
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(
+      std::vector<EventType> &ExptEvents,
+      std::vector<std::string> const &par_names,
+      SFType shift_func);
+
+  /// @brief LP - Registration template function for one-dimensional functional shifts
+  /// @details See above for more details on the call signature and usage.
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(std::vector<EventType> &ExptEvents,
+                                             std::string const &par_name,
+                                             SFType shift_func);
   /// @brief ETA - generic function applying shifts
+  /// @note It is virtual so we can perform unorthodox shifts, ideally we should de-virtualise once we ensure we can support everything in core
   virtual void ApplyShifts(const int iEvent);
+  /// @brief HH - reset the shifted values to the original values
+  virtual void ResetShifts([[maybe_unused]] const int iEvent) {};
+  /// @brief LP - Optionally calculate derived observables after all shifts have been applied
+  /// @details For example, have shifts that varied lepton energy and hadron energy separately
+  ///          in a subclass implementation of this method you may add the shifted quantities
+  ///          together to build a shifted neutrino energy estimator
+  virtual void FinaliseShifts([[maybe_unused]] const int iEvent) {};
+  // ----- end Functional Parameters -----
 
   /// @brief DB Function which determines if an event is selected based on @ref KinematicCut
   bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
-  /// @brief HH - reset the shifted values to the original values
-  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
-  /// @brief LP - Optionally calculate derived observables after all shifts have been applied
-  /// @details LP - For example, have shifts that varied lepton energy and hadron energy separately
-  ///               in a subclass implementation of this method you may add the shifted quantities
-  ///               together to build a shifted neutrino energy estimator
-  virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
-  /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<FunctionalShifter*>> funcParsGrid;
-  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
-  /// struct
-  /// HH - Changed to a vector of pointers since it's faster than unordered_map
-  /// and we are using ints as keys
-  std::vector<FunctionalShifter> funcParsMap;
-
-  /// @todo KS: Below functional variables are used only on setup, thus we should refactor them in such a way
-  /// that they are removed as class members but this would be breaking change thus keep it for the time being.
-
-  /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<std::vector<FunctionalParameter>> funcParsVec;
-  /// @brief HH - a map that relates the name of the functional parameter to
-  /// funcpar enum
-  std::unordered_map<std::string, int> funcParsNamesMap;
-  /// @brief HH - a map that relates the funcpar enum to pointer of the actual
-  /// function
-  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
-  /// @brief HH - a vector of string names for each functional parameter
-  std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
   /// @param norm_parameters indexed [sample][param] describe norm params and associated kinematic cuts etc.
@@ -295,23 +331,24 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(const int iEvent) {return; (void)iEvent;};
+  virtual void CalcWeightFunc([[maybe_unused]] const int iEvent) {return;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
   double ReturnKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
     return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
+  /// @brief Return the value of an associated kinematic parameter for an event
   virtual double ReturnKinematicParameter(const int KinematicVariable, const int iEvent) const = 0;
 
   // === JM declare the same functions for kinematic vectors ===
   std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, const int iEvent) const {
     return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter), iEvent);
   }
-  virtual std::vector<double> ReturnKinematicVector(const int KinematicVariable, const int iEvent) const {
-    return {}; (void)KinematicVariable; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector([[maybe_unused]] const int KinematicVariable,
+                                                    [[maybe_unused]] const int iEvent) const {return {};};
   // ===========================================================
 
-  /// @brief Return the binning used to draw a kinematic parameter
+  /// @copydoc SampleHandlerInterface::ReturnKinematicParameterBinning
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const final;
 
   const double* GetPointerToKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
@@ -332,18 +369,20 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// DB Replace previous implementation with reading bin contents from SampleHandler_array
   void FillHist(const int Sample, TH1* Hist, std::vector<double> &Array);
 
-  /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
-#ifdef MULTITHREAD
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting but multithreaded
-  void FillArray_MP();
-#endif
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting
+  /// @brief Function which does the core reweighting. This assumes that oscillation weights have
+  /// already been calculated.
   void FillArray();
 
   /// @brief Helper function to reset histograms
-  void ResetHistograms();
+  void ResetHistograms() _noexcept_;
+  /// @brief Setup spline handler (both binned or unbinned)
+  void InitialiseSplineObject();
+
+  /// Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
+  std::unique_ptr<SplineBase> SplineHandler;
+
+  /// Contains oscillator handling calculating oscillation probabilities
+  std::shared_ptr<OscillationHandler> Oscillator;
 
   //===============================================================================
   //DB Variables required for GetLikelihood
@@ -370,17 +409,13 @@ class SampleHandlerBase :  public SampleHandlerInterface
   ParameterHandlerGeneric *ParHandler = nullptr;
 
   //===============================================================================
-  /// @brief A unique ID for each sample based on which we can define what systematic should be applied
+  /// @brief Identifier of this Sample Handler, mostly used for fancy printing in FitterBase
   std::string SampleHandlerName;
 
   //===========================================================================
-  //DB Vectors to store which kinematic cuts we apply
-  //like in XsecNorms but for events in sample. Read in from sample yaml file
-  //What gets used in IsEventSelected, which gets set equal to user input plus
-  //all the vectors in StoreSelection
-
-  /// @brief What gets pulled from config options, these are constant after loading in
-  /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
+  /// @brief DB Vectors to store which kinematic cuts we apply.
+  /// Gets used in IsEventSelected
+  /// Read in from sample yaml file
   std::vector< std::vector< KinematicCut > > StoredSelection;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
@@ -399,14 +434,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// The manager object used to read the sample yaml file
   std::unique_ptr<Manager> SampleManager;
-  void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
 
   //===============================================================================
-  /// DB Miscellaneous Variables
+  /// DB: Legend associated with stacked histograms produced by this class.
   TLegend* THStackLeg = nullptr;
-  //===============================================================================
 
   /// KS:Super hacky to update W2 or not
   bool FirstTimeW2;
@@ -423,12 +456,17 @@ class SampleHandlerBase :  public SampleHandlerInterface
    /// Returns the original Selection so the caller can restore it later.
    std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
                                                                   const std::vector<KinematicCut>& ExtraCuts);
-
+  /// Mapping from input file names to initial neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
+  /// Mapping from input file names to final neutrino PDG codes.
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
 
-  enum FDPlotType {
-    kModePlot = 0,
-    kOscChannelPlot = 1
-  };
+  /// @brief Helper object for storing/updating information related to functional shift parameters
+  M3::detail::Functional functional;
+
+  /// Number of MC events are there
+  unsigned int nEvents;
 };
+
+//template implementation details live here
+#include "Samples/SampleHandlerBase.txx"

@@ -1,54 +1,59 @@
 # For more see: https://github.com/actions/labeler?tab=readme-ov-file#pull-request-labeler
-MCMC:
+MCMC 🎲:
   - changed-files:
       - any-glob-to-any-file: 
           - Fitters/**
+          - NuDock/**
 
-Plotting:
+Plotting 📊:
   - changed-files:
       - any-glob-to-any-file: 
-          - Plotting/**
-          - Diagnostics/**
+          - Utils/Plotting/**
+          - CLI/**
 
-Nu Osc/Xsec:
+Parameters ⚙️:
   - changed-files:
       - any-glob-to-any-file: 
           - Parameters/**
           - Splines/**
 
-Samples:
+Samples 🗃️:
   - changed-files:
       - any-glob-to-any-file: 
           - Samples/**
+          - Splines/**
 
-Manager:
+Manager 🧠:
   - changed-files:
       - any-glob-to-any-file: 
           - Manager/**
 
-Documentation:
+Documentation 📚:
   - changed-files:
       - any-glob-to-any-file: 
           - Doc/**
-Cmake:
+          - .mailmap
+
+Cmake 🛠️:
   - changed-files:
       - any-glob-to-any-file:
           - cmake/**
           - CMakeLists.txt
 
-GPU:
+GPU ⚡:
   - changed-files:
       - any-glob-to-any-file:
           - '**/*.cu'
           - '**/*.cuh'
 
-CI/CD:
+CI/CD 🤖:
   - changed-files:
       - any-glob-to-any-file:
           - .github/**
 
-python:
+python 🐍:
   - changed-files:
       - any-glob-to-any-file:
           - '**/*.py'
+          - python/**
 

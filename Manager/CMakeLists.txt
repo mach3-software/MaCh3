@@ -30,6 +30,12 @@ endif()
 target_link_libraries(Manager PUBLIC MaCh3CompilerOptions MaCh3GPUCompilerOptions yaml-cpp spdlog NuOscillator ROOT::Tree ROOT::Hist ROOT::Physics)
 target_link_libraries(Manager PRIVATE MaCh3Warnings)
 
+# KS: To use std::filesystem for older gcc version this is needed
+# See https://en.cppreference.com/cpp/filesystem#Notes
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+    target_link_libraries(Manager PUBLIC stdc++fs)
+endif()
+
 target_include_directories(Manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
   $<INSTALL_INTERFACE:include>)
@@ -40,6 +46,7 @@ install(TARGETS Manager
         PUBLIC_HEADER DESTINATION include/Manager)
 
 add_library(MaCh3::Manager ALIAS Manager)
+target_link_libraries(MaCh3 INTERFACE Manager)
 
 
 install(TARGETS yaml-cpp
