@@ -905,10 +905,6 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   TDirectory *LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
   MACH3LOG_INFO("Using LLHScans of type {}",LLH_type);
 
-  const double global_Xsec_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["XsecStepScale"],1.0, __FILE__, __LINE__);
-  const double global_Osc_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["OscStepScale"], 1.0,__FILE__, __LINE__);
-    
-  double global_par_scale;
   if(!LLHScans || LLHScans->IsZombie())
   {
     MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
@@ -919,6 +915,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   for (ParameterHandlerBase *cov : systematics)
   {
     const int npars = cov->GetNumParams();
+    const double GlobalScale = cov->GetGlobalStepScale();
 
     // Vector of parameter names correlated to given parameter, from correlation matrix
     std::vector<std::vector<std::string>> CorrParams(npars);
@@ -980,15 +977,11 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       const double approxSigma = TMath::Abs(Var)/std::sqrt(LLH_val);
 
       std::string var_name = cov->GetParName(i);
-      if(cov->GetParameterGroup(i) == "XSec" || cov->GetParameterGroup(i) == "Flux")
-	global_par_scale = global_Xsec_scale;
-      else if (cov->GetParameterGroup(i) == "Osc")
-	global_par_scale = global_Osc_scale;
       else
 	MACH3LOG_ERROR("Parameter group not recognised");
 
       // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-      const double NewStepScale = (approxSigma * 2.38/std::sqrt(npars)) /global_par_scale;
+      const double NewStepScale = (approxSigma * 2.38/std::sqrt(npars)) /GlobalScale;
 
       StepScale[i] = NewStepScale;
       MACH3LOG_DEBUG("Sigma: {}", approxSigma);
