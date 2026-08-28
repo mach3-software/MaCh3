@@ -442,9 +442,7 @@ class ParameterHandlerBase {
   std::vector<bool> _fFlatPrior;
   /// Defines the group of the parameter
   std::vector<std::string> _fParameterGroup;
-  /// Correlation matrix elements for given parameter
-  std::vector<std::map<std::string, double>> _fCorrElement;
-  
+
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
 

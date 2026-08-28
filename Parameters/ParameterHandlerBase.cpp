@@ -235,6 +235,8 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
+  _fNames = std::vector<std::string>(SizeVec);
+  _fFancyNames = std::vector<std::string>(SizeVec);
   _fPreFitValue     = std::vector<double>(SizeVec, 1.0);
   _fError           = std::vector<double>(SizeVec, 1.0);
   _fCurrVal         = std::vector<double>(SizeVec, 0.0);

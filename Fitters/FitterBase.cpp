@@ -912,7 +912,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   } else {
     outputFileLLH = outputFile;
 
-    MACH3LOG_INFO("MENAI  Starting Get Step Scale Based On LLHScan");
+    MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
     auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
   
