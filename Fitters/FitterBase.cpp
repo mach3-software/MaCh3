@@ -892,22 +892,28 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   }
   else
     outputFileLLH = outputFile;
-
-  TDirectory *Total_LLH = outputFileLLH->Get<TDirectory>("Total_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
   auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
-
   
+  std::string LLH_type = "Sample_LLH";
+  const std::string llhType = GetFromManager<std::string>(fitMan->raw()["LLHScan"]["LLHType"], {}, __FILE__ , __LINE__);
+  if(!llhType.empty()){
+    LLH_type = llhType;
+  }
+  
+  TDirectory *LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
+  MACH3LOG_INFO("Using LLHScans of type {}",LLH_type);
+
   const double global_Xsec_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["XsecStepScale"],1.0, __FILE__, __LINE__);
   const double global_Osc_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["OscStepScale"], 1.0,__FILE__, __LINE__);
     
   double global_par_scale;
-  if(!Total_LLH || Total_LLH->IsZombie())
+  if(!LLHScans || LLHScans->IsZombie())
   {
-    MACH3LOG_WARN("Couldn't find Sample_LLH, it looks like LLH scan wasn't run, will do this now");
+    MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
     RunLLHScan();
-    Total_LLH = outputFileLLH->Get<TDirectory>("Total_LLH");
+    LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
   }
 
   for (ParameterHandlerBase *cov : systematics)
@@ -927,11 +933,11 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 	std::string corr_var_name = corrMap.first;
 	if (!ParamVector.empty()){
 	  if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
-	    // Only consider parameters in chosen list
+	    // Only create vector if parameter is in chosen list from config file
 	    continue;
 	  }
 	  if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
-	    // Only consider correlation of parameters in chosen list
+	    // Only consider correlation of parameters in chosen list 
 	    continue;
 	  }
 
@@ -951,7 +957,13 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 	  continue;
 	}
       }
-      TH1D* LLHScan = Total_LLH->Get<TH1D>((name+"_full").c_str());
+
+      TH1D* LLHScan = nullptr;
+      if(LLH_type == "Total_LLH")
+	LLHScan = LLHScans->Get<TH1D>((name+"_full").c_str());
+      else
+	LLHScan = LLHScans->Get<TH1D>((name+"_sam").c_str());
+      
       if(LLHScan == nullptr)
       {
         MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
@@ -984,12 +996,14 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
     }
     std::vector<double> StepScaleCorr = StepScale;
     for (int p = 0; p < npars; p++){
+      //Adjust parameter step scale if correlated parameters exist
       if(CorrParams[p].size() != 0){
 	double avg_step_scale = StepScale[p];
 	for(const auto& corrName : CorrParams[p]) {
 	  int index = cov->GetParIndex(corrName);
 	  avg_step_scale += StepScale[index];
 	}
+	//Determine average step scale for correlated parameters
 	avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
 	StepScaleCorr[p] = avg_step_scale;
 	MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
