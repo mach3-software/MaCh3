@@ -43,9 +43,10 @@ namespace M3{
             /// @brief Install shell completion scripts for bash and zsh
             void install_completions() const;
 
-            /// @brief Generate completion suggestions for the given prefix
-            /// @param prefix The prefix string to match against available subcommands
-            void completions(const std::string& prefix) const;
+            /// @brief Generate completion suggestions given the current prefix and preceding words
+            /// @param prefix   The partially-typed word being completed
+            /// @param context  Words already typed after the program name but before prefix
+            void completions(const std::string& prefix, const std::vector<std::string>& context) const;
 
             /// @brief Unload all dynamically loaded plugins
             void unload_dynamic_plugins();
@@ -79,17 +80,39 @@ namespace M3{
 _mach3_complete() {
     local cur prev words cword
     _init_completion || return
-    COMPREPLY=( $(mach3 --complete "$cur" "${words[@]:1:$cword}") )
+
+    # Pass current prefix + preceding words as context; binary filters by prefix
+    local -a raw
+    mapfile -t raw < <(mach3 --complete "$cur" "${words[@]:1:$((cword-1))}" 2>/dev/null)
+
+    if [[ ${#raw[@]} -eq 0 ]]; then
+        # No completions from binary — fall back to default (file) completion
+        compopt -o default 2>/dev/null
+        return
+    fi
+    COMPREPLY=( "${raw[@]}" )
 }
 complete -F _mach3_complete mach3
 )";
             static constexpr std::string_view ZSH_COMPLETION = R"(
 #compdef mach3
 
-local -a completions
-local cur="$words[-1]"
-completions=("${(@f)$(mach3 --complete "$cur" "${words[@]:1}")}")
-compadd -a completions
+_mach3() {
+    local cur="${words[$CURRENT]}"
+    local -a ctx
+    ctx=("${words[@]:1:$((CURRENT-2))}")
+
+    local -a completions
+    completions=("${(@f)$(mach3 --complete "$cur" "${ctx[@]}" 2>/dev/null)}")
+
+    if [[ ${#completions[@]} -eq 0 ]]; then
+        _files
+        return
+    fi
+    compadd -a completions
+}
+
+_mach3
 )";
     };
 }

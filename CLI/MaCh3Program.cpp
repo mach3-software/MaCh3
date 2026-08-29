@@ -49,28 +49,96 @@ namespace M3{
             return;
         }
 
+        // Resolve the absolute path of this binary so the completion script
+        // works even when mach3 is not on PATH.
+        std::string binary_path = "mach3";
+        try {
+            binary_path = fs::read_symlink("/proc/self/exe").string();
+        } catch (...) {}
+
+        // Replace the generic "mach3" invocation in the template with the
+        // absolute binary path so the script is self-contained.
+        auto embed_path = [&](std::string_view tmpl) -> std::string {
+            std::string s(tmpl);
+            const std::string placeholder = "mach3 --complete";
+            const std::string replacement = binary_path + " --complete";
+            for (std::size_t pos = s.find(placeholder); pos != std::string::npos;
+                 pos = s.find(placeholder, pos + replacement.size()))
+                s.replace(pos, placeholder.size(), replacement);
+            return s;
+        };
+
         fs::path home_path(home);
 
         if (shell == "bash") {
             fs::path path = home_path / ".local/share/bash-completion/completions/mach3";
-            if (write_file(path, MaCh3Program::BASH_COMPLETION))
+            if (write_file(path, embed_path(MaCh3Program::BASH_COMPLETION)))
                 std::cout << "Installed bash completions → " << path << "\n";
             return;
         }
 
         if (shell == "zsh") {
             fs::path path = home_path / ".local/share/zsh/site-functions/_mach3";
-            if (write_file(path, MaCh3Program::ZSH_COMPLETION))
+            if (write_file(path, embed_path(MaCh3Program::ZSH_COMPLETION)))
                 std::cout << "Installed zsh completions → " << path << "\n";
             return;
         }
     }
-                
-    void MaCh3Program::completions(const std::string& prefix) const{
-        for (const std::string& cmd : m_subcommands) {
-            if (cmd.rfind(prefix, 0) == 0)
-                std::cout << cmd << "\n";
+
+    void MaCh3Program::completions(const std::string& prefix, const std::vector<std::string>& context) const {
+        // Find the active subcommand from previously typed context words
+        std::string active_subcommand;
+        for (const auto& word : context) {
+            for (const auto& sub : m_subcommands) {
+                if (word == sub) {
+                    active_subcommand = sub;
+                    break;
+                }
+            }
+            if (!active_subcommand.empty()) break;
         }
+
+        if (active_subcommand.empty()) {
+            // No subcommand typed yet — complete top-level subcommand names
+            for (const auto& cmd : m_subcommands) {
+                if (cmd.rfind(prefix, 0) == 0)
+                    std::cout << cmd << "\n";
+            }
+            return;
+        }
+
+        // Find the parser for the active subcommand
+        const MaCh3ArgumentParser* sub_parser = nullptr;
+        for (const auto& [parser, mod] : m_module_map) {
+            if (parser->name() == active_subcommand) { sub_parser = parser; break; }
+        }
+        if (!sub_parser) {
+            for (const auto& [parser, plug] : m_dynamic_plugin_map) {
+                if (parser->name() == active_subcommand) { sub_parser = parser; break; }
+            }
+        }
+        if (!sub_parser) return; // unknown subcommand — fall back to files
+
+        // If the last context word is an option that expects a value argument,
+        // output nothing so the shell falls back to file completion.
+        if (!context.empty()) {
+            const std::string& prev = context.back();
+            if (prev.size() >= 2 && prev[0] == '-') {
+                if (sub_parser->option_takes_value(prev)) {
+                    return; // option takes a value — let the shell complete files
+                }
+            }
+        }
+
+        // Complete long option names when the prefix starts with '-'
+        if (!prefix.empty() && prefix[0] == '-') {
+            for (const auto& name : sub_parser->get_long_option_names()) {
+                if (name.rfind(prefix, 0) == 0)
+                    std::cout << name << "\n";
+            }
+            return;
+        }
+        // Non-option prefix (or empty) — output nothing, shell falls back to files
     }
 
     // void MaCh3Program::parse_args(int argc, const char *const argv[]) {
