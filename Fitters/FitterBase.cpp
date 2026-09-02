@@ -3,7 +3,6 @@
 #include <memory>
 
 _MaCh3_Safe_Include_Start_ //{
-#include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
@@ -19,8 +18,8 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 // *************************
   AlgorithmName = "";
   //Get mach3 modes from Manager
-  random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
-
+  auto Seed = Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__);
+  M3::rand::SetSeed(Seed);
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;

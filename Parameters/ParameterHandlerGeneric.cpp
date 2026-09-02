@@ -189,14 +189,6 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
 // ********************************************
   std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
   LoadAndMergeYAML(YAMLFile, ThrowSubMatrixOverrides);
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
   PrintLength = 35;
 
   // Set the covariance matrix

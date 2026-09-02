@@ -233,7 +233,7 @@ void MCMCBase::AdaptiveStep() {
 bool MCMCBase::IsStepAccepted(const double acc_prob) {
 // *************************
     // Get the random number
-    const double fRandom = random->Rndm();
+    const double fRandom = M3::rand::Uniform();
     // Do the accept/reject
     #ifdef MACH3_DEBUG
     debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;

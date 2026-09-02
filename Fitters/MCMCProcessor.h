@@ -27,7 +27,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TTree.h"
 #include "TROOT.h"
 #include "TKey.h"
-#include "TRandom3.h"
 #include "TGraphPolar.h"
 #include "TCandle.h"
 #include "TMath.h"
