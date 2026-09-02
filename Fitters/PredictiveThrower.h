@@ -39,8 +39,6 @@ class PredictiveThrower : public FitterBase {
 
   /// @brief Produce toys by throwing from MCMC
   void ProduceToys();
-  /// @copydoc FitterBase::GetFancyName
-  virtual std::string GetFancyName() const final {return GetName();};
 
   /// @brief Main routine responsible for producing posterior predictive distributions and $p$-value
   void RunPredictiveAnalysis();

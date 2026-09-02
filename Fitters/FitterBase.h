@@ -73,7 +73,7 @@ class FitterBase {
   /// @brief Get name of class
   std::string GetName() const {return AlgorithmName;};
   /// @brief This name is to get include some special algorithm extensions
-  virtual std::string GetFancyName() const = 0;
+  virtual std::string GetFancyName() const {return GetName();};
 
  protected:
   /// @brief Process MCMC output
