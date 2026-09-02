@@ -3207,7 +3207,7 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
     auto isCircular = ParamCircular[ParType][ParamTemp];
     if(isCircular) {
       MACH3LOG_ERROR("Trying to apply smearing for param {}, which has circular prior", Names[k]);
-      MACH3LOG_ERROR("Please implement me or ask gently someone");
+      MACH3LOG_ERROR("Please implement me or gently ask someone");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
