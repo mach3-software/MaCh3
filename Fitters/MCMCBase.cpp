@@ -270,7 +270,8 @@ std::string MCMCBase::GetFancyName() const {
 
     for(unsigned int i = 0; i < systematics.size(); ++i){
         if(systematics[i]->GetDoAdaption()){
-         OutName += "Adaptive_";
+            OutName += "Adaptive_";
+            break;
         }
     }
 
