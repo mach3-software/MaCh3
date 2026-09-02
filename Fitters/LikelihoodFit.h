@@ -9,6 +9,8 @@ class LikelihoodFit : public FitterBase {
     LikelihoodFit(Manager * const fitMan);
     /// @brief Destructor
     virtual ~LikelihoodFit();
+    /// @copydoc FitterBase::GetFancyName
+    virtual std::string GetFancyName() const final {return GetName();};
 
     /// @brief Chi2 calculation over all included samples and syst objects
     virtual double CalcChi2(const double* x);
