@@ -33,8 +33,6 @@ class BinnedSplineHandler : public SplineBase {
     virtual void FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames);
     /// @brief Return the splines which affect a given event
     std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, const std::vector<double>& VarVals);
-    /// @copydoc SplineBase::SynchroniseMemTransfer
-    void SynchroniseMemTransfer() const final {return;}
     /// @brief Count how many splines we have
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0) const;
 
@@ -108,16 +106,13 @@ class BinnedSplineHandler : public SplineBase {
     std::vector<SplineIndex> IndexVect;
     /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
     std::map<std::tuple<int, int, int, int, std::vector<int>>, int> IndexVectMap;
-    /// Number of coefficients for a single flat (after flattening)
-    std::vector<int > coeffindexvec;
-    /// Unique coefficient indices
-    std::vector<int> uniquecoeffindices;
+    /// KS: CPU Number of knots per spline
+    std::vector<unsigned int> nKnots_arr;
 
     /// holds each spline object before stripping into coefficient monolith
     std::vector< TSpline3_red* > splinevec_Monolith;
 
-    int MonolithSize;
-    int MonolithIndex;
+    unsigned int MonolithIndex;
     int CoeffIndex;
 
     /// Need to keep track of which splines are flat and which aren't
@@ -128,9 +123,9 @@ class BinnedSplineHandler : public SplineBase {
     M3::float_t *manycoeff_arr;
 
     /// Stores weight from spline evaluation for each single spline
-    std::vector<M3::float_t> weightvec_Monolith;
-    /// Maps single spline object with single parameter
-    std::vector<int> uniquesplinevec_Monolith;
+    std::vector<M3::float_t> cpu_spline_weights;
+    /// CW: CPU array with the number of points per spline (not per spline point!)
+    std::vector<short int> paramNo_arr;
 
     /// pointer to MaCh3 Mode from which we get spline suffix
     MaCh3Modes* Modes;
@@ -140,9 +135,10 @@ class BinnedSplineHandler : public SplineBase {
     virtual std::vector<std::string> GetTokensFromSplineName(const std::string& FullSplineName) = 0;
 
   private:
+    /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
+    void MoveToGPU();
     /// @brief This function will find missing splines in file
     void InvestigateMissingSplines() const;
-
     /// @brief KS: Load preprocessed Settings
     /// @param SplineFile File from which we load new tree
     void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);
