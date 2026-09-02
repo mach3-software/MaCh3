@@ -87,6 +87,7 @@ void OscProcessor::LoadAdditionalInfo() {
     // Push back the name
     ParamNames[kXSecPar].push_back("J_cp");
     ParamFlat[kXSecPar].push_back( false );
+    ParamCircular[kXSecPar].push_back( false );
   } else if(PlotJarlskog && !OscEnabled) {
     MACH3LOG_ERROR("Trying to enable Jarlskog without oscillations");
     throw MaCh3Exception(__FILE__,__LINE__);

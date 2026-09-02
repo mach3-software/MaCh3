@@ -476,6 +476,8 @@ class MCMCProcessor {
     std::vector<std::vector<double>>  ParamErrors;
     /// Whether Param has flat prior or not
     std::vector<std::vector<bool>>    ParamFlat;
+    /// Whether param has circualr prior or not, like often delta CP
+    std::vector<std::vector<bool>>    ParamCircular;
     /// Number of parameters per type
     std::vector<int> nParam;
     /// Make an enum for which class this parameter belongs to so we don't have to keep string comparing
