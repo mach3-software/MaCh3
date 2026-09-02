@@ -77,6 +77,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParamCentral.resize(kNParameterEnum);
   ParamErrors.resize(kNParameterEnum);
   ParamFlat.resize(kNParameterEnum);
+  ParamCircular.resize(kNParameterEnum);
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
@@ -200,7 +201,7 @@ void MCMCProcessor::MakeOutputFile() {
   auto rand = std::make_unique<TRandom3>(0);
   std::string name = "";
   do {
-    const int uniform = int(rand->Uniform(0, 10000));
+    const int uniform = M3::rand::UniformInt(0, 9999);
     name = "Posterior" + std::to_string(uniform);
   } while (gROOT->GetListOfCanvases()->FindObject(name.c_str()) != nullptr);
 
@@ -848,7 +849,6 @@ void MCMCProcessor::MakeViolin() {
   hviolin_prior = std::make_unique<TH2D>("hviolin_prior", "hviolin_prior", nDraw, 0, nDraw, PriorFactor*vBins, PriorFactor*mini_y, PriorFactor*maxi_y);
   hviolin_prior->SetDirectory(nullptr);
 
-  auto rand = std::make_unique<TRandom3>(0);
   std::vector<double> PriorVec(nDraw);
   std::vector<double> PriorErrorVec(nDraw);
   std::vector<bool> PriorFlatVec(nDraw);
@@ -894,7 +894,7 @@ void MCMCProcessor::MakeViolin() {
     {
       for (int k = 0; k < nEntries; ++k)
       {
-        const double Entry = rand->Gaus(PriorVec[x], PriorErrorVec[x]);
+        const double Entry = M3::rand::Gaus(PriorVec[x], PriorErrorVec[x]);
         const double y = hviolin_prior->GetYaxis()->FindBin(Entry);
         hviolin_prior->SetBinContent(x+1, y,  hviolin_prior->GetBinContent(x+1, y)+1);
       }
@@ -2731,6 +2731,11 @@ void MCMCProcessor::ReadModelFile() {
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__));
 
+    if(CheckNodeExists(param["Systematic"],"SpecialProposal", "CircularBounds")) {
+      ParamCircular[kXSecPar].push_back(true);
+    } else {
+      ParamCircular[kXSecPar].push_back(false);
+    }
     ParameterGroup.push_back(Group);
 
     nParam[kXSecPar]++;
@@ -2769,6 +2774,7 @@ void MCMCProcessor::ReadNDFile() {
     ParamNames[kNDPar].push_back( Form("ND Det %i", i) );
     //KS: Currently we can only set it via config, change it in future
     ParamFlat[kNDPar].push_back( false );
+    ParamCircular[kNDPar].push_back( false );
   }
 
   TIter next(BinningDirectory->GetListOfKeys());
@@ -2807,6 +2813,7 @@ void MCMCProcessor::ReadFDFile() {
 
     //KS: Currently we can only set it via config, change it in future
     ParamFlat[kFDDetPar].push_back( false );
+    ParamCircular[kFDDetPar].push_back( false );
   }
   //KS: The last parameter is p scale
   //ETA: we need to be careful here, this is only true for SK in the T2K beam analysis...
@@ -3086,11 +3093,10 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
-      auto rand = std::make_unique<TRandom3>(0);
       //KS: Throw nice gaussian, just need big number to have smooth distribution
       for(int g = 0; g < 1000000; ++g)
       {
-        PriorHist->Fill(rand->Gaus(Prior, PriorError));
+        PriorHist->Fill(M3::rand::Gaus(Prior, PriorError));
       }
     }
     SavageDickeyPlot(PriorHist, PosteriorHist, std::string(Title), EvaluationPoint[k]);
@@ -3194,6 +3200,15 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(ParamNo, Prior, PriorError, Title);
 
+    ParameterEnum ParType = ParamType[ParamNo];
+    int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
+    auto isCircular = ParamCircular[ParType][ParamTemp];
+    if(isCircular) {
+      MACH3LOG_ERROR("Trying to apply smearing for param {}, which has circular prior", Names[k]);
+      MACH3LOG_ERROR("Please implement me or gently ask someone");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+
     Param.push_back(ParamNo);
   }
   std::string InputFile = MCMCFile+".root";
@@ -3222,7 +3237,6 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
     }
   }
 
-  auto rand = std::make_unique<TRandom3>(0);
   Long64_t AllEntries = post->GetEntries();
   for (Long64_t i = 0; i < AllEntries; ++i) {
     // Entry from the old chain
@@ -3235,7 +3249,7 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
     }
     // Smear it
     for(size_t iPar = 0; iPar < Param.size(); iPar++) {
-      NewParameter[iPar] = NewParameter[iPar] + rand->Gaus(0, Error[iPar]);
+      NewParameter[iPar] += M3::rand::Gaus(0, Error[iPar]);
     }
     // Fill to the new chain
     treeNew->Fill();

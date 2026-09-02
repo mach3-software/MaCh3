@@ -12,7 +12,6 @@
 #include "Fitters/MCMCProcessor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
-class TRandom3;
 class TStopwatch;
 class TTree;
 class TGraphAsymmErrors;
@@ -148,9 +147,6 @@ class FitterBase {
   std::unique_ptr<TStopwatch> stepClock;
   /// Time of single step
   double stepTime;
-
-  /// Random number
-  std::unique_ptr<TRandom3> random;
 
   /// Output
   TFile *outputFile;

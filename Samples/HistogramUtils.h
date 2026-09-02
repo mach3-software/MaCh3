@@ -4,9 +4,8 @@
 #include "Samples/SampleStructs.h"
 #include "Parameters/ParameterStructs.h"
 #include "Manager/YamlHelper.h"
-
+#include "Manager/Random.h"
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
-class TRandom3;
 class TObject;
 
 /// @file HistogramUtils.h
@@ -63,22 +62,22 @@ void CheckTH2PolyFileVersion(TFile *file);
 void RemoveFitter(TH1D* hist, const std::string& name);
 
 /// @brief Make Poisson fluctuation of TH1D hist using default fast method
-void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist);
 /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
-void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist);
 
 /// @brief Make Poisson fluctuation of TH2D hist using default fast method
-void MakeFluctuatedHistogramStandard(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramStandard(TH2D *FluctHist, TH2D* PolyHist);
 /// @brief Make Poisson fluctuation of TH2D hist
-void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist);
 
 /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
-void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist);
 /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
-void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
+void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist);
 
 /// @brief KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on [link](https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e)
-int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
+int GetRandomPoly2(const TH2Poly* PolyHist);
 
 /// @brief KS: Fill Violin histogram with entry from a toy
 /// @param violin hist that will be filled
