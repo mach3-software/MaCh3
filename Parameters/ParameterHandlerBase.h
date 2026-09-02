@@ -6,6 +6,7 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
+#include "Manager/TablePrinter.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
 /// @details Provides core functionality for managing systematic parameters,
@@ -92,8 +93,6 @@ class ParameterHandlerBase {
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
-  /// @brief KS: In case someone really want to change this
-  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -406,9 +405,6 @@ class ParameterHandlerBase {
   double* corr_throw;
   /// Global step scale applied to all params in this class
   double _fGlobalStepScale;
-
-  /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
-  int PrintLength;
 
   /// ETA _fNames is set automatically in the covariance class to be something like param_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
