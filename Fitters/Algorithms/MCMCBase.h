@@ -23,6 +23,10 @@ class MCMCBase : public FitterBase {
 
     /// @copydoc FitterBase::GetFancyName
     virtual std::string GetFancyName() const final;
+
+    /// @brief Set how long chain should be
+    /// @param L new chain length
+   void setChainLength(unsigned int L) { chainLength = L; };
  protected:
     /// @brief The full StartStep->DoStep->EndStep chain
     void DoMCMCStep();
