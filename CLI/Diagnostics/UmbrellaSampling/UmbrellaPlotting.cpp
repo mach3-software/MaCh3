@@ -258,7 +258,6 @@ void UmbrellaPlotting(std::string InputFile,
             normalizeHist(hRefDelm23Shape);
             hasReferenceDelm23 = true;
             std::cout << "Loaded reference delm23 histogram from " << referenceTreeName << std::endl;
-	    
     	}  else {
             hRefDelm23Shape = new TH1D("hRefDelm23Shape", "", nBins_delm23, delm23_io_min, delm23_no_max);
             refTree->Draw("dm23>>hRefDelm23Shape", "", "goff");
@@ -1912,6 +1911,7 @@ void UmbrellaPlotting(std::string InputFile,
 
 // Main function for compiled version
 int main(int argc, char *argv[]) {
+    SetMaCh3LoggerFormat();
     std::string InputFile = argv[1];
     std::string outputDir = argv[2];
 

@@ -8,8 +8,8 @@ MCMC 🎲:
 Plotting 📊:
   - changed-files:
       - any-glob-to-any-file: 
-          - Plotting/**
-          - Diagnostics/**
+          - Utils/Plotting/**
+          - CLI/**
 
 Parameters ⚙️:
   - changed-files:
@@ -32,6 +32,8 @@ Documentation 📚:
   - changed-files:
       - any-glob-to-any-file: 
           - Doc/**
+          - .mailmap
+
 Cmake 🛠️:
   - changed-files:
       - any-glob-to-any-file:

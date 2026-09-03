@@ -1,6 +1,6 @@
 //MaCh3 Includes
-#include "PlottingUtils/PlottingUtils.h"
-#include "PlottingUtils/PlottingManager.h"
+#include "Utils/Plotting/PlottingUtils.h"
+#include "Utils/Plotting/PlottingManager.h"
 #include <numeric>
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
@@ -134,6 +134,7 @@ void PretifyHistogram(TH1* Hist, const std::string& SampleName) {
   Hist->SetTitle(PlotMan->style().prettifySampleName(SampleName).c_str());
   auto BinWidthScale = PlotMan->style().getBinWidthScale(Hist->GetXaxis()->GetTitle());
   auto PrettyX = PlotMan->style().prettifyKinematicName(Hist->GetXaxis()->GetTitle());
+  PlotMan->style().setTH1XRange(Hist);
   Hist->GetXaxis()->SetTitle(PrettyX.c_str());
   Hist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
   M3::ScaleHistogram(Hist, BinWidthScale);
@@ -252,6 +253,7 @@ void OverlayViolin(const YAML::Node& Settings,
         ViolinHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         ViolinHist[iFile]->SetFillStyle(1001);
+        PlotMan->style().setTH1XRange(ViolinHist[iFile].get());
         ViolinHist[iFile]->GetXaxis()->SetTitle(PlotMan->style().prettifyKinematicName(
                                                 ViolinHist[iFile]->GetXaxis()->GetTitle()).c_str());
         ViolinHist[iFile]->GetYaxis()->SetTitle("Events");
@@ -325,14 +327,14 @@ void OverlayPredicitve(const YAML::Node& Settings,
 
       auto BinWidthScale = PlotMan->style().getBinWidthScale(hist->GetXaxis()->GetTitle());
       std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-      auto DataPoissonErrors = PoissonGraphScaled(DataHist.get(), BinWidthScale);
-      M3::ScaleHistogram(DataHist.get(), BinWidthScale);
-
-      DataHist->SetLineColor(kBlack);
-      DataPoissonErrors->SetLineColor(kBlack);
       //KS: +1 for data, we want to get integral before scaling of the histogram
       std::vector<double> Integral(nFiles+1);
       Integral[nFiles] = DataHist->Integral();
+
+      auto DataPoissonErrors = PoissonGraphScaled(DataHist.get(), BinWidthScale);
+      M3::ScaleHistogram(DataHist.get(), BinWidthScale);
+      DataHist->SetLineColor(kBlack);
+      DataPoissonErrors->SetLineColor(kBlack);
       std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
 
       for(int iFile = 0; iFile < nFiles; iFile++)
@@ -346,6 +348,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
         }
         PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>((HistLocation).c_str()));
         Integral[iFile] = PredHist[iFile]->Integral();
+        PlotMan->style().setTH1XRange(PredHist[iFile].get());
         PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
@@ -361,7 +364,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
       DataPoissonErrors->Draw("p same");
 
       auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
-      legend->AddEntry(DataPoissonErrors.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
+      legend->AddEntry(DataPoissonErrors.get(), Form("Data, #int=%.2f", Integral[nFiles]),"le");
       for(int ig = 0; ig < nFiles; ig++ ) {
         legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
       }
@@ -389,6 +392,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
         RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
         RatioPlot[ig]->SetFillStyle(1001);
         RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
+        PlotMan->style().setTH1XRange(RatioPlot[ig].get());
         auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
         RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
         RatioPlot[ig]->SetBit(TH1D::kNoTitle);

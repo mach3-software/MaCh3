@@ -365,63 +365,17 @@ void SampleHandlerBase::Reweight() {
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
 
-  #ifdef MULTITHREAD
-  // Call entirely different routine if we're running with openMP
-  FillArray_MP();
-  #else
+  // Here we fill weights to MC predictions weights for splines and osc already have been filled
   FillArray();
-  #endif
 
   //KS: If you want to not update W2 wights then uncomment this line
   if(!UpdateW2) FirstTimeW2 = false;
 }
 
-//************************************************
-// Function which does the core reweighting. This assumes that oscillation weights have
-// already been calculated and stored in SampleHandlerBase.osc_w[iEvent]. This
-// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerBase
-// array array which is binned to match the sample binning, such that bin[1][1] is the
-// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
-void SampleHandlerBase::FillArray() {
-//************************************************
-  //DB Reset which cuts to apply
-  Selection = StoredSelection;
-
-  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    ApplyShifts(iEvent);
-    const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
-
-    if (!IsEventSelected(MCEvent->NominalSample, iEvent)) {
-      continue;
-    }
-
-    // Virtual by default does nothing, has to happen before CalcWeightTotal
-    CalcWeightFunc(iEvent);
-
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
-    if (totalweight <= 0.){
-      continue;
-    }
-
-    //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
-
-    //DB Fill relevant part of thread array
-    if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandler_array[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandler_array_w2[GlobalBin] += totalweight*totalweight;
-    }
-  }
-}
-
-#ifdef MULTITHREAD
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloca"
 // ************************************************
-/// Multithreaded version of fillArray @see fillArray()
-void SampleHandlerBase::FillArray_MP() {
+void SampleHandlerBase::FillArray() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
@@ -440,13 +394,14 @@ void SampleHandlerBase::FillArray_MP() {
   // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandler_array_class[yBin][xBin]
   //
   // We will hit <0.1 s/step eventually! :D
-  const auto TotalBins = Binning->GetNBins();
+  [[maybe_unused]] const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
-
+  #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
+  #endif
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -481,11 +436,10 @@ void SampleHandlerBase::FillArray_MP() {
   }
 }
 #pragma GCC diagnostic pop
-#endif
 
 // **************************************************
 // Helper function to reset the data and MC histograms
-void SampleHandlerBase::ResetHistograms() {
+void SampleHandlerBase::ResetHistograms() _noexcept_ {
 // **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
@@ -986,11 +940,18 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     }
   }
   // get osc params for sample 0, later we check all have same number
-  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
+  auto OscParams = ParHandler->GetOscParsFromSampleName(GetSampleName(0));
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<const M3::float_t*> OscParamsValues(OscParams.size());
+  std::vector<std::string> NuOscName(OscParams.size());
+  for(size_t ij = 0; ij < OscParams.size(); ij++){
+    OscParamsValues[ij] = ParHandler->RetPointer(OscParams[ij].index);
+    NuOscName[ij] = OscParams[ij].NuOscName;
   }
 
   for(int iSample = 1; iSample < GetNSamples(); iSample++) {
@@ -1001,7 +962,8 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParamsValues,
+                                                    NuOscName, GetNOscChannels(0));
   // Add samples only if we don't use same binning
   if(!EqualBinningPerOscChannel) {
     // KS: Start from 1 because sample 0 already added
@@ -1153,10 +1115,10 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
   std::vector< SplineIndex > EventSplines;
   switch(GetNDim(SampleIndex)) {
     case 1:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), 0.);
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), 0.});
       break;
     case 2:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
     default:
       if(ThrowCrititcal) {
@@ -1164,7 +1126,7 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
         MACH3LOG_CRITICAL("Will use 2D like approach");
         ThrowCrititcal = false;
       }
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
   }
   return EventSplines;
@@ -1338,8 +1300,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
     SetSplinePointers();
 
     BinnedSplines->CleanUpMemory();
-  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
-    (void) UnbinnedSpline;
+  } else if ([[maybe_unused]] auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     SetSplinePointers();
   } else {
     MACH3LOG_ERROR("Unsupported spline type encountered.");

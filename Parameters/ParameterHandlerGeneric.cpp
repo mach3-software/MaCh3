@@ -163,7 +163,8 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
       if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
         Corr2 = Correlations[index][_fFancyNames[j]];
         //Do they agree to better than float precision?
-        if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
+        constexpr double tolerance = 1e-6;
+        if(std::abs(Corr2 - Corr1) > tolerance) {
           MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
           MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
           throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -188,14 +189,6 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
 // ********************************************
   std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
   LoadAndMergeYAML(YAMLFile, ThrowSubMatrixOverrides);
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
   PrintLength = 35;
 
   // Set the covariance matrix
@@ -214,7 +207,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
@@ -569,6 +562,7 @@ OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAM
 // ********************************************
   OscillationParameter OscParamInfo;
   GetBaseParameter(param, Index, OscParamInfo);
+  OscParamInfo.NuOscName = Get<std::string>(param["NuOscName"], __FILE__ , __LINE__);
 
   return OscParamInfo;
 }
@@ -585,6 +579,13 @@ const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalPar
 const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
   return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Osc parameters for the relevant SampleName
+const std::vector<OscillationParameter> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kOsc], OscParams, SampleName);
 }
 
 // ********************************************
@@ -849,15 +850,22 @@ void ParameterHandlerGeneric::PrintOscillationParams() const {
 // ********************************************
   MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:40}│", "#", "Global #", "Name", "NuOscName");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────────────────────────┤");
+
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
     auto &OscIndex = pair.first;
     auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│{3:40}│",
+                  std::to_string(OscIndex),
+                  GlobalIndex,
+                  GetParFancyName(GlobalIndex),
+                  OscParams[OscIndex].NuOscName);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────────────────────────┘");
 }
 
 // ********************************************
@@ -1022,20 +1030,6 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
     if(IsParFromGroup(i, Group)) Counter++;
   }
   return Counter;
-}
-
-// ********************************************
-// DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
-// ********************************************
-  std::vector<const M3::float_t*> returnVec;
-  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
-    const auto& globalIndex = pair.second;
-    if (AppliesToSample(globalIndex, SampleName)) {
-      returnVec.push_back(RetPointer(globalIndex));
-    }
-  }
-  return returnVec;
 }
 
 // ********************************************

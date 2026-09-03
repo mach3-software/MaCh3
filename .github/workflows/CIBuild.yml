@@ -25,7 +25,7 @@ jobs:
           - os: Ubuntu22.04 Debug
             file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
             tag: ubuntu22.04latest
-            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
+            cmakeoptions: -DMaCh3_DEBUG_ENABLED=ON -DLOG_LEVEL=TRACE -DMaCh3_NUDOCK_ENABLED=ON -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
           - os: Fedora34 Low Memory
             file: Doc/MaCh3DockerFiles/Fedora34/Dockerfile
             tag: fedora34latest
@@ -70,7 +70,7 @@ jobs:
     name: Build CI ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

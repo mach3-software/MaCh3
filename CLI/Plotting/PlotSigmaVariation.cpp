@@ -1,6 +1,6 @@
 //MaCh3 Includes
-#include "PlottingUtils/PlottingUtils.h"
-#include "PlottingUtils/PlottingManager.h"
+#include "Utils/Plotting/PlottingUtils.h"
+#include "Utils/Plotting/PlottingManager.h"
 
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -294,6 +294,7 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
     Poly[ik]->SetLineWidth(2.);
     Poly[ik]->SetLineColor(Colours[ik]);
     Poly[ik]->SetLineStyle(Style[ik]);
+    PlotMan->style().setTH1XRange(Poly[ik].get());
     auto BinWidthScale = PlotMan->style().getBinWidthScale(Poly[ik]->GetXaxis()->GetTitle());
     Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
     M3::ScaleHistogram(Poly[ik].get(), BinWidthScale);
@@ -332,6 +333,7 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
   MakeRatio(Poly, Ratio);
 
   auto PrettyX = PlotMan->style().prettifyKinematicName(Ratio[0]->GetXaxis()->GetTitle());
+  PlotMan->style().setTH1XRange(Ratio[0].get());
   Ratio[0]->GetXaxis()->SetTitle(PrettyX.c_str());
   Ratio[0]->GetXaxis()->SetTitleSize(0.12);
   Ratio[0]->GetYaxis()->SetTitleOffset(0.4);
@@ -706,6 +708,7 @@ void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Project
   M3::ScaleHistogram(PriorHist, BinWidthScale);
 
   auto PrettyX = PlotMan->style().prettifyKinematicName(PriorHist->GetXaxis()->GetTitle());
+  PlotMan->style().setTH1XRange(PriorHist);
   PriorHist->GetXaxis()->SetTitle(PrettyX.c_str());
   for(int ik = 0; ik < static_cast<int>(sigmaArray.size()); ++ik)
   {

@@ -28,6 +28,15 @@ PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
   Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
   Ntoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);
 
+  if(!Is_PriorPredictive) {
+    auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+    auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
+    if(PosteriorFileName == outfile){
+      MACH3LOG_ERROR("Output file ({}) and posterior files ({}) have same name", outfile, PosteriorFileName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
   ReweightWeight.resize(Ntoys);
   PenaltyTerm.resize(Ntoys);
 }
@@ -610,7 +619,7 @@ void PredictiveThrower::ProduceToys() {
       // If we have combined chains by hadd need to check the step in the chain
       // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
       while(Step < burn_in || !WithinBounds) {
-        entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
+        entry = M3::rand::UniformInt(0, static_cast<int>(PosteriorFile->GetEntries()) - 1);
         PosteriorFile->GetEntry(entry);
         // KS: This might be bit hacky... but BoundValuePointer refer to values in ParameterHandler
         // so we need to update them
@@ -691,19 +700,25 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
   MACH3LOG_INFO("Starting {}", __func__);
 
   TDirectory * ogdir = gDirectory;
+  TDirectory* ToyDir = nullptr;
+
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-
   TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
   gErrorIgnoreLevel = originalErrorWarning;
-  TDirectory* ToyDir = file->GetDirectory("Toys_1DHistVar");
-  // If toys not amiable in posterior file this means they must be in output file
-  if(ToyDir == nullptr) {
+
+  if (file == nullptr || file->IsZombie()) {
     ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+  } else {
+    ToyDir = file->GetDirectory("Toys_1DHistVar");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+    }
   }
+
   // [sample], [toy], [dim]
   std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>> ProjectionToys(TotalNumberOfSamples);
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
@@ -725,7 +740,7 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
       }
     } // end loop over samples
   } // end loop over toys
-  file->Close(); delete file;
+  if(file) { file->Close(); delete file; }
   if(ogdir){ ogdir->cd(); }
 
   ProduceSpectra(ProjectionToys, SampleDirectories, "mc");
@@ -755,6 +770,11 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
         TH1D* ProjectionX = PolyProjectionX(static_cast<TH2Poly*>(hist), nameX.c_str(), XBinning, false);
         TH1D* ProjectionY = PolyProjectionY(static_cast<TH2Poly*>(hist), nameY.c_str(), YBinning, false);
 
+        auto x_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 0);
+        auto y_var = SampleInfo[sample].SamHandler->GetKinVarName(SampleInfo[sample].LocalId, 1);
+        ProjectionX->GetXaxis()->SetTitle(x_var.c_str());
+        ProjectionY->GetXaxis()->SetTitle(y_var.c_str());
+        
         ProjectionX->SetDirectory(nullptr);
         ProjectionY->SetDirectory(nullptr);
 
@@ -784,20 +804,26 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
 // *************************
   MACH3LOG_INFO("Starting {}", __func__);
 
-  TDirectory * ogdir = gDirectory;
+  TDirectory* ogdir = gDirectory;
+  TDirectory* ToyDir = nullptr;
+
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-
   TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
-
   gErrorIgnoreLevel = originalErrorWarning;
-  TDirectory* ToyDir = file->GetDirectory("Toys_ByMode");
-  // If toys not amiable in posterior file this means they must be in output file
-  if(ToyDir == nullptr) {
+
+  if (file == nullptr || file->IsZombie()) {
     ToyDir = outputFile->GetDirectory("Toys_ByMode");
+  } else {
+    ToyDir = file->GetDirectory("Toys_ByMode");
+    // If toys not amiable in posterior file this means they must be in output file
+    if(ToyDir == nullptr) {
+      ToyDir = outputFile->GetDirectory("Toys_ByMode");
+    }
   }
+
   /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
   /// expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim]
   /// so we can reuse this functionality
@@ -845,7 +871,7 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
     ModeDirectory[iSample]->Close();
     delete ModeDirectory[iSample];
   }
-  file->Close(); delete file;
+  if(file){file->Close(); delete file;}
   if(ogdir){ ogdir->cd(); }
 }
 
@@ -1312,9 +1338,9 @@ void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist) {
   // Determine which fluctuation function to call
   auto applyFluctuation = [&](auto* f, auto* h) {
     if (StandardFluctuation) {
-      MakeFluctuatedHistogramStandard(f, h, random.get());
+      MakeFluctuatedHistogramStandard(f, h);
     } else {
-      MakeFluctuatedHistogramAlternative(f, h, random.get());
+      MakeFluctuatedHistogramAlternative(f, h);
     }
   };
 

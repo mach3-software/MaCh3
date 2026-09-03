@@ -15,9 +15,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Destructor
     virtual ~BinnedSplineHandler();
 
-    /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
-    /// to store the weights; probably the best one here! Same thing but pass parameter
-    /// spline segments instead of variations
+    /// @copydoc SplineBase::Evaluate
     void Evaluate() final;
 
     /// @brief add oscillation channel to spline monolith
@@ -34,23 +32,19 @@ class BinnedSplineHandler : public SplineBase {
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
     virtual void FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames);
     /// @brief Return the splines which affect a given event
-    std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
-    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    /// @note now is empty but once we add GPU support it will actually do something
-    void SynchroniseMemTransfer() const final {return;}
+    std::vector<SplineIndex> GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, const std::vector<double>& VarVals);
     /// @brief Count how many splines we have
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0) const;
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* RetPointer(const SplineIndex& Variables) const;
-    /// @brief KS: Prepare spline file that can be used for fast loading
+    /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    /// @copydoc SplineBase::LoadSplineFile
     void LoadSplineFile(std::string FileName) final;
 
   protected:
-    /// @brief CPU based code which eval weight for each spline
+    /// @copydoc SplineBase::CalcSplineWeights
     void CalcSplineWeights() final;
     /// @brief Initialise flat structure
     void PrepForReweight();
@@ -111,17 +105,14 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Variables related to determined which modes have splines and which piggy-back of other modes
     std::vector<SplineIndex> IndexVect;
     /// @brief Map between spline origin/properties (iSample, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3) and the index of the spline in IndexVect
-    std::map<std::tuple<int, int, int, int, int, int, int>, int> IndexVectMap;
-    /// Number of coefficients for a single flat (after flattening)
-    std::vector<int > coeffindexvec;
-    /// Unique coefficient indices
-    std::vector<int> uniquecoeffindices;
+    std::map<std::tuple<int, int, int, int, std::vector<int>>, int> IndexVectMap;
+    /// KS: CPU Number of knots per spline
+    std::vector<unsigned int> nKnots_arr;
 
     /// holds each spline object before stripping into coefficient monolith
     std::vector< TSpline3_red* > splinevec_Monolith;
 
-    int MonolithSize;
-    int MonolithIndex;
+    unsigned int MonolithIndex;
     int CoeffIndex;
 
     /// Need to keep track of which splines are flat and which aren't
@@ -132,21 +123,22 @@ class BinnedSplineHandler : public SplineBase {
     M3::float_t *manycoeff_arr;
 
     /// Stores weight from spline evaluation for each single spline
-    std::vector<M3::float_t> weightvec_Monolith;
-    /// Maps single spline object with single parameter
-    std::vector<int> uniquesplinevec_Monolith;
+    std::vector<M3::float_t> cpu_spline_weights;
+    /// CW: CPU array with the number of points per spline (not per spline point!)
+    std::vector<short int> paramNo_arr;
 
     /// pointer to MaCh3 Mode from which we get spline suffix
     MaCh3Modes* Modes;
-    enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
+    enum TokenOrdering{kSystToken,kModeToken,kVarBinToken};
     /// @brief Extract metadata tokens encoded in a spline name.
     /// allows experiment to have different formats of splines
     virtual std::vector<std::string> GetTokensFromSplineName(const std::string& FullSplineName) = 0;
 
   private:
+    /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
+    void MoveToGPU();
     /// @brief This function will find missing splines in file
     void InvestigateMissingSplines() const;
-
     /// @brief KS: Load preprocessed Settings
     /// @param SplineFile File from which we load new tree
     void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);

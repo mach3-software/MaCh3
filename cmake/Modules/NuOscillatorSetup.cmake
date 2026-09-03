@@ -11,7 +11,7 @@ set(OSCILLATOR_OPTIONS
     OscProb
     OscLibLinear
     GLoBESLinear
-    CHICLinear
+    CHIC
 )
 
 # KS: Tells whether all oscillators were disabled
@@ -66,7 +66,7 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v1.5.0")
+  set(MaCh3_NuOscillatorBranch "v2.1.0")
 endif()
 
 #Try adding Oscillator Class
@@ -89,7 +89,7 @@ CPMAddPackage(
     "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"
     "UseOscProb ${USE_OscProb}"
     "UseGLoBESLinear ${USE_GLoBESLinear}"
-    "UseCHICLinear ${USE_CHICLinear}"
+    "UseCHIC ${USE_CHIC}"
     "UseOscLibLinear ${USE_OscLibLinear}"
 
     "NuOscillator_Compiler_Flags ${cpu_compile_options_string}"

@@ -52,7 +52,7 @@ MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
   // Destructor
 }
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
 void MulticanonicalMCMCHandler::setDebugStream(std::ostream* os, bool enabled) {
   debugStream = os;
   debugEnabled = enabled;
@@ -60,7 +60,6 @@ void MulticanonicalMCMCHandler::setDebugStream(std::ostream* os, bool enabled) {
 #endif
 
 void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<ParameterHandlerBase*>& systematics) {
-  
   bool foundDeltaCP = false;
   bool foundDelm23 = false;
 
@@ -97,14 +96,13 @@ void MulticanonicalMCMCHandler::FindOscCovParams(const std::vector<ParameterHand
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* fitMan, std::vector<ParameterHandlerBase*>& systematics) {
-
   FindOscCovParams(systematics);
 
   const auto mcmcConfig = fitMan->raw()["General"]["MCMC"];
 
   // Get the multicanonical beta value from the configuration file
   // This acts as a global bias strength factor
-  multicanonicalBeta = mcmcConfig["Multicanonical"]["Beta"].as<double>();
+  multicanonicalBeta = Get<double>(mcmcConfig["Multicanonical"]["Beta"],  __FILE__, __LINE__);
   MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 
   /// @todo DR: I realised this will fail if you set spline to true but don't
@@ -135,9 +133,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
   // setup for spline bias mode
   if (multicanonicalSpline) {
-
-    std::string splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
-
+    auto splineFileName = Get<std::string>(mcmcConfig["Multicanonical"]["Spline"]["SplineFile"], __FILE__, __LINE__);
     TFile* splineFile = M3::Open(splineFileName.c_str(), "READ",__FILE__, __LINE__);
 
     // grab the splines and do a quick check that they are evaluatable
@@ -155,7 +151,6 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
 
     splineFile->Close();
     splineFile = nullptr;
-
   } else {
     // Umbrella mode with explicit bias function selection
     MACH3LOG_INFO("Using umbrella multicanonical method with bias function {}", umbrellaBiasFunctionName);
@@ -303,7 +298,7 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double delt
   double g0 = generalisedGaussian2(deltacp, umbrellaMean, umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
   double g1 = generalisedGaussian2(deltacp, umbrellaMean - 2 * TMath::Pi(), umbrellaWidth);
   double g2 = generalisedGaussian2(deltacp, umbrellaMean + 2 * TMath::Pi(), umbrellaWidth);
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
   if (debugStream && debugEnabled) (*debugStream) << " g0: " << g0 << " g1: " << g1 << " g2: " << g2 << std::endl;
 #endif
   return -std::log(g0 + g1 + g2) * (multicanonicalBeta);

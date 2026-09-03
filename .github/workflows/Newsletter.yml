@@ -2,7 +2,7 @@
 name: Post MaCh3 Newsletter
 on:
   schedule:
-    - cron: '0 0 * * 1' # Every Monday at midnight
+    - cron: '0 12 1 * *' # 1st day of every month at 12:00 PM UTC
 
 jobs:
   post_discussion:
@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: MaCh3 stats
         uses: ./.github/actions/mach3-stats
@@ -49,27 +49,27 @@ jobs:
 
             **MaCh3 Repository**
             - Total number of commits: ${{ env.mach3_commit_count }}
-            - Total number of commits in the last week: ${{ env.mach3_commits_last_week }}
+            - Total number of commits in the last month: ${{ env.mach3_commits_last_month }}
             - Most recent tag: ${{ env.mach3_latest_tag }}
-            - Most active author in the last week: ${{ env.mach3_most_active_author_name }} (Commits: ${{ env.mach3_most_active_author_count }})
-            - Author with most PRs last week: ${{ env.mach3_most_active_pr_author_name }} (PRs: ${{ env.mach3_most_active_pr_author_count }})
-            - Number of PR last week is ${{ env.mach3_number_of_PR }}
+            - Most active author in the last month: ${{ env.mach3_most_active_author_name }} (Commits: ${{ env.mach3_most_active_author_count }})
+            - Author with most PRs last month: ${{ env.mach3_most_active_pr_author_name }} (PRs: ${{ env.mach3_most_active_pr_author_count }})
+            - Number of PR last month is ${{ env.mach3_number_of_PR }}
 
             **MaCh3 Tutorial Repository**
             - Total number of commits: ${{ env.tutorial_commit_count }}
-            - Total number of commits in the last week: ${{ env.tutorial_commits_last_week }}
+            - Total number of commits in the last month: ${{ env.tutorial_commits_last_month }}
             - Most recent tag: ${{ env.tutorial_latest_tag }}
-            - Most active author in the last week: ${{ env.tutorial_most_active_author_name }} (Commits: ${{ env.tutorial_most_active_author_count }})
-            - Author with most PRs last week: ${{ env.tutorial_most_active_pr_author_name }} (PRs: ${{ env.tutorial_most_active_pr_author_count }})
-            - Number of PR last week is ${{ env.tutorial_number_of_PR }}
+            - Most active author in the last month: ${{ env.tutorial_most_active_author_name }} (Commits: ${{ env.tutorial_most_active_author_count }})
+            - Author with most PRs last month: ${{ env.tutorial_most_active_pr_author_name }} (PRs: ${{ env.tutorial_most_active_pr_author_count }})
+            - Number of PR last month is ${{ env.tutorial_number_of_PR }}
 
             **MaCh3 SbiTools Repository**
             - Total number of commits: ${{ env.sbi_commit_count }}
-            - Total number of commits in the last week: ${{ env.sbi_commits_last_week }}
+            - Total number of commits in the last month: ${{ env.sbi_commits_last_month }}
             - Most recent tag: ${{ env.sbi_latest_tag }}
-            - Most active author in the last week: ${{ env.sbi_most_active_author_name }} (Commits: ${{ env.sbi_most_active_author_count }})
-            - Author with most PRs last week: ${{ env.sbi_most_active_pr_author_name }} (PRs: ${{ env.sbi_most_active_pr_author_count }})
-            - Number of PR last week is ${{ env.sbi_number_of_PR }}
+            - Most active author in the last month: ${{ env.sbi_most_active_author_name }} (Commits: ${{ env.sbi_most_active_author_count }})
+            - Author with most PRs last month: ${{ env.sbi_most_active_pr_author_name }} (PRs: ${{ env.sbi_most_active_pr_author_count }})
+            - Number of PR last month is ${{ env.sbi_number_of_PR }}
 
             Cheers,
             MaCh3-bot

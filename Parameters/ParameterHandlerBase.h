@@ -369,14 +369,15 @@ class ParameterHandlerBase {
 
     struct FunctionalFlipProposal;
 
-  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
-  /// @param index parameter index you want to flip
-  /// @param FlipPoint Value around which flipping is done
-  void FlipParameterValue(const int index, const double FlipPoint);
+
+  /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
+  /// @param group Name of the flip group
+  void FlipParameterGroup(const std::string& group);
 
   /// @brief Evaluate a formula-driven flip for a target parameter.
   /// @param flip Functional flip configuration.
-    void FlipParameterValue(const FunctionalFlipProposal& flip);
+  M3::float_t FlipParameterValue(const FunctionalFlipProposal& flip,
+                                 const std::vector<double>& proposed_values) const;
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -386,10 +387,10 @@ class ParameterHandlerBase {
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
 
   /// @brief Parse and register a functional flip defined in YAML.
-  void AddFunctionalFlip(const YAML::Node& param, const int index);
+  void AddFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
 
   /// @brief Queue a functional flip until all parameters have been loaded.
-  void QueueFunctionalFlip(const YAML::Node& param, const int index);
+  void QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
 
   /// @brief Resolve queued functional flips after parameter names are known.
   void ResolveFunctionalFlips();
@@ -417,6 +418,7 @@ class ParameterHandlerBase {
 
   struct PendingFunctionalFlipProposal {
     int target_index = M3::_BAD_INT_;
+    std::string group_name;
     YAML::Node config;
   };
 
@@ -434,9 +436,6 @@ class ParameterHandlerBase {
   TMatrixDSym *invCovMatrix;
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
-
-  /// KS: Set Random numbers for each thread so each thread has different seed
-  std::vector<std::unique_ptr<TRandom3>> random_number;
 
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
@@ -499,12 +498,18 @@ class ParameterHandlerBase {
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  /// Indices of parameters with flip symmetry
-  std::vector<int>    FlipParameterIndex;
-  /// Central points around which parameters are flipped
-  std::vector<double> FlipParameterPoint;
-  /// Functional flips which depend on the current proposed state of other parameters.
-  std::vector<FunctionalFlipProposal> FunctionalFlipParameters;
+  /// @brief Struct to hold information about a group of parameters that flip together at the same time
+  struct FlipGroup {
+    /// Indices of parameters with flip symmetry
+    std::vector<int> FlipParameterIndex;  
+    /// Central points around which parameters are flipped
+    std::vector<double> FlipParameterPoint; 
+    /// Formula-driven flips that should be applied when this group flips.
+    std::vector<FunctionalFlipProposal> FunctionalFlipParameters;
+  };
+
+  /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
+  std::map<std::string, FlipGroup> FlipGroups;
   /// Functional flips waiting for full parameter-name registration.
   std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds

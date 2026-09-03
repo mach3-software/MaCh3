@@ -27,7 +27,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TTree.h"
 #include "TROOT.h"
 #include "TKey.h"
-#include "TRandom3.h"
 #include "TGraphPolar.h"
 #include "TCandle.h"
 #include "TMath.h"
@@ -246,6 +245,11 @@ class MCMCProcessor {
     
     /// @brief Get the vector of branch names from root file
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
+    /// @brief Get the vector of each sample branch names from root file
+    const std::vector<TString>& GetSampleBranchNames() const { return SampleName_v;};
+    /// @brief Get the vector of each systematic branch names from root file
+    const std::vector<TString>& GetSystBranchNames() const { return SystName_v;};
+
     /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
@@ -471,6 +475,8 @@ class MCMCProcessor {
     std::vector<std::vector<double>>  ParamErrors;
     /// Whether Param has flat prior or not
     std::vector<std::vector<bool>>    ParamFlat;
+    /// Whether param has circualr prior or not, like often delta CP
+    std::vector<std::vector<bool>>    ParamCircular;
     /// Number of parameters per type
     std::vector<int> nParam;
     /// Make an enum for which class this parameter belongs to so we don't have to keep string comparing
@@ -481,9 +487,9 @@ class MCMCProcessor {
     // KS: For example flux or detector within matrix
     std::vector<std::string> ParameterGroup;
 
-    /// Vector of each systematic
-    std::vector<TString> SampleName_v;
     /// Vector of each sample PDF object
+    std::vector<TString> SampleName_v;
+    /// Vector of each systematic
     std::vector<TString> SystName_v;
     
     /// Name of output files

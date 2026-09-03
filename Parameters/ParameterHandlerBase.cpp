@@ -89,14 +89,6 @@ void ParameterHandlerBase::InitFromFile(const std::string& name, const std::stri
   }
 
   PrintLength = 35;
-
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
@@ -117,14 +109,42 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 // ********************************************
   doSpecialStepProposal = true;
 
-  YAML::Node special_proposal = YAML::Clone(param);
-  const YAML::Node circular_bounds = special_proposal["CircularBounds"];
-  const YAML::Node flip_parameter = special_proposal["FlipParameter"];
-  const YAML::Node functional_flip = special_proposal["FunctionalFlip"];
+  bool CircEnabled = false;
+  std::pair<double, double> circular_bounds;
+  
+  bool FlipEnabled = false;
+  std::string flip_group;
+  double flip_point;
 
-  const bool CircEnabled = static_cast<bool>(circular_bounds);
-  const bool FlipEnabled = static_cast<bool>(flip_parameter);
-  const bool FunctionalFlipEnabled = static_cast<bool>(functional_flip);
+  bool FunctionalFlipEnabled = false;
+  YAML::Node functional_flip;
+
+  if (param["CircularBounds"]) {
+    CircEnabled = true;
+    circular_bounds = Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__);
+  }
+
+  if (param["FlipParameter"]) {
+    FlipEnabled = true;
+    // grab flip group if it exists, otherwise use the parameter name as the group
+    if (param["FlipGroup"]) {
+      flip_group = Get<std::string>(param["FlipGroup"], __FILE__, __LINE__);
+    } else {
+      flip_group = GetParFancyName(Index);
+    }
+    flip_point = Get<double>(param["FlipParameter"], __FILE__, __LINE__);
+  }
+
+  if (param["FunctionalFlip"]) {
+    FunctionalFlipEnabled = true;
+    // grab functional flip details if needed
+    if (param["FlipGroup"]) {
+      flip_group = Get<std::string>(param["FlipGroup"], __FILE__, __LINE__);
+    } else {
+      flip_group = GetParFancyName(Index);
+    }
+    functional_flip = param["FunctionalFlip"];
+  }
 
   if (!CircEnabled && !FlipEnabled && !FunctionalFlipEnabled) {
     MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
@@ -138,15 +158,15 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (CircEnabled) {
     CircularBoundsIndex.push_back(Index);
-    CircularBoundsValues.push_back(Get<std::pair<double, double>>(circular_bounds, __FILE__, __LINE__));
+    CircularBoundsValues.push_back(circular_bounds);
     MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
                   GetParFancyName(Index),
-                  CircularBoundsValues.back().first,
-                  CircularBoundsValues.back().second);
+                  circular_bounds.first,
+                  circular_bounds.second);
     // KS: Make sure circular bounds are within physical bounds. If we are outside of physics bound MCMC will never explore such phase space region
-    if (CircularBoundsValues.back().first < _fLowBound.at(Index) || CircularBoundsValues.back().second > _fUpBound.at(Index)) {
+    if (circular_bounds.first < _fLowBound.at(Index) || circular_bounds.second > _fUpBound.at(Index)) {
       MACH3LOG_ERROR("Circular bounds [{}, {}] for parameter {} exceed physical bounds [{}, {}]",
-                     CircularBoundsValues.back().first, CircularBoundsValues.back().second,
+                     circular_bounds.first, circular_bounds.second,
                      GetParFancyName(Index),
                      _fLowBound.at(Index), _fUpBound.at(Index));
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -161,46 +181,56 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
   }
 
   if (FlipEnabled) {
-    FlipParameterIndex.push_back(Index);
-    FlipParameterPoint.push_back(Get<double>(flip_parameter, __FILE__, __LINE__));
-    MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
+    FlipGroup& group = FlipGroups[flip_group];
+    group.FlipParameterIndex.push_back(Index);
+    group.FlipParameterPoint.push_back(flip_point);
+
+    MACH3LOG_INFO("Enabling Flipping for parameter {} in group {} with value {}",
                   GetParFancyName(Index),
-                  FlipParameterPoint.back());
+                  flip_group,
+                  flip_point);
   }
 
   if (FunctionalFlipEnabled) {
-    QueueFunctionalFlip(functional_flip, Index); // leave the resolution of the functional flips until after all the params have been loaded in
+    FlipGroups[flip_group];
+    QueueFunctionalFlip(functional_flip, Index, flip_group); // leave the resolution of the functional flips until after all the params have been loaded in
+
+    MACH3LOG_INFO("Enabling Functional Flipping for parameter {} in group {} with config {}",
+                  GetParFancyName(Index),
+                  flip_group,
+                  YAML::Dump(functional_flip));
   }
 
   if (CircEnabled && FlipEnabled) {
-    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+    if (flip_point < circular_bounds.first || flip_point > circular_bounds.second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+                     flip_point, GetParFancyName(Index), circular_bounds.first, circular_bounds.second);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    const double low = CircularBoundsValues.back().first;
-    const double high = CircularBoundsValues.back().second;
+    const double low = circular_bounds.first;
+    const double high = circular_bounds.second;
 
     // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
-    const double flipped_low = 2 * FlipParameterPoint.back() - low;
-    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double flipped_low = 2 * flip_point - low;
+    const double flipped_high = 2 * flip_point - high;
     const double min_flip = std::min(flipped_low, flipped_high);
     const double max_flip = std::max(flipped_low, flipped_high);
 
     if (min_flip < low || max_flip > high) {
       MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
+                     flip_point, GetParFancyName(Index), low, high);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 }
 
 // ********************************************
-void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const int index) {
+void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name) {
 // ********************************************
   PendingFunctionalFlipProposal pending_flip;
   pending_flip.target_index = index;
+  pending_flip.group_name = group_name;
   pending_flip.config = YAML::Clone(param);
   PendingFunctionalFlipParameters.push_back(std::move(pending_flip));
 }
@@ -209,14 +239,14 @@ void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const in
 void ParameterHandlerBase::ResolveFunctionalFlips() {
 // ********************************************
   for (const auto& pending_flip : PendingFunctionalFlipParameters) {
-    AddFunctionalFlip(pending_flip.config, pending_flip.target_index);
+    AddFunctionalFlip(pending_flip.config, pending_flip.target_index, pending_flip.group_name);
   }
 
   PendingFunctionalFlipParameters.clear();
 }
 
 // ********************************************
-void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int index) {
+void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name) {
 // ********************************************
   YAML::Node functional_flip = YAML::Clone(param);
   const YAML::Node formula = functional_flip["Formula"];
@@ -254,7 +284,10 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
     flip.argument_indices.push_back(argument_index);
   }
 
-  const std::string flip_name = fmt::format("{}_functional_flip_{}", matrixName, FunctionalFlipParameters.size());
+  const std::string flip_name = fmt::format("{}_{}_functional_flip_{}",
+                                            matrixName,
+                                            group_name,
+                                            FlipGroups[group_name].FunctionalFlipParameters.size());
   flip.evaluator = std::make_unique<TF1>(flip_name.c_str(), flip.formula.c_str(), 0.0, 1.0);
 
   if (!flip.evaluator || flip.evaluator->IsZombie()) {
@@ -272,7 +305,7 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
 
   MACH3LOG_INFO("Enabling FunctionalFlip for parameter {} with formula '{}'",
                 GetParFancyName(index), flip.formula);
-  FunctionalFlipParameters.push_back(std::move(flip));
+  FlipGroups[group_name].FunctionalFlipParameters.push_back(std::move(flip));
 }
 
 // ********************************************
@@ -391,7 +424,7 @@ void ParameterHandlerBase::ThrowParameters() {
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        randParams[i] = M3::rand::Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + corr_throw_single);
         if (throws > 10000)
@@ -413,7 +446,7 @@ void ParameterHandlerBase::ThrowParameters() {
   }
   else
   {
-    PCAObj->ThrowParameters(random_number, throwMatrixCholDecomp,
+    PCAObj->ThrowParameters(throwMatrixCholDecomp,
                             randParams, corr_throw,
                             _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
   } // end if pca
@@ -443,7 +476,7 @@ void ParameterHandlerBase::RandomConfiguration() {
     double throwrange = sigma;
     if (paramrange < sigma) throwrange = paramrange;
 
-    _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
+    _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + M3::rand::Gaus(0, 1)*throwrange);
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
     int throws = 0;
     while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
@@ -453,7 +486,7 @@ void ParameterHandlerBase::RandomConfiguration() {
         MACH3LOG_WARN("Param: {}", _fNames[i]);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
+      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + M3::rand::Gaus(0, 1)*throwrange);
       throws++;
     }
     MACH3LOG_INFO("Setting current step in {} param {} = {} from {}", matrixName, i, _fPropVal[i], _fCurrVal[i]);
@@ -513,18 +546,9 @@ void ParameterHandlerBase::SpecialStepProposal() {
       CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
-  // Functional flips need to see the post-circular, pre-simple-flip state.
-  for (const auto& flip : FunctionalFlipParameters) {
-    if (!IsParameterFixed(flip.target_index)) {
-      FlipParameterValue(flip);
-    }
-  }
-
-  // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    const int index = FlipParameterIndex[i];
-    if(!IsParameterFixed(index))
-      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+  // // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  for (const auto& [group_name, group] : FlipGroups) {
+    FlipParameterGroup(group_name);
   }
 }
 
@@ -542,7 +566,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
       if (!IsParameterFixed(i) > 0.0) {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        randParams[i] = M3::rand::Gaus(0, 1);
         // If parameter IS fixed
       } else {
         randParams[i] = 0.0;
@@ -560,7 +584,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
       if (PCAObj->IsParameterFixedPCA(i)) {
         randParams[i] = 0.0;
       } else {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
+        randParams[i] = M3::rand::Gaus(0, 1);
       }
     }
   }
@@ -626,28 +650,55 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 }
 
 // *************************************
-void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
+void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 // *************************************
-  if(random_number[0]->Uniform() < 0.5) {
-    _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
-  }
-}
+  const FlipGroup& flip_group = FlipGroups.at(group);
+  const bool has_standard_flips = !flip_group.FlipParameterIndex.empty();
 
-// *************************************
-void ParameterHandlerBase::FlipParameterValue(const ParameterHandlerBase::FunctionalFlipProposal& flip) {
-// *************************************
-  if (random_number[0]->Uniform() >= flip.probability) {
+  if (has_standard_flips && M3::rand::Uniform() >= 0.5) {
     return;
   }
 
-  std::vector<double> parameter_values(flip.argument_indices.size(), 0.0);
-  for (size_t i = 0; i < flip.argument_indices.size(); ++i) {
-    parameter_values[i] = _fPropVal[flip.argument_indices[i]];
+  std::vector<double> proposed_values(_fNumPar, 0.0);
+  for (int i = 0; i < _fNumPar; ++i) {
+    proposed_values[i] = _fPropVal[i];
   }
 
-  const double target_value = _fPropVal[flip.target_index];
+  for (size_t i = 0; i < flip_group.FlipParameterIndex.size(); ++i) {
+    const int index = flip_group.FlipParameterIndex[i];
+    if (!IsParameterFixed(index)) {
+      const double flip_point = flip_group.FlipParameterPoint[i];
+      _fPropVal[index] = static_cast<M3::float_t>(2 * flip_point - proposed_values[index]);
+    }
+  }
+
+  for (const auto& functional_flip : flip_group.FunctionalFlipParameters) {
+    if (!has_standard_flips && M3::rand::Uniform() >= functional_flip.probability) {
+      continue;
+    }
+
+    if (IsParameterFixed(functional_flip.target_index)) {
+      continue;
+    }
+
+    _fPropVal[functional_flip.target_index] = FlipParameterValue(functional_flip, proposed_values);
+  }
+}
+
+
+
+// *************************************
+M3::float_t ParameterHandlerBase::FlipParameterValue(const ParameterHandlerBase::FunctionalFlipProposal& flip,
+                                                     const std::vector<double>& proposed_values) const {
+// *************************************
+  std::vector<double> parameter_values(flip.argument_indices.size(), 0.0);
+  for (size_t i = 0; i < flip.argument_indices.size(); ++i) {
+    parameter_values[i] = proposed_values[flip.argument_indices[i]];
+  }
+
+  const double target_value = proposed_values[flip.target_index];
   const double flipped_value = flip.evaluator->EvalPar(&target_value, parameter_values.data());
-  _fPropVal[flip.target_index] = static_cast<M3::float_t>(flipped_value);
+  return static_cast<M3::float_t>(flipped_value);
 }
 #pragma GCC diagnostic pop
 // ********************************************
@@ -972,7 +1023,6 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov, bool verbose) {
   if(n_attempts > 0 && verbose) {
     MACH3LOG_WARN("Covariance matrix {} was not positive-definite, made it positive-definite after {} attempts", matrixName, n_attempts);
   }
-
 }
 
 // ********************************************
@@ -1075,23 +1125,15 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
 // ********************************************
 void ParameterHandlerBase::SanitizeAdaption() const {
 // ********************************************
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    const int index = FlipParameterIndex[i];
-    if(!param_skip_adapt_flags[index]) {
-      MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
-      MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
-      MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
-
-  for (const auto& flip : FunctionalFlipParameters) {
-    if (!param_skip_adapt_flags[flip.target_index]) {
-      MACH3LOG_ERROR("You enabled adaption for parameter which has enabled functional flipping ({})",
-                     _fFancyNames[flip.target_index]);
-      MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config",
-                     _fFancyNames[flip.target_index]);
-      throw MaCh3Exception(__FILE__, __LINE__);
+  for (const auto& [_, group] : FlipGroups) {
+    for (size_t i = 0; i < group.FlipParameterIndex.size(); ++i) {
+      const int index = group.FlipParameterIndex[i];
+      if(!param_skip_adapt_flags[index]) {
+        MACH3LOG_ERROR("You enabled adaption for parameter which has enabled flipping ({})", _fFancyNames[index]);
+        MACH3LOG_ERROR("Right now flipping and adapting doesn't work very well");
+        MACH3LOG_ERROR("Please skip adaption for param {}, using ParametersToSkip option in config", _fFancyNames[index]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     }
   }
 
@@ -1204,7 +1246,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
   }
 
   /// Need to adjust the scale every step
-  if(AdaptiveHandler->GetUseRobbinsMonro()){
+  if(AdaptiveHandler->GetStartRobbinsMonro()){
     bool verbose=false;
     #ifdef MACH3_DEBUG
     verbose=true;
@@ -1328,7 +1370,7 @@ void ParameterHandlerBase::SaveUpdatedMatrixConfig() {
   for (YAML::Node param : copyNode["Systematics"])
   {
     //KS: Feel free to update it, if you need updated prefit value etc
-    param["Systematic"]["StepScale"]["MCMC"] = M3::Utils::FormatDouble(_fIndivStepScale[i], 4);
+    param["Systematic"]["StepScale"] = M3::Utils::FormatDouble(_fIndivStepScale[i], 4);
     i++;
   }
   // Save the modified node to a file
@@ -1371,14 +1413,14 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
       for (size_t iPar = 0; iPar < FancyNames.size(); ++iPar) {
         if(GetParFancyName(i) == FancyNames[iPar]) {
           MACH3LOG_DEBUG("Matched name {} in config", FancyNames[iPar]);
-          PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
-          PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
+          PosteriorFile->SetBranchStatus(BranchNames[iPar].c_str(), true);
+          PosteriorFile->SetBranchAddress(BranchNames[iPar].c_str(), &BranchValues[i]);
           matched = true;
           break;
         }
       }
       if(!matched) {
-        MACH3LOG_WARN("Didn't match param {} is this what you want?", GetParFancyName(i));
+        MACH3LOG_WARN("Didn't match param {}, is this what you want?", GetParFancyName(i));
       }
     }
   } else {
@@ -1386,8 +1428,8 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     for (int i = 0; i < GetNumParams(); ++i) {
       BranchNames[i] = GetParName(i);
       if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
-        MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!", BranchNames[i]);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_WARN("Branch '{}' does not exist in the TTree, is this what you want?", BranchNames[i]);
+        continue;
       }
       PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
       PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);

@@ -66,7 +66,7 @@ namespace M3{
     config = m_parser->get<std::string>("config");
     auto mcmc_chain_args = m_parser->get<std::vector<std::string>>("mcmc-chain");
 
-    int nargs = mcmc_chain_args.size();
+    int nargs = static_cast<int>(mcmc_chain_args.size());
     if (nargs != 1 && nargs !=4 && nargs != 6)
     {
       MACH3LOG_ERROR("invalid number of arguments: {}", nargs);
@@ -184,6 +184,8 @@ namespace M3{
     Processor->SetPlotBinValue(GetFromManager<bool>(Settings["PlotBinValue"], false, __FILE__, __LINE__));
     //KS: Plot only 2D posteriors with correlations greater than 0.2
     Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2, __FILE__, __LINE__));
+    // Weight to be considered
+    Processor->SetReweightNames(GetFromManager<std::vector<std::string>>(Settings["WeightNames"], {"Weight"}, __FILE__, __LINE__));
 
     Processor->Initialise();
 
@@ -290,6 +292,9 @@ namespace M3{
 
       Processor[ik]->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["PlotRelativeToPrior"], false, __FILE__, __LINE__));
       Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true, __FILE__, __LINE__));
+
+      // Weight to be considered
+      Processor[ik]->SetReweightNames(GetFromManager<std::vector<std::string>>(Settings["WeightNames"], {"Weight"}, __FILE__, __LINE__));
       Processor[ik]->Initialise();
 
       if(Settings["BurnInSteps"]) {
@@ -922,4 +927,4 @@ namespace M3{
       Posterior->Print(canvasname);
     } //End loop over parameter
   }
-};
+}

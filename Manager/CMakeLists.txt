@@ -6,6 +6,7 @@ set(HEADERS
     Monitor.h
     MaCh3Exception.h
     gpuUtils.cuh
+    Random.h
     Core.h
 )
 

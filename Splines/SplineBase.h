@@ -21,6 +21,9 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TTree.h"
 _MaCh3_Safe_Include_End_ //}
 
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class SplineMonolithGPU;
+
 /// @brief Base class for calculating weight from spline
 /// @author Dan Barrow
 /// @author Kamil Skwarczynski
@@ -47,12 +50,39 @@ class SplineBase {
     virtual void LoadSplineFile(std::string FileName) = 0;
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    virtual void SynchroniseMemTransfer() const = 0;
+    void SynchroniseMemTransfer() const;
 
   protected:
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     void FindSplineSegment();
     /// @brief CPU based code which eval weight for each spline
+    ///
+    /// @details
+    ///
+    /// Splines are stored using a flat monolithic structure.
+    /// The monolith is organised as follows:
+    /// @code
+    ///   Spline 0
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///
+    ///   Spline 1
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///
+    ///   Spline 2
+    ///     Segment 0: [ Y | B | C | D ]
+    ///     Segment 1: [ Y | B | C | D ]
+    ///     Segment 2: [ Y | B | C | D ]
+    ///     ...
+    /// @endcode
+    ///
+    /// Once coefficient are grabbed we calculate weight using:
+    /// @code
+    /// weight = Y + B*dx + C*dx^2 + D*dx^3;
+    /// @endcode
     virtual void CalcSplineWeights() = 0;
 
     /// @brief KS: Prepare Fast Spline Info within SplineFile
@@ -68,6 +98,8 @@ class SplineBase {
     /// @param nPoints number of knots
     /// @param coeffs Array holding coefficients for each knot
     void GetTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs) const;
+    /// @brief Since we find segment before actual reweight and sometimes we want to copy it to GPU we have different functionality depending if GPU or CPU
+    void SetupSegments();
 
     /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     /// Method identical to TSpline3::Eval(double) but faster because less operations
@@ -79,6 +111,13 @@ class SplineBase {
     float *ParamValues;
     /// Number of parameters that have splines
     short int nParams;
+    /// Max knots for production
+    short int _max_knots;
+    /// Number of valid splines
+    unsigned int NSplines_valid;
+
+    /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
+    SplineMonolithGPU* gpu_monolith;
 
   private:
      /// @brief Validates that the spline segment is correct for the given variation.
