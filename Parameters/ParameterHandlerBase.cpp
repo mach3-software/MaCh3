@@ -88,7 +88,6 @@ void ParameterHandlerBase::InitFromFile(const std::string& name, const std::stri
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  PrintLength = 35;
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
 
@@ -558,8 +557,16 @@ void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
 void ParameterHandlerBase::PrintPreFitValues() const {
 // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
-  for (int i = 0; i < _fNumPar; i++) {
-    MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParPreFit(i));
+
+  M3::Utils::TablePrinter table({{"Parameter", 10, 40, M3::Utils::Alignment::Left},
+                                 {"Prior",     10, 15, M3::Utils::Alignment::Right},});
+
+  for (int i = 0; i < _fNumPar; ++i) {
+    table.AddRow(GetParFancyName(i), GetParPreFit(i));
+  }
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
   }
 }
 
@@ -572,9 +579,20 @@ void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
   if (pca) {
     PCAObj->Print();
   }
-  MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
+  M3::Utils::TablePrinter table({{"Name",     10, 40, M3::Utils::Alignment::Left},
+                                 {"Prior",    10, 15, M3::Utils::Alignment::Right},
+                                 {"Current",  10, 15, M3::Utils::Alignment::Right},
+                                 {"Proposed", 10, 15, M3::Utils::Alignment::Right},});
+
   for (int i = 0; i < _fNumPar; ++i) {
-    MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
+    table.AddRow(GetParFancyName(i),
+                 M3::Utils::Cell(_fPreFitValue[i], "{:.2f}"),
+                 M3::Utils::Cell(_fCurrVal[i], "{:.2f}"),
+                 M3::Utils::Cell(_fPropVal[i], "{:.2f}"));
+  }
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
   }
 }
 
@@ -853,12 +871,16 @@ void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscal
 // ********************************************
 void ParameterHandlerBase::PrintIndivStepScale() const {
 // ********************************************
-  MACH3LOG_INFO("============================================================");
-  MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
-  for (int iParam = 0; iParam < _fNumPar; iParam++) {
-    MACH3LOG_INFO("{:<{}} | {:<11}", _fFancyNames[iParam].c_str(), PrintLength, _fIndivStepScale[iParam]);
+  M3::Utils::TablePrinter table({{"Parameter",  10, 40, M3::Utils::Alignment::Left},
+                                 {"Step scale", 10, 15, M3::Utils::Alignment::Right},});
+
+  for (int iParam = 0; iParam < _fNumPar; ++iParam) {
+    table.AddRow(_fFancyNames[iParam], _fIndivStepScale[iParam]);
   }
-  MACH3LOG_INFO("============================================================");
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
+  }
 }
 
 // ********************************************
