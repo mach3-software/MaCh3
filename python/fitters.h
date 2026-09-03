@@ -119,14 +119,13 @@ void initFittersModule(py::module &m_fitters){
             " :param cov: A Covariance object derived from ParameterHandlerBase. ",
             py::arg("cov")
         )
-
     ; // End of FitterBase class binding
 
     py::class_<MR2T2, FitterBase>(m_fitters, "mcmc")
-        .def(py::init<Manager *const>())
+        .def(py::init<Manager *const>());
 
     py::class_<DelayedMR2T2, FitterBase>(m_fitters, "DelayedMCMC")
-        .def(py::init<Manager *const>())
+        .def(py::init<Manager *const>());
 
     py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitters, "LikelihoodFit")
         .def(py::init<Manager* const>())
