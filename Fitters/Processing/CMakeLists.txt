@@ -35,7 +35,7 @@ target_include_directories(FitProcessing PUBLIC
 install(TARGETS FitProcessing
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/FitProcessing)
+        PUBLIC_HEADER DESTINATION include/Processing)
 
 add_library(MaCh3::FitProcessing ALIAS FitProcessing)
 target_link_libraries(MaCh3 INTERFACE FitProcessing)
