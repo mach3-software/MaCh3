@@ -39,7 +39,7 @@ target_include_directories(Fitters PUBLIC
 install(TARGETS Fitters
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/Fitters)
+        PUBLIC_HEADER DESTINATION include/Algorithms)
 
 add_library(MaCh3::Fitters ALIAS Fitters)
 target_link_libraries(MaCh3 INTERFACE Fitters)
