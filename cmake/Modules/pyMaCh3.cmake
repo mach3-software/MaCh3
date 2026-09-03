@@ -88,6 +88,7 @@ function(setup_pyMaCh3)
         Manager
         SplineDict
         Parameters
+        FitProcessing
         Splines
         Samples
         Fitters

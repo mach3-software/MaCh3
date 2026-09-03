@@ -9,7 +9,7 @@
 #include "Samples/SampleHandlerInterface.h"
 #include "Parameters/ParameterHandlerBase.h"
 #include "Manager/Manager.h"
-#include "Fitters/MCMCProcessor.h"
+#include "Processing/MCMCProcessor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TStopwatch;
@@ -72,6 +72,9 @@ class FitterBase {
 
   /// @brief Get name of class
   std::string GetName() const {return AlgorithmName;};
+  /// @brief This name is to get include some special algorithm extensions
+  virtual std::string GetFancyName() const {return GetName();};
+
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
