@@ -9,7 +9,7 @@
 #include "Samples/SampleHandlerInterface.h"
 #include "Parameters/ParameterHandlerBase.h"
 #include "Manager/Manager.h"
-#include "Fitters/Processing/MCMCProcessor.h"
+#include "Processing/MCMCProcessor.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TStopwatch;
