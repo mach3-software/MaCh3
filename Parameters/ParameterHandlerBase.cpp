@@ -117,21 +117,14 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 // ********************************************
   doSpecialStepProposal = true;
 
-  bool CircEnabled = false;
-  bool FlipEnabled = false;
-  bool FunctionalFlipEnabled = false;
+  YAML::Node special_proposal = YAML::Clone(param);
+  const YAML::Node circular_bounds = special_proposal["CircularBounds"];
+  const YAML::Node flip_parameter = special_proposal["FlipParameter"];
+  const YAML::Node functional_flip = special_proposal["FunctionalFlip"];
 
-  if (param["CircularBounds"]) {
-    CircEnabled = true;
-  }
-
-  if (param["FlipParameter"]) {
-    FlipEnabled = true;
-  }
-
-  if (param["FunctionalFlip"]) {
-    FunctionalFlipEnabled = true;
-  }
+  const bool CircEnabled = static_cast<bool>(circular_bounds);
+  const bool FlipEnabled = static_cast<bool>(flip_parameter);
+  const bool FunctionalFlipEnabled = static_cast<bool>(functional_flip);
 
   if (!CircEnabled && !FlipEnabled && !FunctionalFlipEnabled) {
     MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
@@ -145,7 +138,7 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (CircEnabled) {
     CircularBoundsIndex.push_back(Index);
-    CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));
+    CircularBoundsValues.push_back(Get<std::pair<double, double>>(circular_bounds, __FILE__, __LINE__));
     MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
                   GetParFancyName(Index),
                   CircularBoundsValues.back().first,
@@ -169,14 +162,14 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (FlipEnabled) {
     FlipParameterIndex.push_back(Index);
-    FlipParameterPoint.push_back(Get<double>(param["FlipParameter"], __FILE__, __LINE__));
+    FlipParameterPoint.push_back(Get<double>(flip_parameter, __FILE__, __LINE__));
     MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
                   GetParFancyName(Index),
                   FlipParameterPoint.back());
   }
 
   if (FunctionalFlipEnabled) {
-    AddFunctionalFlip(param["FunctionalFlip"], Index);
+    QueueFunctionalFlip(functional_flip, Index); // leave the resolution of the functional flips until after all the params have been loaded in
   }
 
   if (CircEnabled && FlipEnabled) {
@@ -204,22 +197,46 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 }
 
 // ********************************************
+void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const int index) {
+// ********************************************
+  PendingFunctionalFlipProposal pending_flip;
+  pending_flip.target_index = index;
+  pending_flip.config = YAML::Clone(param);
+  PendingFunctionalFlipParameters.push_back(std::move(pending_flip));
+}
+
+// ********************************************
+void ParameterHandlerBase::ResolveFunctionalFlips() {
+// ********************************************
+  for (const auto& pending_flip : PendingFunctionalFlipParameters) {
+    AddFunctionalFlip(pending_flip.config, pending_flip.target_index);
+  }
+
+  PendingFunctionalFlipParameters.clear();
+}
+
+// ********************************************
 void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int index) {
 // ********************************************
-  if (!param["Formula"]) {
+  YAML::Node functional_flip = YAML::Clone(param);
+  const YAML::Node formula = functional_flip["Formula"];
+  const YAML::Node parameters = functional_flip["Parameters"];
+  const YAML::Node probability = functional_flip["Probability"];
+
+  if (!formula) {
     MACH3LOG_ERROR("FunctionalFlip for parameter {} is missing Formula", GetParFancyName(index));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if (!param["Parameters"]) {
+  if (!parameters) {
     MACH3LOG_ERROR("FunctionalFlip for parameter {} is missing Parameters list", GetParFancyName(index));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   FunctionalFlipProposal flip;
   flip.target_index = index;
-  flip.formula = Get<std::string>(param["Formula"], __FILE__, __LINE__);
-  flip.argument_names = Get<std::vector<std::string>>(param["Parameters"], __FILE__, __LINE__);
-  flip.probability = GetFromManager<double>(param["Probability"], 0.5, __FILE__, __LINE__);
+  flip.formula = Get<std::string>(formula, __FILE__, __LINE__);
+  flip.argument_names = Get<std::vector<std::string>>(parameters, __FILE__, __LINE__);
+  flip.probability = GetFromManager<double>(probability, 0.5, __FILE__, __LINE__);
 
   if (flip.probability < 0.0 || flip.probability > 1.0) {
     MACH3LOG_ERROR("FunctionalFlip probability for parameter {} must be in [0, 1], got {}",

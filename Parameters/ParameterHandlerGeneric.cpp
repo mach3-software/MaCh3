@@ -255,6 +255,8 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
+  ResolveFunctionalFlips();
+
   // load correlation
   LoadCorrelationFromConfig(Correlations, CorrNamesMap);
   if (_fNumPar <= 0) {

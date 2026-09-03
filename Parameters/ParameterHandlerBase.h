@@ -388,6 +388,12 @@ class ParameterHandlerBase {
   /// @brief Parse and register a functional flip defined in YAML.
   void AddFunctionalFlip(const YAML::Node& param, const int index);
 
+  /// @brief Queue a functional flip until all parameters have been loaded.
+  void QueueFunctionalFlip(const YAML::Node& param, const int index);
+
+  /// @brief Resolve queued functional flips after parameter names are known.
+  void ResolveFunctionalFlips();
+
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
   void SpecialStepProposal();
@@ -407,6 +413,11 @@ class ParameterHandlerBase {
 
     FunctionalFlipProposal(const FunctionalFlipProposal&) = delete;
     FunctionalFlipProposal& operator=(const FunctionalFlipProposal&) = delete;
+  };
+
+  struct PendingFunctionalFlipProposal {
+    int target_index = M3::_BAD_INT_;
+    YAML::Node config;
   };
 
   /// Check if any of special step proposal were enabled
@@ -494,6 +505,8 @@ class ParameterHandlerBase {
   std::vector<double> FlipParameterPoint;
   /// Functional flips which depend on the current proposed state of other parameters.
   std::vector<FunctionalFlipProposal> FunctionalFlipParameters;
+  /// Functional flips waiting for full parameter-name registration.
+  std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
