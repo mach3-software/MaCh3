@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fitters/Algorithms/MR2T2.h"
+#include "Algorithms/MR2T2.h"
 
 /// @brief Implementation of delayed rejection for MR2T2
 /// @author Henry Wallace

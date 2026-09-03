@@ -1,13 +1,13 @@
 #pragma once
 
 // MaCh3 includes
-#include "Fitters/Algorithms/FitterBase.h"
-#include "Fitters/Algorithms/MR2T2.h"
-#include "Fitters/Algorithms/DelayedMR2T2.h"
-#include "Fitters/Algorithms/PSO.h"
-#include "Fitters/Algorithms/LikelihoodFit.h"
+#include "Algorithms/FitterBase.h"
+#include "Algorithms/MR2T2.h"
+#include "Algorithms/DelayedMR2T2.h"
+#include "Algorithms/PSO.h"
+#include "Algorithms/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
-#include "Fitters/Algorithms/MinuitFit.h"
+#include "Algorithms/MinuitFit.h"
 #endif
 
 #include "Parameters/ParameterHandlerGeneric.h"

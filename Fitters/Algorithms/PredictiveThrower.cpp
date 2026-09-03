@@ -1,4 +1,4 @@
-#include "Fitters/Algorithms/PredictiveThrower.h"
+#include "Algorithms/PredictiveThrower.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 _MaCh3_Safe_Include_Start_ //{
 #include "TH3.h"

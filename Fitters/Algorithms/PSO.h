@@ -6,7 +6,7 @@
 #include <numeric>
 
 // MaCh3 includes
-#include "Fitters/Algorithms/LikelihoodFit.h"
+#include "Algorithms/LikelihoodFit.h"
 
 /// @brief Class particle - stores the position, velocity and personal best
 /// With functions which move particle and update velocity

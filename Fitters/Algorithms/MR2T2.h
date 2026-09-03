@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fitters/Algorithms/MCMCBase.h"
+#include "Algorithms/MCMCBase.h"
 
 /// @brief MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR\f$^2\f$T\f$^2\f$) method.
 /// @note MR\f$^2\f$T\f$^2\f$ is also known as Metropolis-Hastings

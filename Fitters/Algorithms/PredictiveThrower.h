@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fitters/Algorithms/FitterBase.h"
+#include "Algorithms/FitterBase.h"
 
 class ParameterHandlerGeneric;
 

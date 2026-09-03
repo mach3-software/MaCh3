@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "Fitters/Processing/MCMCProcessor.h"
+#include "Processing/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
