@@ -18,6 +18,8 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
   -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
   -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
+  -Wcast-align            # Warn when a pointer cast may result in stricter alignment requirements
+  #-Wdouble-promotion     # Warn when float values are implicitly promoted to double
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
@@ -88,6 +90,7 @@ else()
     -funroll-loops                        # Unroll loops where possible for performance
     -fno-math-errno                       # Don’t set errno after math calls (can speed up hot loops with math)
     # KS: Below could help with performance but require validations and benchmarking
+    #-fdevirtualize-at-ltrans             # Perform additional virtual function devirtualisation during link-time optimisation
     #-fno-signed-zeros                    # Allow optimisations that don't preserve the distinction between +0.0 and -0.0
     #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage

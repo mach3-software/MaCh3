@@ -136,9 +136,9 @@ void PSO::init(){
       else{
         double dist = fabs(ranges_max[j]-ranges_min[j]);
         //Initialise to random position uniform in space
-        init_position.push_back(ranges_min[j] + random->Rndm()*dist);
+        init_position.push_back(ranges_min[j] + M3::rand::Uniform()*dist);
         //Initialise velocity to random position uniform in space
-        init_velocity.push_back((2.0*random->Rndm()-1.0));//*dist);
+        init_velocity.push_back((2.0*M3::rand::Uniform()-1.0));//*dist);
       }
     }
     system.emplace_back(std::make_unique<particle>(init_position, init_velocity));
@@ -347,8 +347,8 @@ double PSO::swarmIterate(){
 
   for (int i = 0; i < fParticles; ++i) {
     std::vector<double> part1 = vector_multiply(system[i]->get_velocity(), fInertia);
-    std::vector<double> part2 = vector_multiply(vector_subtract(system[i]->get_personal_best_position(), system[i]->get_position()), (fOne * random->Rndm()));
-    std::vector<double> part3 = vector_multiply(vector_subtract(get_best_particle()->get_personal_best_position(), system[i]->get_position()),(fTwo * random->Rndm()));
+    std::vector<double> part2 = vector_multiply(vector_subtract(system[i]->get_personal_best_position(), system[i]->get_position()), (fOne * M3::rand::Uniform()));
+    std::vector<double> part3 = vector_multiply(vector_subtract(get_best_particle()->get_personal_best_position(), system[i]->get_position()),(fTwo * M3::rand::Uniform()));
     std::vector<double> new_velocity = three_vector_addition(part1, part2, part3);
     std::vector<double> new_pos = vector_add(system[i]->get_position(), new_velocity);
     transform(total_pos.begin(), total_pos.end(), new_pos.begin(), total_pos.begin(),[](double x, double y) {return x+y;});
@@ -411,7 +411,7 @@ void PSO::run() {
     //double meanVel = std::accumulate(vel, vel + fParticles, 0) / fParticles;
 
     // Weight inertia randomly but scaled by total distance of swarm from global minimum - proxy for total velocity
-    // fWeight = ((random->Rndm()+1.0)*0.5)*(10.0/meanVel);
+    // fWeight = ((M3::rand::Uniform()+1.0)*0.5)*(10.0/meanVel);
 
     logLCurr = fBestValue;
 

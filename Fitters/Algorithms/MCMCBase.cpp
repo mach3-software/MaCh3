@@ -41,7 +41,6 @@ void MCMCBase::RunMCMC() {
     
         // Initialize the multicanonical handler with the systematics
         multicanonicalHandler->InitializeMulticanonicalHandlerConfig(fitMan, systematics);
-        AlgorithmName += "_UmbrellaSampling"; // Append to the algorithm name
 #ifdef MACH3_DEBUG
     // Enable debug output stream for multicanonical handler if debug is enabled
     multicanonicalHandler->setDebugStream(&debugFile, debug);
@@ -233,7 +232,7 @@ void MCMCBase::AdaptiveStep() {
 bool MCMCBase::IsStepAccepted(const double acc_prob) {
 // *************************
     // Get the random number
-    const double fRandom = random->Rndm();
+    const double fRandom = M3::rand::Uniform();
     // Do the accept/reject
     #ifdef MACH3_DEBUG
     debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;
@@ -259,3 +258,24 @@ void MCMCBase::AcceptStep() {
         systematics[s]->AcceptStep();
     }
 }
+
+// *************************
+std::string MCMCBase::GetFancyName() const {
+// *************************
+    auto originalName = GetName();
+    std::string OutName = "";
+    if(multicanonical){
+        OutName += "MultiCanonical_";
+    }
+
+    for(unsigned int i = 0; i < systematics.size(); ++i){
+        if(systematics[i]->GetDoAdaption()){
+            OutName += "Adaptive_";
+            break;
+        }
+    }
+
+    OutName += originalName;
+    return OutName;
+}
+

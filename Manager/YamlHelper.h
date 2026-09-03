@@ -36,9 +36,8 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief Use this like this CheckNodeExists(config, "LikelihoodOptions", "TestStatistic");
 /// KS: Base case for recursion
 template<typename T>
-bool CheckNodeExistsHelper(const T& node) {
+bool CheckNodeExistsHelper([[maybe_unused]] const T& node) {
 // **********************
-  (void)node;
   return true; // Node exists, return true
 }
 

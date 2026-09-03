@@ -10,19 +10,11 @@
 //Set everything to NULL or 0
 void UnbinnedSplineHandler::Initialise() {
 // *****************************************
-#ifdef MaCh3_CUDA
-  MACH3LOG_INFO("Using GPU version event by event monolith");
-  gpu_monolith = nullptr;
-#endif
-
   cpu_monolith = new SplineMonoStruct();
 
   nKnots = 0;
   nTF1coeff = 0;
   NEvents = 0;
-  _max_knots = 0;
-
-  NSplines_valid = 0;
   NTF1_valid = 0;
 
   cpu_weights_spline_var = nullptr;
@@ -259,19 +251,22 @@ void UnbinnedSplineHandler::MoveToGPU() {
   // Can probably make this a bit prettier but will do for now
   // Could be a lot smaller of a function...
   gpu_monolith->InitGPU_SplineMonolith(
-          &cpu_total_weights,
-          NEvents,
           nKnots, // How many entries in coefficient array (*4 for the "many" array)
           NSplines_valid, // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
           NTF1_valid,
           event_size_max //Knots times event number of unique splines
   );
 
+  gpu_monolith->InitGPU_Unbinned_SplineMonolith(
+          &cpu_total_weights,
+          NEvents
+  );
+
   // Move number of splines and spline size to constant GPU memory; every thread does not need a copy...
   // The implementation lives in splines/gpuSplineUtils.cu
   // The GPU splines don't actually need declaring but is good for demonstration, kind of
   // fixed by passing const reference
-  gpu_monolith->CopyToGPU_SplineMonolith(
+  gpu_monolith->CopyToGPU_SplineMonolith_Unbinned(
           cpu_monolith,
 
           // TFI related now
@@ -518,24 +513,6 @@ void UnbinnedSplineHandler::LoadSplineFile(std::string FileName) {
 }
 
 // *****************************************
-void UnbinnedSplineHandler::SetupSegments() {
-// *****************************************
-  //KS: Since we are going to copy it each step use fancy CUDA memory allocation
-  #ifdef MaCh3_CUDA
-  gpu_monolith->InitGPU_Segments(&SplineSegments);
-  gpu_monolith->InitGPU_Vals(&ParamValues);
-  #else
-  SplineSegments = new short int[nParams]();
-  ParamValues = new float[nParams]();
-  #endif
-  for (M3::int_t j = 0; j < nParams; j++)
-  {
-    SplineSegments[j] = 0;
-    ParamValues[j] = -999;
-  }
-}
-
-// *****************************************
 // Save SplineMonolith into ROOT file
 void UnbinnedSplineHandler::PrepareSplineFile(std::string FileName) {
 // *****************************************
@@ -693,7 +670,7 @@ void UnbinnedSplineHandler::Evaluate() {
   FindSplineSegment();
 
   // The main call to the GPU
-  gpu_monolith->RunGPU_SplineMonolith(
+  gpu_monolith->RunGPU_SplineMonolith_Unbinned(
           cpu_total_weights,
           ParamValues,
           SplineSegments);
@@ -739,7 +716,7 @@ void UnbinnedSplineHandler::CalcSplineWeights() {
       const short int segment_X = short(Param*_max_knots+segment);
 
       //KS: Find knot position in out monolithical structure
-      const unsigned int CurrentKnotPos = cpu_monolith->nKnots_arr[splineNum]*_nCoeff_+segment*_nCoeff_;
+      const unsigned int CurrentKnotPos = (cpu_monolith->nKnots_arr[splineNum] + segment) * _nCoeff_;
 
       // We've read the segment straight from CPU and is saved in segment_gpu
       // polynomial parameters from the monolithic splineMonolith
@@ -836,14 +813,4 @@ void UnbinnedSplineHandler::PrintInitialsiation() const {
 
   MACH3LOG_INFO("On average {:.2f} TF1 per event ({}/{})", float(NTF1_valid)/float(NEvents), NTF1_valid, NEvents);
   MACH3LOG_INFO("Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB", double(sizeof(float)*NTF1_valid*_nTF1Coeff_)/1.E6);
-}
-
-//*********************************************************
-//KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-void UnbinnedSplineHandler::SynchroniseMemTransfer() const {
-//*********************************************************
-  #ifdef MaCh3_CUDA
-  SynchroniseSplines();
-  CudaCheckError();
-  #endif
 }

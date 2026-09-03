@@ -621,7 +621,7 @@ void PredictiveThrower::ProduceToys() {
       // If we have combined chains by hadd need to check the step in the chain
       // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
       while(Step < burn_in || !WithinBounds) {
-        entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
+        entry = M3::rand::UniformInt(0, static_cast<int>(PosteriorFile->GetEntries()) - 1);
         PosteriorFile->GetEntry(entry);
         // KS: This might be bit hacky... but BoundValuePointer refer to values in ParameterHandler
         // so we need to update them
@@ -1340,9 +1340,9 @@ void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist) {
   // Determine which fluctuation function to call
   auto applyFluctuation = [&](auto* f, auto* h) {
     if (StandardFluctuation) {
-      MakeFluctuatedHistogramStandard(f, h, random.get());
+      MakeFluctuatedHistogramStandard(f, h);
     } else {
-      MakeFluctuatedHistogramAlternative(f, h, random.get());
+      MakeFluctuatedHistogramAlternative(f, h);
     }
   };
 

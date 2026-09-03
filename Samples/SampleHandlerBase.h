@@ -267,7 +267,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   // ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters(){};
-  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
+  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in FillArray
   virtual void PrepFunctionalParameters(){};
 
   /// @brief LP - Registration template function for multi-dimensional functional shifts
@@ -369,18 +369,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// DB Replace previous implementation with reading bin contents from SampleHandler_array
   void FillHist(const int Sample, TH1* Hist, std::vector<double> &Array);
 
-  /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
-#ifdef MULTITHREAD
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting but multithreaded
-  void FillArray_MP();
-#endif
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting
+  /// @brief Function which does the core reweighting. This assumes that oscillation weights have
+  /// already been calculated.
   void FillArray();
 
   /// @brief Helper function to reset histograms
-  void ResetHistograms();
+  void ResetHistograms() _noexcept_;
   /// @brief Setup spline handler (both binned or unbinned)
   void InitialiseSplineObject();
 

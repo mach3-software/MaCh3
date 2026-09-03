@@ -177,5 +177,5 @@ void DelayedMR2T2::DoStep() {
 bool DelayedMR2T2::ProbabilisticDelay() const {
 // *************************
     // We can delay probabilistically
-    return (random->Rndm() > delay_probability);
+    return (M3::rand::Uniform() > delay_probability);
 }

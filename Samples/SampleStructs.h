@@ -571,7 +571,7 @@ struct SampleBinningInfo {
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
-  int FindBin(const int Dimension, const double Var, const int NomBin) const {
+  int FindBin(const int Dimension, const double Var, const int NomBin) const _noexcept_ {
     return FindBin(Var, NomBin, AxisNBins[Dimension], BinEdges[Dimension], BinLookup[Dimension]);
   }
 
@@ -587,7 +587,7 @@ struct SampleBinningInfo {
               const int NomBin,
               const int N_Bins,
               const std::vector<double>& Bin_Edges,
-              const std::vector<BinShiftLookup>& Bin_Lookup) const {
+              const std::vector<BinShiftLookup>& Bin_Lookup) const _noexcept_ {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
     if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {

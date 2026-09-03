@@ -21,6 +21,9 @@ class MCMCBase : public FitterBase {
     /// @param FitName Name of previous chain
     void StartFromPreviousFit(const std::string &FitName) final;
 
+    /// @copydoc FitterBase::GetFancyName
+    virtual std::string GetFancyName() const final;
+
     /// @brief Set how long chain should be
     /// @param L new chain length
    void setChainLength(unsigned int L) { chainLength = L; };

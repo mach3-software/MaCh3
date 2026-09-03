@@ -3,7 +3,6 @@
 #include <memory>
 
 _MaCh3_Safe_Include_Start_ //{
-#include "TRandom.h"
 #include "TStopwatch.h"
 #include "TTree.h"
 #include "TGraphAsymmErrors.h"
@@ -19,8 +18,8 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 // *************************
   AlgorithmName = "";
   //Get mach3 modes from Manager
-  random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
-
+  auto Seed = Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__);
+  M3::rand::SetSeed(Seed);
   // Counter of the accepted # of steps
   accCount = 0;
   step = 0;
@@ -113,13 +112,14 @@ void FitterBase::SaveSettings() {
   versionHeader.ReadFile(header_path.c_str());
   versionHeader.Write();
 
-  if(GetName() == ""){
-    MACH3LOG_ERROR("Name of currently used algorithm is {}", GetName());
+  auto Name = GetFancyName();
+  if(Name == ""){
+    MACH3LOG_ERROR("Name of currently used algorithm is {}", Name);
     MACH3LOG_ERROR("Have you forgotten to modify AlgorithmName?");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  TNamed Engine(GetName(), GetName());
-  Engine.Write(GetName().c_str());
+  TNamed Engine(Name, Name);
+  Engine.Write(Name.c_str());
 
   MaCh3Version->Write();
   delete MaCh3Version;
@@ -133,8 +133,9 @@ void FitterBase::SaveSettings() {
 
   MACH3LOG_INFO("#####Current Setup#####");
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
-  for(unsigned int i = 0; i < systematics.size(); ++i)
+  for(unsigned int i = 0; i < systematics.size(); ++i){
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
+  }
   MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i) {
     MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNSamples());
