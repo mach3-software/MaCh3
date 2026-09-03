@@ -650,20 +650,29 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 }
 
 // *************************************
-void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
+void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 // *************************************
   const FlipGroup& flip_group = FlipGroups.at(group);
   const bool has_standard_flips = !flip_group.FlipParameterIndex.empty();
+  const size_t n_group_members = flip_group.FlipParameterIndex.size() + flip_group.FunctionalFlipParameters.size();
+  double group_flip_probability = 0.5;
 
-  if (has_standard_flips && M3::rand::Uniform() >= 0.5) {
+  if (!has_standard_flips && n_group_members == 1 && !flip_group.FunctionalFlipParameters.empty()) {
+    group_flip_probability = flip_group.FunctionalFlipParameters.front().probability;
+  }
+
+  // singleton functional groups use their configured probability; all other groups use a shared 50% gate
+  if (M3::rand::Uniform() >= group_flip_probability) {
     return;
   }
 
+  // store the proposed values before doing any flipping, so that the functional flip can see the unflipped values for any standard flips
   std::vector<double> proposed_values(_fNumPar, 0.0);
   for (int i = 0; i < _fNumPar; ++i) {
     proposed_values[i] = _fPropVal[i];
   }
 
+  // perform standard flips first
   for (size_t i = 0; i < flip_group.FlipParameterIndex.size(); ++i) {
     const int index = flip_group.FlipParameterIndex[i];
     if (!IsParameterFixed(index)) {
@@ -672,24 +681,21 @@ void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
     }
   }
 
+  // perform functional flips next
   for (const auto& functional_flip : flip_group.FunctionalFlipParameters) {
-    if (!has_standard_flips && M3::rand::Uniform() >= functional_flip.probability) {
-      continue;
-    }
-
     if (IsParameterFixed(functional_flip.target_index)) {
       continue;
     }
-
-    _fPropVal[functional_flip.target_index] = FlipParameterValue(functional_flip, proposed_values);
+    
+    _fPropVal[functional_flip.target_index] = EvaluateFunctionalFlip(functional_flip, proposed_values);
   }
 }
 
 
 
 // *************************************
-M3::float_t ParameterHandlerBase::FlipParameterValue(const ParameterHandlerBase::FunctionalFlipProposal& flip,
-                                                     const std::vector<double>& proposed_values) const {
+M3::float_t ParameterHandlerBase::EvaluateFunctionalFlip(const ParameterHandlerBase::FunctionalFlipProposal& flip,
+                                                         const std::vector<double>& proposed_values) const {
 // *************************************
   std::vector<double> parameter_values(flip.argument_indices.size(), 0.0);
   for (size_t i = 0; i < flip.argument_indices.size(); ++i) {

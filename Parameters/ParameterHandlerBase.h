@@ -374,8 +374,8 @@ class ParameterHandlerBase {
 
   /// @brief Evaluate a formula-driven flip for a target parameter.
   /// @param flip Functional flip configuration.
-  M3::float_t FlipParameterValue(const FunctionalFlipProposal& flip,
-                                 const std::vector<double>& proposed_values) const;
+  M3::float_t EvaluateFunctionalFlip(const FunctionalFlipProposal& flip,
+                                     const std::vector<double>& proposed_values) const;
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
