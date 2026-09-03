@@ -5,7 +5,7 @@
 #include <cstdio>
 
 // MaCh3 includes
-#include "Fitters/StatisticalUtils.h"
+#include "Processing/StatisticalUtils.h"
 #include "Samples/HistogramUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
 

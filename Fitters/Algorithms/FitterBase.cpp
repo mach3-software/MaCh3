@@ -1,4 +1,4 @@
-#include "FitterBase.h"
+#include "Algorithms/FitterBase.h"
 #include <vector>
 #include <memory>
 

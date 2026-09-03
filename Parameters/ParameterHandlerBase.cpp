@@ -650,7 +650,7 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 }
 
 // *************************************
-void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
+void ParameterHandlerBase::FlipParameterGroup(const std::string group) {
 // *************************************
   const FlipGroup& flip_group = FlipGroups.at(group);
   const bool has_standard_flips = !flip_group.FlipParameterIndex.empty();

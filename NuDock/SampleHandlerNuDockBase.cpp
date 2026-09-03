@@ -1,6 +1,6 @@
-#include "NuDock/SampleHandlerNuDockBase.h"
 #include <unordered_map>
-#include <NuDock/NuDockFactory.h>
+#include "NuDock/SampleHandlerNuDockBase.h"
+#include "NuDock/NuDockFactory.h"
 
 // ***************************************************************************
 /// @copydoc SampleHandlerNuDockBase::SampleHandlerNuDockBase

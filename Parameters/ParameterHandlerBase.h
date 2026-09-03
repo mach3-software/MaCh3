@@ -338,8 +338,6 @@ class ParameterHandlerBase {
   ///    are in `FancyNames`. This is useful for studies where one performs ND fits and passes
   ///    them to FD fits, which may have additional parameters (e.g., oscillations).
   ///  - If `FancyNames` is empty, it matches all parameters in the systematic handler.
-  ///
-  /// @throws MaCh3Exception if any parameter branch is uninitialized.
   void MatchMaCh3OutputBranches(TTree *PosteriorFile,
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
@@ -499,6 +497,8 @@ class ParameterHandlerBase {
   std::unique_ptr<ParameterTunes> Tunes;
 
   /// @brief Struct to hold information about a group of parameters that flip together at the same time
+  /// @author Charlotte Knight
+  /// @author Liban Warsame
   struct FlipGroup {
     /// Indices of parameters with flip symmetry
     std::vector<int> FlipParameterIndex;  
