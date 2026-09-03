@@ -2,9 +2,6 @@
 
 #include "Splines/SplineBase.h"
 
-//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
-class SplineMonolithGPU;
-
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
@@ -30,8 +27,6 @@ class UnbinnedSplineHandler : public SplineBase {
 
     /// @brief Get class name
     std::string GetName() const override {return "SplineMonolith";};
-    /// @copydoc SplineBase::SynchroniseMemTransfer
-    void SynchroniseMemTransfer() const final;
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
     /// @param event Name event number in used MC
@@ -76,7 +71,6 @@ class UnbinnedSplineHandler : public SplineBase {
     void PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
     /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
     void MoveToGPU();
-    void SetupSegments();
 
     /// @brief KS: Print info about how much knots etc has been initialised
     void PrintInitialsiation() const;
@@ -96,11 +90,7 @@ class UnbinnedSplineHandler : public SplineBase {
 
     /// Number of events
     unsigned int NEvents;
-    /// Max knots for production
-    short int _max_knots;
 
-    /// Number of valid splines
-    unsigned int NSplines_valid;
     /// Number of valid TF1
     unsigned int NTF1_valid;
 
@@ -124,9 +114,6 @@ class UnbinnedSplineHandler : public SplineBase {
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_monolith;
-
-    /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SplineMonolithGPU* gpu_monolith;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;

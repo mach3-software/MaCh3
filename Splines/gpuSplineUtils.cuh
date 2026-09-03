@@ -87,12 +87,17 @@ class SplineMonolithGPU
     /// @param n_splines Total number of spline objects, not knots
     /// @param n_tf1 Total number of TF1 objects, not coefficients
     __host__ void InitGPU_SplineMonolith(
-      M3::float_t **cpu_total_weights,
-      int n_events,
       unsigned int total_nknots,
       unsigned int n_splines,
       unsigned int n_tf1,
       int Eve_size);
+
+    /// @brief Allocate memory on gpu for spline monolith
+    /// @param cpu_total_weights KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
+    /// @param n_events Number of events, this is necessary to allocate correctly memory
+    __host__ void InitGPU_Unbinned_SplineMonolith(
+        M3::float_t **cpu_total_weights,
+        int n_events);
 
     /// @brief Copies data from CPU to GPU for the spline monolith.
     ///
@@ -111,7 +116,7 @@ class SplineMonolithGPU
     /// @param spline_size Size of each spline object.
     /// @param total_nknots Total number of knots across all splines.
     /// @param n_tf1 Total number of TF1 objects.
-    __host__ void CopyToGPU_SplineMonolith(
+    __host__ void CopyToGPU_SplineMonolith_Unbinned(
       const SplineMonoStruct* cpu_spline_handler,
 
       // TFI related now
@@ -126,6 +131,18 @@ class SplineMonolithGPU
       const short int spline_size,
       const unsigned int total_nknots,
       const unsigned int n_tf1);
+
+    /// @brief Copies data from CPU to GPU for the spline monolith.
+    __host__ void CopyToGPU_SplineMonolith_Binned(
+      M3::float_t *manycoeff_arr,
+      M3::float_t *xcoeff_arr,
+      const std::vector<short int>& uniquesplinevec_Monolith,
+      const std::vector<unsigned int>& coeffindexvec,
+
+      const int n_params,
+      const unsigned int n_splines,
+      const short int spline_size,
+      const unsigned int total_nknots);
 
     /// @brief Allocate memory for spline segments
     /// @param segment Found spline segment for each parameter
@@ -154,8 +171,15 @@ class SplineMonolithGPU
     ///        `Weight_On_SplineBySpline_Basis` is not defined).
     /// @param vals Pointer to an array holding the parameter values to be processed.
     /// @param segment Pointer to an array containing segment indices for parameters.
-    __host__ void RunGPU_SplineMonolith(
+    __host__ void RunGPU_SplineMonolith_Unbinned(
       M3::float_t* cpu_total_weights,
+      // Holds the changes in parameters
+      float *vals,
+      // Holds the segments for parameters
+      short int *segment);
+
+    __host__ void RunGPU_SplineMonolith_Binned(
+      M3::float_t* cpu_spline_weights,
       // Holds the changes in parameters
       float *vals,
       // Holds the segments for parameters
@@ -217,6 +241,10 @@ class SplineMonolithGPU
     int cpu_n_params;
     /// Number of events living on CPU
     int cpu_n_events;
+    #ifndef _LOW_MEMORY_STRUCTS_
+    /// Temporary weight needed for conversion from float to double
+    std::vector<float> cpu_tmp_weights;
+    #endif
 
     // ******************************************
     // TEXTURES
