@@ -1,6 +1,6 @@
 #include <ostream>
 #include <stdexcept>
-#include "Fitters/MulticanonicalMCMCHandler.h"
+#include "Algorithms/MulticanonicalMCMCHandler.h"
 #include "Parameters/ParameterHandlerBase.h"
 #include "Samples/HistogramUtils.h"
 

@@ -4,7 +4,7 @@
 #include "Manager/MaCh3Logger.h"
 #include "Manager/YamlHelper.h"
 #include "Manager/MaCh3Exception.h"
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Samples/SampleStructs.h"
 
 // Other plotting includes

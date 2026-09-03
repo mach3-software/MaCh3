@@ -2,7 +2,7 @@
 /// @brief Implementation of the ProcessMCMCModule class
 
 //MaCh3 includes
-#include "Fitters/OscProcessor.h"
+#include "Fitters/Processing/OscProcessor.h"
 #include "Manager/Manager.h"
 #include "CLI/Modules/ProcessMCMCModule.hpp"
 

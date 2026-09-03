@@ -1,4 +1,4 @@
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 
