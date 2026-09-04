@@ -1300,7 +1300,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
     SetSplinePointers();
 
     BinnedSplines->CleanUpMemory();
-  } else if ([[maybe_unused]] auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
+  } else if (dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     SetSplinePointers();
   } else {
     MACH3LOG_ERROR("Unsupported spline type encountered.");
