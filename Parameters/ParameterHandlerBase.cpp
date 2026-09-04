@@ -251,7 +251,6 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
   YAML::Node functional_flip = YAML::Clone(param);
   const YAML::Node formula = functional_flip["Formula"];
   const YAML::Node parameters = functional_flip["Parameters"];
-  const YAML::Node probability = functional_flip["Probability"];
 
   if (!formula) {
     MACH3LOG_ERROR("FunctionalFlip for parameter {} is missing Formula", GetParFancyName(index));
@@ -266,13 +265,6 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
   flip.target_index = index;
   flip.formula = Get<std::string>(formula, __FILE__, __LINE__);
   flip.argument_names = Get<std::vector<std::string>>(parameters, __FILE__, __LINE__);
-  flip.probability = GetFromManager<double>(probability, 0.5, __FILE__, __LINE__);
-
-  if (flip.probability < 0.0 || flip.probability > 1.0) {
-    MACH3LOG_ERROR("FunctionalFlip probability for parameter {} must be in [0, 1], got {}",
-                   GetParFancyName(index), flip.probability);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
 
   for (const auto& name : flip.argument_names) {
     const int argument_index = GetParIndex(name);
@@ -653,16 +645,8 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 // *************************************
   const FlipGroup& flip_group = FlipGroups.at(group);
-  const bool has_standard_flips = !flip_group.FlipParameterIndex.empty();
-  const size_t n_group_members = flip_group.FlipParameterIndex.size() + flip_group.FunctionalFlipParameters.size();
-  double group_flip_probability = 0.5;
-
-  if (!has_standard_flips && n_group_members == 1 && !flip_group.FunctionalFlipParameters.empty()) {
-    group_flip_probability = flip_group.FunctionalFlipParameters.front().probability;
-  }
-
-  // singleton functional groups use their configured probability; all other groups use a shared 50% gate
-  if (M3::rand::Uniform() >= group_flip_probability) {
+  // all standard and functional flip groups use the same 50% gate
+  if (M3::rand::Uniform() >= 0.5) {
     return;
   }
 

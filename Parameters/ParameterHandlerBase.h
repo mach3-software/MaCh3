@@ -403,7 +403,6 @@ class ParameterHandlerBase {
     std::vector<int> argument_indices;
     std::vector<std::string> argument_names;
     std::string formula;
-    double probability = 0.5;
     std::unique_ptr<TF1> evaluator;
 
     FunctionalFlipProposal() = default;
