@@ -8,11 +8,15 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 
 // *****************************************
-SplineBase::SplineBase() {
+SplineBase::SplineBase([[maybe_unused]] bool Use_GPU) {
 // *****************************************
   #ifdef MaCh3_CUDA
-  MACH3LOG_INFO("Using GPU version event by event monolith");
+  useGPU = Use_GPU;
+  if(useGPU) MACH3LOG_INFO("Using GPU version of {}", GetName());
   gpu_monolith = nullptr;
+  #else
+  // if we don't have GPU simply
+  useGPU = false;
   #endif
 
   NSplines_valid = 0;
@@ -21,7 +25,6 @@ SplineBase::SplineBase() {
   SplineSegments = nullptr;
   ParamValues = nullptr;
 }
-
 
 // *****************************************
 SplineBase::~SplineBase() {
@@ -206,12 +209,15 @@ void SplineBase::SetupSegments() {
 // *****************************************
   //KS: Since we are going to copy it each step use fancy CUDA memory allocation
   #ifdef MaCh3_CUDA
-  gpu_monolith->InitGPU_Segments(&SplineSegments);
-  gpu_monolith->InitGPU_Vals(&ParamValues);
-  #else
-  SplineSegments = new short int[nParams]();
-  ParamValues = new float[nParams]();
+  if (useGPU) {
+    gpu_monolith->InitGPU_Segments(&SplineSegments);
+    gpu_monolith->InitGPU_Vals(&ParamValues);
+  } else
   #endif
+  {
+    SplineSegments = new short int[nParams]();
+    ParamValues = new float[nParams]();
+  }
   //ETA - let this just be set as the first segment by default
   for (M3::int_t j = 0; j < nParams; j++)
   {
@@ -225,7 +231,9 @@ void SplineBase::SetupSegments() {
 void SplineBase::SynchroniseMemTransfer() const {
 //*********************************************************
   #ifdef MaCh3_CUDA
-  SynchroniseSplines();
-  CudaCheckError();
+  if(useGPU) {
+    SynchroniseSplines();
+    CudaCheckError();
+  }
   #endif
 }
