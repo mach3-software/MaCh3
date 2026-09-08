@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: Fitters/MCMCProcessor.h File Reference</title>
+<title>MaCh3: Fitters/Processing/MCMCProcessor.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -72,7 +72,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li><li class="navelem"><a class="el" href="dir_4f694ceccc58a5d9c8eddfc5eb6f9f21.html">Processing</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -85,7 +85,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;complex&gt;</code><br />
 <code>#include &lt;cstdio&gt;</code><br />
-<code>#include &quot;<a class="el" href="StatisticalUtils_8h_source.html">Fitters/StatisticalUtils.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="StatisticalUtils_8h_source.html">Processing/StatisticalUtils.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="HistogramUtils_8h_source.html">Samples/HistogramUtils.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="ParameterHandlerUtils_8h_source.html">Parameters/ParameterHandlerUtils.h</a>&quot;</code><br />
 <code>#include &quot;TFile.h&quot;</code><br />
@@ -104,7 +104,6 @@ $(function() {
 <code>#include &quot;TTree.h&quot;</code><br />
 <code>#include &quot;TROOT.h&quot;</code><br />
 <code>#include &quot;TKey.h&quot;</code><br />
-<code>#include &quot;TRandom3.h&quot;</code><br />
 <code>#include &quot;TGraphPolar.h&quot;</code><br />
 <code>#include &quot;TCandle.h&quot;</code><br />
 <code>#include &quot;TMath.h&quot;</code><br />
@@ -159,18 +158,18 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a"></a>kNParameterEnum&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8h_source.html#l00045">45</a> of file <a class="el" href="MCMCProcessor_8h_source.html">MCMCProcessor.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                   {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>  = 0,</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>    = 1,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a> = 2,</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a">kNParameterEnum</a> = 3 <span class="comment">//KS: keep it at the end to keep track of all parameters</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
-<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a></div><div class="ttdeci">@ kNDPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00047">MCMCProcessor.h:47</a></div></div>
-<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a></div><div class="ttdeci">@ kXSecPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00046">MCMCProcessor.h:46</a></div></div>
-<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a">kNParameterEnum</a></div><div class="ttdeci">@ kNParameterEnum</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00051">MCMCProcessor.h:50</a></div></div>
-<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a></div><div class="ttdeci">@ kFDDetPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00048">MCMCProcessor.h:48</a></div></div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8h_source.html#l00044">44</a> of file <a class="el" href="MCMCProcessor_8h_source.html">MCMCProcessor.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                   {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>  = 0,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>    = 1,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a> = 2,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a">kNParameterEnum</a> = 3 <span class="comment">//KS: keep it at the end to keep track of all parameters</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
+<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a></div><div class="ttdeci">@ kNDPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00046">MCMCProcessor.h:46</a></div></div>
+<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a></div><div class="ttdeci">@ kXSecPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00045">MCMCProcessor.h:45</a></div></div>
+<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20babd8035289bbe1770c6cb4d4d3e9d1b5a">kNParameterEnum</a></div><div class="ttdeci">@ kNParameterEnum</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00050">MCMCProcessor.h:49</a></div></div>
+<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a></div><div class="ttdeci">@ kFDDetPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00047">MCMCProcessor.h:47</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

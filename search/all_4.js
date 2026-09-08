@@ -14,7 +14,7 @@ var searchData=
   ['bingridmapping_160',['BinGridMapping',['../structSampleBinningInfo.html#a15bfb782a7d5b366feea60e1133bb776',1,'SampleBinningInfo']]],
   ['bininfo_161',['BinInfo',['../structBinInfo.html',1,'']]],
   ['binlookup_162',['BinLookup',['../structSampleBinningInfo.html#af904ff07b050cb7b25150a28b882d0ee',1,'SampleBinningInfo']]],
-  ['binnedsplinehandler_163',['BinnedSplineHandler',['../classBinnedSplineHandler.html#a9a3233f79781c2ae9e72e540a3e9f07b',1,'BinnedSplineHandler::BinnedSplineHandler()'],['../classBinnedSplineHandler.html',1,'BinnedSplineHandler']]],
+  ['binnedsplinehandler_163',['BinnedSplineHandler',['../classBinnedSplineHandler.html#adaf71b584032b0aba1d8e054e1aebe0e',1,'BinnedSplineHandler::BinnedSplineHandler()'],['../classBinnedSplineHandler.html',1,'BinnedSplineHandler']]],
   ['binnedsplinehandler_2ecpp_164',['BinnedSplineHandler.cpp',['../BinnedSplineHandler_8cpp.html',1,'']]],
   ['binnedsplinehandler_2eh_165',['BinnedSplineHandler.h',['../BinnedSplineHandler_8h.html',1,'']]],
   ['binning_166',['Binning',['../classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648',1,'SampleHandlerBase']]],

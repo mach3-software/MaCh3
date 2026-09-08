@@ -85,7 +85,7 @@ $(function() {
 <p>Helper class for configuring and evaluating multicanonical umbrella weights.  
  <a href="classMulticanonicalMCMCHandler.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="MulticanonicalMCMCHandler_8h_source.html">Fitters/MulticanonicalMCMCHandler.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="MulticanonicalMCMCHandler_8h_source.html">Fitters/Algorithms/MulticanonicalMCMCHandler.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for MulticanonicalMCMCHandler:</div>
 <div class="dyncontent">
@@ -332,7 +332,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Adjust the parameter-of-interest's step scale according to the width of the umbrella bias function. </p>
-<p>This is used to adjust the step scale of the parameter to keep the size of the step scale relative to the new biased space the chain sees the same. Current assumes that your are sampling delta cp (ie circular on 2pi) </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000018">Todo:</a></b></dt><dd>grab the step scale from the object directly and update based on the radtio to the umbrella width, removing assumption that its dcp </dd></dl>
+<p>This is used to adjust the step scale of the parameter to keep the size of the step scale relative to the new biased space the chain sees the same. Current assumes that your are sampling delta cp (ie circular on 2pi) </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000021">Todo:</a></b></dt><dd>grab the step scale from the object directly and update based on the radtio to the umbrella width, removing assumption that its dcp </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html#l00205">205</a> of file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                                                                                                           {</div>
@@ -590,7 +590,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Compute a generalised-Gaussian multicanonical penalty. </p>
-<p>the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger constraint in the tails of the distribution, more like a tophat function. The normalisation is a little ugly and uses gamma functions, so for now it is hardcoded to n=2. This is the current recommended configuration for umbrella sampling. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000019">Todo:</a></b></dt><dd><p class="startdd">implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary </p>
+<p>the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger constraint in the tails of the distribution, more like a tophat function. The normalisation is a little ugly and uses gamma functions, so for now it is hardcoded to n=2. This is the current recommended configuration for umbrella sampling. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000022">Todo:</a></b></dt><dd><p class="startdd">implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary </p>
 <p class="enddd">implement the normalisation for n != 2, and allow n to be set in the yaml configuration file </p>
 </dd></dl>
 
@@ -751,7 +751,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Read multicanonical configuration from the yaml via manager and initialise handler state. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000017">Todo:</a></b></dt><dd>DR: I realised this will fail if you set spline to true but don't </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000020">Todo:</a></b></dt><dd>DR: I realised this will fail if you set spline to true but don't </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html#l00098">98</a> of file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                                                                                                                                    {</div>
@@ -860,10 +860,10 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  }</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;}</div>
 <div class="ttc" id="aMulticanonicalMCMCHandler_8cpp_html_a5b9acf0497db36bdb1449fb8cd554832"><div class="ttname"><a href="MulticanonicalMCMCHandler_8cpp.html#a5b9acf0497db36bdb1449fb8cd554832">ParseBiasFunction</a></div><div class="ttdeci">M3::BiasFunction ParseBiasFunction(const std::string &amp;biasFunctionName)</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8cpp_source.html#l00011">MulticanonicalMCMCHandler.cpp:11</a></div></div>
-<div class="ttc" id="aclassManager_html_a6cfc76d6af382b177ac35be0a2fb5aab"><div class="ttname"><a href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">Manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw() const</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00047">Manager.h:47</a></div></div>
+<div class="ttc" id="aclassManager_html_a6cfc76d6af382b177ac35be0a2fb5aab"><div class="ttname"><a href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">Manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw() const</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00048">Manager.h:48</a></div></div>
 <div class="ttc" id="aclassMulticanonicalMCMCHandler_html_a417536b58d823d79d42e61fe38d7fe80"><div class="ttname"><a href="classMulticanonicalMCMCHandler.html#a417536b58d823d79d42e61fe38d7fe80">MulticanonicalMCMCHandler::AdjustUmbrellaStepScale</a></div><div class="ttdeci">void AdjustUmbrellaStepScale(const std::vector&lt; ParameterHandlerBase * &gt; &amp;systematics)</div><div class="ttdoc">Adjust the parameter-of-interest's step scale according to the width of the umbrella bias function.</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8cpp_source.html#l00205">MulticanonicalMCMCHandler.cpp:205</a></div></div>
 <div class="ttc" id="aclassMulticanonicalMCMCHandler_html_a6c3740e21231113ff87c3f3f648e6138"><div class="ttname"><a href="classMulticanonicalMCMCHandler.html#a6c3740e21231113ff87c3f3f648e6138">MulticanonicalMCMCHandler::FindOscCovParams</a></div><div class="ttdeci">void FindOscCovParams(const std::vector&lt; ParameterHandlerBase * &gt; &amp;systematics)</div><div class="ttdoc">Locate the systematic object which contains the parameters used by the handler. Stores the parameter ...</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8cpp_source.html#l00062">MulticanonicalMCMCHandler.cpp:62</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00782">HistogramUtils.cpp:782</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00772">HistogramUtils.cpp:772</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1411,8 +1411,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>Fitters/<a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a></li>
-<li>Fitters/<a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a></li>
+<li>Fitters/Algorithms/<a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a></li>
+<li>Fitters/Algorithms/<a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: Fitters/StatisticalUtils.cpp File Reference</title>
+<title>MaCh3: Fitters/Processing/StatisticalUtils.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -72,7 +72,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li><li class="navelem"><a class="el" href="dir_4f694ceccc58a5d9c8eddfc5eb6f9f21.html">Processing</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -82,7 +82,7 @@ $(function() {
 <div class="title">StatisticalUtils.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="StatisticalUtils_8h_source.html">Fitters/StatisticalUtils.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="StatisticalUtils_8h_source.html">Fitters/Processing/StatisticalUtils.h</a>&quot;</code><br />
 <code>#include &lt;numeric&gt;</code><br />
 <code>#include &quot;Math/QuantFuncMathCore.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -1093,7 +1093,7 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  delta_chi2-&gt;SetMaximum(NewMaximum*1.1);</div>
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <span class="keywordflow">return</span> delta_chi2;</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;}</div>
-<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00155">HistogramUtils.h:155</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00154">HistogramUtils.h:154</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a2aed672aeeb4fcf51069966193176ff3"><div class="ttname"><a href="namespaceM3.html#a2aed672aeeb4fcf51069966193176ff3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">constexpr static const double _BAD_DOUBLE_</div><div class="ttdoc">Default value used for double initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00053">Core.h:53</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1117,7 +1117,7 @@ Functions</h2></td></tr>
 <p>Convert a Bayes factor into an approximate particle-physics significance level using the Dunne–Kaboth scale. </p>
 <p>This function maps a Bayes factor B(θ1,θ2) to an equivalent Gaussian significance ("n σ") assuming equal priors for the two hypotheses.</p>
 <p>The thresholds are based on commonly used particle-physics probability levels and their corresponding Bayes factors:</p>
-<h2><a class="anchor" id="autotoc_md195"></a>
+<h2><a class="anchor" id="autotoc_md191"></a>
 Bayes factor (B)      Approximate significance</h2>
 <p>B &lt; 2.125 &lt; 1 σ 2.125 ≤ B &lt; 20.74 &gt; 1 σ 20.74 ≤ B &lt; 369.4 &gt; 2 σ 369.4 ≤ B &lt; 15800 &gt; 3 σ 15800 ≤ B &lt; 1745000 &gt; 4 σ B ≥ 1745000 &gt; 5 σ</p>
 <p>For example, a Bayes factor of 369.4 corresponds approximately to a 3 σ effect in traditional particle-physics terminology.</p>
@@ -2074,7 +2074,7 @@ Bayes factor (B)      Approximate significance</h2>
 <div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Thinned TTree saved and overwrote original in: {}&quot;</span>, TempFilePath);</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;}</div>
 <div class="ttc" id="anamespaceM3_1_1Utils_html_ab021e008806b98e6c67713e2685c96b4"><div class="ttname"><a href="namespaceM3_1_1Utils.html#ab021e008806b98e6c67713e2685c96b4">M3::Utils::PrintProgressBar</a></div><div class="ttdeci">void PrintProgressBar(const Long64_t Done, const Long64_t All)</div><div class="ttdoc">KS: Simply print progress bar.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00229">Monitor.cpp:229</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00782">HistogramUtils.cpp:782</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00772">HistogramUtils.cpp:772</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

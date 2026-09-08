@@ -89,7 +89,7 @@ $(function() {
 <p>This executable allow to reweight MCMC Chain, such technique is used to study impact of different priors without rerunning MCMC.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="Manager_8h_source.html">Manager/Manager.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="MCMCProcessor_8h_source.html">Fitters/MCMCProcessor.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="MCMCProcessor_8h_source.html">Fitters/Processing/MCMCProcessor.h</a>&quot;</code><br />
 <code>#include &quot;TFile.h&quot;</code><br />
 <code>#include &quot;TTree.h&quot;</code><br />
 <code>#include &quot;TChain.h&quot;</code><br />
@@ -381,9 +381,9 @@ Evan Goodman </dd></dl>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
 <div class="ttc" id="aSplineStructs_8h_html_aee66563def836e531cda07c5efa45d87"><div class="ttname"><a href="SplineStructs_8h.html#aee66563def836e531cda07c5efa45d87">isFlat</a></div><div class="ttdeci">bool isFlat(TSpline3_red *&amp;spl)</div><div class="ttdoc">CW: Helper function used in the constructor, tests to see if the spline is flat.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00784">SplineStructs.h:784</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a07204936619139b886e9a877bc46d1a4"><div class="ttname"><a href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">MCMCProcessor::GetNthParameter</a></div><div class="ttdeci">void GetNthParameter(const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title) const</div><div class="ttdoc">Get properties of parameter by passing it number.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02854">MCMCProcessor.cpp:2854</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a40fe1af4b88a7954de0461638e2819ad"><div class="ttname"><a href="classMCMCProcessor.html#a40fe1af4b88a7954de0461638e2819ad">MCMCProcessor::GetParamFlat</a></div><div class="ttdeci">bool GetParamFlat(const int iParam) const</div><div class="ttdoc">Get whether param has flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04663">MCMCProcessor.cpp:4663</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a563df09ed03a95aa8ad2781db9c8807b"><div class="ttname"><a href="classMCMCProcessor.html#a563df09ed03a95aa8ad2781db9c8807b">MCMCProcessor::GetParamIndexFromName</a></div><div class="ttdeci">int GetParamIndexFromName(const std::string &amp;Name) const</div><div class="ttdoc">Get parameter number based on name.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02867">MCMCProcessor.cpp:2867</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a07204936619139b886e9a877bc46d1a4"><div class="ttname"><a href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">MCMCProcessor::GetNthParameter</a></div><div class="ttdeci">void GetNthParameter(const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title) const</div><div class="ttdoc">Get properties of parameter by passing it number.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02861">MCMCProcessor.cpp:2861</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a40fe1af4b88a7954de0461638e2819ad"><div class="ttname"><a href="classMCMCProcessor.html#a40fe1af4b88a7954de0461638e2819ad">MCMCProcessor::GetParamFlat</a></div><div class="ttdeci">bool GetParamFlat(const int iParam) const</div><div class="ttdoc">Get whether param has flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04677">MCMCProcessor.cpp:4677</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a563df09ed03a95aa8ad2781db9c8807b"><div class="ttname"><a href="classMCMCProcessor.html#a563df09ed03a95aa8ad2781db9c8807b">MCMCProcessor::GetParamIndexFromName</a></div><div class="ttdeci">int GetParamIndexFromName(const std::string &amp;Name) const</div><div class="ttdoc">Get parameter number based on name.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02874">MCMCProcessor.cpp:2874</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ac289df32a5b3b05c61a87cbac5702b25"><div class="ttname"><a href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></div><div class="ttdeci">constexpr static const int _BAD_INT_</div><div class="ttdoc">Default value used for int initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00055">Core.h:55</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -415,7 +415,7 @@ Evan Goodman </dd></dl>
 </div><div class="memdoc">
 
 <p>Function to interpolate 1D graph. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000039">Todo:</a></b></dt><dd>double check implementation of TGraph interpolation for 1D </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000040">Todo:</a></b></dt><dd>double check implementation of TGraph interpolation for 1D </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ReweightMCMC_8cpp_source.html#l00121">121</a> of file <a class="el" href="ReweightMCMC_8cpp_source.html">ReweightMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;{</div>
@@ -778,7 +778,7 @@ Evan Goodman </dd></dl>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  }</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00782">HistogramUtils.cpp:782</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00772">HistogramUtils.cpp:772</a></div></div>
 <div class="ttc" id="astructReweightConfig_html"><div class="ttname"><a href="structReweightConfig.html">ReweightConfig</a></div><div class="ttdoc">Structure to hold reweight configuration.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00042">ReweightMCMC.cpp:42</a></div></div>
 <div class="ttc" id="astructReweightConfig_html_a2f118ccc5cf3b9bb8c72a4ee713741e2"><div class="ttname"><a href="structReweightConfig.html#a2f118ccc5cf3b9bb8c72a4ee713741e2">ReweightConfig::weightBranchName</a></div><div class="ttdeci">std::string weightBranchName</div><div class="ttdoc">Output weight branch name.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00052">ReweightMCMC.cpp:52</a></div></div>
 <div class="ttc" id="astructReweightConfig_html_a2ffe9206e43e6fe7468a8cd193fb018b"><div class="ttname"><a href="structReweightConfig.html#a2ffe9206e43e6fe7468a8cd193fb018b">ReweightConfig::fileName</a></div><div class="ttdeci">std::string fileName</div><div class="ttdoc">ROOT file containing graph data.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00056">ReweightMCMC.cpp:56</a></div></div>
@@ -876,10 +876,10 @@ Evan Goodman </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>David Riley </dd>
 <dd>
 Evan Goodman </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000040">Todo:</a></b></dt><dd>add a generic 2D reweight that is not dm32 and theta13 specific DWR </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000041">Todo:</a></b></dt><dd>Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000042">Todo:</a></b></dt><dd>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000043">Todo:</a></b></dt><dd>add tracking for how many events are outside the graph ranges for diagnostics DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000041">Todo:</a></b></dt><dd>add a generic 2D reweight that is not dm32 and theta13 specific DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000042">Todo:</a></b></dt><dd>Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000043">Todo:</a></b></dt><dd>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000044">Todo:</a></b></dt><dd>add tracking for how many events are outside the graph ranges for diagnostics DWR </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ReweightMCMC_8cpp_source.html#l00422">422</a> of file <a class="el" href="ReweightMCMC_8cpp_source.html">ReweightMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;{</div>

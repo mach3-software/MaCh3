@@ -1,17 +1,16 @@
 <map id="PSO" name="PSO">
-<area shape="rect" id="node1" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="1245,481,1296,508"/>
-<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="995,271,1089,297"/>
-<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="759,231,841,257"/>
-<area shape="rect" id="node4" title=" " alt="" coords="371,21,572,48"/>
-<area shape="rect" id="node5" title=" " alt="" coords="379,73,563,114"/>
-<area shape="rect" id="node6" title=" " alt="" coords="371,138,571,179"/>
-<area shape="rect" id="node7" title=" " alt="" coords="374,204,569,231"/>
-<area shape="rect" id="node8" title=" " alt="" coords="181,287,261,313"/>
-<area shape="rect" id="node10" href="$classManager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,317,507,344"/>
-<area shape="rect" id="node9" title=" " alt="" coords="5,279,132,321"/>
-<area shape="rect" id="node11" title=" " alt="" coords="399,395,544,421"/>
-<area shape="rect" id="node14" href="$classparticle.html" title="Class particle &#45; stores the position, velocity and personal best With functions which move particle a..." alt="" coords="869,452,935,479"/>
-<area shape="rect" id="node12" title=" " alt="" coords="963,509,1121,550"/>
-<area shape="rect" id="node13" title=" " alt="" coords="964,574,1120,615"/>
-<area shape="rect" id="node15" title=" " alt="" coords="977,640,1107,667"/>
+<area shape="rect" id="node1" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="1245,427,1296,453"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="995,241,1089,268"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="759,201,841,228"/>
+<area shape="rect" id="node4" title=" " alt="" coords="371,17,572,44"/>
+<area shape="rect" id="node5" title=" " alt="" coords="379,69,563,110"/>
+<area shape="rect" id="node6" title=" " alt="" coords="371,134,571,175"/>
+<area shape="rect" id="node7" title=" " alt="" coords="181,232,261,259"/>
+<area shape="rect" id="node9" href="$classManager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,263,507,289"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,225,132,266"/>
+<area shape="rect" id="node10" title=" " alt="" coords="399,340,544,367"/>
+<area shape="rect" id="node13" href="$classparticle.html" title="Class particle &#45; stores the position, velocity and personal best With functions which move particle a..." alt="" coords="869,397,935,424"/>
+<area shape="rect" id="node11" title=" " alt="" coords="963,454,1121,495"/>
+<area shape="rect" id="node12" title=" " alt="" coords="964,519,1120,561"/>
+<area shape="rect" id="node14" title=" " alt="" coords="977,585,1107,612"/>
 </map>

@@ -84,7 +84,7 @@ $(function() {
 <p>Class particle - stores the position, velocity and personal best With functions which move particle and update velocity.  
  <a href="classparticle.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="PSO_8h_source.html">Fitters/PSO.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="PSO_8h_source.html">Fitters/Algorithms/PSO.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for particle:</div>
 <div class="dyncontent">
@@ -141,7 +141,7 @@ Private Attributes</h2></td></tr>
 Mark Scott </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>24/2/2023 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00017">17</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00016">16</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7ad06fab12e86c9dbf2e0a5e8c794cae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ad06fab12e86c9dbf2e0a5e8c794cae">&#9670;&nbsp;</a></span>particle()</h2>
@@ -179,10 +179,10 @@ Mark Scott </dd></dl>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00020">20</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;: <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a>(pos), <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a>(vel){};</div>
-<div class="ttc" id="aclassparticle_html_a16f312fadb1c50e0a45a840f9e393eae"><div class="ttname"><a href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">particle::position</a></div><div class="ttdeci">std::vector&lt; double &gt; position</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00064">PSO.h:61</a></div></div>
-<div class="ttc" id="aclassparticle_html_a7c7a70f520cbcd91e49e17f7b9406044"><div class="ttname"><a href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">particle::velocity</a></div><div class="ttdeci">std::vector&lt; double &gt; velocity</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00065">PSO.h:65</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00019">19</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;: <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a>(pos), <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a>(vel){};</div>
+<div class="ttc" id="aclassparticle_html_a16f312fadb1c50e0a45a840f9e393eae"><div class="ttname"><a href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">particle::position</a></div><div class="ttdeci">std::vector&lt; double &gt; position</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00063">PSO.h:60</a></div></div>
+<div class="ttc" id="aclassparticle_html_a7c7a70f520cbcd91e49e17f7b9406044"><div class="ttname"><a href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">particle::velocity</a></div><div class="ttdeci">std::vector&lt; double &gt; velocity</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00064">PSO.h:64</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -211,8 +211,8 @@ Mark Scott </dd></dl>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00022">22</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00021">21</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -240,11 +240,11 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00036">36</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                                    {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">personal_best_position</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      };</div>
-<div class="ttc" id="aclassparticle_html_a8b36e78ddaa8737f8d1d3d1b39e6924f"><div class="ttname"><a href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">particle::personal_best_position</a></div><div class="ttdeci">std::vector&lt; double &gt; personal_best_position</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00068">PSO.h:68</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00035">35</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                                                    {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">personal_best_position</a>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      };</div>
+<div class="ttc" id="aclassparticle_html_a8b36e78ddaa8737f8d1d3d1b39e6924f"><div class="ttname"><a href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">particle::personal_best_position</a></div><div class="ttdeci">std::vector&lt; double &gt; personal_best_position</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00067">PSO.h:67</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -271,11 +271,11 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00044">44</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                      {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">personal_best_value</a>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      };</div>
-<div class="ttc" id="aclassparticle_html_ad45e229bdf80e2eaadeb9e9ae216277b"><div class="ttname"><a href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">particle::personal_best_value</a></div><div class="ttdeci">double personal_best_value</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00066">PSO.h:66</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00043">43</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                                      {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">personal_best_value</a>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      };</div>
+<div class="ttc" id="aclassparticle_html_ad45e229bdf80e2eaadeb9e9ae216277b"><div class="ttname"><a href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">particle::personal_best_value</a></div><div class="ttdeci">double personal_best_value</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00065">PSO.h:65</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -302,10 +302,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00028">28</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                                       {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00027">27</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                                       {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -332,11 +332,11 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00056">56</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                        {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">curr_value</a>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      };</div>
-<div class="ttc" id="aclassparticle_html_a3fa66bc070aa43b66389b8e0b9754f32"><div class="ttname"><a href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">particle::curr_value</a></div><div class="ttdeci">double curr_value</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00067">PSO.h:67</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00055">55</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                        {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">curr_value</a>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      };</div>
+<div class="ttc" id="aclassparticle_html_a3fa66bc070aa43b66389b8e0b9754f32"><div class="ttname"><a href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">particle::curr_value</a></div><div class="ttdeci">double curr_value</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00066">PSO.h:66</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -363,10 +363,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00048">48</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                                      {</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00047">47</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                      {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -394,10 +394,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00032">32</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                                                                       {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <a class="code" href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">personal_best_position</a> = new_pos;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00031">31</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                                                       {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <a class="code" href="classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f">personal_best_position</a> = new_pos;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -425,10 +425,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00040">40</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                                        {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <a class="code" href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">personal_best_value</a> = new_val;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00039">39</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                                        {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <a class="code" href="classparticle.html#ad45e229bdf80e2eaadeb9e9ae216277b">personal_best_value</a> = new_val;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -456,10 +456,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00024">24</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                                               {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a> = new_position;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00023">23</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;                                                               {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <a class="code" href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">position</a> = new_position;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -487,10 +487,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00059">59</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                                      {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <a class="code" href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">curr_value</a> = val;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00058">58</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                      {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <a class="code" href="classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32">curr_value</a> = val;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -518,10 +518,10 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00052">52</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                                                              {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a> = new_velocity;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      };</div>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00051">51</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                                                              {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <a class="code" href="classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044">velocity</a> = new_velocity;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -546,7 +546,7 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00067">67</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00066">66</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +570,7 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00068">68</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00067">67</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 
 </div>
 </div>
@@ -594,7 +594,7 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00066">66</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00065">65</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 
 </div>
 </div>
@@ -618,7 +618,7 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00064">64</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00063">63</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 
 </div>
 </div>
@@ -642,12 +642,12 @@ Mark Scott </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00065">65</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PSO_8h_source.html#l00064">64</a> of file <a class="el" href="PSO_8h_source.html">PSO.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>Fitters/<a class="el" href="PSO_8h_source.html">PSO.h</a></li>
+<li>Fitters/Algorithms/<a class="el" href="PSO_8h_source.html">PSO.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->

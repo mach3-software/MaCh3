@@ -91,8 +91,8 @@ $(function() {
 <td class="markdownTableBodyNone">v2.8.0   </td><td class="markdownTableBodyNone">* Major: <br  />
  * Minor:   </td><td class="markdownTableBodyNone">XX-XX-2026    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">v2.7.0   </td><td class="markdownTableBodyNone">* Major: <b>Osc params no longer require particular order</b>, <code>NuOscillator</code> 1.5.0-&gt;2.1.0, Flip Groups <br  />
- * Minor: <b>Tweaked syntax for step scale</b>, <b>Removed Sample-Summary</b>, <b>Unified random number generator</b>, <b>Spline tokens no longer assumes dimensionality</b>, histogram plotting range via style config, GPU for binned splines and steps toward spline unification, <b>split of Fitters folder into processing and algorithms</b>, Bump <code>pybins</code> v2.13.5→v2.13.6   </td><td class="markdownTableBodyNone">XX-XX-2026    </td></tr>
+<td class="markdownTableBodyNone">v2.7.0   </td><td class="markdownTableBodyNone">* Major: <b>Osc params no longer require particular order</b>, <code>NuOscillator</code> v1.5.0-&gt;v2.1.1, Flip Groups, Functional flip <br  />
+ * Minor: <b>Tweaked syntax for step scale</b>, <b>Removed Sample-Summary</b>, <b>Unified random number generator</b>, <b>Spline tokens no longer assumes dimensionality</b>, histogram plotting range via style config, GPU for binned splines and steps toward spline unification, <b>split of Fitters folder into processing and algorithms</b>, Bump <code>pybind</code> v2.13.5→v2.13.6, table printing class, ability to control GPU splines via config not only compilation flags, fancy algorithm name   </td><td class="markdownTableBodyNone">XX-09-2026    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="https://github.com/mach3-software/MaCh3/releases/tag/v2.6.1">v2.6.1</a>   </td><td class="markdownTableBodyNone">* Major: <code><a class="el" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,...">MCMCProcessor</a></code> support for umbrella weight <br  />
  * Minor: <code>UmbrellaSolver</code> no longer produces hard-coded output <code>TTree</code>, Logarithmic scale for LLH scan, unify <code>RHat</code> and <code>RHat_HighMem</code>, unified App/CLI folder, reducing bot spam   </td><td class="markdownTableBodyNone">12-08-2026    </td></tr>
@@ -238,17 +238,18 @@ $(function() {
 <h1><a class="anchor" id="autotoc_md96"></a>
 Release Summary Talks</h1>
 <ul>
-<li><b>v2.4.0 – v2.5.0</b> — <a href="https://indico.global/event/17497/contributions/149780/attachments/69417/134641/MaCh3%20News.pdf">May 5, 2026</a></li>
-<li><b>v2.2.2 – v2.3.2</b> — <a href="https://indico.global/event/16525/contributions/142708/attachments/66207/128092/13.MaCh3Devel-01.26.pdf">January 20, 2026</a></li>
-<li><b>v2.2.1</b> — <a href="https://indico.global/event/15221/contributions/130845/attachments/61568/118568/MaCh3%20Core%20Update%20-%20August%20Meeting.pdf">August 5, 2025</a></li>
-<li><b>v2.0.0 – v2.2.2</b> — <a href="https://indico.global/event/15220/contributions/130837/attachments/60784/117119/MaCh3Devel.pdf">July 8, 2025</a></li>
-<li><b>v1.5.0</b> — <a href="https://indico.global/event/15228/contributions/130865/attachments/60814/117173/M3CoreUpdate060525.pdf">May 6, 2025</a></li>
-<li><b>v1.3.5 – v1.4.6</b> — <a href="https://indico.global/event/15230/contributions/130874/attachments/60820/117179/MaCh3Devel-02.25.pdf">February 25, 2025</a></li>
-<li><b>v1.3.0 – v1.3.4</b> — <a href="https://indico.global/event/15231/contributions/130877/attachments/60821/117180/MaCh3Devel.pdf">January 14, 2025</a></li>
-<li><b>v1.2.0</b> — <a href="https://indico.global/event/15232/contributions/130879/attachments/60823/117183/CoreUpdate.pdf">December 3, 2024</a></li>
-<li><b>v1.1.1 – v1.1.8</b> — <a href="https://indico.global/event/15233/contributions/130882/attachments/60825/117185/MaCh3Devel.pdf">November 5, 2024</a></li>
-<li><b>v1.1.0</b> — <a href="https://indico.global/event/15236/contributions/130891/attachments/60830/117190/MaCh3_General_030924.pdf">September 3, 2024</a></li>
-<li><b>v1.0.0</b> — <a href="https://indico.global/event/15239/contributions/130903/attachments/60840/117200/MaCh3%20GM%20-04.2024.pdf">April 30, 2024</a> </li>
+<li><b>v2.5.1 - v2.6.0</b> — <a href="https://indico.global/event/18212/contributions/166438/attachments/75682/146821/CoreUpdates.pdf">8 September 2026</a></li>
+<li><b>v2.4.0 – v2.5.0</b> — <a href="https://indico.global/event/17497/contributions/149780/attachments/69417/134641/MaCh3%20News.pdf">5 May 2026</a></li>
+<li><b>v2.2.2 – v2.3.2</b> — <a href="https://indico.global/event/16525/contributions/142708/attachments/66207/128092/13.MaCh3Devel-01.26.pdf">20 January 2026</a></li>
+<li><b>v2.2.1</b> — <a href="https://indico.global/event/15221/contributions/130845/attachments/61568/118568/MaCh3%20Core%20Update%20-%20August%20Meeting.pdf">5 August 2025</a></li>
+<li><b>v2.0.0 – v2.2.2</b> — <a href="https://indico.global/event/15220/contributions/130837/attachments/60784/117119/MaCh3Devel.pdf">8 July 2025</a></li>
+<li><b>v1.5.0</b> — <a href="https://indico.global/event/15228/contributions/130865/attachments/60814/117173/M3CoreUpdate060525.pdf">6 May 2025</a></li>
+<li><b>v1.3.5 – v1.4.6</b> — <a href="https://indico.global/event/15230/contributions/130874/attachments/60820/117179/MaCh3Devel-02.25.pdf">25 February 2025</a></li>
+<li><b>v1.3.0 – v1.3.4</b> — <a href="https://indico.global/event/15231/contributions/130877/attachments/60821/117180/MaCh3Devel.pdf">14 January 2025</a></li>
+<li><b>v1.2.0</b> — <a href="https://indico.global/event/15232/contributions/130879/attachments/60823/117183/CoreUpdate.pdf">3 December 2024</a></li>
+<li><b>v1.1.1 – v1.1.8</b> — <a href="https://indico.global/event/15233/contributions/130882/attachments/60825/117185/MaCh3Devel.pdf">5 November 2024</a></li>
+<li><b>v1.1.0</b> — <a href="https://indico.global/event/15236/contributions/130891/attachments/60830/117190/MaCh3_General_030924.pdf">3 September 2024</a></li>
+<li><b>v1.0.0</b> — <a href="https://indico.global/event/15239/contributions/130903/attachments/60840/117200/MaCh3%20GM%20-04.2024.pdf">30 April 2024</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

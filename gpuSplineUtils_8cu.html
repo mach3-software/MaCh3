@@ -190,48 +190,48 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00330">330</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;                                                       {</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="comment">// points per spline is the offset to skip in the index to move between splines</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> splineNum = (blockIdx.x * blockDim.x + threadIdx.x);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="comment">// this is the stopping condition!</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  <span class="keywordflow">if</span> (splineNum &lt; gpu_n_splines) {</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="comment">// This is the segment we want for this parameter variation</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="comment">// for this particular splineNum; 0 = MACCQE, 1 = pFC, 2 = EBC, etc</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <span class="comment">//CW: Which Parameter we are accessing</span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> Param = gpu_paramNo_arr[splineNum];</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="comment">//CW: Avoids doing costly binary search on GPU</span></div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment = gpu_spline_segment[Param];</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="comment">//KS: Segment for coeff_x is simply parameter*max knots + segment as each parmeters has the same spacing</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment_X = Param*gpu_spline_size+segment;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160; </div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="comment">//KS: Find knot position in out monolitical structure</span></div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> CurrentKnotPos = gpu_nKnots_arr[splineNum]*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>+segment*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160; </div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="comment">// We&#39;ve read the segment straight from CPU and is saved in gpu_spline_segment</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="comment">// polynomial parameters from the monolithic splineMonolith</span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fY = gpu_coeff_many[CurrentKnotPos];</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fB = gpu_coeff_many[CurrentKnotPos + 1];</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fC = gpu_coeff_many[CurrentKnotPos + 2];</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fD = gpu_coeff_many[CurrentKnotPos + 3];</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> dx = gpu_par_val[Param] - tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="comment">//CW: Wooow, let&#39;s use some fancy intrinsics and pull down the processing time by &lt;1% from normal multiplication! HURRAY</span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    gpu_weights[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">// Or for the more &quot;easy to read&quot; version:</span></div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="comment">//gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="comment">//#ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="comment">//printf(&quot;splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, gpu_n_splines = %i, gpu_spline_size = %i, weight = %f \n&quot;, splineNum, gpu_n_splines, gpu_paramNo_arr[splineNum], gpu_par_val[Param], segment, tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X), tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X+1), dx, gpu_n_splines, gpu_spline_size, gpu_weights[splineNum]);</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="comment">//#endif</span></div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  }</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00405">405</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;                                                       {</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <span class="comment">// points per spline is the offset to skip in the index to move between splines</span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> splineNum = (blockIdx.x * blockDim.x + threadIdx.x);</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <span class="comment">// this is the stopping condition!</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keywordflow">if</span> (splineNum &lt; gpu_n_splines) {</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="comment">// This is the segment we want for this parameter variation</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="comment">// for this particular splineNum; 0 = MACCQE, 1 = pFC, 2 = EBC, etc</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="comment">//CW: Which Parameter we are accessing</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> Param = gpu_paramNo_arr[splineNum];</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="comment">//CW: Avoids doing costly binary search on GPU</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment = gpu_spline_segment[Param];</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="comment">//KS: Segment for coeff_x is simply parameter*max knots + segment as each parmeters has the same spacing</span></div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span> segment_X = Param*gpu_spline_size+segment;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160; </div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="comment">//KS: Find knot position in out monolitical structure</span></div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> CurrentKnotPos = gpu_nKnots_arr[splineNum]*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>+segment*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="comment">// We&#39;ve read the segment straight from CPU and is saved in gpu_spline_segment</span></div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="comment">// polynomial parameters from the monolithic splineMonolith</span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fY = gpu_coeff_many[CurrentKnotPos];</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fB = gpu_coeff_many[CurrentKnotPos + 1];</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fC = gpu_coeff_many[CurrentKnotPos + 2];</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> fD = gpu_coeff_many[CurrentKnotPos + 3];</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> dx = gpu_par_val[Param] - tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X);</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">//CW: Wooow, let&#39;s use some fancy intrinsics and pull down the processing time by &lt;1% from normal multiplication! HURRAY</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    gpu_weights[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="comment">// Or for the more &quot;easy to read&quot; version:</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="comment">//gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="comment">//#ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="comment">//printf(&quot;splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, gpu_n_splines = %i, gpu_spline_size = %i, weight = %f \n&quot;, splineNum, gpu_n_splines, gpu_paramNo_arr[splineNum], gpu_par_val[Param], segment, tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X), tex1Dfetch&lt;float&gt;(text_coeff_x, segment_X+1), dx, gpu_n_splines, gpu_spline_size, gpu_weights[splineNum]);</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="comment">//#endif</span></div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  }</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;}</div>
 <div class="ttc" id="aSplineCommon_8h_html_a790348db7c20fb9896e94403fbee52cf"><div class="ttname"><a href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a></div><div class="ttdeci">constexpr int _nCoeff_</div><div class="ttdoc">KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather th...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00018">SplineCommon.h:18</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -291,26 +291,26 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00383">383</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                                         {</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  <span class="comment">// points per spline is the offset to skip in the index to move between splines</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> tf1Num = (blockIdx.x * blockDim.x + threadIdx.x);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160; </div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <span class="keywordflow">if</span> (tf1Num &lt; gpu_n_TF1) {</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> x = gpu_par_val[gpu_paramNo_arr_tf1[tf1Num]];</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <span class="comment">// Read the coefficients</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> TF1_Index = tf1Num * <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> a = gpu_coeffs_tf1[TF1_Index];</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> b = gpu_coeffs_tf1[TF1_Index+1];</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    gpu_weights_tf1[tf1Num] = fmaf(a, x, b);</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="comment">// gpu_weights_tf1[tf1Num] = a*x + b;</span></div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="comment">// gpu_weights_tf1[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00458">458</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;                                         {</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="comment">// points per spline is the offset to skip in the index to move between splines</span></div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> tf1Num = (blockIdx.x * blockDim.x + threadIdx.x);</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  <span class="keywordflow">if</span> (tf1Num &lt; gpu_n_TF1) {</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="comment">// The is the variation itself (needed to evaluate variation - stored spline point = dx)</span></div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> x = gpu_par_val[gpu_paramNo_arr_tf1[tf1Num]];</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    <span class="comment">// Read the coefficients</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> TF1_Index = tf1Num * <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> a = gpu_coeffs_tf1[TF1_Index];</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> b = gpu_coeffs_tf1[TF1_Index+1];</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160; </div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    gpu_weights_tf1[tf1Num] = fmaf(a, x, b);</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    <span class="comment">// gpu_weights_tf1[tf1Num] = a*x + b;</span></div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    <span class="comment">// gpu_weights_tf1[tf1Num] = 1 + a*x + b*x*x + c*x*x*x + d*x*x*x*x + e*x*x*x*x*x;</span></div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  }</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;}</div>
 <div class="ttc" id="aSplineCommon_8h_html_ad6cacf3d45a37eeeeffe38ad24345d54"><div class="ttname"><a href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a></div><div class="ttdeci">constexpr int _nTF1Coeff_</div><div class="ttdoc">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it her...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00020">SplineCommon.h:20</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -378,27 +378,27 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00410">410</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
-<div class="fragment"><div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;                                                                  {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = (blockIdx.x * blockDim.x + threadIdx.x);</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="keywordflow">if</span>(EventNum &lt; gpu_n_events) <span class="comment">//stopping condition</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  {</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordtype">float</span> local_total_weight = 1.f;</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160; </div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventOffset = 2 * EventNum;</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; id &lt; tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent, EventOffset); ++id) {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;      local_total_weight *= gpu_weights[tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent, EventOffset+1) + id];</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    }</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; id &lt; tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent_TF1, EventOffset); ++id) {</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      local_total_weight *= gpu_weights_tf1[tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent_TF1, EventOffset+1) + id];</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    }</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    gpu_total_weights[EventNum] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespaceM3.html#a56237bdae03e917fa4cd332944557bc5">M3::float_t</a><span class="keyword">&gt;</span>(local_total_weight);</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  }</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="gpuSplineUtils_8cu_source.html#l00485">485</a> of file <a class="el" href="gpuSplineUtils_8cu_source.html">gpuSplineUtils.cu</a>.</p>
+<div class="fragment"><div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;                                                                  {</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = (blockIdx.x * blockDim.x + threadIdx.x);</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160; </div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="keywordflow">if</span>(EventNum &lt; gpu_n_events) <span class="comment">//stopping condition</span></div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  {</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <span class="keywordtype">float</span> local_total_weight = 1.f;</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160; </div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventOffset = 2 * EventNum;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160; </div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; id &lt; tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent, EventOffset); ++id) {</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;      local_total_weight *= gpu_weights[tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent, EventOffset+1) + id];</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    }</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160; </div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; id &lt; tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent_TF1, EventOffset); ++id) {</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;      local_total_weight *= gpu_weights_tf1[tex1Dfetch&lt;unsigned int&gt;(text_nParamPerEvent_TF1, EventOffset+1) + id];</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;    }</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    gpu_total_weights[EventNum] = <span class="keyword">static_cast&lt;</span><a class="code" href="namespaceM3.html#a56237bdae03e917fa4cd332944557bc5">M3::float_t</a><span class="keyword">&gt;</span>(local_total_weight);</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  }</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;}</div>
 <div class="ttc" id="anamespaceM3_html_a56237bdae03e917fa4cd332944557bc5"><div class="ttname"><a href="namespaceM3.html#a56237bdae03e917fa4cd332944557bc5">M3::float_t</a></div><div class="ttdeci">double float_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00037">Core.h:37</a></div></div>
 </div><!-- fragment -->
 </div>

@@ -188,20 +188,20 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classM3_1_1IPlugin.html#ae8ad25f20cf93722239c569bca8ef32e">M3::IPlugin</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DiagMCMCModule_8cpp_source.html#l00016">16</a> of file <a class="el" href="DiagMCMCModule_8cpp_source.html">DiagMCMCModule.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                                 {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a> = std::make_unique&lt;MaCh3ArgumentParser&gt;(<span class="stringliteral">&quot;diag&quot;</span>, <span class="stringliteral">&quot;1.0&quot;</span>, argparse::default_arguments::help);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_description(<span class="stringliteral">&quot;Tool for MCMC diagnostic like autocorrelations.&quot;</span>);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_argument(<span class="stringliteral">&quot;mcmc-output&quot;</span>)</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      .help(<span class="stringliteral">&quot;MCMC chain root file.&quot;</span>)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      .metavar(<span class="stringliteral">&quot;MCMC_CHAIN&quot;</span>)</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      .required();</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_argument(<span class="stringliteral">&quot;config&quot;</span>)</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      .help(<span class="stringliteral">&quot;Config file.&quot;</span>)</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      .metavar(<span class="stringliteral">&quot;CONFIG&quot;</span>)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      .required();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>.get();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="DiagMCMCModule_8cpp_source.html#l00015">15</a> of file <a class="el" href="DiagMCMCModule_8cpp_source.html">DiagMCMCModule.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;                                                 {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a> = std::make_unique&lt;MaCh3ArgumentParser&gt;(<span class="stringliteral">&quot;diag&quot;</span>, <span class="stringliteral">&quot;1.0&quot;</span>, argparse::default_arguments::help);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_description(<span class="stringliteral">&quot;Tool for MCMC diagnostic like autocorrelations.&quot;</span>);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_argument(<span class="stringliteral">&quot;mcmc-output&quot;</span>)</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      .help(<span class="stringliteral">&quot;MCMC chain root file.&quot;</span>)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      .metavar(<span class="stringliteral">&quot;MCMC_CHAIN&quot;</span>)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      .required();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;add_argument(<span class="stringliteral">&quot;config&quot;</span>)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      .help(<span class="stringliteral">&quot;Config file.&quot;</span>)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      .metavar(<span class="stringliteral">&quot;CONFIG&quot;</span>)</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      .required();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>.get();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1PluginBase_html_a5c7e3ecc7cfb8d91889fadf2dacf2f23"><div class="ttname"><a href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">M3::PluginBase::m_parser</a></div><div class="ttdeci">std::unique_ptr&lt; MaCh3ArgumentParser &gt; m_parser</div><div class="ttdoc">Argument parser for this plugin.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00044">plugin.hpp:44</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -242,38 +242,38 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classM3_1_1IPlugin.html#ae7743d20286ed2907623673fe3459dd1">M3::IPlugin</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DiagMCMCModule_8cpp_source.html#l00034">34</a> of file <a class="el" href="DiagMCMCModule_8cpp_source.html">DiagMCMCModule.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                          {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Producing single fit output&quot;</span>);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    std::string inputFile = <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;get&lt;std::string&gt;(<span class="stringliteral">&quot;mcmc-output&quot;</span>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    std::string config = <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;get&lt;std::string&gt;(<span class="stringliteral">&quot;config&quot;</span>);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;File for study: {}&quot;</span>, inputFile);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    YAML::Node Settings = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(config);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// Make the processor</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">auto</span> Processor = std::make_unique&lt;MCMCProcessor&gt;(inputFile);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    Processor-&gt;SetOutputSuffix(<span class="stringliteral">&quot;_MCMC_Diag&quot;</span>);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">//KS:Turn off plotting detector and some other setting</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    Processor-&gt;SetExcludedTypes(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedTypes&quot;</span>], {}, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    Processor-&gt;SetExcludedNames(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedNames&quot;</span>], {}, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    Processor-&gt;SetExcludedGroups(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedGroups&quot;</span>], {}, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    Processor-&gt;SetPlotRelativeToPrior(GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;PlotRelativeToPrior&quot;</span>], <span class="keyword">false</span>, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">//KS: Use 20 batches for batched means</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    Processor-&gt;SetnBatches(GetFromManager&lt;int&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;nBatches&quot;</span>], 20, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    Processor-&gt;SetnLags(GetFromManager&lt;int&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;nLags&quot;</span>], 25000, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    Processor-&gt;SetPrintToPDF(GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;PrintToPDF&quot;</span>], <span class="keyword">true</span>, __FILE__, __LINE__));</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    Processor-&gt;Initialise();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">if</span>(Settings[<span class="stringliteral">&quot;MaxEntries&quot;</span>]) {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        Processor-&gt;SetEntries(Get&lt;int&gt;(Settings[<span class="stringliteral">&quot;MaxEntries&quot;</span>], __FILE__, __LINE__));</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">//KS: finally call main method</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    Processor-&gt;DiagMCMC();</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="DiagMCMCModule_8cpp_source.html#l00033">33</a> of file <a class="el" href="DiagMCMCModule_8cpp_source.html">DiagMCMCModule.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                          {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Producing single fit output&quot;</span>);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    std::string inputFile = <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;get&lt;std::string&gt;(<span class="stringliteral">&quot;mcmc-output&quot;</span>);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    std::string config = <a class="code" href="classM3_1_1PluginBase.html#a5c7e3ecc7cfb8d91889fadf2dacf2f23">m_parser</a>-&gt;get&lt;std::string&gt;(<span class="stringliteral">&quot;config&quot;</span>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;File for study: {}&quot;</span>, inputFile);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    YAML::Node Settings = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(config);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">// Make the processor</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">auto</span> Processor = std::make_unique&lt;MCMCProcessor&gt;(inputFile);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    Processor-&gt;SetOutputSuffix(<span class="stringliteral">&quot;_MCMC_Diag&quot;</span>);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="comment">//KS:Turn off plotting detector and some other setting</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    Processor-&gt;SetExcludedTypes(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedTypes&quot;</span>], {}, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    Processor-&gt;SetExcludedNames(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedNames&quot;</span>], {}, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    Processor-&gt;SetExcludedGroups(<a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>&lt;std::vector&lt;std::string&gt;&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;ExcludedGroups&quot;</span>], {}, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    Processor-&gt;SetPlotRelativeToPrior(GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;PlotRelativeToPrior&quot;</span>], <span class="keyword">false</span>, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">//KS: Use 20 batches for batched means</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    Processor-&gt;SetnBatches(GetFromManager&lt;int&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;nBatches&quot;</span>], 20, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    Processor-&gt;SetnLags(GetFromManager&lt;int&gt;(Settings[<span class="stringliteral">&quot;DiagMCMC&quot;</span>][<span class="stringliteral">&quot;nLags&quot;</span>], 25000, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    Processor-&gt;SetPrintToPDF(GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;PrintToPDF&quot;</span>], <span class="keyword">true</span>, __FILE__, __LINE__));</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    Processor-&gt;Initialise();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">if</span>(Settings[<span class="stringliteral">&quot;MaxEntries&quot;</span>]) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        Processor-&gt;SetEntries(Get&lt;int&gt;(Settings[<span class="stringliteral">&quot;MaxEntries&quot;</span>], __FILE__, __LINE__));</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//KS: finally call main method</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    Processor-&gt;DiagMCMC();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00060">MaCh3Logger.h:60</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_a99b6a2259dcdf8e2875c807a793d7cd1"><div class="ttname"><a href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a></div><div class="ttdeci">Type GetFromManager(const YAML::Node &amp;node, const Type defval, const std::string &amp;File, const int Line)</div><div class="ttdoc">Get content of config file if node is not found take default value specified.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00328">YamlHelper.h:328</a></div></div>

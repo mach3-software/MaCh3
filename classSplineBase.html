@@ -96,15 +96,15 @@ Inheritance diagram for SplineBase:</div>
 <div class="dynheader">
 Collaboration diagram for SplineBase:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classSplineBase__coll__graph.svg" width="202" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classSplineBase__coll__graph.svg" width="360" height="216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">SplineBase</a> ()</td></tr>
-<tr class="memdesc:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">More...</a><br /></td></tr>
-<tr class="separator:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5716d4cc4b9ed5f6b2c9017b98c8301"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ae5716d4cc4b9ed5f6b2c9017b98c8301">SplineBase</a> (const bool Use_GPU=true)</td></tr>
+<tr class="memdesc:ae5716d4cc4b9ed5f6b2c9017b98c8301"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classSplineBase.html#ae5716d4cc4b9ed5f6b2c9017b98c8301">More...</a><br /></td></tr>
+<tr class="separator:ae5716d4cc4b9ed5f6b2c9017b98c8301"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0de19b2322edb4197380506d594456bd"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a0de19b2322edb4197380506d594456bd">~SplineBase</a> ()</td></tr>
 <tr class="memdesc:a0de19b2322edb4197380506d594456bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="classSplineBase.html#a0de19b2322edb4197380506d594456bd">More...</a><br /></td></tr>
 <tr class="separator:a0de19b2322edb4197380506d594456bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,9 +123,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ad107ad4a91c5de35f14f3805bc52c1d3">LoadSplineFile</a> (std::string FileName)=0</td></tr>
 <tr class="memdesc:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Load preprocessed spline file.  <a href="classSplineBase.html#ad107ad4a91c5de35f14f3805bc52c1d3">More...</a><br /></td></tr>
 <tr class="separator:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">SynchroniseMemTransfer</a> () const =0</td></tr>
-<tr class="memdesc:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">More...</a><br /></td></tr>
-<tr class="separator:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1621487bd81622a932393413d84432b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a1621487bd81622a932393413d84432b7">SynchroniseMemTransfer</a> () const</td></tr>
+<tr class="memdesc:a1621487bd81622a932393413d84432b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classSplineBase.html#a1621487bd81622a932393413d84432b7">More...</a><br /></td></tr>
+<tr class="separator:a1621487bd81622a932393413d84432b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -144,6 +144,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a106518719051d8179d2e4f967b8fa932"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">GetTF1Coeff</a> (<a class="el" href="classTF1__red.html">TF1_red</a> *&amp;spl, int &amp;nPoints, float *&amp;coeffs) const</td></tr>
 <tr class="memdesc:a106518719051d8179d2e4f967b8fa932"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Gets the polynomial coefficients for TF1.  <a href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">More...</a><br /></td></tr>
 <tr class="separator:a106518719051d8179d2e4f967b8fa932"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb04f73789874c39938910ac53909367"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#afb04f73789874c39938910ac53909367">SetupSegments</a> ()</td></tr>
+<tr class="memdesc:afb04f73789874c39938910ac53909367"><td class="mdescLeft">&#160;</td><td class="mdescRight">Since we find segment before actual reweight and sometimes we want to copy it to GPU we have different functionality depending if GPU or CPU.  <a href="classSplineBase.html#afb04f73789874c39938910ac53909367">More...</a><br /></td></tr>
+<tr class="separator:afb04f73789874c39938910ac53909367"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -157,6 +160,18 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a2165b057a0125a28d96f247ca8680b42"><td class="memItemLeft" align="right" valign="top">short int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a></td></tr>
 <tr class="memdesc:a2165b057a0125a28d96f247ca8680b42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of parameters that have splines.  <a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">More...</a><br /></td></tr>
 <tr class="separator:a2165b057a0125a28d96f247ca8680b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31247a703b0996de2dcaf1195bf0147d"><td class="memItemLeft" align="right" valign="top">short int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a31247a703b0996de2dcaf1195bf0147d">_max_knots</a></td></tr>
+<tr class="memdesc:a31247a703b0996de2dcaf1195bf0147d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Max knots for production.  <a href="classSplineBase.html#a31247a703b0996de2dcaf1195bf0147d">More...</a><br /></td></tr>
+<tr class="separator:a31247a703b0996de2dcaf1195bf0147d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19b1dcc33cc6642c91cf055baba10c21"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a19b1dcc33cc6642c91cf055baba10c21">NSplines_valid</a></td></tr>
+<tr class="memdesc:a19b1dcc33cc6642c91cf055baba10c21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of valid splines.  <a href="classSplineBase.html#a19b1dcc33cc6642c91cf055baba10c21">More...</a><br /></td></tr>
+<tr class="separator:a19b1dcc33cc6642c91cf055baba10c21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a020ee092aa76ec045c1e2148d5bcf295"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSplineMonolithGPU.html">SplineMonolithGPU</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">gpu_monolith</a></td></tr>
+<tr class="memdesc:a020ee092aa76ec045c1e2148d5bcf295"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.  <a href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">More...</a><br /></td></tr>
+<tr class="separator:a020ee092aa76ec045c1e2148d5bcf295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3d55f65dfbe924683a4e463b3acb016"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a></td></tr>
+<tr class="memdesc:ab3d55f65dfbe924683a4e463b3acb016"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to use GPU or not.  <a href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">More...</a><br /></td></tr>
+<tr class="separator:ab3d55f65dfbe924683a4e463b3acb016"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -170,10 +185,10 @@ Private Member Functions</h2></td></tr>
 <dd>
 Kamil Skwarczynski </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00027">27</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00030">30</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aa6965d1522cc68ecf81ac3bfd2dcd6f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6965d1522cc68ecf81ac3bfd2dcd6f1">&#9670;&nbsp;</a></span>SplineBase()</h2>
+<a id="ae5716d4cc4b9ed5f6b2c9017b98c8301"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5716d4cc4b9ed5f6b2c9017b98c8301">&#9670;&nbsp;</a></span>SplineBase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -181,7 +196,8 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="memname">SplineBase::SplineBase </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>Use_GPU</em> = <code>true</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -189,16 +205,33 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00007">7</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;                       {</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// *****************************************</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> = 0;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00108">SplineBase.h:108</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00104">SplineBase.h:104</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00106">SplineBase.h:106</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00011">11</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                                                    {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a> = Use_GPU;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a>) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Using GPU version of {}&quot;</span>, <a class="code" href="classSplineBase.html#a2e1534f622ae1976b21df1ebf984eec5">GetName</a>());</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <a class="code" href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">gpu_monolith</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">  #else</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="comment">// if we don&#39;t have GPU simply</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <a class="code" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="classSplineBase.html#a19b1dcc33cc6642c91cf055baba10c21">NSplines_valid</a> = 0;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> = 0;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classSplineBase.html#a31247a703b0996de2dcaf1195bf0147d">_max_knots</a> = 0;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;}</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a020ee092aa76ec045c1e2148d5bcf295"><div class="ttname"><a href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">SplineBase::gpu_monolith</a></div><div class="ttdeci">SplineMonolithGPU * gpu_monolith</div><div class="ttdoc">KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary informa...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00120">SplineBase.h:120</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a19b1dcc33cc6642c91cf055baba10c21"><div class="ttname"><a href="classSplineBase.html#a19b1dcc33cc6642c91cf055baba10c21">SplineBase::NSplines_valid</a></div><div class="ttdeci">unsigned int NSplines_valid</div><div class="ttdoc">Number of valid splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00117">SplineBase.h:117</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00113">SplineBase.h:113</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2e1534f622ae1976b21df1ebf984eec5"><div class="ttname"><a href="classSplineBase.html#a2e1534f622ae1976b21df1ebf984eec5">SplineBase::GetName</a></div><div class="ttdeci">virtual std::string GetName() const</div><div class="ttdoc">Get class name.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00041">SplineBase.h:41</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a31247a703b0996de2dcaf1195bf0147d"><div class="ttname"><a href="classSplineBase.html#a31247a703b0996de2dcaf1195bf0147d">SplineBase::_max_knots</a></div><div class="ttdeci">short int _max_knots</div><div class="ttdoc">Max knots for production.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00115">SplineBase.h:115</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00109">SplineBase.h:109</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00111">SplineBase.h:111</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_ab3d55f65dfbe924683a4e463b3acb016"><div class="ttname"><a href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">SplineBase::useGPU</a></div><div class="ttdeci">bool useGPU</div><div class="ttdoc">Whether to use GPU or not.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00123">SplineBase.h:123</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -227,10 +260,10 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00016">16</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                        {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// *****************************************</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00030">30</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                        {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -337,22 +370,22 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00021">21</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                                                              {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">if</span> (xPts[segment] &gt; xvar &amp;&amp; segment != 0) {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found a segment which is _ABOVE_ the variation!&quot;</span>);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;IT SHOULD ALWAYS BE BELOW! (except when segment 0)&quot;</span>);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Spline: {}&quot;</span>, i);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found segment = {}&quot;</span>, segment);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Doing variation = {}&quot;</span>, xvar);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;x in spline = {}&quot;</span>, xPts[segment]);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; xPts.size(); ++j) {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;    {} = {}&quot;</span>, j, xPts[j]);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00035">35</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                                                                              {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span> (xPts[segment] &gt; xvar &amp;&amp; segment != 0) {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found a segment which is _ABOVE_ the variation!&quot;</span>);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;IT SHOULD ALWAYS BE BELOW! (except when segment 0)&quot;</span>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Spline: {}&quot;</span>, i);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Found segment = {}&quot;</span>, segment);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Doing variation = {}&quot;</span>, xvar);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;x in spline = {}&quot;</span>, xPts[segment]);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; xPts.size(); ++j) {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;    {} = {}&quot;</span>, j, xPts[j]);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 </div><!-- fragment -->
@@ -412,75 +445,75 @@ Kamil Skwarczynski </dd></dl>
 
 <p>CW:Code used in step by step reweighting, Find Spline Segment for each param. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00044">44</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                   {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="comment">// Loop over the splines</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="comment">//KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">const</span> std::vector&lt;M3::float_t&gt;&amp; xArray = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="comment">// Get the variation for this reconfigure for the ith parameter</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> xvar = float(*<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].splineParsPointer);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>[i] = xvar;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">// EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">//     In principle, such parameters shouldn&#39;t really be included in the first place, but with new det syst splines this</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span>(xArray.size() == 0) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> segment = 0;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHigh = nPoints-1;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="comment">//KS: We expect new segment is very close to previous</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> PreviousSegment = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span> (xvar &lt;= xArray[0]) {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      segment = 0;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="comment">// If the variation is above the highest saved spline point</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvar &gt;= xArray[nPoints-1]) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      <span class="comment">//CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      segment = kHigh;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="comment">//KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( xArray[PreviousSegment+1] &gt; xvar &amp;&amp; xvar &gt;= xArray[PreviousSegment] ) {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      segment = PreviousSegment;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="comment">// The top point we&#39;ve got</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHalf = 0;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="comment">// Increment the half-step</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        kHalf = <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>((segment + kHigh)/2);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordflow">if</span> (xvar &gt; xArray[kHalf]) {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;          segment = kHalf;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;          <span class="comment">// Else move kHigh down</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          kHigh = kHalf;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">if</span> (segment &gt;= nPoints-1 &amp;&amp; nPoints &gt; 1) segment = nPoints-2;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">// CW: This way we avoid doing 1.2M+ binary searches on the GPU</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">// and literally just multiply lots of numbers together on the GPU without any algorithm</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">// Update the values and which segment it belongs to</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment = segment;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>[i] = short(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">    #ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classSplineBase.html#a0e155d6a6e0d1475880f669006405408">CheckSegmentValidity</a>(i, segment, xvar, <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  } <span class="comment">//end loop over params</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_a0e155d6a6e0d1475880f669006405408"><div class="ttname"><a href="classSplineBase.html#a0e155d6a6e0d1475880f669006405408">SplineBase::CheckSegmentValidity</a></div><div class="ttdeci">void CheckSegmentValidity(const M3::int_t i, const M3::int_t segment, const M3::float_t xvar, const std::vector&lt; M3::float_t &gt; &amp;xPts) const</div><div class="ttdoc">Validates that the spline segment is correct for the given variation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00021">SplineBase.cpp:21</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00101">SplineBase.h:101</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00058">58</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                   {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// Loop over the splines</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">//KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">const</span> std::vector&lt;M3::float_t&gt;&amp; xArray = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="comment">// Get the variation for this reconfigure for the ith parameter</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">float</span> xvar = float(*<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].splineParsPointer);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>[i] = xvar;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">// EM: if we have a parameter that has no response for any event (i.e. all splines have just one knot), then skip it and avoid a seg fault here</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="comment">//     In principle, such parameters shouldn&#39;t really be included in the first place, but with new det syst splines this</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">//     could happen if say you were just running on one FHC run, then all RHC parameters would be flat and the code below would break.</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">if</span>(xArray.size() == 0) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> segment = 0;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHigh = nPoints-1;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="comment">//KS: We expect new segment is very close to previous</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> PreviousSegment = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">if</span> (xvar &lt;= xArray[0]) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      segment = 0;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="comment">// If the variation is above the highest saved spline point</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (xvar &gt;= xArray[nPoints-1]) {</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="comment">//CW: Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      segment = kHigh;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="comment">//KS: It is quite probable the new segment is same as in previous step so try to avoid binary search, first we have to check if it is in bounds to avoid seg fault</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( xArray[PreviousSegment+1] &gt; xvar &amp;&amp; xvar &gt;= xArray[PreviousSegment] ) {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      segment = PreviousSegment;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="comment">// The top point we&#39;ve got</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> kHalf = 0;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="comment">// Increment the half-step</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        kHalf = <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>((segment + kHigh)/2);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">if</span> (xvar &gt; xArray[kHalf]) {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          segment = kHalf;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;          <span class="comment">// Else move kHigh down</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;          kHigh = kHalf;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">if</span> (segment &gt;= nPoints-1 &amp;&amp; nPoints &gt; 1) segment = nPoints-2;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="comment">// CW: This way we avoid doing 1.2M+ binary searches on the GPU</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">// and literally just multiply lots of numbers together on the GPU without any algorithm</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">// Update the values and which segment it belongs to</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment = segment;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>[i] = short(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].CurrSegment);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">    #ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="classSplineBase.html#a0e155d6a6e0d1475880f669006405408">CheckSegmentValidity</a>(i, segment, xvar, <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  } <span class="comment">//end loop over params</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
+<div class="ttc" id="aclassSplineBase_html_a0e155d6a6e0d1475880f669006405408"><div class="ttname"><a href="classSplineBase.html#a0e155d6a6e0d1475880f669006405408">SplineBase::CheckSegmentValidity</a></div><div class="ttdeci">void CheckSegmentValidity(const M3::int_t i, const M3::int_t segment, const M3::float_t xvar, const std::vector&lt; M3::float_t &gt; &amp;xPts) const</div><div class="ttdoc">Validates that the spline segment is correct for the given variation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00035">SplineBase.cpp:35</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00106">SplineBase.h:106</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00038">Core.h:38</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -512,8 +545,8 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classUnbinnedSplineHandler.html#abf064f47a31207fb05e054e366e32bea">UnbinnedSplineHandler</a>, and <a class="el" href="classPySplineBase.html#a00fe8ae11d3ca09811cfcf8affd66262">PySplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00038">38</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{<span class="keywordflow">return</span> <span class="stringliteral">&quot;SplineBase&quot;</span>;};</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00041">41</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{<span class="keywordflow">return</span> <span class="stringliteral">&quot;SplineBase&quot;</span>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -542,8 +575,8 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Get number of spline parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00041">41</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>;};</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00044">44</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -597,29 +630,29 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00115">115</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                                                                               {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">// *****************************************</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="comment">// Initialise all arrays to 1.0</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>; ++i) {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    coeffs[i] = 0.0;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="comment">// Get number of points in spline</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  nPoints = spl-&gt;<a class="code" href="classTF1__red.html#a9b9bb6dddca958d36442521dff0067eb">GetSize</a>();</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keywordflow">if</span>(nPoints &gt; <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Too big number of points for TF1&quot;</span>);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="comment">// TSpline3 can only take doubles, not floats</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="comment">// But our GPU is slow with doubles, so need to cast to float</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nPoints; i++) {</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    coeffs[i] = float(spl-&gt;<a class="code" href="classTF1__red.html#a0828b0f5490033f25a5cfed97d0125fb">GetParameter</a>(<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(i)));</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00129">129</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;                                                                               {</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="comment">// Initialise all arrays to 1.0</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>; ++i) {</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    coeffs[i] = 0.0;</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">// The structure is now coeffs  = {a,b,c,d,e}</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="comment">// Get number of points in spline</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  nPoints = spl-&gt;<a class="code" href="classTF1__red.html#a9b9bb6dddca958d36442521dff0067eb">GetSize</a>();</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="keywordflow">if</span>(nPoints &gt; <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Too big number of points for TF1&quot;</span>);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="comment">// TSpline3 can only take doubles, not floats</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="comment">// But our GPU is slow with doubles, so need to cast to float</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nPoints; i++) {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    coeffs[i] = float(spl-&gt;<a class="code" href="classTF1__red.html#a0828b0f5490033f25a5cfed97d0125fb">GetParameter</a>(<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(i)));</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="comment">// The structure is now coeffs  = {a,b,c,d,e}</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
 <div class="ttc" id="aSplineCommon_8h_html_ad6cacf3d45a37eeeeffe38ad24345d54"><div class="ttname"><a href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a></div><div class="ttdeci">constexpr int _nTF1Coeff_</div><div class="ttdoc">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it her...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00020">SplineCommon.h:20</a></div></div>
 <div class="ttc" id="aclassTF1__red_html_a0828b0f5490033f25a5cfed97d0125fb"><div class="ttname"><a href="classTF1__red.html#a0828b0f5490033f25a5cfed97d0125fb">TF1_red::GetParameter</a></div><div class="ttdeci">double GetParameter(M3::int_t Parameter) const</div><div class="ttdoc">Get a parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00223">SplineStructs.h:223</a></div></div>
 <div class="ttc" id="aclassTF1__red_html_a9b9bb6dddca958d36442521dff0067eb"><div class="ttname"><a href="classTF1__red.html#a9b9bb6dddca958d36442521dff0067eb">TF1_red::GetSize</a></div><div class="ttdeci">int GetSize() const</div><div class="ttdoc">Get the size.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00238">SplineStructs.h:238</a></div></div>
@@ -658,32 +691,32 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00167">167</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;                                                                       {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment">// *****************************************</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  TTree *FastSplineInfoTree = SplineFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keywordtype">float</span> xtemp[20];</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  FastSplineInfoTree-&gt;SetBranchAddress(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  FastSplineInfoTree-&gt;SetBranchAddress(<span class="stringliteral">&quot;xPts&quot;</span>, &amp;xtemp);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> == 0){</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Calling {} with {} number of params&quot;</span>, __func__, <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>);</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  }</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>.resize(<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i) {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    FastSplineInfoTree-&gt;GetEntry(i);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="comment">// Fill the number of points</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts = nPoints;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">if</span>(nPoints == -999) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts.resize(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts; ++k)</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    {</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts[k] = xtemp[k];</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    }</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00181">181</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                                                                       {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  TTree *FastSplineInfoTree = SplineFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="keywordtype">float</span> xtemp[20];</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  FastSplineInfoTree-&gt;SetBranchAddress(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  FastSplineInfoTree-&gt;SetBranchAddress(<span class="stringliteral">&quot;xPts&quot;</span>, &amp;xtemp);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> == 0){</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Calling {} with {} number of params&quot;</span>, __func__, <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  }</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>.resize(<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i) {</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    FastSplineInfoTree-&gt;GetEntry(i);</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">// Fill the number of points</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts = nPoints;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span>(nPoints == -999) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts.resize(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts; ++k)</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts[k] = xtemp[k];</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    }</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  }</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -756,32 +789,32 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00139">139</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                                                                                {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment">// *****************************************</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  TTree *FastSplineInfoTree = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>, <span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordtype">float</span> xtemp[20];</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints, <span class="stringliteral">&quot;nPts/I&quot;</span>);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;xPts&quot;</span>, xtemp, <span class="stringliteral">&quot;xPts[nPts]/F&quot;</span>);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  {</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    nPoints = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts; ++k)</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    {</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      xtemp[k] = float(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts[k]);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    FastSplineInfoTree-&gt;Fill();</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  SplineFile-&gt;cd();</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  FastSplineInfoTree-&gt;Write();</div>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00153">153</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                                                                                {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  TTree *FastSplineInfoTree = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>, <span class="stringliteral">&quot;FastSplineInfoTree&quot;</span>);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = 0;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keywordtype">float</span> xtemp[20];</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;nPts&quot;</span>, &amp;nPoints, <span class="stringliteral">&quot;nPts/I&quot;</span>);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  FastSplineInfoTree-&gt;Branch(<span class="stringliteral">&quot;xPts&quot;</span>, xtemp, <span class="stringliteral">&quot;xPts[nPts]/F&quot;</span>);</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keyword">delete</span> FastSplineInfoTree;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    nPoints = <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> k = 0; k &lt; <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts; ++k)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      xtemp[k] = float(<a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts[k]);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    }</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    FastSplineInfoTree-&gt;Fill();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  }</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  SplineFile-&gt;cd();</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  FastSplineInfoTree-&gt;Write();</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keyword">delete</span> FastSplineInfoTree;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -815,8 +848,8 @@ Kamil Skwarczynski </dd></dl>
 
 </div>
 </div>
-<a id="aec23c4a87dbbd3b2c0329c93ebbd72c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec23c4a87dbbd3b2c0329c93ebbd72c0">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
+<a id="afb04f73789874c39938910ac53909367"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb04f73789874c39938910ac53909367">&#9670;&nbsp;</a></span>SetupSegments()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -825,26 +858,132 @@ Kamil Skwarczynski </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void SplineBase::SynchroniseMemTransfer </td>
+          <td class="memname">void SplineBase::SetupSegments </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Since we find segment before actual reweight and sometimes we want to copy it to GPU we have different functionality depending if GPU or CPU. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00208">208</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                               {</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment">// *****************************************</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="comment">//KS: Since we are going to copy it each step use fancy CUDA memory allocation</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a>) {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <a class="code" href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">gpu_monolith</a>-&gt;<a class="code" href="classSplineMonolithGPU.html#a800df84031e179e0aa1402d576a33fb9">InitGPU_Segments</a>(&amp;<a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <a class="code" href="classSplineBase.html#a020ee092aa76ec045c1e2148d5bcf295">gpu_monolith</a>-&gt;<a class="code" href="classSplineMonolithGPU.html#a4308be103ff4bcabd59a44ef336d8ce4">InitGPU_Vals</a>(&amp;<a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  } <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">new</span> <span class="keywordtype">short</span> <span class="keywordtype">int</span>[<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>]();</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>]();</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="comment">//ETA - let this just be set as the first segment by default</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> j = 0; j &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; j++)</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>[j] = 0;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>[j] = -999;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
+<div class="ttc" id="aclassSplineMonolithGPU_html_a4308be103ff4bcabd59a44ef336d8ce4"><div class="ttname"><a href="classSplineMonolithGPU.html#a4308be103ff4bcabd59a44ef336d8ce4">SplineMonolithGPU::InitGPU_Vals</a></div><div class="ttdeci">__host__ void InitGPU_Vals(float **vals)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00191">gpuSplineUtils.cu:191</a></div></div>
+<div class="ttc" id="aclassSplineMonolithGPU_html_a800df84031e179e0aa1402d576a33fb9"><div class="ttname"><a href="classSplineMonolithGPU.html#a800df84031e179e0aa1402d576a33fb9">SplineMonolithGPU::InitGPU_Segments</a></div><div class="ttdeci">__host__ void InitGPU_Segments(short int **segment)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00182">gpuSplineUtils.cu:182</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1621487bd81622a932393413d84432b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1621487bd81622a932393413d84432b7">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SplineBase::SynchroniseMemTransfer </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied. </p>
 
-<p>Implemented in <a class="el" href="classUnbinnedSplineHandler.html#a36f8064516e244961d852fd01eab8424">UnbinnedSplineHandler</a>, and <a class="el" href="classBinnedSplineHandler.html#af4f79130a7c92a6774eeaa2fbd24cb34">BinnedSplineHandler</a>.</p>
-
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00231">231</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                                              {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016">useGPU</a>) {</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <a class="code" href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a>();</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <a class="code" href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a>();</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;}</div>
+<div class="ttc" id="agpuSplineUtils_8cu_html_a953e5c5aecebd908f5d8c6ad64de482c"><div class="ttname"><a href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a></div><div class="ttdeci">__host__ void SynchroniseSplines()</div><div class="ttdoc">Make sure all Cuda threads finished execution.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00050">gpuSplineUtils.cu:50</a></div></div>
+<div class="ttc" id="agpuUtils_8cuh_html_a0345e89c96b417069f1e64674cc77318"><div class="ttname"><a href="gpuUtils_8cuh.html#a0345e89c96b417069f1e64674cc77318">CudaCheckError</a></div><div class="ttdeci">#define CudaCheckError()</div><div class="ttdef"><b>Definition:</b> <a href="gpuUtils_8cuh_source.html#l00021">gpuUtils.cuh:21</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a31247a703b0996de2dcaf1195bf0147d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31247a703b0996de2dcaf1195bf0147d">&#9670;&nbsp;</a></span>_max_knots</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">short int SplineBase::_max_knots</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Max knots for production. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00115">115</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+
+</div>
+</div>
+<a id="a020ee092aa76ec045c1e2148d5bcf295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a020ee092aa76ec045c1e2148d5bcf295">&#9670;&nbsp;</a></span>gpu_monolith</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSplineMonolithGPU.html">SplineMonolithGPU</a>* SplineBase::gpu_monolith</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00120">120</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+
+</div>
+</div>
 <a id="a2165b057a0125a28d96f247ca8680b42"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2165b057a0125a28d96f247ca8680b42">&#9670;&nbsp;</a></span>nParams</h2>
 
@@ -867,7 +1006,33 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Number of parameters that have splines. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00108">108</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00113">113</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+
+</div>
+</div>
+<a id="a19b1dcc33cc6642c91cf055baba10c21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19b1dcc33cc6642c91cf055baba10c21">&#9670;&nbsp;</a></span>NSplines_valid</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int SplineBase::NSplines_valid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of valid splines. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00117">117</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -893,7 +1058,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Store parameter values they are not in <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified parameters and help with FindSplineSegment.">FastSplineInfo</a> as in case of GPU we need to copy paste it to GPU. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00106">106</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00111">111</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -918,7 +1083,7 @@ Kamil Skwarczynski </dd></dl>
 </div><div class="memdoc">
 <p>Array of <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified parameters and help with FindSplineSegment.">FastSplineInfo</a> structs: keeps information on each xsec spline for fast evaluation Method identical to TSpline3::Eval(double) but faster because less operations </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00101">101</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00106">106</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -943,7 +1108,33 @@ Kamil Skwarczynski </dd></dl>
 </div><div class="memdoc">
 <p>Store currently found segment they are not in <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified parameters and help with FindSplineSegment.">FastSplineInfo</a> as in case of GPU we need to copy paste it to GPU </p><dl class="section warning"><dt>Warning</dt><dd>this is being used sometimes by GPU, therefore must be raw pointer! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00104">104</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00109">109</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+
+</div>
+</div>
+<a id="ab3d55f65dfbe924683a4e463b3acb016"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3d55f65dfbe924683a4e463b3acb016">&#9670;&nbsp;</a></span>useGPU</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SplineBase::useGPU</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether to use GPU or not. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00123">123</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>

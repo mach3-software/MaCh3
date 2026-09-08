@@ -50,7 +50,7 @@ var searchData=
   ['_5flow_5fmc_5fbound_5f_57',['_LOW_MC_BOUND_',['../namespaceM3.html#ad6bd1a7e1e5b714f2985b91f8bdc4104',1,'M3']]],
   ['_5fmach3_5fsafe_5finclude_5fend_5f_58',['_MaCh3_Safe_Include_End_',['../Core_8h.html#a91209a17295738b34b124b79faa68a1b',1,'Core.h']]],
   ['_5fmach3_5fsafe_5finclude_5fstart_5f_59',['_MaCh3_Safe_Include_Start_',['../Core_8h.html#a46b8fa28114cf68de4549061568b5ade',1,'Core.h']]],
-  ['_5fmax_5fknots_60',['_max_knots',['../classUnbinnedSplineHandler.html#a8b2aa6ba6206ee64829814ee04fd450a',1,'UnbinnedSplineHandler']]],
+  ['_5fmax_5fknots_60',['_max_knots',['../classSplineBase.html#a31247a703b0996de2dcaf1195bf0147d',1,'SplineBase']]],
   ['_5fmodenomweightmap_61',['_modeNomWeightMap',['../classSampleHandlerBase.html#a42639b039695ec4bffc4e40b4aceaede',1,'SampleHandlerBase']]],
   ['_5fncoeff_5f_62',['_nCoeff_',['../SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf',1,'SplineCommon.h']]],
   ['_5fnoexcept_5f_63',['_noexcept_',['../Core_8h.html#a2abc3d82639661d84964bed9e2df0e68',1,'Core.h']]],

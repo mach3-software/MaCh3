@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: Fitters/PredictiveThrower.cpp File Reference</title>
+<title>MaCh3: Fitters/Algorithms/PredictiveThrower.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -72,7 +72,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li><li class="navelem"><a class="el" href="dir_7e24bcd91ba4ec1504f4cc616018a715.html">Algorithms</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -82,7 +82,7 @@ $(function() {
 <div class="title">PredictiveThrower.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="PredictiveThrower_8h_source.html">PredictiveThrower.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="PredictiveThrower_8h_source.html">Algorithms/PredictiveThrower.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="ParameterHandlerGeneric_8h_source.html">Parameters/ParameterHandlerGeneric.h</a>&quot;</code><br />
 <code>#include &quot;TH3.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -154,21 +154,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01932">1932</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;                                                                               {</div>
-<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;<span class="comment">// ****************</span></div>
-<div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;  <span class="comment">// Compute the mean log-likelihood and the squared mean</span></div>
-<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;  mean_llh /= Ntoys;</div>
-<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;  mean_llh_squared /= Ntoys;</div>
-<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160;  sum_exp_llh /= Ntoys;</div>
-<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;  sum_exp_llh = std::log(sum_exp_llh);</div>
-<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160; </div>
-<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;  <span class="comment">// Log pointwise predictive density based on Eq. 4 in Gelman2014</span></div>
-<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;  lppd += sum_exp_llh;</div>
-<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160; </div>
-<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;  <span class="comment">// Compute the effective number of parameters for WAIC</span></div>
-<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160;  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);</div>
-<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01934">1934</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;                                                                               {</div>
+<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;<span class="comment">// ****************</span></div>
+<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;  <span class="comment">// Compute the mean log-likelihood and the squared mean</span></div>
+<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160;  mean_llh /= Ntoys;</div>
+<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;  mean_llh_squared /= Ntoys;</div>
+<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160;  sum_exp_llh /= Ntoys;</div>
+<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;  sum_exp_llh = std::log(sum_exp_llh);</div>
+<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160; </div>
+<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160;  <span class="comment">// Log pointwise predictive density based on Eq. 4 in Gelman2014</span></div>
+<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;  lppd += sum_exp_llh;</div>
+<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160; </div>
+<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;  <span class="comment">// Compute the effective number of parameters for WAIC</span></div>
+<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);</div>
+<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -210,16 +210,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01917">1917</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;                                            {</div>
-<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;<span class="comment">// ****************</span></div>
-<div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;  <span class="comment">// Negate the negative log-likelihood to get the actual log-likelihood</span></div>
-<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;  <span class="keywordtype">double</span> LLH_temp = -neg_LLH_temp;</div>
-<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160; </div>
-<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;  mean_llh += LLH_temp;</div>
-<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;  mean_llh_squared += LLH_temp * LLH_temp;</div>
-<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;  sum_exp_llh += std::exp(LLH_temp);</div>
-<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01919">1919</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;                                            {</div>
+<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;<span class="comment">// ****************</span></div>
+<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="comment">// Negate the negative log-likelihood to get the actual log-likelihood</span></div>
+<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;  <span class="keywordtype">double</span> LLH_temp = -neg_LLH_temp;</div>
+<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160; </div>
+<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;  mean_llh += LLH_temp;</div>
+<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;  mean_llh_squared += LLH_temp * LLH_temp;</div>
+<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;  sum_exp_llh += std::exp(LLH_temp);</div>
+<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -249,19 +249,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00460">460</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;                                                                       {</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; BoundValuePointer.size(); ++i) {</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> val = *(BoundValuePointer[i]);</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> minVal = ParamBounds[i].first;</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> maxVal = ParamBounds[i].second;</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="keywordflow">if</span> (val &lt; minVal || val &gt; maxVal)</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// out of bounds</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  }</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// all values are within bounds</span></div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00462">462</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;                                                                       {</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; BoundValuePointer.size(); ++i) {</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> val = *(BoundValuePointer[i]);</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> minVal = ParamBounds[i].first;</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> maxVal = ParamBounds[i].second;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160; </div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="keywordflow">if</span> (val &lt; minVal || val &gt; maxVal)</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// out of bounds</span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  }</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// all values are within bounds</span></div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>

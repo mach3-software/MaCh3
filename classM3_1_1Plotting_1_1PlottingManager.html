@@ -326,11 +326,11 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Describe an option you want to add to the <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a> which can be read in from the command line and retrieved later with <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html#a4207e322abe2e417a55ca196cb64ff8f" title="Get a specific option from the config for this executable.">getOption()</a>. This should be done before calling <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html#ad9e079dc9b4837e48fcb889b0b2f0779" title="Parse command line arguments.">parseInputs()</a>. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000031">Todo:</a></b></dt><dd><p class="startdd">Would be good to add functionality to this to allow user to add their own options. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000032">Todo:</a></b></dt><dd><p class="startdd">Would be good to add functionality to this to allow user to add their own options. </p>
 <p class="interdd">The way I can think to do this would be have fn <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html#a6aa071649ea67bf0c626d266b5594e5b" title="Describe an option you want to add to the PlottingManager which can be read in from the command line ...">addUserOption()</a> to set the options, defining the cmd line option (e.g. -x), the name of the option, and maybe some description of the option to be used in the help message </p>
 <p class="enddd">can then store these options in some map or something to be retrieved later by <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html#a399a02dd500f82e200052d97e30dfa51" title="Retrieve a command line option you specified using addOption.">getUserOption()</a> </p>
 </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000032">Todo:</a></b></dt><dd>Implement this. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000033">Todo:</a></b></dt><dd>Implement this. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlottingManager_8cpp_source.html#l00188">188</a> of file <a class="el" href="PlottingManager_8cpp_source.html">PlottingManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                                    {</div>
@@ -762,7 +762,7 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Retrieve a command line option you specified using addOption. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000033">Todo:</a></b></dt><dd>Implement this. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000034">Todo:</a></b></dt><dd>Implement this. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlottingManager_8cpp_source.html#l00192">192</a> of file <a class="el" href="PlottingManager_8cpp_source.html">PlottingManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                                                                {</div>
@@ -795,7 +795,7 @@ template&lt;typename T &gt; </div>
 <li>Add all files specified in this PlottingManagers _fileNames vector to the new <a class="el" href="classM3_1_1Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> that was just created <dl class="section warning"><dt>Warning</dt><dd>This should always be called <em>After</em> <a class="el" href="classM3_1_1Plotting_1_1PlottingManager.html#ad9e079dc9b4837e48fcb889b0b2f0779" title="Parse command line arguments.">parseInputs()</a> unless you are manually specifying all input file names and config file names in your drawing application. </dd></dl>
 </li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000029">Todo:</a></b></dt><dd>should add some kind of validataConfigs() method to got through all of the specified config files and make sure that all provided options are valid and all necessary options are provided as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails to find an option at runtime </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000030">Todo:</a></b></dt><dd>should add some kind of validataConfigs() method to got through all of the specified config files and make sure that all provided options are valid and all necessary options are provided as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails to find an option at runtime </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlottingManager_8cpp_source.html#l00027">27</a> of file <a class="el" href="PlottingManager_8cpp_source.html">PlottingManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                                 {</div>
@@ -975,7 +975,7 @@ template&lt;typename T &gt; </div>
 <div class="line">unnamed options are treated as files to be processed</div>
 <div class="ttc" id="aclassM3_1_1Plotting_1_1PlottingManager_html_a25abad2cc827631bd1e5849aff606b35"><div class="ttname"><a href="classM3_1_1Plotting_1_1PlottingManager.html#a25abad2cc827631bd1e5849aff606b35">M3::Plotting::PlottingManager::input</a></div><div class="ttdeci">const InputManager &amp; input() const</div><div class="ttdoc">Get the InputManager contained within this PlottingManager, for doing input related things.</div><div class="ttdef"><b>Definition:</b> <a href="PlottingManager_8h_source.html#l00165">PlottingManager.h:165</a></div></div>
 <div class="ttc" id="aclassM3_1_1Plotting_1_1PlottingManager_html_ae78da8aaff53d21ca507e94d0379789d"><div class="ttname"><a href="classM3_1_1Plotting_1_1PlottingManager.html#ae78da8aaff53d21ca507e94d0379789d">M3::Plotting::PlottingManager::parseFileLabels</a></div><div class="ttdeci">void parseFileLabels(std::string labelString, std::vector&lt; std::string &gt; &amp;labelVec)</div><div class="ttdoc">Parse string of labels into a vector of strings.</div><div class="ttdef"><b>Definition:</b> <a href="PlottingManager_8cpp_source.html#l00271">PlottingManager.cpp:271</a></div></div>
-</div><!-- fragment --> <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000030">Todo:</a></b></dt><dd>make this able to return any un-parsed arguments so that user can specify their own arguments for use in their plotting scripts </dd></dl>
+</div><!-- fragment --> <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000031">Todo:</a></b></dt><dd>make this able to return any un-parsed arguments so that user can specify their own arguments for use in their plotting scripts </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlottingManager_8cpp_source.html#l00090">90</a> of file <a class="el" href="PlottingManager_8cpp_source.html">PlottingManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                                                              {</div>
@@ -1255,7 +1255,7 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Print a usage message for the current executable. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000034">Todo:</a></b></dt><dd>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options? </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000035">Todo:</a></b></dt><dd>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options? </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlottingManager_8cpp_source.html#l00198">198</a> of file <a class="el" href="PlottingManager_8cpp_source.html">PlottingManager.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                                  {</div>

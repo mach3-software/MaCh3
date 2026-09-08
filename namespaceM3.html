@@ -95,6 +95,8 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceM3_1_1Plotting"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3_1_1Plotting.html">Plotting</a></td></tr>
 <tr class="memdesc:namespaceM3_1_1Plotting"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flexible, experiment-agnostic plotting utilities for MaCh3. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespaceM3_1_1rand"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3_1_1rand.html">rand</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespaceM3_1_1Utils"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3_1_1Utils.html">Utils</a></td></tr>
 <tr class="memdesc:namespaceM3_1_1Utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility helpers used across MaCh3. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,11 +144,6 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:aac995ad2de0eca11488028f2d4a964e7"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">BiasFunction</a> { <a class="el" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89ab933cd0242085c2dbf804dbf288ce7f0">kGaussian</a>
-, <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">kVonMises</a>
-, <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">kGeneralisedGaussian</a>
- }</td></tr>
-<tr class="separator:aac995ad2de0eca11488028f2d4a964e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a007e5ed320c3672a3faf79da0a38fb7a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7a">kInfCrit</a> { <a class="el" href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aa79fe5945605f47383db32b24445e9d9b">kBIC</a>
 , <a class="el" href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aaefce2d9c622c72dcb56556408d3d56dc">kDIC</a>
 , <a class="el" href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7aa37b99344010ca5011c37f1a609d6f61d">kWAIC</a>
@@ -154,6 +151,11 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a007e5ed320c3672a3faf79da0a38fb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Different Information Criterion tests mostly based Gelman paper.  <a href="namespaceM3.html#a007e5ed320c3672a3faf79da0a38fb7a">More...</a><br /></td></tr>
 <tr class="separator:a007e5ed320c3672a3faf79da0a38fb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac995ad2de0eca11488028f2d4a964e7"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">BiasFunction</a> { <a class="el" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89ab933cd0242085c2dbf804dbf288ce7f0">kGaussian</a>
+, <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">kVonMises</a>
+, <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">kGeneralisedGaussian</a>
+ }</td></tr>
+<tr class="separator:aac995ad2de0eca11488028f2d4a964e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afee9f50ad950e4e28ec5863bd2d18f89"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89">kReweightType</a> { <br />
 &#160;&#160;<a class="el" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">kGaussian</a>
 , <a class="el" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89ab933cd0242085c2dbf804dbf288ce7f0">kGaussian</a>
@@ -178,9 +180,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ad7693a9e309503bd894b04443f163f3c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ad7693a9e309503bd894b04443f163f3c">AddPath</a> (std::string &amp;FilePath)</td></tr>
 <tr class="memdesc:ad7693a9e309503bd894b04443f163f3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepends the MACH3 environment path to FilePath if it is not already present.  <a href="namespaceM3.html#ad7693a9e309503bd894b04443f163f3c">More...</a><br /></td></tr>
 <tr class="separator:ad7693a9e309503bd894b04443f163f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">GetThreadIndex</a> ()</td></tr>
-<tr class="memdesc:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="mdescLeft">&#160;</td><td class="mdescRight">thread index inside parallel loop  <a href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">More...</a><br /></td></tr>
-<tr class="separator:a5ed0accdbf66626c16b6c3b00bd5d030"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87841bdbf0e0a2a733d9e4ca499f820d"><td class="memItemLeft" align="right" valign="top">TFile *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">Open</a> (const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</td></tr>
 <tr class="memdesc:a87841bdbf0e0a2a733d9e4ca499f820d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a ROOT file with the given name and mode.  <a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">More...</a><br /></td></tr>
 <tr class="separator:a87841bdbf0e0a2a733d9e4ca499f820d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -681,7 +680,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_aae72fb06a391f1073add5eed6c6485dd"><div class="ttname"><a href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a></div><div class="ttdeci">std::string YAMLtoSTRING(const YAML::Node &amp;node)</div><div class="ttdoc">KS: Convert a YAML node to a string representation.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00111">YamlHelper.h:111</a></div></div>
 <div class="ttc" id="anamespaceM3_1_1Utils_html_a9c1c1d6d38585550e356e7d36bfdb704"><div class="ttname"><a href="namespaceM3_1_1Utils.html#a9c1c1d6d38585550e356e7d36bfdb704">M3::Utils::FormatDouble</a></div><div class="ttdeci">std::string FormatDouble(const double value, const int precision)</div><div class="ttdoc">Convert double into string for precision, useful for playing with yaml if you don't want to have in c...</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00835">SampleStructs.h:835</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00155">HistogramUtils.h:155</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00154">HistogramUtils.h:154</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a68ab9b6b3d413a94604c740208c7895d"><div class="ttname"><a href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a></div><div class="ttdeci">void FixSampleNamesQuotes(std::string &amp;yamlStr)</div><div class="ttdoc">KS: Yaml emitter has problem and drops &quot;&quot;, if you have special signs in you like * then there is prob...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00198">ParameterHandlerUtils.h:198</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -887,21 +886,21 @@ Variables</h2></td></tr>
 
 <p>KS: Helper function check if data and MC binning matches. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00821">821</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                                                                                                    {</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;<span class="comment">// ***************************************************************************</span></div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX()) {</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH1D: {} vs {}&quot;</span>, Hist1-&gt;GetNbinsX(), Hist2-&gt;GetNbinsX());</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;  }</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bin edges do not match for TH1D at bin {}&quot;</span>, i);</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;    }</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;  }</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00811">811</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;                                                                                                    {</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX()) {</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH1D: {} vs {}&quot;</span>, Hist1-&gt;GetNbinsX(), Hist2-&gt;GetNbinsX());</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;  }</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bin edges do not match for TH1D at bin {}&quot;</span>, i);</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    }</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;  }</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -945,29 +944,29 @@ Variables</h2></td></tr>
 
 <p>KS: Helper function check if data and MC binning matches. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00837">837</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;                                                                                                    {</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;<span class="comment">// ***************************************************************************</span></div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX() || Hist1-&gt;GetNbinsY() != Hist2-&gt;GetNbinsY()) {</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2D&quot;</span>);</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;  }</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160; </div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;X bin edges do not match for TH2D at bin {}&quot;</span>, i);</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    }</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;  }</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= Hist1-&gt;GetNbinsY(); ++j) {</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinLowEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinLowEdge(j)) &gt; 0.001 ||</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;      std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinUpEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinUpEdge(j)) &gt; 0.001) {</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Y bin edges do not match for TH2D at bin {}&quot;</span>, j);</div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;    }</div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;  }</div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00827">827</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;                                                                                                    {</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX() || Hist1-&gt;GetNbinsY() != Hist2-&gt;GetNbinsY()) {</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2D&quot;</span>);</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;  }</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160; </div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;X bin edges do not match for TH2D at bin {}&quot;</span>, i);</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    }</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;  }</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= Hist1-&gt;GetNbinsY(); ++j) {</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinLowEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinLowEdge(j)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;      std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinUpEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinUpEdge(j)) &gt; 0.001) {</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Y bin edges do not match for TH2D at bin {}&quot;</span>, j);</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;    }</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  }</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1011,33 +1010,33 @@ Variables</h2></td></tr>
 
 <p>KS: Helper function check if data and MC binning matches. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00862">862</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;                                                                                              {</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;<span class="comment">// ***************************************************************************</span></div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;  <span class="keywordtype">int</span> NBins1 = Hist1-&gt;GetNumberOfBins();</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;  <span class="keywordtype">int</span> NBins2 = Hist2-&gt;GetNumberOfBins();</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;  <span class="keywordflow">if</span> (NBins1 != NBins2) {</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2Poly: {} vs {}&quot;</span>, NBins1, NBins2);</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;  }</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= NBins1; j++)</div>
-<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;  {</div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    <span class="comment">//KS: There is weird offset between bin content and GetBins so this is correct, in spite of looking funny</span></div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;    TH2PolyBin* polybin1 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist1-&gt;GetBins()-&gt;At(j - 1));</div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;    TH2PolyBin* polybin2 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist2-&gt;GetBins()-&gt;At(j - 1));</div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160; </div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    <span class="keywordflow">if</span>( std::fabs(polybin2-&gt;GetXMin() - polybin1-&gt;GetXMin()) &gt; 0.001 ||</div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;      std::fabs(polybin2-&gt;GetXMax() - polybin1-&gt;GetXMax()) &gt; 0.001 ||</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;      std::fabs(polybin2-&gt;GetYMin() - polybin1-&gt;GetYMin()) &gt; 0.001 ||</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;      std::fabs(polybin2-&gt;GetYMax() - polybin1-&gt;GetYMax()) &gt; 0.001  )</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;    {</div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Binning doesn&#39;t match&quot;</span>, Hist1-&gt;GetTitle());</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;data  x min {} x max {} y min {} y max {}&quot;</span>, polybin2-&gt;GetXMin(), polybin2-&gt;GetXMax(), polybin2-&gt;GetYMin(), polybin2-&gt;GetYMax());</div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;mc    x min {} x max {} y min {} y max {}&quot;</span>, polybin1-&gt;GetXMin(), polybin1-&gt;GetXMax(), polybin1-&gt;GetYMin(), polybin1-&gt;GetYMax());</div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File , Line );</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    }</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;  }</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00852">852</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;                                                                                              {</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;  <span class="keywordtype">int</span> NBins1 = Hist1-&gt;GetNumberOfBins();</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;  <span class="keywordtype">int</span> NBins2 = Hist2-&gt;GetNumberOfBins();</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;  <span class="keywordflow">if</span> (NBins1 != NBins2) {</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2Poly: {} vs {}&quot;</span>, NBins1, NBins2);</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;  }</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= NBins1; j++)</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;  {</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    <span class="comment">//KS: There is weird offset between bin content and GetBins so this is correct, in spite of looking funny</span></div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    TH2PolyBin* polybin1 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist1-&gt;GetBins()-&gt;At(j - 1));</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    TH2PolyBin* polybin2 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist2-&gt;GetBins()-&gt;At(j - 1));</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160; </div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    <span class="keywordflow">if</span>( std::fabs(polybin2-&gt;GetXMin() - polybin1-&gt;GetXMin()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;      std::fabs(polybin2-&gt;GetXMax() - polybin1-&gt;GetXMax()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;      std::fabs(polybin2-&gt;GetYMin() - polybin1-&gt;GetYMin()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;      std::fabs(polybin2-&gt;GetYMax() - polybin1-&gt;GetYMax()) &gt; 0.001  )</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;    {</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Binning doesn&#39;t match&quot;</span>, Hist1-&gt;GetTitle());</div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;data  x min {} x max {} y min {} y max {}&quot;</span>, polybin2-&gt;GetXMin(), polybin2-&gt;GetXMax(), polybin2-&gt;GetYMin(), polybin2-&gt;GetYMax());</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;mc    x min {} x max {} y min {} y max {}&quot;</span>, polybin1-&gt;GetXMin(), polybin1-&gt;GetXMax(), polybin1-&gt;GetYMin(), polybin1-&gt;GetYMax());</div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File , Line );</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;    }</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;  }</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1085,16 +1084,16 @@ template&lt;typename ObjectType &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>std::unique_ptr&lt;ObjectType&gt; Owning pointer to the cloned object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00155">155</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                                                                                   {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">return</span> Hist;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00154">154</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;                                                                                   {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">return</span> Hist;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1917,42 +1916,6 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a5ed0accdbf66626c16b6c3b00bd5d030"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ed0accdbf66626c16b6c3b00bd5d030">&#9670;&nbsp;</a></span>GetThreadIndex()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int M3::GetThreadIndex </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>thread index inside parallel loop </p>
-
-<p class="definition">Definition at line <a class="el" href="Monitor_8h_source.html#l00086">86</a> of file <a class="el" href="Monitor_8h_source.html">Monitor.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                              {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">return</span> omp_get_thread_num();</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">    #else</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  }</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="a8db7c365e6cff53f8dbfa681fb8bacca"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8db7c365e6cff53f8dbfa681fb8bacca">&#9670;&nbsp;</a></span>MakeCorrelationMatrix()</h2>
 
@@ -2620,24 +2583,24 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the opened ROOT file. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00782">782</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;                                                                                                 {</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;<span class="comment">// **************************************************************************</span></div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160; </div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    std::string lowerType = Type;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;    }</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;  }</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00772">772</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;                                                                                                 {</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<span class="comment">// **************************************************************************</span></div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160; </div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    std::string lowerType = Type;</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    }</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;  }</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2681,50 +2644,50 @@ template&lt;typename T &gt; </div>
 
 <p>KS: Convert TH2Poly into yaml config accepted by MaCh3. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00891">891</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;                                                                                                     {</div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;<span class="comment">// ***************************************************************************</span></div>
-<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;  <span class="keywordflow">if</span> (!Hist) {</div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Null TH2Poly pointer&quot;</span>);</div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;  }</div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160; </div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;  YAML::Node bins(YAML::NodeType::Sequence);</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;  bins.SetStyle(YAML::EmitterStyle::Flow);</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> NBins = Hist-&gt;GetNumberOfBins();</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160; </div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= NBins; j++)</div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;  {</div>
-<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;    TH2PolyBin* polybin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist-&gt;GetBins()-&gt;At(j - 1));</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00881">881</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;                                                                                                     {</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;  <span class="keywordflow">if</span> (!Hist) {</div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Null TH2Poly pointer&quot;</span>);</div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;  }</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160; </div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;  YAML::Node bins(YAML::NodeType::Sequence);</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;  bins.SetStyle(YAML::EmitterStyle::Flow);</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> NBins = Hist-&gt;GetNumberOfBins();</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160; </div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= NBins; j++)</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;  {</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;    TH2PolyBin* polybin = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist-&gt;GetBins()-&gt;At(j - 1));</div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160; </div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;    <span class="keywordtype">double</span> xmin = polybin-&gt;GetXMin();</div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;    <span class="keywordtype">double</span> xmax = polybin-&gt;GetXMax();</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;    <span class="keywordtype">double</span> ymin = polybin-&gt;GetYMin();</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    <span class="keywordtype">double</span> ymax = polybin-&gt;GetYMax();</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160; </div>
+<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    YAML::Node xNode(YAML::NodeType::Sequence);</div>
+<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;    xNode.SetStyle(YAML::EmitterStyle::Flow);</div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;    xNode.push_back(xmin);</div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;    xNode.push_back(xmax);</div>
 <div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160; </div>
-<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;    <span class="keywordtype">double</span> xmin = polybin-&gt;GetXMin();</div>
-<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;    <span class="keywordtype">double</span> xmax = polybin-&gt;GetXMax();</div>
-<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    <span class="keywordtype">double</span> ymin = polybin-&gt;GetYMin();</div>
-<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;    <span class="keywordtype">double</span> ymax = polybin-&gt;GetYMax();</div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;    YAML::Node yNode(YAML::NodeType::Sequence);</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;    yNode.SetStyle(YAML::EmitterStyle::Flow);</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    yNode.push_back(ymin);</div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;    yNode.push_back(ymax);</div>
 <div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160; </div>
-<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;    YAML::Node xNode(YAML::NodeType::Sequence);</div>
-<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;    xNode.SetStyle(YAML::EmitterStyle::Flow);</div>
-<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;    xNode.push_back(xmin);</div>
-<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;    xNode.push_back(xmax);</div>
+<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;    YAML::Node bin(YAML::NodeType::Sequence);</div>
+<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;    bin.SetStyle(YAML::EmitterStyle::Flow);</div>
+<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;    bin.push_back(xNode);</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;    bin.push_back(yNode);</div>
 <div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160; </div>
-<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    YAML::Node yNode(YAML::NodeType::Sequence);</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;    yNode.SetStyle(YAML::EmitterStyle::Flow);</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    yNode.push_back(ymin);</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    yNode.push_back(ymax);</div>
-<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160; </div>
-<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;    YAML::Node bin(YAML::NodeType::Sequence);</div>
-<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;    bin.SetStyle(YAML::EmitterStyle::Flow);</div>
-<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;    bin.push_back(xNode);</div>
-<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;    bin.push_back(yNode);</div>
-<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160; </div>
-<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;    bins.push_back(bin);</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;  }</div>
-<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160; </div>
-<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;  YAML::Node result;</div>
-<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;  result[YamlName] = bins;</div>
-<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160; </div>
-<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;}</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    bins.push_back(bin);</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;  }</div>
+<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160; </div>
+<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;  YAML::Node result;</div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;  result[YamlName] = bins;</div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160; </div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2756,25 +2719,25 @@ template&lt;typename T &gt; </div>
 
 <p>Scale histogram to get divided by bin width. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00801">801</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;                                                          {</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;<span class="comment">// ***************************************************************************</span></div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= Sample_Hist-&gt;GetNbinsX(); ++j)</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;  {</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    <span class="keywordtype">double</span> num = Sample_Hist-&gt;GetBinContent(j);</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    <span class="keywordtype">double</span> numErr = Sample_Hist-&gt;GetBinError(j);</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="keywordtype">double</span> den = Sample_Hist-&gt;GetBinWidth(j);</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="keywordtype">double</span> value = 0.;</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    <span class="keywordtype">double</span> valueErr = 0.;</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    <span class="keywordflow">if</span> (den != 0)</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    {</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;      value = num/(den/scale);</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;      valueErr = numErr/(den/scale);</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;      Sample_Hist-&gt;SetBinContent(j,value);</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;      Sample_Hist-&gt;SetBinError(j,valueErr);</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;    }</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;  }</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00791">791</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;                                                          {</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= Sample_Hist-&gt;GetNbinsX(); ++j)</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;  {</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    <span class="keywordtype">double</span> num = Sample_Hist-&gt;GetBinContent(j);</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    <span class="keywordtype">double</span> numErr = Sample_Hist-&gt;GetBinError(j);</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    <span class="keywordtype">double</span> den = Sample_Hist-&gt;GetBinWidth(j);</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    <span class="keywordtype">double</span> value = 0.;</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    <span class="keywordtype">double</span> valueErr = 0.;</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    <span class="keywordflow">if</span> (den != 0)</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    {</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;      value = num/(den/scale);</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;      valueErr = numErr/(den/scale);</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;      Sample_Hist-&gt;SetBinContent(j,value);</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;      Sample_Hist-&gt;SetBinError(j,valueErr);</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    }</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;  }</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
