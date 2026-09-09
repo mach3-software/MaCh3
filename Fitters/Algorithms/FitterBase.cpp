@@ -1026,7 +1026,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       }
     if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
   }
-
+}
 // *************************
 // Run 2D LLH scan
 void FitterBase::Run2DLLHScan() {
