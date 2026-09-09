@@ -152,6 +152,8 @@ The following fitting algorithms are available:
 | MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | -                | Yes      |
 | PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | -                | No       |
 
+To find more information about each we recomend reading [here](https://mach3-software.github.io/MaCh3/group__FittingAlgorithms.html).
+
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
 ```bash
