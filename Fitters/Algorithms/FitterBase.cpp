@@ -919,6 +919,8 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       ownsfile = true;
     }
   }
+  else if (outputFile != nullptr)
+    outputFileLLH = outputFile;
   
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
@@ -1032,8 +1034,8 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 	  MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
 	}
       }
-      cov->SetIndivStepScale(StepScaleCorr);
       MACH3LOG_INFO("Step scale after optimisation");
+      cov->SetIndivStepScale(StepScaleCorr);
       cov->SaveUpdatedMatrixConfig();
     }
   if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
