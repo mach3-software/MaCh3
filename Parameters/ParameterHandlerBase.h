@@ -370,9 +370,6 @@ class ParameterHandlerBase {
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
-  /// @brief Setup vector of correlations for each parameter
-  void GetCorrelationVector();
-
   
   /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
   /// @param group Name of the flip group
