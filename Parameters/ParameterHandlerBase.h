@@ -154,7 +154,7 @@ class ParameterHandlerBase {
   std::string GetParameterGroup(const int i) const {return _fParameterGroup[i];}
 
   /// @brief Get a map of the correlation element for a given parameter
-  std::map<std::string, double> GetCorrElements(const int i) const {return Correlations[i];}
+  std::map<std::string, double> GetCorrElements(const int i) const {return CorrelationsVec[i];}
   
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
@@ -372,7 +372,10 @@ class ParameterHandlerBase {
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
+  /// @brief Setup vector of correlations for each parameter
+  void GetCorrelationVector();
 
+  
   /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
   /// @param group Name of the flip group
   void FlipParameterGroup(std::string group);
@@ -438,6 +441,9 @@ class ParameterHandlerBase {
   std::vector<double> _fUpBound;
   /// Individual step scale used by MCMC algorithm
   std::vector<double> _fIndivStepScale;
+  /// Vector of correlations for given parameter index
+  std::vector<std::map<std::string, double>> CorrelationsVec;
+
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
   /// Defines the group of the parameter

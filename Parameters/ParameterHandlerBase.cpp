@@ -981,6 +981,16 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
   SetThrowMatrix(cov);
 }
 
+void ParameterHandlerBase::GetCorrelationVector(){
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) {
+    for (int j = 0; j <= i; ++j) {
+        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
+       CorrelationsVec.push_back({{_fFancyNames[i], corr}});
+    }
+  }
+}
+
 
 // ********************************************
 void ParameterHandlerBase::SanitizeAdaption() const {
