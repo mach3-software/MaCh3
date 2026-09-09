@@ -154,7 +154,7 @@ class ParameterHandlerBase {
   std::string GetParameterGroup(const int i) const {return _fParameterGroup[i];}
 
   /// @brief Get a map of the correlation element for a given parameter
-  std::map<std::string, double> GetCorrElements(const int i) const {return CorrelationsVec[i];}
+  std::map<std::string, double> GetCorrElements(const int i) const {return Correlations[i];}
   
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
@@ -437,7 +437,7 @@ class ParameterHandlerBase {
   /// Individual step scale used by MCMC algorithm
   std::vector<double> _fIndivStepScale;
   /// Vector of correlations for given parameter index
-  std::vector<std::map<std::string, double>> CorrelationsVec;
+  std::vector<std::map<std::string, double>> Correlations;
 
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;

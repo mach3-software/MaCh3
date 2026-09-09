@@ -905,127 +905,142 @@ void FitterBase::RunLLHScan() {
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 // *************************
+
+  MACH3LOG_INFO("Beginning get step scale");
+  
   TFile* outputFileLLH = nullptr;
   bool ownsfile = false;
+  
   if(outputFileName != ""){
-    outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
-    ownsfile = true;
-  } else {
-    outputFileLLH = outputFile;
-
-    MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
-
-    auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
-  
-    std::string LLH_type = "Sample_LLH";
-    const std::string llhType = GetFromManager<std::string>(fitMan->raw()["LLHScan"]["LLHType"], {}, __FILE__ , __LINE__);
-    if(!llhType.empty()){
-      LLH_type = llhType;
+    //If filename matches that in the config file, get ownership issues. Easier just to run LLH scan again with correct ownership
+    if (outputFile != nullptr && std::string(outputFile->GetName()) == outputFileName) {
+      outputFileLLH = outputFile;
     }
+    else {
+      outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
+      ownsfile = true;
+    }
+  }
   
-    TDirectory *LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
-    MACH3LOG_INFO("Using LLHScans of type {}",LLH_type);
+  MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
-    if(!LLHScans || LLHScans->IsZombie())
-      {
-	MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
-	RunLLHScan();
-	LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
-      }
+  auto ParamVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["StepScaleParameters"], {}, __FILE__ , __LINE__);
+  
+  std::string LLH_type = "Sample_LLH";
+  const std::string llhType = GetFromManager<std::string>(fitMan->raw()["LLHScan"]["LLHType"], {}, __FILE__ , __LINE__);
+  if(!llhType.empty()){
+    LLH_type = llhType;
+  }
 
-    for (ParameterHandlerBase *cov : systematics)
-      {
-	const int npars = cov->GetNumParams();
+  MACH3LOG_INFO("Should have opened a file");
 
-	// Vector of parameter names correlated to given parameter, from correlation matrix
-	std::vector<std::vector<std::string>> CorrParams(npars);
-	std::vector<double> StepScale(npars);
-	for (int i = 0; i < npars; ++i)
-	  {
-	    std::string name = cov->GetParFancyName(i);
+  TDirectory *LLHScans = nullptr;
+  if(outputFileLLH != nullptr)
+    LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
+  
+  if(!LLHScans || LLHScans->IsZombie() || LLHScans == nullptr)
+    {
+      MACH3LOG_WARN("Couldn't find LLH directory, it looks like LLH scan wasn't run, will do this now");
+      RunLLHScan();
+      outputFileLLH = outputFile;
+      LLHScans = outputFileLLH->Get<TDirectory>(LLH_type.c_str());
+    }
+    
+  for (ParameterHandlerBase *cov : systematics)
+    {
+      MACH3LOG_INFO("Step scale before optimisation");
+      cov->PrintIndivStepScale();
+      const int npars = cov->GetNumParams();
+	
+      // Vector of parameter names correlated to given parameter, from correlation matrix
+      std::vector<std::vector<std::string>> CorrParams(npars);
+      std::vector<double> StepScale(npars);
+      for (int i = 0; i < npars; ++i)
+	{
+	  std::string name = cov->GetParFancyName(i);
 
-	    //Make vector of parameters which are correlated to given parameter
-	    std::map<std::string, double> parCorr = cov->GetCorrElements(i);
-	    for (const auto& corrMap : parCorr){
-	      std::string corr_var_name = corrMap.first;
-	      if (!ParamVector.empty()){
-		if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
-		  // Only create vector if parameter is in chosen list from config file
-		  continue;
-		}
-		if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
-		  // Only consider correlation of parameters in chosen list 
-		  continue;
-		}
-
-	      }
-	      double corr = corrMap.second;
-	      int index = cov->GetParIndex(corr_var_name);
-	      // Cut on what is consider a correlated parameter
-	      // Also only allow same groups correlations
-	      if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
-		CorrParams[i].push_back(corr_var_name);
-	    }
-	    StepScale[i] = cov->GetIndivStepScale(i);
-     
+	  //Make vector of parameters which are correlated to given parameter
+	  std::map<std::string, double> parCorr = cov->GetCorrElements(i);
+	  for (const auto& corrMap : parCorr){
+	    std::string corr_var_name = corrMap.first;
 	    if (!ParamVector.empty()){
 	      if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
-		// 'name' is not in the vector, skip this iteration
+		// Only create vector if parameter is in chosen list from config file
 		continue;
 	      }
-	    }
+	      if (std::find(ParamVector.begin(), ParamVector.end(), corr_var_name) == ParamVector.end()) {
+		// Only consider correlation of parameters in chosen list 
+		continue;
+	      }
 
-	    TH1D* LLHScan = nullptr;
-	    if(LLH_type == "Total_LLH")
-	      LLHScan = LLHScans->Get<TH1D>((name+"_full").c_str());
-	    else
-	      LLHScan = LLHScans->Get<TH1D>((name+"_sam").c_str());
+	    }
+	    double corr = corrMap.second;
+	    int index = cov->GetParIndex(corr_var_name);
+	    // Cut on what is consider a correlated parameter
+	    // Also only allow same groups correlations
+	    if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
+	      CorrParams[i].push_back(corr_var_name);
+	  }
+	  StepScale[i] = cov->GetIndivStepScale(i);
+     
+	  if (!ParamVector.empty()){
+	    if (std::find(ParamVector.begin(), ParamVector.end(), name) == ParamVector.end()) {
+	      // 'name' is not in the vector, skip this iteration
+	      continue;
+	    }
+	  }
+
+	  TH1D* LLHScan = nullptr;
+	  if(LLH_type == "Total_LLH")
+	    LLHScan = LLHScans->Get<TH1D>((name+"_full").c_str());
+	  else
+	    LLHScan = LLHScans->Get<TH1D>((name+"_sam").c_str());
       
-	    if(LLHScan == nullptr)
-	      {
-		MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
-		continue;
-	      }
-	    const double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
-	    //If there is no sensitivity leave it
-	    if(LLH_val < 0.001) continue;
-
-	    // EM: assuming that the likelihood is gaussian, approximate sigma value is given by variation/sqrt(-2LLH)
-	    // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
-	    // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
-	    const double Var = 1.;
-	    const double approxSigma = std::abs(Var)/std::sqrt(LLH_val);
-	    const double GlobalScale = cov->GetGlobalStepScale();
-	    // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
-	    const double TargetStep = approxSigma * 2.38 / std::sqrt(npars);
-	    // KS: Need to divide by currently used gloalStepScale
-	    const double NewStepScale = TargetStep / GlobalScale;
-
-	    StepScale[i] = NewStepScale;
-	    MACH3LOG_DEBUG("Sigma: {}", approxSigma);
-	    MACH3LOG_DEBUG("Target Step Size (before accounting for global step size): {}", TargetStep);
-	    MACH3LOG_DEBUG("Optimal Step Size: {}", NewStepScale);
-	  }
-	std::vector<double> StepScaleCorr = StepScale;
-	for (int p = 0; p < npars; p++){
-	  //Adjust parameter step scale if correlated parameters exist
-	  if(CorrParams[p].size() != 0){
-	    double avg_step_scale = StepScale[p];
-	    for(const auto& corrName : CorrParams[p]) {
-	      int index = cov->GetParIndex(corrName);
-	      avg_step_scale += StepScale[index];
+	  if(LLHScan == nullptr)
+	    {
+	      MACH3LOG_WARN("Couldn't find LLH scan, for {}, skipping", name);
+	      continue;
 	    }
-	    //Determine average step scale for correlated parameters
-	    avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
-	    StepScaleCorr[p] = avg_step_scale;
-	    MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
-	  }
+	  const double LLH_val = std::max(LLHScan->GetBinContent(1), LLHScan->GetBinContent(LLHScan->GetNbinsX()));
+	  //If there is no sensitivity leave it
+	  if(LLH_val < 0.001) continue;
+
+	  // EM: assuming that the likelihood is gaussian, approximate sigma value is given by variation/sqrt(-2LLH)
+	  // can evaluate this at any point, simple to evaluate it in the first bin of the LLH scan
+	  // KS: We assume variation is 1 sigma, each dial has different scale so it becomes faff...
+	  const double Var = 1.;
+	  const double approxSigma = std::abs(Var)/std::sqrt(LLH_val);
+	  const double GlobalScale = cov->GetGlobalStepScale();
+	  // Based on Ewan comment I just took the 1sigma width from the LLH, assuming it was Gaussian, but then had to also scale by 2.38/sqrt(N_params)
+	  const double TargetStep = approxSigma * 2.38 / std::sqrt(npars);
+	  // KS: Need to divide by currently used gloalStepScale
+	  const double NewStepScale = TargetStep / GlobalScale;
+
+	  StepScale[i] = NewStepScale;
+	  MACH3LOG_DEBUG("Sigma: {}", approxSigma);
+	  MACH3LOG_DEBUG("Target Step Size (before accounting for global step size): {}", TargetStep);
+	  MACH3LOG_DEBUG("Optimal Step Size: {}", NewStepScale);
 	}
-	cov->SetIndivStepScale(StepScaleCorr);
-	cov->SaveUpdatedMatrixConfig();
+      std::vector<double> StepScaleCorr = StepScale;
+      for (int p = 0; p < npars; p++){
+	//Adjust parameter step scale if correlated parameters exist
+	if(CorrParams[p].size() != 0){
+	  double avg_step_scale = StepScale[p];
+	  for(const auto& corrName : CorrParams[p]) {
+	    int index = cov->GetParIndex(corrName);
+	    avg_step_scale += StepScale[index];
+	  }
+	  //Determine average step scale for correlated parameters
+	  avg_step_scale /= static_cast<double>(CorrParams[p].size()) + 1.0;
+	  StepScaleCorr[p] = avg_step_scale;
+	  MACH3LOG_INFO("Changed step scale of parameter {} from {} to {}",cov->GetParFancyName(p),StepScale[p],StepScaleCorr[p]);
+	}
       }
-    if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
-  }
+      cov->SetIndivStepScale(StepScaleCorr);
+      MACH3LOG_INFO("Step scale after optimisation");
+      cov->SaveUpdatedMatrixConfig();
+    }
+  if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
 }
 // *************************
 // Run 2D LLH scan

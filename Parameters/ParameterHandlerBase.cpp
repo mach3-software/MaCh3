@@ -237,7 +237,8 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fUpBound         = std::vector<double>(SizeVec, 999.99);
   _fFlatPrior       = std::vector<bool>(SizeVec, false);
   _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
-  _fParameterGroup = std::vector<std::string>(SizeVec);
+  _fParameterGroup  = std::vector<std::string>(SizeVec);
+  Correlations    = std::vector<std::map<std::string,double>>(SizeVec);
 
   corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)
@@ -972,17 +973,6 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
   throwMatrix = nullptr;
   SetThrowMatrix(cov);
 }
-
-void ParameterHandlerBase::GetCorrelationVector(){
-// ********************************************
-  for (int i = 0; i < _fNumPar; ++i) {
-    for (int j = 0; j <= i; ++j) {
-        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
-       CorrelationsVec.push_back({{_fFancyNames[i], corr}});
-    }
-  }
-}
-
 
 // ********************************************
 void ParameterHandlerBase::SanitizeAdaption() const {

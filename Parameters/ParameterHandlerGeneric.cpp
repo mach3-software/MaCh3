@@ -138,7 +138,7 @@ void ParameterHandlerGeneric::LoadAndMergeYAML(const std::vector<std::string>& Y
 }
 
 // ********************************************
-void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std::string,double>>& Correlations,
+void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std::string,double>>& CorrelationsVec,
                                                         std::map<std::string, int>& CorrNamesMap) {
 // ********************************************
   // ETA Now that we've been through all systematic let's fill the covmatrix
@@ -147,7 +147,7 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
   for(int j = 0; j < _fNumPar; j++) {
     (*_fCovMatrix)(j, j) = _fError[j]*_fError[j];
     //Get the map of parameter name to correlation from the Correlations object
-    for (auto const& pair : Correlations[j]) {
+    for (auto const& pair : CorrelationsVec[j]) {
       auto const& key = pair.first;
       auto const& val = pair.second;
       int index = -1;
@@ -160,8 +160,8 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
       }
       double Corr1 = val;
       double Corr2 = 0;
-      if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
-        Corr2 = Correlations[index][_fFancyNames[j]];
+      if(CorrelationsVec[index].find(_fFancyNames[j]) != CorrelationsVec[index].end()) {
+        Corr2 = CorrelationsVec[index][_fFancyNames[j]];
         //Do they agree to better than float precision?
         constexpr double tolerance = 1e-6;
         if(std::abs(Corr2 - Corr1) > tolerance) {
@@ -197,7 +197,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   ReserveMemory(_fNumPar);
 
   int i = 0;
-  std::vector<std::map<std::string,double>> Correlations(_fNumPar);
+  //std::vector<std::map<std::string,double>> Correlations(_fNumPar);
   std::map<std::string, int> CorrNamesMap;
 
   //ETA - read in the systematics. Would be good to add in some checks to make sure
