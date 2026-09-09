@@ -906,8 +906,6 @@ void FitterBase::RunLLHScan() {
 void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 // *************************
 
-  MACH3LOG_INFO("Beginning get step scale");
-  
   TFile* outputFileLLH = nullptr;
   bool ownsfile = false;
   
@@ -931,8 +929,6 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
   if(!llhType.empty()){
     LLH_type = llhType;
   }
-
-  MACH3LOG_INFO("Should have opened a file");
 
   TDirectory *LLHScans = nullptr;
   if(outputFileLLH != nullptr)
