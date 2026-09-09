@@ -167,7 +167,7 @@ add_subdirectory(Utils)
 add_subdirectory(CLI)
 add_subdirectory(python)
 
-foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
   set_property(
     TARGET
     ${lib}
@@ -178,7 +178,7 @@ endforeach()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-target_link_libraries(MaCh3 INTERFACE CLIApi Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE CLIApi Fitters FitProcessing Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3

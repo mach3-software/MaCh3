@@ -1,10 +1,13 @@
 // MaCh3 includes
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
 #include "THStack.h"
 #include "TGraphAsymmErrors.h"
 #include "TLegend.h"
 #include <TSystem.h>
+_MaCh3_Safe_Include_End_ //}
 
 /// @file PlotMCMCDiag.cpp
 /// @brief KS: This script is used to analyse output form DiagMCMC.

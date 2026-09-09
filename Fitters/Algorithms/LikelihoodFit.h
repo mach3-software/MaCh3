@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fitters/FitterBase.h"
+#include "Algorithms/FitterBase.h"
 
 /// @brief Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation while actual use depend on classes which inherits.
 class LikelihoodFit : public FitterBase {

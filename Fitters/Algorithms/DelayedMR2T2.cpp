@@ -1,4 +1,4 @@
-#include "Fitters/DelayedMR2T2.h"
+#include "Algorithms/DelayedMR2T2.h"
 
 // *************************
 DelayedMR2T2::DelayedMR2T2(Manager* const FitManager) : MR2T2(FitManager) {
@@ -177,5 +177,5 @@ void DelayedMR2T2::DoStep() {
 bool DelayedMR2T2::ProbabilisticDelay() const {
 // *************************
     // We can delay probabilistically
-    return (random->Rndm() > delay_probability);
+    return (M3::rand::Uniform() > delay_probability);
 }

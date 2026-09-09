@@ -866,6 +866,8 @@ INPUT                  = . \
                          Parameters \
                          NuDock \
                          Fitters \
+                         Fitters/Processing \
+                         Fitters/Algorithms \
                          Utils/Plotting \
                          CLI \
                          CLI/API \

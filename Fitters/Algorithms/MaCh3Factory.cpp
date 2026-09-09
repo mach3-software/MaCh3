@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "Fitters/MaCh3Factory.h"
+#include "Algorithms/MaCh3Factory.h"
 
 // ********************************************
 std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {

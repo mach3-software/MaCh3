@@ -1,5 +1,6 @@
-#include "RHatCalculator.h"
-#include "MCMCProcessor.h"
+#include "Fitters/Processing/RHatCalculator.h"
+#include "Fitters/Processing/MCMCProcessor.h"
+
 #include <filesystem>
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

@@ -5,7 +5,7 @@
 #pragma once
 // yaml Includes
 #include "yaml-cpp/yaml.h"
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "CLI/API/plugin.hpp"
 
 namespace M3{

@@ -1,9 +1,13 @@
 #pragma once
 
 // MaCh3 includes
-#include "Fitters/MCMCProcessor.h"
+#include "Processing/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+
+_MaCh3_Safe_Include_Start_ //{
+// ROOT includes
 #include "TComplex.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
@@ -62,7 +66,6 @@ class OscProcessor : public MCMCProcessor {
     double CalcJarlskog(const double s2th13, const double s2th23, const double s2th12, const double dcp) const;
     /// @brief Draw Prior value
     double SamplePriorForParam(const int paramIndex,
-                               const std::unique_ptr<TRandom3>& randGen,
                                const std::vector<double>& FlatBounds) const;
     /// @brief Extract 1D reactor constraint information from an MCMC file.
     /// @param Sin13_NewPrior Pair containing the prior mean and uncertainty.

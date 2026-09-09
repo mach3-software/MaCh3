@@ -318,8 +318,7 @@ void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>&
 }
 
 // ********************************************
-void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
-                                 double** throwMatrixCholDecomp,
+void PCAHandler::ThrowParameters(double** throwMatrixCholDecomp,
                                  double* randParams,
                                  double* corr_throw,
                                  const std::vector<double>& fPreFitValue,
@@ -340,7 +339,7 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while ((*_pPropVal)[i] > fUpBound[i] || (*_pPropVal)[i] < fLowBound[i]) {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        randParams[i] = M3::rand::Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         (*_pPropVal)[i] = static_cast<M3::float_t>(fPreFitValue[i] + corr_throw_single);
         if (throws > 10000)

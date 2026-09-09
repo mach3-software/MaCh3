@@ -82,12 +82,4 @@ namespace Utils {
   /// @brief Prepends the MACH3 environment path to FilePath if it is not already present.
   /// @param FilePath Reference to the file path string to be modified.
   void AddPath(std::string& FilePath);
-  /// @brief thread index inside parallel loop
-  inline int GetThreadIndex() {
-    #ifdef MULTITHREAD
-    return omp_get_thread_num();
-    #else
-    return 0;
-    #endif
-  }
 } // end M3 namespace

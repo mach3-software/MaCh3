@@ -87,6 +87,7 @@ void OscProcessor::LoadAdditionalInfo() {
     // Push back the name
     ParamNames[kXSecPar].push_back("J_cp");
     ParamFlat[kXSecPar].push_back( false );
+    ParamCircular[kXSecPar].push_back( false );
   } else if(PlotJarlskog && !OscEnabled) {
     MACH3LOG_ERROR("Trying to enable Jarlskog without oscillations");
     throw MaCh3Exception(__FILE__,__LINE__);
@@ -111,7 +112,7 @@ double OscProcessor::CalcJarlskog(const double s2th13, const double s2th23, cons
 }
 
 // ***************
-double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique_ptr<TRandom3>& randGen, const std::vector<double>& FlatBounds) const {
+double OscProcessor::SamplePriorForParam(const int paramIndex, const std::vector<double>& FlatBounds) const {
 // ***************
   TString Title = "";
   double Prior = 1.0, PriorError = 1.0;
@@ -125,10 +126,10 @@ double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique
   FlatPrior = ParamFlat[ParType][ParamTemp];
 
   if (FlatPrior) {
-    return randGen->Uniform(FlatBounds[0], FlatBounds[1]);
+    return M3::rand::Uniform(FlatBounds[0], FlatBounds[1]);
   } else {
     // Gaussian prior centered at Prior with width PriorError
-    return randGen->Gaus(Prior, PriorError);
+    return M3::rand::Gaus(Prior, PriorError);
   }
 }
 
@@ -270,7 +271,6 @@ void OscProcessor::PerformJarlskogAnalysis() {
   auto prior3 = std::make_unique<TF1>("prior3", "TMath::Abs(TMath::Cos(x))");
 
   // T2K prior is flat (and uncorrelated) in dcp, sin^2(th13), sin^2(th23)
-  auto randGen = std::make_unique<TRandom3>(0);
   const Long64_t countwidth = nEntries/5;
 
   for(int i = 0; i < nEntries; ++i) {
@@ -293,12 +293,12 @@ void OscProcessor::PerformJarlskogAnalysis() {
     jarl_flatsindcp->Fill(j, prior_weight*weight);
     jarl_th23_flatsindcp->Fill(j, s2th23, prior_weight*weight);
 
-    const double prior_s2th13 = SamplePriorForParam(Sin2Theta13Index, randGen, {0.,1.});
-    const double prior_s2th23 = SamplePriorForParam(Sin2Theta23Index, randGen, {0.,1.});
-    const double prior_s2th12 = SamplePriorForParam(Sin2Theta12Index, randGen, {0.,1.});
-    const double prior_dcp = SamplePriorForParam(DeltaCPIndex, randGen, {-1.*TMath::Pi(),TMath::Pi()});
+    const double prior_s2th13 = SamplePriorForParam(Sin2Theta13Index, {0.,1.});
+    const double prior_s2th23 = SamplePriorForParam(Sin2Theta23Index, {0.,1.});
+    const double prior_s2th12 = SamplePriorForParam(Sin2Theta12Index, {0.,1.});
+    const double prior_dcp = SamplePriorForParam(DeltaCPIndex, {-1.*TMath::Pi(),TMath::Pi()});
     // KS: This is hardcoded but we always assume flat in delta CP so probably fine
-    const double prior_sindcp = randGen->Uniform(-1., 1.);
+    const double prior_sindcp = M3::rand::Uniform(-1., 1.);
 
     const double prior_s13          = std::sqrt(prior_s2th13);
     const double prior_s23          = std::sqrt(prior_s2th23);
@@ -314,7 +314,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
     jarl_prior_flatsindcp->Fill(prior_flatsindcp_j);
 
     if(DoReweight) {
-      const double prior_wRC_s2th13       = randGen->Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
+      const double prior_wRC_s2th13       = M3::rand::Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
       const double prior_wRC_s13          = std::sqrt(prior_wRC_s2th13);
       const double prior_wRC_c13          = std::sqrt(1.-prior_wRC_s2th13);
       const double prior_wRC_j            = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;

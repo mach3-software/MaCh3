@@ -5,7 +5,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TList.h"
 #include "TObjArray.h"
 #include "TObjString.h"
-#include "TRandom3.h"
 _MaCh3_Safe_Include_End_ //}
 
 // **************************************************
@@ -405,7 +404,7 @@ void RemoveFitter(TH1D* hist, const std::string& name) {
 
 // ****************
 // Make Poisson Fluctuation of TH1D hist
-void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand){
+void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist){
 // ****************
   // Make the Poisson fluctuated hist
   FluctHist->Reset("");
@@ -416,7 +415,7 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
     // Get the posterior predictive bin content
     const double MeanContent = PolyHist->GetBinContent(i);
     // Get a Poisson fluctuation of the content
-    const double Random = rand->PoissonD(MeanContent);
+    const double Random = M3::rand::PoissonD(MeanContent);
     // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
     FluctHist->SetBinContent(i,Random);
   }
@@ -424,7 +423,7 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
 
 // ****************
 // Make Poisson Fluctuation of TH2Poly hist
-void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand) {
+void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist) {
 // ****************
   // Make the Poisson fluctuated hist
   FluctHist->Reset("");
@@ -435,7 +434,7 @@ void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRan
     // Get the posterior predictive bin content
     const double MeanContent = PolyHist->GetBinContent(i);
     // Get a Poisson fluctuation of the content
-    const double Random = rand->PoissonD(MeanContent);
+    const double Random = M3::rand::PoissonD(MeanContent);
     // Set the fluctuated histogram content to the Poisson variation of the posterior predictive histogram
     FluctHist->SetBinContent(i,Random);
   }
@@ -443,7 +442,7 @@ void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRan
 
 // ****************
 // Make Poisson Fluctuation of TH2D hist
-void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist, TRandom3* rand) {
+void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist) {
 // ****************
   // Reset the histogram
   FluctHist->Reset("");
@@ -457,7 +456,7 @@ void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist, TRandom3* rand
       // Get the original bin content
       const double MeanContent = Hist->GetBinContent(ix, iy);
       // Generate Poisson fluctuation
-      const double Random = rand->PoissonD(MeanContent);
+      const double Random = M3::rand::PoissonD(MeanContent);
       // Set the Random content
       FluctHist->SetBinContent(ix, iy, Random);
     }
@@ -466,17 +465,14 @@ void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist, TRandom3* rand
 
 // ****************
 // Make Poisson Fluctuation of TH1D hist
-void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom3* rand){
+void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist){
 // ****************
   // Make the Poisson fluctuated hist
   FluctHist->Reset("");
   FluctHist->Fill(0.0, 0.0);
 
   const double evrate = PolyHist->Integral();
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wconversion"
-  const int num = rand->Poisson(evrate);
-  #pragma GCC diagnostic pop
+  const int num = M3::rand::Poisson(evrate);
   int count = 0;
   while(count < num)
   {
@@ -488,16 +484,13 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
 
 // ****************
 // Make Poisson Fluctuation of TH1D hist
-void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom3* rand) {
+void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist) {
 // ****************
   FluctHist->Reset();
   FluctHist->Fill(0.0, 0.0, 0.0);
 
   const double evrate = PolyHist->Integral();
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wconversion"
-  const int num = rand->Poisson(evrate);
-  #pragma GCC diagnostic pop
+  const int num = M3::rand::Poisson(evrate);
 
   double x, y;
   for (int count = 0; count < num; ++count) {
@@ -508,10 +501,10 @@ void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom
 // ****************
 //KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
-int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand) {
+int GetRandomPoly2(const TH2Poly* PolyHist) {
 // ****************
   const int nbins = PolyHist->GetNumberOfBins();
-  const double r1 = rand->Rndm();
+  const double r1 = M3::rand::Uniform();;
 
   double* fIntegral = new double[nbins+2];
   fIntegral[0] = 0.0;
@@ -537,21 +530,18 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand) {
 
 // ****************
 // Make Poisson fluctuation of TH2Poly hist
-void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand){
+void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist){
 // ****************
   // Make the Poisson fluctuated hist
   FluctHist->Reset("");
   FluctHist->Fill(0.0, 0.0, 0.0);
 
   const double evrate = NoOverflowIntegral(PolyHist);
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wconversion"
-  const int num = rand->Poisson(evrate);
-  #pragma GCC diagnostic pop
+  const int num = M3::rand::Poisson(evrate);
   int count = 0;
   while(count < num)
   {
-    const int iBin = GetRandomPoly2(PolyHist, rand);
+    const int iBin = GetRandomPoly2(PolyHist);
     FluctHist->SetBinContent(iBin, FluctHist->GetBinContent(iBin) + 1);
     count++;
   }

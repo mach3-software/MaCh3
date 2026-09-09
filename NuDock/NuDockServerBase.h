@@ -5,7 +5,7 @@
 ///        JSON-based request/response protocol.
 /// @author Hank Hua
 
-#include "Fitters/FitterBase.h"
+#include "Fitters/Algorithms/FitterBase.h"
 #include "NuDockFactory.h"
 _MaCh3_Safe_Include_Start_ //{
 #include <nlohmann/json.hpp>

@@ -4,10 +4,9 @@
 ///
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "Manager/Manager.h"
 #include "CLI/Modules/DiagMCMCModule.hpp"
-
 
 namespace M3{
 

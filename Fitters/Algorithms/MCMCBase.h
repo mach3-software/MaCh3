@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Fitters/FitterBase.h"
-#include "Fitters/MulticanonicalMCMCHandler.h"
+#include "Algorithms/FitterBase.h"
+#include "Algorithms/MulticanonicalMCMCHandler.h"
 /// @brief Base class for MCMC fitting algorithms
 /// @details Inherits from `FitterBase` and defines the interface for MCMC-based fitting, including chain management and step handling.
 /// @author Asher Kaboth
@@ -20,6 +20,9 @@ class MCMCBase : public FitterBase {
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
     void StartFromPreviousFit(const std::string &FitName) final;
+
+    /// @copydoc FitterBase::GetFancyName
+    virtual std::string GetFancyName() const final;
 
     /// @brief Set how long chain should be
     /// @param L new chain length
