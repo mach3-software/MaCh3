@@ -134,6 +134,7 @@ Following neutrino oscillation calculators are available:
 | CHIC             | CPU        | Beam/Atm   | PMNS       | [Ref](https://arxiv.org/pdf/2512.16427)                 |
 | OscLib           | CPU        | Beam       | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI))</details>       | [Ref](https://github.com/cafana/OscLib)                 |
 
+
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
@@ -145,12 +146,14 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm    | Reference        |Need Ext Lib  |
-|--------------|------------------|--------------|
-| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | No       |
-| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
-| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
-| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
+| Algorithm    | Reference        | Variants     |Need Ext Lib  |
+|--------------|------------------|--------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | <details><summary>Extensions </summary> Adaptive MR2T2, Multi-Canonical MR2T2, Temperature-Annealed MR2T2, (variants may be combined) </details> | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | Same as in MR2T2 | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | -                | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | -                | No       |
+
+To find more information about each we recomend reading [here](https://mach3-software.github.io/MaCh3/group__FittingAlgorithms.html).
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
