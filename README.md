@@ -120,19 +120,20 @@ MaCh3 has access to several neutrino oscillation calculators via [NuOscillator](
 
 Following neutrino oscillation calculators are available:
 
-| Oscillator | Hardware | Source | Model | Reference |
-|------------|----------|--------|-------|-----------|
-| CUDAProb3Linear | CPU/GPU | Beam | PMNS | |
-| CUDAProb3 | CPU/GPU | Atm | PMNS | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022) |
-| ProbGPULinear | GPU | Beam | PMNS | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23) |
-| Prob3++Linear | CPU | Beam | PMNS | |
-| NuFastLinear | CPU | Beam | PMNS | [Ref](https://doi.org/10.48550/arXiv.2405.02400) |
-| NuFastEarth | CPU | ATM | PMNS | [Ref](https://arxiv.org/abs/2511.04735) |
+| Oscillator       | Hardware   | Source     | Model      | Reference  |
+|------------------|------------|------------|------------|------------|
+| CUDAProb3Linear  | CPU/GPU    | Beam       | PMNS       |            |
+| CUDAProb3        | CPU/GPU    | Atm        | PMNS       | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
+| ProbGPULinear    | GPU        | Beam       | PMNS       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
+| Prob3++Linear    | CPU        | Beam       | PMNS       |            |
+| NuFastLinear     | CPU        | Beam       | PMNS       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
+| NuFastEarth      | CPU        | ATM        | PMNS       | [Ref](https://arxiv.org/abs/2511.04735)                 |
 | OscProb | CPU | Beam/Atm | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Scalar NSI (SNSI), Sterile Neutrinos (+1, +2, +3), Neutrino Decay, Decoherence, Non-Unitarity (NUNM), Lorentz Invariance Violation (LIV), Sidereal LIV, Open Quantum Systems (OPS)</details> | [Ref](https://doi.org/10.5281/zenodo.6347002) |
-| NuSQUIDSLinear | CPU | Beam | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Decoherence, Lorentz Invariance Violation (LIV)</details> | [Ref](https://doi.org/10.1016/j.cpc.2022.108346) |
-| GLoBESLinear | CPU | Beam | PMNS | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003) |
-| CHIC | CPU | Beam/Atm | PMNS | [Ref](https://arxiv.org/pdf/2512.16427) |
-| OscLib | CPU | Beam | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI)</details> | [Ref](https://github.com/cafana/OscLib) |
+| NuSQUIDSLinear   | CPU        | Beam       | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Decoherence, Lorentz Invariance Violation (LIV)</details>           | [Ref](https://doi.org/10.1016/j.cpc.2022.108346)        |
+| GLoBESLinear     | CPU        | Beam       | PMNS       | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003)        |
+| CHIC             | CPU        | Beam/Atm   | PMNS       | [Ref](https://arxiv.org/pdf/2512.16427)                 |
+| OscLib           | CPU        | Beam       | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI))</details>       | [Ref](https://github.com/cafana/OscLib)                 |
+
 
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
@@ -145,12 +146,12 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm | Reference | Variants | Need Ext Lib |
-|-----------|-----------|----------|--------------|
-| MR2T2 | [Ref](https://doi.org/10.1063/1.1699114) | <details><summary>Extensions</summary>Adaptive MR2T2, Multi-Canonical MR2T2, Temperature-Annealed MR2T2 (variants may be combined)</details> | No |
-| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0) | Same as in MR2T2 | No |
-| MINUIT2 | [Ref](https://cds.cern.ch/record/2296388/) | - | Yes |
-| PSO | [Ref](https://doi.org/10.1162/EVCO_r_00180) | - | No |
+| Algorithm    | Reference        | Variants     |Need Ext Lib  |
+|--------------|------------------|--------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | <details><summary>Extensions </summary> Adaptive MR2T2, Multi-Canonical MR2T2, Temperature-Annealed MR2T2, (variants may be combined) </details> | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | Same as in MR2T2 | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | -                | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | -                | No       |
 
 To find more information about each we recomend reading [here](https://mach3-software.github.io/MaCh3/group__FittingAlgorithms.html).
 
