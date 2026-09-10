@@ -334,7 +334,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
-
   _fPreFitValue     = std::vector<double>(SizeVec, 1.0);
   _fError           = std::vector<double>(SizeVec, 1.0);
   _fCurrVal         = std::vector<double>(SizeVec, 0.0);
@@ -1111,7 +1110,6 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
   throwMatrix = nullptr;
   SetThrowMatrix(cov);
 }
-
 
 // ********************************************
 void ParameterHandlerBase::SanitizeAdaption() const {
