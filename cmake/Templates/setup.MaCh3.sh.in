@@ -151,4 +151,6 @@ if test -d ${MaCh3_ROOT}/pyMaCh3; then
   add_to_PYTHONPATH ${MaCh3_ROOT}
 fi
 
+${MaCh3_ROOT}/bin/mach3 --install-completions
+
 unset SCRIPT_PATH
