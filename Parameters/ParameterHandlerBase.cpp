@@ -134,12 +134,7 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     }
     flip_point = Get<double>(param["FlipParameter"], __FILE__, __LINE__);
   }
-
-  if (!CircEnabled && !FlipEnabled && !FunctionalFlipEnabled) {
-    MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  
   if (param["FunctionalFlip"]) {
     FunctionalFlipEnabled = true;
     // grab functional flip details if needed
@@ -150,6 +145,12 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     }
     functional_flip = param["FunctionalFlip"];
   }
+
+  if (!CircEnabled && !FlipEnabled && !FunctionalFlipEnabled) {
+    MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
 
   if (FlipEnabled && FunctionalFlipEnabled) {
     MACH3LOG_ERROR("Parameter {} enables both FlipParameter and FunctionalFlip; choose exactly one flip type", GetParFancyName(Index));
