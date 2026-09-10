@@ -14,7 +14,7 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
 //****************************************
-BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, MaCh3Modes *Modes_) : SplineBase() {
+BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, MaCh3Modes *Modes_, bool Use_GPU) : SplineBase(Use_GPU) {
 //****************************************
   if (!ParHandler_) {
     MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized covariance object");
@@ -35,18 +35,21 @@ BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, M
 }
 
 //****************************************
-BinnedSplineHandler::~BinnedSplineHandler(){
+BinnedSplineHandler::~BinnedSplineHandler() {
 //****************************************
   if(manycoeff_arr != nullptr) delete[] manycoeff_arr;
   if(xcoeff_arr != nullptr) delete[] xcoeff_arr;
   #ifdef MaCh3_CUDA
+  if (useGPU) {
   //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
   gpu_monolith->CleanupPinnedMemory(nullptr, SplineSegments, ParamValues);
   delete gpu_monolith;
-  #else
-  if(SplineSegments != nullptr) delete[] SplineSegments;
-  if(ParamValues != nullptr) delete[] ParamValues;
+  } else
   #endif
+  {
+    if(SplineSegments != nullptr) delete[] SplineSegments;
+    if(ParamValues != nullptr) delete[] ParamValues;
+  }
 }
 
 //****************************************
@@ -268,7 +271,6 @@ void BinnedSplineHandler::TransferToMonolith() {
   SetupSegments();
 }
 
-#ifdef MaCh3_CUDA
 // *****************************************
 void BinnedSplineHandler::Evaluate() {
 // *****************************************
@@ -276,24 +278,20 @@ void BinnedSplineHandler::Evaluate() {
   // Find the spline segments
   FindSplineSegment();
 
-  // The main call to the GPU
-  gpu_monolith->RunGPU_SplineMonolith_Binned(
-    cpu_spline_weights.data(),
-    ParamValues,
-    SplineSegments);
+  #ifdef MaCh3_CUDA
+  if (useGPU) { // GPU calculations
+    // The main call to the GPU
+    gpu_monolith->RunGPU_SplineMonolith_Binned(
+      cpu_spline_weights.data(),
+      ParamValues,
+      SplineSegments);
+  } else
+  #endif
+  { // CPU-only calculations
+    // KS: Huge MP loop over all valid splines
+    CalcSplineWeights();
+  }
 }
-#else
-// *****************************************
-void BinnedSplineHandler::Evaluate() {
-// *****************************************
-  // There's a parameter mapping that goes from spline parameter to a global parameter index
-  // Find the spline segments
-  FindSplineSegment();
-
-  //KS: Huge MP loop over all valid splines
-  CalcSplineWeights();
-}
-#endif
 
 //****************************************
 void BinnedSplineHandler::CalcSplineWeights() {
@@ -818,6 +816,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
 void BinnedSplineHandler::MoveToGPU() {
 //****************************************
   #ifdef MaCh3_CUDA
+  if(!useGPU) return;
   gpu_monolith = new SplineMonolithGPU();
   unsigned int event_size_max = _max_knots * nParams;
 

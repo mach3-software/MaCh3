@@ -33,7 +33,10 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Returns enum describing our param type
     /// @param i parameter index
     SystType GetParamType(const int i) const {return _fParamType[i];}
-
+    /// @brief Returns group of param
+    /// @param i parameter index
+    std::string GetParamGroup(const int i) const{return _ParameterGroup[i];};
+  
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}

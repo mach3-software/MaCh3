@@ -11,7 +11,7 @@
 class BinnedSplineHandler : public SplineBase {
   public:
     /// @brief Constructor
-    BinnedSplineHandler(ParameterHandlerGeneric *ParamHandler, MaCh3Modes *Modes_);
+    BinnedSplineHandler(ParameterHandlerGeneric *ParamHandler, MaCh3Modes *Modes_, const bool Use_GPU = true);
     /// @brief Destructor
     virtual ~BinnedSplineHandler();
 

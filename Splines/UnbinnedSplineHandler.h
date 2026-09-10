@@ -15,7 +15,8 @@ class UnbinnedSplineHandler : public SplineBase {
     UnbinnedSplineHandler(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
               const std::vector<RespFuncType> &SplineType,
               const bool SaveFlatTree = false,
-              const std::string& _FastSplineName = "SplineFile.root");
+              const std::string& _FastSplineName = "SplineFile.root",
+              const bool Use_GPU = true);
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
     UnbinnedSplineHandler(const std::string& FileName);

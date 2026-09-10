@@ -20,6 +20,28 @@
   /// - **DelayedMR2T2** — Extension including delayed rejection to improve
   ///   sampling efficiency and acceptance in difficult likelihood surfaces.
   ///
+  /// Implemented Variants:
+  /// There are multiple ways to modify algorithm by using so called variants.
+  /// This modifies only single aspect of algorithm and are enable or disabled on
+  /// on config level. This list includes
+  /// - Adaptive MCMC (**AdaptiveMCMCHandler**) - modifies proposal matrix resulting in better acceptance and smaller autocorrelations
+  /// - Multi-Canonical or Umbrella Sampling (**MulticanonicalMCMCHandler**) - modifies the sampling distribution to improve exploration of difficult
+  /// or multimodal posterior regions.
+  /// @code{.yaml}
+  /// General:
+  ///   MCMC:
+  ///     Multicanonical:
+  ///       Enabled: true
+  /// @endcode
+  /// - Temperature annealing (**MCMCBase::AnnealTemp**) - modifies the effective
+  /// sampling temperature, allowing the sampler to explore the parameter space
+  /// more broadly.
+  /// @code{.yaml}
+  /// General:
+  ///   MCMC:
+  ///     AnnealTemp: 0.5
+  /// @endcode
+  ///
   /// -----------------------------------------------------------------------------
   /// # Likelihood Minimizers
   /// These algorithms deterministically minimise the negative log-likelihood to
@@ -38,7 +60,7 @@
   /// Example configuration:
   /// @code{.yaml}
   /// General:
-  ///   FittingAlgorithm: "MCMC"
+  ///   FittingAlgorithm: "MR2T2"
   /// @endcode
   ///
   /// or

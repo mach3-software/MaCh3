@@ -30,7 +30,7 @@ class SplineMonolithGPU;
 class SplineBase {
   public:
     /// @brief Constructor
-    SplineBase();
+    SplineBase(const bool Use_GPU = true);
     /// @brief Destructor
     virtual ~SplineBase();
 
@@ -119,6 +119,8 @@ class SplineBase {
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonolithGPU* gpu_monolith;
 
+    /// Whether to use GPU or not
+    bool useGPU;
   private:
      /// @brief Validates that the spline segment is correct for the given variation.
      /// @param i Index of the spline in SplineInfoArray.
