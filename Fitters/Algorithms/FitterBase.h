@@ -8,6 +8,7 @@
 // MaCh3 Includes
 #include "Samples/SampleHandlerInterface.h"
 #include "Parameters/ParameterHandlerBase.h"
+#include "Parameters/ParameterHandlerGeneric.h"
 #include "Manager/Manager.h"
 #include "Processing/MCMCProcessor.h"
 
