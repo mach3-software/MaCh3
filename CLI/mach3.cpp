@@ -7,6 +7,8 @@
 #include "CLI/Modules/ProcessMCMCModule.hpp"
 #include "CLI/Modules/DiagMCMCModule.hpp"
 #include "CLI/Modules/GetPenaltyTermModule.hpp"
+#include "CLI/Modules/RHatModule.hpp"
+#include "CLI/Modules/SmearModule.hpp"
 #include "CLI/MaCh3Program.hpp"
 
 /// @brief Main entry point for the MaCh3 application
@@ -33,10 +35,14 @@ int main(int argc, char *argv[]) {
     M3::ProcessMCMCModule proc;
     M3::DiagMCMCModule diag;
     M3::GetPenaltyTermModule penterm;
+    M3::RHatModule rhat;
+    M3::SmearModule smear;
 
     program.add_core_module(proc);
     program.add_core_module(diag);
     program.add_core_module(penterm);
+    program.add_core_module(rhat);
+    program.add_core_module(smear);
     program.load_dynamic_plugins();
 
     try {
