@@ -6,6 +6,7 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
+#include "Parameters/SpecialProposals.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
 /// @details Provides core functionality for managing systematic parameters,
@@ -367,7 +368,11 @@ class ParameterHandlerBase {
 
   /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
   /// @param group Name of the flip group
-  void FlipParameterGroup(std::string group);
+  void FlipParameterGroup(const std::string& group);
+
+  /// @brief Evaluate a formula-driven flip for a target parameter.
+  /// @param flip Functional flip configuration.
+  M3::float_t EvaluateFunctionalFlip(const FunctionalFlipProposal& flip, const std::vector<double>& proposed_values) const;
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -375,6 +380,15 @@ class ParameterHandlerBase {
 
   /// @brief Enable special proposal
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
+
+  /// @brief Parse and register a functional flip defined in YAML.
+  void AddFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
+
+  /// @brief Queue a functional flip until all parameters have been loaded.
+  void QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
+
+  /// @brief Resolve queued functional flips after parameter names are known.
+  void ResolveFunctionalFlips();
 
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
@@ -456,19 +470,10 @@ class ParameterHandlerBase {
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  /// @brief Struct to hold information about a group of parameters that flip together at the same time
-  /// @author Charlotte Knight
-  /// @author Liban Warsame
-  struct FlipGroup {
-    /// Indices of parameters with flip symmetry
-    std::vector<int> FlipParameterIndex;  
-    /// Central points around which parameters are flipped
-    std::vector<double> FlipParameterPoint; 
-  };
-
   /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
   std::map<std::string, FlipGroup> FlipGroups;
-
+  /// Functional flips waiting for full parameter-name registration.
+  std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
