@@ -953,12 +953,20 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
       // Vector of parameter names correlated to given parameter, from correlation matrix
       std::vector<std::vector<std::string>> CorrParams(npars);
       std::vector<double> StepScale(npars);
+      TMatrixDSym *cov_matrix = cov->GetCovMatrix();
+      
       for (int i = 0; i < npars; ++i)
 	{
 	  std::string name = cov->GetParFancyName(i);
 
 	  //Make vector of parameters which are correlated to given parameter
-	  std::map<std::string, double> parCorr = cov->GetCorrElements(i);
+	  std::map<std::string, double> parCorr;
+	  for (int j = 0; j < npars; ++j) {
+	    double correlation = (*cov_matrix)(i, j) / std::sqrt((*cov_matrix)(i, i) * (*cov_matrix)(j, j));
+	    std::string par_corr_name = cov->GetParFancyName(j);
+	    parCorr[par_corr_name] = correlation;
+	  }
+	  
 	  for (const auto& corrMap : parCorr){
 	    std::string corr_var_name = corrMap.first;
 	    if (!ParamVector.empty()){
@@ -974,9 +982,17 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 	    }
 	    double corr = corrMap.second;
 	    int index = cov->GetParIndex(corr_var_name);
+	    if(index == i) continue;
 	    // Cut on what is consider a correlated parameter
 	    // Also only allow same groups correlations
-	    if(std::abs(corr) > 0.3 && cov->GetParameterGroup(i) == cov->GetParameterGroup(index)) 
+	    std::string parameter_group_i = "";
+	    std::string parameter_group_index = "";
+	    //If type isnt specified, allow parameters of different groups to be correlated
+	    if (auto *param_handler= dynamic_cast<ParameterHandlerGeneric *>(cov)) {
+	      parameter_group_i = param_handler->GetParamGroup(i);
+	      parameter_group_index = param_handler->GetParamGroup(index);
+	    }
+	    if(std::abs(corr) > 0.3 && parameter_group_i == parameter_group_index) 
 	      CorrParams[i].push_back(corr_var_name);
 	  }
 	  StepScale[i] = cov->GetIndivStepScale(i);

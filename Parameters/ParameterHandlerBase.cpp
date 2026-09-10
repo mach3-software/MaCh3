@@ -237,8 +237,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fUpBound         = std::vector<double>(SizeVec, 999.99);
   _fFlatPrior       = std::vector<bool>(SizeVec, false);
   _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
-  _fParameterGroup  = std::vector<std::string>(SizeVec);
-  Correlations    = std::vector<std::map<std::string,double>>(SizeVec);
 
   corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)
