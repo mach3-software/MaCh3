@@ -13,7 +13,6 @@
 namespace fs = std::filesystem;
 
 namespace M3{
-
     /// @class MaCh3Program
     /// @brief Main program class that manages modules, plugins, and command-line parsing
     ///
@@ -115,4 +114,4 @@ _mach3() {
 _mach3
 )";
     };
-};
+}
