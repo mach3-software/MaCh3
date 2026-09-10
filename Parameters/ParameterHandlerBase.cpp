@@ -679,7 +679,7 @@ void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 
 
 // *************************************
-M3::float_t ParameterHandlerBase::EvaluateFunctionalFlip(const ParameterHandlerBase::FunctionalFlipProposal& flip,
+M3::float_t ParameterHandlerBase::EvaluateFunctionalFlip(const FunctionalFlipProposal& flip,
                                                          const std::vector<double>& proposed_values) const {
 // *************************************
   std::vector<double> parameter_values(flip.argument_indices.size(), 0.0);

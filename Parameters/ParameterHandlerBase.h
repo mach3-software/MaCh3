@@ -6,6 +6,7 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
+#include "Parameters/SpecialProposals.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
 /// @details Provides core functionality for managing systematic parameters,
@@ -365,9 +366,6 @@ class ParameterHandlerBase {
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
 
-    struct FunctionalFlipProposal;
-
-
   /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
   /// @param group Name of the flip group
   void FlipParameterGroup(const std::string& group);
@@ -395,28 +393,6 @@ class ParameterHandlerBase {
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
   void SpecialStepProposal();
-
-  /// @brief Configuration for a formula-based functional flip.
-  struct FunctionalFlipProposal {
-    int target_index = M3::_BAD_INT_;
-    std::vector<int> argument_indices;
-    std::vector<std::string> argument_names;
-    std::string formula;
-    std::unique_ptr<TF1> evaluator;
-
-    FunctionalFlipProposal() = default;
-    FunctionalFlipProposal(FunctionalFlipProposal&&) _noexcept_ = default;
-    FunctionalFlipProposal& operator=(FunctionalFlipProposal&&) _noexcept_ = default;
-
-    FunctionalFlipProposal(const FunctionalFlipProposal&) = delete;
-    FunctionalFlipProposal& operator=(const FunctionalFlipProposal&) = delete;
-  };
-
-  struct PendingFunctionalFlipProposal {
-    int target_index = M3::_BAD_INT_;
-    std::string group_name;
-    YAML::Node config;
-  };
 
   /// Check if any of special step proposal were enabled
   bool doSpecialStepProposal;
@@ -493,18 +469,6 @@ class ParameterHandlerBase {
   std::unique_ptr<AdaptiveMCMCHandler> AdaptiveHandler;
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
-
-  /// @brief Struct to hold information about a group of parameters that flip together at the same time
-  /// @author Charlotte Knight
-  /// @author Liban Warsame
-  struct FlipGroup {
-    /// Indices of parameters with flip symmetry
-    std::vector<int> FlipParameterIndex;  
-    /// Central points around which parameters are flipped
-    std::vector<double> FlipParameterPoint; 
-    /// Formula-driven flips that should be applied when this group flips.
-    std::vector<FunctionalFlipProposal> FunctionalFlipParameters;
-  };
 
   /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
   std::map<std::string, FlipGroup> FlipGroups;
