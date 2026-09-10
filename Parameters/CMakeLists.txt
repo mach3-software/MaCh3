@@ -6,6 +6,7 @@ set(HEADERS
     PCAHandler.h
     ParameterTunes.h
     ParameterStructs.h
+    SpecialProposals.h
 )
 
 add_library(Parameters SHARED
