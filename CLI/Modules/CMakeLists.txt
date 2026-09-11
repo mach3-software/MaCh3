@@ -10,6 +10,7 @@ add_library(CLIModules SHARED
     RHatModule.cpp
     SmearModule.cpp
     ReweightModule.cpp
+    CombineModule.cpp
 )
 
 target_link_libraries(CLIModules PRIVATE MaCh3::All)
