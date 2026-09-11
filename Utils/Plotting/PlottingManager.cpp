@@ -236,13 +236,13 @@ void PlottingManager::setOutFileName(const std::string& saveName) {
   }
 
   std::string ext = path.extension().string();
-  if (ext == ".pdf" || ext == ".ps" || ext == ".eps") {
+  if (ext == ".pdf" || ext == ".ps" || ext == ".eps" || ext == ".root") {
     _outputName = saveName;
     return;
   }
 
   MACH3LOG_WARN("file extension '{}' that you provided doesnt support multiple plots in one file", ext);
-  MACH3LOG_WARN("should be one of .pdf, .eps .ps, will use pdf");
+  MACH3LOG_WARN("should be one of .pdf, .eps .ps, .root, will use pdf");
   _outputName = saveName + ".pdf";
 }
 

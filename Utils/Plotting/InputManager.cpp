@@ -306,7 +306,6 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
   else if (locationVec.size() == 2)
   {
     TDirectoryFile *directory = fileDef.file->Get<TDirectoryFile>(locationVec[0].c_str());
-    size_t nMatchingObjects = 0;
 
     // let's make sure that the directory itself exists
     if (directory == nullptr)
@@ -315,25 +314,11 @@ std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
     }
     else
     {
-      // loop through the keys in the directory and find objects whose name matches the specified
-      // pattern
-      TIter next(directory->GetListOfKeys());
-      while (TKey *key = static_cast<TKey*>(next()))
-      {
-        if (strEndsWith(std::string(key->GetName()), locationVec[1]))
-        {
-          object = std::shared_ptr<TObject>(directory->Get(key->GetName()));
-          nMatchingObjects++;
-        }
+      object = std::shared_ptr<TObject>(directory->Get(locationVec[1].c_str()));
+      if (object == nullptr){
+        MACH3LOG_INFO("Couldn't find object with name " + locationVec[1] + " in directory " + locationVec[0]);
+        throw MaCh3Exception(__FILE__ , __LINE__ );        
       }
-    }
-    // check that only one object matched the pattern
-    if (nMatchingObjects > 1)
-    {
-      MACH3LOG_CRITICAL("Too many objects match the pattern specified by {} {}", locationVec[0], locationVec.size()==2 ? locationVec[1] : "");
-      MACH3LOG_CRITICAL("Found {} matching objects, should just be one", nMatchingObjects);
-
-      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   else // Vector too big!!
@@ -429,6 +414,17 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
         }
         break;
       }
+    }
+  }
+  else if(inputFileDef.posteriorTree != nullptr){ //literally just a raw MCMC tree, never been processed
+    std::string specificName = getFitterSpecificParamName(fitter, kMCMC, parameter);
+
+    MACH3LOG_DEBUG("Trying to use a raw MCMC file with branchname {}", specificName);
+    if(inputFileDef.posteriorTree->GetBranch(specificName.c_str())){
+      wasFound = true;
+      // EM: should probably use MCMCProcessor for this so we can use caching, gpu etc.
+      inputFileDef.MCMCstepParamsMap[parameter] = new double( M3::_BAD_DOUBLE_ ); // <- initialise the parameter step values
+      inputFileDef.posteriorTree->SetBranchAddress( specificName.c_str(), inputFileDef.MCMCstepParamsMap.at(parameter) );
     }
   }
   return wasFound;
@@ -692,6 +688,10 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThought
 
         postTree = inputFileDef.file->Get<TTree>(rawLoc.c_str());
 
+        if ( postTree != nullptr && thisFitterSpec_config["MCMCsteps"]["skipProcessMCMC"]){
+          MACH3LOG_DEBUG("Found MCMC posterior chain and you asked to skip processMCMC");
+          break;
+        }
         if ( postTree != nullptr && (postTree->GetNbranches() != 0) )
         {
           inputFileDef.mcmcProc = std::make_unique<MCMCProcessor>(inputFileDef.fileName);
@@ -706,6 +706,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThought
     
       if ( postTree != nullptr && (postTree->GetNbranches() != 0) )
       {
+        MACH3LOG_DEBUG("Found an MCMC file and you asked to skip processMCMC");
         inputFileDef.posteriorTree = postTree;
         inputFileDef.nMCMCentries = int(postTree->GetEntries());
       }

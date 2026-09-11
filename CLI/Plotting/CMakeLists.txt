@@ -4,6 +4,7 @@ foreach(app
     PlotLLH
     MatrixPlotter
     PlotSigmaVariation
+    MakePosteriorHistograms
     )
     add_executable(${app} ${app}.cpp )
     target_link_libraries(${app} MaCh3::All MaCh3Warnings)
