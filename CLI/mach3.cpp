@@ -9,6 +9,7 @@
 #include "CLI/Modules/GetPenaltyTermModule.hpp"
 #include "CLI/Modules/RHatModule.hpp"
 #include "CLI/Modules/SmearModule.hpp"
+#include "CLI/Modules/ReweightModule.hpp"
 #include "CLI/MaCh3Program.hpp"
 
 /// @brief Main entry point for the MaCh3 application
@@ -37,12 +38,14 @@ int main(int argc, char *argv[]) {
     M3::GetPenaltyTermModule penterm;
     M3::RHatModule rhat;
     M3::SmearModule smear;
+    M3::ReweightModule reweight;
 
     program.add_core_module(proc);
     program.add_core_module(diag);
     program.add_core_module(penterm);
     program.add_core_module(rhat);
     program.add_core_module(smear);
+    program.add_core_module(reweight);
     program.load_dynamic_plugins();
 
     try {

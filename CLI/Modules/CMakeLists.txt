@@ -9,6 +9,7 @@ add_library(CLIModules SHARED
     GetPenaltyTermModule.cpp
     RHatModule.cpp
     SmearModule.cpp
+    ReweightModule.cpp
 )
 
 target_link_libraries(CLIModules PRIVATE MaCh3::All)
