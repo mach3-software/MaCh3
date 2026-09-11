@@ -5,11 +5,11 @@
 // ***************************************************************************
 /// @copydoc SampleHandlerNuDockBase::SampleHandlerNuDockBase
 // ***************************************************************************
-SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* xsec_cov)
+SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* par_handler)
 : SampleHandlerInterface() {
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
-  ParHandler = xsec_cov;
+  ParHandler = par_handler;
   SampleManager = std::make_unique<Manager>(configFile.c_str());
   verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false, __FILE__, __LINE__);
 
@@ -49,13 +49,13 @@ void SampleHandlerNuDockBase::Init() {
 void SampleHandlerNuDockBase::Reweight() {
   nlohmann::json request;
   std::unordered_map<std::string, double> osc_params;
-  std::unordered_map<std::string, double> xsec_params;
+  std::unordered_map<std::string, double> sys_params;
   
   // Loop for systs
   for (const auto& iParam : nudockParamInds) {
     std::string paramName = ParHandler->GetParFancyName(iParam);
     double paramValue = ParHandler->GetParProp(iParam);
-    xsec_params[paramName] = paramValue;
+    sys_params[paramName] = paramValue;
   }
 
   // Loop over NuDockOscNameMap_r to get osc params
@@ -71,7 +71,7 @@ void SampleHandlerNuDockBase::Reweight() {
   }
 
   request["osc_pars"] = osc_params;
-  request["sys_pars"] = xsec_params;
+  request["sys_pars"] = sys_params;
 
   auto response = nudock_ptr->send_request("/set_parameters", request);
   if (verbose) {

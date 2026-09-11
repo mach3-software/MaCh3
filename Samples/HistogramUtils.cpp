@@ -499,14 +499,14 @@ void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist) {
   }
 }
 // ****************
-//KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
+// KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
 int GetRandomPoly2(const TH2Poly* PolyHist) {
 // ****************
   const int nbins = PolyHist->GetNumberOfBins();
   const double r1 = M3::rand::Uniform();;
 
-  double* fIntegral = new double[nbins+2];
+  std::vector<double> fIntegral(nbins+2);
   fIntegral[0] = 0.0;
 
   //KS: This is custom version of ComputeIntegral, once again ROOT was lazy :(
@@ -520,11 +520,10 @@ int GetRandomPoly2(const TH2Poly* PolyHist) {
   fIntegral[nbins+1] = PolyHist->GetEntries();
 
   //KS: We just return one rather then X and Y, this way we can use SetBinContent rather than Fill, which is faster
-  int iBin = int(TMath::BinarySearch(nbins, fIntegral, r1));
+  int iBin = int(TMath::BinarySearch(nbins, fIntegral.data(), r1));
   //KS: Have to increment because TH2Poly has stupid offset arghh
   iBin += 1;
 
-  delete[] fIntegral;
   return iBin;
 }
 

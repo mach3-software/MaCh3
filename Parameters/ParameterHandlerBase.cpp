@@ -798,7 +798,6 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
   #pragma GCC diagnostic ignored "-Wuseless-cast"
   // If empty, set the proposed to prior
   if (pars.empty()) {
-    // For xsec this means setting to the prior (because prior is the prior)
     for (int i = 0; i < _fNumPar; i++) {
       _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i]);
     }
