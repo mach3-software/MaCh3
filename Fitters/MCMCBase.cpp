@@ -140,7 +140,10 @@ void MCMCBase::PostStepProcess() {
     AdaptiveStep();
 
     if (step % auto_save == 0){
-        outTree->AutoSave();
+        // FlushBaskets stops the tree key from embedding every open basket, which can
+        // overflow ROOT's 2GB TBuffer limit. SaveSelf writes the file header too, so the
+        // output opens without TFile::Recover if the job is killed
+        outTree->AutoSave("FlushBaskets SaveSelf");
     }
     gErrorIgnoreLevel = originalErrorLevel;
 }

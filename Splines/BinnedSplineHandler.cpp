@@ -537,8 +537,8 @@ void BinnedSplineHandler::PrepForReweight() {
     if (FoundNonFlatSpline) {
       UniqueSystNames.push_back(SystName);
     } else {
-      MACH3LOG_INFO("{} syst has no response in sample {}", SystName, entry.iSample);
-      MACH3LOG_INFO("Whilst this isn't necessarily a problem, it seems odd");
+      MACH3LOG_DEBUG("{} syst has no response in sample {}", SystName, entry.iSample);
+      MACH3LOG_DEBUG("Whilst this isn't necessarily a problem, it seems odd");
     }
   }  // end loop over indices
   nParams = static_cast<short int>(UniqueSystSplines.size());

@@ -130,7 +130,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
   outTree->Fill();
 
   // Auto save the output
-  if (step % auto_save == 0) outTree->AutoSave();
+  if (step % auto_save == 0) outTree->AutoSave("FlushBaskets SaveSelf");
   step++;
   accCount++;
 
