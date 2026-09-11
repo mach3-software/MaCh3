@@ -27,9 +27,9 @@ public:
   ///
   /// @param configFile Path to a YAML configuration file containing the
   ///                   NuDockClient block.
-  /// @param xsec_cov   Pointer to the cross-section parameter handler from
-  ///                   which current parameter values are read.
-  SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* xsec_cov);
+  /// @param par_handler Pointer to the cross-section parameter handler from
+  ///                    which current parameter values are read.
+  SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* par_handler);
 
   /// @brief Destructor.
   virtual ~SampleHandlerNuDockBase();

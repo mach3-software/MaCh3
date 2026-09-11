@@ -17,7 +17,7 @@ SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandle
 
   //ETA - safety feature so you can't pass a NULL _ParHandler
   if(!_ParHandler) {
-    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
+    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any model parameter");
   }
   ParHandler = _ParHandler;
   nEvents = 0;
@@ -570,7 +570,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector <std::vector<NormParameter>>& 
       auto& NormParam = norm_parameters[SampleId];
       // Skip oscillated NC events
       // Not strictly needed, but these events don't get included in oscillated predictions, so
-      // no need to waste our time calculating and storing information about xsec parameters
+      // no need to waste our time calculating and storing information about xsec/flux etc. parameters
       // that will never be used.
       if (MCEvents[iEvent].isNC && (MCEvents[iEvent].nupdg != MCEvents[iEvent].nupdgUnosc) ) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);

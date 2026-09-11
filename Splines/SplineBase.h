@@ -101,7 +101,7 @@ class SplineBase {
     /// @brief Since we find segment before actual reweight and sometimes we want to copy it to GPU we have different functionality depending if GPU or CPU
     void SetupSegments();
 
-    /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
+    /// Array of FastSplineInfo structs: keeps information on each spline for fast evaluation
     /// Method identical to TSpline3::Eval(double) but faster because less operations
     std::vector<FastSplineInfo> SplineInfoArray;
     /// Store currently found segment they are not in FastSplineInfo as in case of GPU we need to copy paste it to GPU
