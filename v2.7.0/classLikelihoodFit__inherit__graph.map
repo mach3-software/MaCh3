@@ -1,0 +1,7 @@
+<map id="LikelihoodFit" name="LikelihoodFit">
+<area shape="rect" id="node1" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="79,80,174,107"/>
+<area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="5,155,77,181"/>
+<area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="101,155,152,181"/>
+<area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="177,155,287,181"/>
+<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="85,5,168,32"/>
+</map>

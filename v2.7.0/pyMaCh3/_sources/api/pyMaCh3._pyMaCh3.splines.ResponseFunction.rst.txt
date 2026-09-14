@@ -1,0 +1,19 @@
+ResponseFunction
+================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.splines
+
+.. autoclass:: ResponseFunction
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ResponseFunction.evaluate
+      ~ResponseFunction.find_segment
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate
+   .. automethod:: find_segment

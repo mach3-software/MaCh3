@@ -1,0 +1,7 @@
+<map id="inheritance5046645c21" name="inheritance5046645c21">
+<area shape="rect" id="node1" href="api/pyMaCh3._pyMaCh3.splines.EventSplineMonolith.html#pyMaCh3._pyMaCh3.splines.EventSplineMonolith" target="_top" title="This &#39;monolith&#39; deals with event by event weighting using splines." alt="" coords="409,5,565,31"/>
+<area shape="rect" id="node2" href="api/pyMaCh3._pyMaCh3.splines.SplineBase.html#pyMaCh3._pyMaCh3.splines.SplineBase" target="_top" title="SplineBase" alt="" coords="225,5,319,31"/>
+<area shape="rect" id="node3" href="api/pyMaCh3._pyMaCh3.splines.InterpolationType.html#pyMaCh3._pyMaCh3.splines.InterpolationType" target="_top" title="Members:" alt="" coords="205,55,339,80"/>
+<area shape="rect" id="node6" title="Base class of the response function, this binding only exists for consistency with the inheritance structure of the c++ code. Just pretend it doesn&#39;t exist and don&#39;t worry about it..." alt="" coords="183,104,361,129"/>
+<area shape="rect" id="node5" href="api/pyMaCh3._pyMaCh3.splines.ResponseFunction.html#pyMaCh3._pyMaCh3.splines.ResponseFunction" target="_top" title="ResponseFunction" alt="" coords="417,104,557,129"/>
+</map>

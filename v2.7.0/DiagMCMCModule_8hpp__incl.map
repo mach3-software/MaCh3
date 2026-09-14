@@ -1,0 +1,7 @@
+<map id="CLI/Modules/DiagMCMCModule.hpp" name="CLI/Modules/DiagMCMCModule.hpp">
+<area shape="rect" id="node1" title="Module for MCMC diagnostic analysis." alt="" coords="5,5,241,32"/>
+<area shape="rect" id="node2" href="$plugin_8hpp.html" title="Plugin interface and registration macros for MaCh3." alt="" coords="58,80,189,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="17,155,88,181"/>
+<area shape="rect" id="node4" href="$m3argparse_8hpp.html" title="MaCh3 wrapper for argparse library with additional functionality." alt="" coords="112,155,279,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="119,229,272,256"/>
+</map>
