@@ -5,6 +5,8 @@
 
 #include "NuDockFactory.h"
 
+#include <algorithm>
+
 /// @brief Mapping from NuDock oscillation parameter names to MaCh3 names.
 const std::unordered_map<std::string, std::string> NuDockOscNameMap = {
   {"Theta12", "sin2th_12"},
@@ -103,13 +105,43 @@ void InitialiseNuDockObj(Manager *man,
 }
 
 void FormatOscParsForNuDock(const std::string &param_name, double &param_value) {
-  if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
+  if (param_name == "sin2th_12" || param_name == "sin2th_13" || param_name == "sin2th_23") {
     param_value = std::asin(std::sqrt(param_value));
   }
 }
 
 void FormatOscParsForMaCh3(const std::string &param_name, double &param_value) {
-  if (param_name == "Theta12" || param_name == "Theta13" || param_name == "Theta23") {
+  if (param_name == "sin2th_12" || param_name == "sin2th_13" || param_name == "sin2th_23") {
     param_value = std::sin(param_value) * std::sin(param_value);
+  }
+}
+
+std::vector<int> GetNuDockOscParIndices(const ParameterHandlerGeneric *parHandler) {
+  if (!parHandler) {
+    MACH3LOG_ERROR("Null ParameterHandlerGeneric passed to {}", __func__);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return parHandler->GetParsIndexFromSampleName(kNuDockSampleTag, SystType::kOsc);
+}
+
+void AssertNuDockOscParamsTagged(const ParameterHandlerGeneric *parHandler) {
+  if (!parHandler) return;
+
+  const auto tagged = GetNuDockOscParIndices(parHandler);
+
+  // Throw error if any standard osc parameters are not tagged with NuDock.
+  std::vector<std::string> untagged;
+  for (int i = 0; i < parHandler->GetNumParams(); ++i) {
+    const std::string name = parHandler->GetParFancyName(i);
+    if (NuDockOscNameMap_r.find(name) == NuDockOscNameMap_r.end()) continue;
+    if (std::find(tagged.begin(), tagged.end(), i) == tagged.end()) untagged.push_back(name);
+  }
+
+  if (!untagged.empty()) {
+    MACH3LOG_ERROR("NuDock oscillation parameters are present but not tagged for NuDock.");
+    MACH3LOG_ERROR("Routing is tag-based: add \"{}\" to SampleNames in the covariance YAML", kNuDockSampleTag);
+    MACH3LOG_ERROR("for each of the following, otherwise they will not be sent at all:");
+    for (const auto &name : untagged) MACH3LOG_ERROR("  - {}", name);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }

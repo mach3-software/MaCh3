@@ -97,6 +97,15 @@ CPMAddPackage(
     "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 
+# Fix the INTERFACE_LINK_LIBRARIES of OscProbCalcer to remove Eigen and OSCPROB if they are present
+if(TARGET OscProbCalcer)
+  get_target_property(_opc_link OscProbCalcer INTERFACE_LINK_LIBRARIES)
+  if(_opc_link)
+    list(REMOVE_ITEM _opc_link Eigen OSCPROB)
+    set_target_properties(OscProbCalcer PROPERTIES INTERFACE_LINK_LIBRARIES "${_opc_link}")
+  endif()
+endif()
+
 if(NOT TARGET NuOscillator)
   cmessage(FATAL_ERROR "Expecting dependency NuOscillator")
 endif()

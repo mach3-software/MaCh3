@@ -124,8 +124,20 @@ protected:
   /// @brief Verbose logging flag, read from the NuDockClient config block.
   bool verbose;
 
+  /// @brief Whether to cross-check the oscillation parameter set against the server.
+  bool checkServerOscParams;
+
   /// @brief Cached indices into the ParameterHandler for parameters sent to the server.
   std::vector<int> nudockParamInds;
+
+  /// @brief Cached indices of the NuDock oscillation parameters
+  std::vector<int> nudockOscParamInds;
+
+  /// @brief Cross-check the oscillation parameter set against the server.
+  ///
+  /// Only called when checkServerOscParams is set.
+  /// @throw MaCh3Exception if the two ends disagree on the oscillation parameter set.
+  void CheckServerOscParams();
 
   /// @brief Non-owning pointer to the cross-section ParameterHandler.
   ParameterHandlerGeneric* ParHandler;

@@ -2,6 +2,31 @@
 #include "Samples/SampleHandlerBase.h"
 
 // ***************************************************************************
+/// @brief Membership flags for the NuDock oscillation-parameter set of one handler.
+// ***************************************************************************
+static std::vector<char> BuildNuDockOscParFlags(ParameterHandlerBase *handler) {
+  std::vector<char> flags(static_cast<size_t>(handler->GetNumParams()), 0);
+  // Osc parameters should be in ParameterHandlerGeneric, so we can cast here.
+  auto *generic = dynamic_cast<ParameterHandlerGeneric *>(handler);
+  if (!generic) return flags;
+  for (const int p : GetNuDockOscParIndices(generic)) {
+    if (p >= 0 && p < static_cast<int>(flags.size())) flags[p] = 1;
+  }
+  return flags;
+}
+
+// ***************************************************************************
+/// @copydoc NuDockServerBase::IsNuDockOscPar
+// ***************************************************************************
+bool NuDockServerBase::IsNuDockOscPar(const size_t s, const int p) const {
+  if (s >= osc_param_flags.size() || p < 0 || p >= static_cast<int>(osc_param_flags[s].size())) {
+    MACH3LOG_ERROR("NuDock oscillation-parameter flags not built; was setup() called?");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return osc_param_flags[s][static_cast<size_t>(p)] != 0;
+}
+
+// ***************************************************************************
 /// @copydoc NuDockServerBase::NuDockServerBase
 // ***************************************************************************
 NuDockServerBase::NuDockServerBase(Manager *man) : FitterBase(man) {
@@ -22,6 +47,13 @@ void NuDockServerBase::setup() {
   sample_llh.resize(samples.size(), M3::_BAD_DOUBLE_);
   verbose = GetFromManager(fitMan->raw()["NuDock"]["Verbose"], false, __FILE__, __LINE__);
   add_prior_llh = GetFromManager(fitMan->raw()["NuDock"]["AddPriorLLH"], false, __FILE__, __LINE__);
+
+  // Build the oscillation-parameter flags for each systematic
+  osc_param_flags.resize(systematics.size());
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    AssertNuDockOscParamsTagged(dynamic_cast<ParameterHandlerGeneric *>(systematics[s]));
+    osc_param_flags[s] = BuildNuDockOscParFlags(systematics[s]);
+  }
 }
 
 // ***************************************************************************
@@ -77,12 +109,14 @@ nlohmann::json NuDockServerBase::setParameters(const nlohmann::json &request) {
     for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
       // Check if this is an oscillation parameter
-      if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()) {
-        std::string param_name_nudock = NuDockOscNameMap_r.at(param_name);
+      if (IsNuDockOscPar(s, p)) {
+        const auto it = NuDockOscNameMap_r.find(param_name);
+        // If the parameter is one of the standard osc params, store the nudock version of the name.
+        std::string param_name_nudock = (it != NuDockOscNameMap_r.end()) ? it->second : param_name;
         // Check if it exists in the request
         if (osc_params.find(param_name_nudock) != osc_params.end()) {
           double param_value = osc_params[param_name_nudock];
-          FormatOscParsForMaCh3(param_name_nudock, param_value);
+          FormatOscParsForMaCh3(param_name, param_value);
           systematics[s]->SetParCurrProp(p, param_value);
           if (verbose) MACH3LOG_INFO("Setting osc param {} to value {}", param_name, param_value);
         } else {
@@ -282,12 +316,17 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
 nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &request) {
   (void)request;
   std::vector<std::string> syst_par_names;
+  std::vector<std::string> osc_par_names;
 
   for (size_t s = 0; s < systematics.size(); ++s) {
     int npars = systematics[s]->GetNumParams();
     for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
-      if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()) continue;
+      if (IsNuDockOscPar(s, p)) {
+        const auto it = NuDockOscNameMap_r.find(param_name);
+        osc_par_names.push_back((it != NuDockOscNameMap_r.end()) ? it->second : param_name);
+        continue;
+      }
       if (!systematics[s]->IsParameterFixed(p)) {
         syst_par_names.push_back(param_name);
       }
@@ -295,6 +334,7 @@ nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &reques
   }
   nlohmann::json response;
   response["sys_pars"] = syst_par_names;
+  response["osc_pars"] = osc_par_names;
   return response;
 }
 
@@ -310,8 +350,9 @@ nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
     for (int p = 0; p < npars; ++p) {
       std::string param_name = systematics[s]->GetParFancyName(p);
       double param_value = systematics[s]->GetParProp(p);
-      if (NuDockOscNameMap_r.find(param_name) != NuDockOscNameMap_r.end()){
-        param_name = NuDockOscNameMap_r.at(param_name);
+      if (IsNuDockOscPar(s, p)){
+        const auto it = NuDockOscNameMap_r.find(param_name);
+        if (it != NuDockOscNameMap_r.end()) param_name = it->second;
         osc_params[param_name] = param_value;
       } else {
         if (!systematics[s]->IsParameterFixed(p)) {

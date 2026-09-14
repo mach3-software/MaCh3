@@ -122,4 +122,14 @@ protected:
   bool verbose;
   /// @brief If true, systematic prior likelihoods are added to the total LLH.
   bool add_prior_llh;
+
+  /// @brief Membership flags for the NuDock oscillation-parameter set.
+  ///
+  /// Indexed [systematics object][parameter], 1 where the parameter carries
+  /// kNuDockSampleTag and is SystType::kOsc.
+  std::vector<std::vector<char>> osc_param_flags;
+
+  /// @brief True if parameter p of systematics object s is in the oscillation set.
+  /// @throw MaCh3Exception if setup() has not been called.
+  bool IsNuDockOscPar(const size_t s, const int p) const;
 };
