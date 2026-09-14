@@ -28,3 +28,52 @@ div.PageDoc div.textblock {
     font-size: 0.9em;
     color: #6c757d;
 }
+
+/* ==========================================================
+ *  Main page: Introduction + MCMC video
+ *  ========================================================== */
+.mach3-intro {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.mach3-intro-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.mach3-mcmc-demo {
+    flex: 0 0 60%;
+    max-width: 640px;
+    margin-top: 35px;
+}
+
+.mach3-mcmc-demo video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.mach3-mcmc-caption {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.85em;
+    opacity: 0.65;
+}
+
+
+/* Mobile */
+@media (max-width: 900px) {
+    .mach3-intro {
+        display: block;
+    }
+
+    .mach3-mcmc-demo {
+        width: 100%;
+        max-width: none;
+        margin-top: 30px;
+    }
+}

@@ -1,5 +1,6 @@
 #ignore any object files
 *.o
+*.mp4
 *.sif
 *.idx
 
