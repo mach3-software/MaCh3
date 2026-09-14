@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['yamlhelper_2eh_2054',['YamlHelper.h',['../YamlHelper_8h.html',1,'']]],
-  ['yamltostring_2055',['YAMLtoSTRING',['../YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd',1,'YamlHelper.h']]],
-  ['yamltotmacro_2056',['YAMLtoTMacro',['../YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb',1,'YamlHelper.h']]],
-  ['yresp_2057',['YResp',['../classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa',1,'TSpline3_red']]]
+  ['xcoeff_5farr_2090',['xcoeff_arr',['../classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836',1,'BinnedSplineHandler']]],
+  ['xpos_2091',['XPos',['../classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79',1,'TSpline3_red']]],
+  ['xpts_2092',['xPts',['../structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb',1,'FastSplineInfo']]]
 ];

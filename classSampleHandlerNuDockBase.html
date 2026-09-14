@@ -101,9 +101,9 @@ Collaboration diagram for SampleHandlerNuDockBase:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aead30244be3fe056bc9cbc4c2bb3d41c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerNuDockBase.html#aead30244be3fe056bc9cbc4c2bb3d41c">SampleHandlerNuDockBase</a> (std::string configFile, <a class="el" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a> *xsec_cov)</td></tr>
-<tr class="memdesc:aead30244be3fe056bc9cbc4c2bb3d41c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the NuDock client sample handler.  <a href="classSampleHandlerNuDockBase.html#aead30244be3fe056bc9cbc4c2bb3d41c">More...</a><br /></td></tr>
-<tr class="separator:aead30244be3fe056bc9cbc4c2bb3d41c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66c399a9c927eb86646c2ae8f593acbf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerNuDockBase.html#a66c399a9c927eb86646c2ae8f593acbf">SampleHandlerNuDockBase</a> (std::string configFile, <a class="el" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a> *par_handler)</td></tr>
+<tr class="memdesc:a66c399a9c927eb86646c2ae8f593acbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the NuDock client sample handler.  <a href="classSampleHandlerNuDockBase.html#a66c399a9c927eb86646c2ae8f593acbf">More...</a><br /></td></tr>
+<tr class="separator:a66c399a9c927eb86646c2ae8f593acbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04a3255f7734d50ed7e592561337d6df"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerNuDockBase.html#a04a3255f7734d50ed7e592561337d6df">~SampleHandlerNuDockBase</a> ()</td></tr>
 <tr class="memdesc:a04a3255f7734d50ed7e592561337d6df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="classSampleHandlerNuDockBase.html#a04a3255f7734d50ed7e592561337d6df">More...</a><br /></td></tr>
 <tr class="separator:a04a3255f7734d50ed7e592561337d6df"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -296,8 +296,8 @@ Protected Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerNuDockBase_8h_source.html#l00020">20</a> of file <a class="el" href="SampleHandlerNuDockBase_8h_source.html">SampleHandlerNuDockBase.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aead30244be3fe056bc9cbc4c2bb3d41c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aead30244be3fe056bc9cbc4c2bb3d41c">&#9670;&nbsp;</a></span>SampleHandlerNuDockBase()</h2>
+<a id="a66c399a9c927eb86646c2ae8f593acbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66c399a9c927eb86646c2ae8f593acbf">&#9670;&nbsp;</a></span>SampleHandlerNuDockBase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,7 +312,7 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a> *&#160;</td>
-          <td class="paramname"><em>xsec_cov</em>&#160;</td>
+          <td class="paramname"><em>par_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -328,7 +328,7 @@ Protected Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">configFile</td><td>Path to a YAML configuration file containing the NuDockClient block. </td></tr>
-    <tr><td class="paramname">xsec_cov</td><td>Pointer to the cross-section parameter handler from which current parameter values are read.</td></tr>
+    <tr><td class="paramname">par_handler</td><td>Pointer to the cross-section parameter handler from which current parameter values are read.</td></tr>
   </table>
   </dd>
 </dl>
@@ -336,7 +336,7 @@ Protected Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">configFile</td><td>Path to a YAML configuration file containing the NuDockClient block. </td></tr>
-    <tr><td class="paramname">xsec_cov</td><td>Pointer to the cross-section parameter handler from which current parameter values are read.</td></tr>
+    <tr><td class="paramname">par_handler</td><td>Pointer to the cross-section parameter handler from which current parameter values are read.</td></tr>
   </table>
   </dd>
 </dl>
@@ -345,7 +345,7 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;: <a class="code" href="classSampleHandlerInterface.html#ac70e34d77f506cb7201ee95cd2d0b3e8">SampleHandlerInterface</a>() {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Creating SampleHandlerNuDock object..&quot;</span>);</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;- Using NuDock sample config in this file {}&quot;</span>, configFile);</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <a class="code" href="classSampleHandlerNuDockBase.html#aaec860a1a1009bc98c60e2050c6d9857">ParHandler</a> = xsec_cov;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <a class="code" href="classSampleHandlerNuDockBase.html#aaec860a1a1009bc98c60e2050c6d9857">ParHandler</a> = par_handler;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <a class="code" href="classSampleHandlerNuDockBase.html#a68b77f5a5c6fa225a5037f0aeab15393">SampleManager</a> = std::make_unique&lt;Manager&gt;(configFile.c_str());</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="classSampleHandlerNuDockBase.html#aad6817093ec517ef19bb68daae3ab268">verbose</a> = <a class="code" href="YamlHelper_8h.html#a99b6a2259dcdf8e2875c807a793d7cd1">GetFromManager</a>(<a class="code" href="classSampleHandlerNuDockBase.html#a68b77f5a5c6fa225a5037f0aeab15393">SampleManager</a>-&gt;raw()[<span class="stringliteral">&quot;NuDockClient&quot;</span>][<span class="stringliteral">&quot;Verbose&quot;</span>], <span class="keyword">false</span>, __FILE__, __LINE__);</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
@@ -1211,7 +1211,7 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">kNorm</a></div><div class="ttdeci">@ kNorm</div><div class="ttdoc">For normalisation parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00257">ParameterStructs.h:257</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">kSpline</a></div><div class="ttdeci">@ kSpline</div><div class="ttdoc">For splined parameters (1D)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00258">ParameterStructs.h:258</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">kFunc</a></div><div class="ttdeci">@ kFunc</div><div class="ttdoc">For functional parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00259">ParameterStructs.h:259</a></div></div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a3d5f33874ee3e271dd7ec29526a1ecda"><div class="ttname"><a href="classParameterHandlerGeneric.html#a3d5f33874ee3e271dd7ec29526a1ecda">ParameterHandlerGeneric::GetParsIndexFromSampleName</a></div><div class="ttdeci">const std::vector&lt; int &gt; GetParsIndexFromSampleName(const std::string &amp;SampleName, const SystType Type) const</div><div class="ttdoc">DB Grab the parameter indices for the relevant SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00638">ParameterHandlerGeneric.cpp:638</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a3d5f33874ee3e271dd7ec29526a1ecda"><div class="ttname"><a href="classParameterHandlerGeneric.html#a3d5f33874ee3e271dd7ec29526a1ecda">ParameterHandlerGeneric::GetParsIndexFromSampleName</a></div><div class="ttdeci">const std::vector&lt; int &gt; GetParsIndexFromSampleName(const std::string &amp;SampleName, const SystType Type) const</div><div class="ttdoc">DB Grab the parameter indices for the relevant SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00632">ParameterHandlerGeneric.cpp:632</a></div></div>
 <div class="ttc" id="aclassSampleHandlerNuDockBase_html_a67d84e3d86e66910b83dea89a1dcb4a9"><div class="ttname"><a href="classSampleHandlerNuDockBase.html#a67d84e3d86e66910b83dea89a1dcb4a9">SampleHandlerNuDockBase::nudockParamInds</a></div><div class="ttdeci">std::vector&lt; int &gt; nudockParamInds</div><div class="ttdoc">Cached indices into the ParameterHandler for parameters sent to the server.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerNuDockBase_8h_source.html#l00128">SampleHandlerNuDockBase.h:128</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1335,13 +1335,13 @@ Protected Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                                       {</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  nlohmann::json request;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  std::unordered_map&lt;std::string, double&gt; osc_params;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::unordered_map&lt;std::string, double&gt; xsec_params;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::unordered_map&lt;std::string, double&gt; sys_params;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  </div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="comment">// Loop for systs</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; iParam : <a class="code" href="classSampleHandlerNuDockBase.html#a67d84e3d86e66910b83dea89a1dcb4a9">nudockParamInds</a>) {</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::string paramName = <a class="code" href="classSampleHandlerNuDockBase.html#aaec860a1a1009bc98c60e2050c6d9857">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerBase.html#a65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(iParam);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">double</span> paramValue = <a class="code" href="classSampleHandlerNuDockBase.html#aaec860a1a1009bc98c60e2050c6d9857">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerBase.html#ac5a8029472e623b848446a1eb2e20c55">GetParProp</a>(iParam);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    xsec_params[paramName] = paramValue;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    sys_params[paramName] = paramValue;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// Loop over NuDockOscNameMap_r to get osc params</span></div>
@@ -1357,7 +1357,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  request[<span class="stringliteral">&quot;osc_pars&quot;</span>] = osc_params;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  request[<span class="stringliteral">&quot;sys_pars&quot;</span>] = xsec_params;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  request[<span class="stringliteral">&quot;sys_pars&quot;</span>] = sys_params;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">auto</span> response = <a class="code" href="classSampleHandlerNuDockBase.html#ae854124f4208a0706f479b26de035837">nudock_ptr</a>-&gt;send_request(<span class="stringliteral">&quot;/set_parameters&quot;</span>, request);</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerNuDockBase.html#aad6817093ec517ef19bb68daae3ab268">verbose</a>) {</div>
@@ -1371,7 +1371,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
 <div class="ttc" id="aNuDockFactory_8cpp_html_a0fb3a5566e0f615cc546f78dea53d16c"><div class="ttname"><a href="NuDockFactory_8cpp.html#a0fb3a5566e0f615cc546f78dea53d16c">NuDockOscNameMap_r</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, std::string &gt; NuDockOscNameMap_r</div><div class="ttdoc">Mapping from MaCh3 oscillation parameter names to NuDock names.</div><div class="ttdef"><b>Definition:</b> <a href="NuDockFactory_8cpp_source.html#l00019">NuDockFactory.cpp:19</a></div></div>
 <div class="ttc" id="aNuDockFactory_8cpp_html_a7c5675ca35c3e4c966f5c3c94f6720f8"><div class="ttname"><a href="NuDockFactory_8cpp.html#a7c5675ca35c3e4c966f5c3c94f6720f8">FormatOscParsForNuDock</a></div><div class="ttdeci">void FormatOscParsForNuDock(const std::string &amp;param_name, double &amp;param_value)</div><div class="ttdoc">Convert an oscillation parameter value from MaCh3 convention to NuDock convention.</div><div class="ttdef"><b>Definition:</b> <a href="NuDockFactory_8cpp_source.html#l00105">NuDockFactory.cpp:105</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a51c54063c18a8fd3ba469dba705b487d"><div class="ttname"><a href="classParameterHandlerBase.html#a51c54063c18a8fd3ba469dba705b487d">ParameterHandlerBase::GetParIndex</a></div><div class="ttdeci">int GetParIndex(const std::string &amp;name) const</div><div class="ttdoc">Get index based on name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00716">ParameterHandlerBase.cpp:716</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a51c54063c18a8fd3ba469dba705b487d"><div class="ttname"><a href="classParameterHandlerBase.html#a51c54063c18a8fd3ba469dba705b487d">ParameterHandlerBase::GetParIndex</a></div><div class="ttdeci">int GetParIndex(const std::string &amp;name) const</div><div class="ttdoc">Get index based on name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00871">ParameterHandlerBase.cpp:871</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="classParameterHandlerBase.html#a65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00151">ParameterHandlerBase.h:151</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_ac5a8029472e623b848446a1eb2e20c55"><div class="ttname"><a href="classParameterHandlerBase.html#ac5a8029472e623b848446a1eb2e20c55">ParameterHandlerBase::GetParProp</a></div><div class="ttdeci">M3::float_t GetParProp(const int i) const</div><div class="ttdoc">Get proposed parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00220">ParameterHandlerBase.h:220</a></div></div>
 </div><!-- fragment -->

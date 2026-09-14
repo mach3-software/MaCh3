@@ -117,6 +117,18 @@ Markov Chain Monte Carlo (MCMC)</h1>
 <li><b><a class="el" href="classMR2T2.html" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method.">MR2T2</a></b> — Metropolis–Rosenbluth–Rosenbluth–Teller–Teller sampler.</li>
 <li><b><a class="el" href="classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2.">DelayedMR2T2</a></b> — Extension including delayed rejection to improve sampling efficiency and acceptance in difficult likelihood surfaces.</li>
 </ul>
+<p>Implemented Variants: There are multiple ways to modify algorithm by using so called variants. This modifies only single aspect of algorithm and are enable or disabled on on config level. This list includes</p><ul>
+<li>Adaptive MCMC (<b><a class="el" href="classAdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix  .">AdaptiveMCMCHandler</a></b>) - modifies proposal matrix resulting in better acceptance and smaller autocorrelations</li>
+<li>Multi-Canonical or Umbrella Sampling (<b><a class="el" href="classMulticanonicalMCMCHandler.html" title="Helper class for configuring and evaluating multicanonical umbrella weights.">MulticanonicalMCMCHandler</a></b>) - modifies the sampling distribution to improve exploration of difficult or multimodal posterior regions. <div class="fragment"><div class="line">General:</div>
+<div class="line">  MCMC:</div>
+<div class="line">    Multicanonical:</div>
+<div class="line">      Enabled: true</div>
+</div><!-- fragment --></li>
+<li>Temperature annealing (<b><a class="el" href="classMCMCBase.html#a58aafc91f036ca781d5984781c8b61fc" title="simulated annealing temperature">MCMCBase::AnnealTemp</a></b>) - modifies the effective sampling temperature, allowing the sampler to explore the parameter space more broadly. <div class="fragment"><div class="line">General:</div>
+<div class="line">  MCMC:</div>
+<div class="line">    AnnealTemp: 0.5</div>
+</div><!-- fragment --></li>
+</ul>
 <hr  />
  <h1><a class="anchor" id="autotoc_md26"></a>
 Likelihood Minimizers</h1>
@@ -129,7 +141,7 @@ Likelihood Minimizers</h1>
 Factory Method</h1>
 <p>A factory method is implemented to select the algorithm from the configuration file instead of hard-coding it.</p>
 <p>Example configuration: </p><div class="fragment"><div class="line">General:</div>
-<div class="line">  FittingAlgorithm: &quot;MCMC&quot;</div>
+<div class="line">  FittingAlgorithm: &quot;MR2T2&quot;</div>
 </div><!-- fragment --><p>or</p>
 <div class="fragment"><div class="line">General:</div>
 <div class="line">  FittingAlgorithm: &quot;PSO&quot;</div>

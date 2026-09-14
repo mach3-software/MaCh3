@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parameterenum_4163',['ParameterEnum',['../MCMCProcessor_8h.html#acd2848273413543fe14936252942c20b',1,'MCMCProcessor.h']]]
+  ['nupdg_4238',['NuPDG',['../SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2',1,'SampleStructs.h']]]
 ];

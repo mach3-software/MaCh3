@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SampleHandlerBase &mdash; pyMaCh3  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyMaCh3
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html">Welcome To MaCh3!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html#mach3">MaCh3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyMaCh3.html">pyMaCh3</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyMaCh3</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SampleHandlerBase</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyMaCh3._pyMaCh3.samples.SampleHandlerBase.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="samplehandlerbase">
+<h1>SampleHandlerBase<a class="headerlink" href="#samplehandlerbase" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyMaCh3._pyMaCh3.samples.</span></span><span class="sig-name descname"><span class="pre">SampleHandlerBase</span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="pyMaCh3._pyMaCh3.samples.SampleHandlerInterface.html#pyMaCh3._pyMaCh3.samples.SampleHandlerInterface" title="pyMaCh3._pyMaCh3.samples.SampleHandlerInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleHandlerInterface</span></code></a></p>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.add_data" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.add_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_data</span></code></a>(self, sample, data_array)</p></td>
+<td><p>Set the data for your sample handler (assumes the binning is the same as your MC!)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_array" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_array</span></code></a>(self, sample)</p></td>
+<td><p>Returns the contents of the MC histogram as a flat list</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_hist" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_hist</span></code></a>(self, Dimension)</p></td>
+<td><p>Get Data histogram as numpy arrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_mc_array" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_mc_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mc_array</span></code></a>(self, sample)</p></td>
+<td><p>Returns the contents of the MC histogram as a flat list</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_sample_title" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_sample_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sample_title</span></code></a>(self, sample)</p></td>
+<td><p>Get the title for a given sample</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_var_hist" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_var_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_var_hist</span></code></a>(self, arg0, arg1, arg2, arg3, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_array" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_w2_array</span></code></a>(self, sample)</p></td>
+<td><p>Returns the contents of the W2 histogram as a flat list</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_hist" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_w2_hist</span></code></a>(self, sample)</p></td>
+<td><p>Get W2 histogram as numpy arrays.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.add_data">
+<span class="sig-name descname"><span class="pre">add_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.add_data" title="Link to this definition"></a></dt>
+<dd><p>Set the data for your sample handler (assumes the binning is the same as your MC!)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_array">
+<span class="sig-name descname"><span class="pre">get_data_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_array" title="Link to this definition"></a></dt>
+<dd><p>Returns the contents of the MC histogram as a flat list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_hist">
+<span class="sig-name descname"><span class="pre">get_data_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dimension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_data_hist" title="Link to this definition"></a></dt>
+<dd><p>Get Data histogram as numpy arrays.
+For 1D: Returns (contents, edges)
+For 2D: Returns (contents, edgesX, edgesY)
+where contents is shape (nbinsY, nbinsX) for 2D</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_mc_array">
+<span class="sig-name descname"><span class="pre">get_mc_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_mc_array" title="Link to this definition"></a></dt>
+<dd><p>Returns the contents of the MC histogram as a flat list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_sample_title">
+<span class="sig-name descname"><span class="pre">get_sample_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_sample_title" title="Link to this definition"></a></dt>
+<dd><p>Get the title for a given sample</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_var_hist">
+<span class="sig-name descname"><span class="pre">get_var_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pyMaCh3._pyMaCh3.samples.KinematicCut.html#pyMaCh3._pyMaCh3.samples.KinematicCut" title="pyMaCh3._pyMaCh3.samples.KinematicCut"><span class="pre">KinematicCut</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg5</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pyMaCh3._pyMaCh3.samples.KinematicCut.html#pyMaCh3._pyMaCh3.samples.KinematicCut" title="pyMaCh3._pyMaCh3.samples.KinematicCut"><span class="pre">KinematicCut</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_var_hist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_array">
+<span class="sig-name descname"><span class="pre">get_w2_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_array" title="Link to this definition"></a></dt>
+<dd><p>Returns the contents of the W2 histogram as a flat list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_hist">
+<span class="sig-name descname"><span class="pre">get_w2_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase" title="pyMaCh3._pyMaCh3.samples.SampleHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.samples.SampleHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.samples.SampleHandlerBase.get_w2_hist" title="Link to this definition"></a></dt>
+<dd><p>Get W2 histogram as numpy arrays.
+For 1D: Returns (contents, edges)
+For 2D: Returns (contents, edgesX, edgesY)
+where contents is shape (nbinsY, nbinsX) for 2D</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kolmogorovsmirnovtest_2956',['KolmogorovSmirnovTest',['../classM3_1_1ProcessMCMCModule.html#accb6fcf64cb3532dc61274f4b5b75bee',1,'M3::ProcessMCMCModule']]]
+  ['join_3010',['join',['../namespaceM3_1_1Utils.html#ae1851bb53770476caf14eb00e4b429a2',1,'M3::Utils']]]
 ];

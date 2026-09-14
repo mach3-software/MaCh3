@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['likelihoodfit_2135',['LikelihoodFit',['../classLikelihoodFit.html',1,'']]]
+  ['kinematiccut_2175',['KinematicCut',['../structKinematicCut.html',1,'']]]
 ];

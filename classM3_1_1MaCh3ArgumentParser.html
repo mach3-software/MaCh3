@@ -114,6 +114,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae4202f8c5464c41255fd881019b3f6be"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classM3_1_1MaCh3ArgumentParser.html">MaCh3ArgumentParser</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#ae4202f8c5464c41255fd881019b3f6be">get_subcommand_used</a> () const</td></tr>
 <tr class="memdesc:ae4202f8c5464c41255fd881019b3f6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the subcommand that was used in parsing.  <a href="classM3_1_1MaCh3ArgumentParser.html#ae4202f8c5464c41255fd881019b3f6be">More...</a><br /></td></tr>
 <tr class="separator:ae4202f8c5464c41255fd881019b3f6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b5ed8a22ecbb4c93968e73207a9f891"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a9b5ed8a22ecbb4c93968e73207a9f891">get_long_option_names</a> () const</td></tr>
+<tr class="memdesc:a9b5ed8a22ecbb4c93968e73207a9f891"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return all long option names (&ndash;xxx) registered with this parser.  <a href="classM3_1_1MaCh3ArgumentParser.html#a9b5ed8a22ecbb4c93968e73207a9f891">More...</a><br /></td></tr>
+<tr class="separator:a9b5ed8a22ecbb4c93968e73207a9f891"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1deca44852b5bbfdcc82510d31db8de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#ae1deca44852b5bbfdcc82510d31db8de">option_takes_value</a> (const std::string &amp;<a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>) const</td></tr>
+<tr class="memdesc:ae1deca44852b5bbfdcc82510d31db8de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the named option expects a value (not a flag)  <a href="classM3_1_1MaCh3ArgumentParser.html#ae1deca44852b5bbfdcc82510d31db8de">More...</a><br /></td></tr>
+<tr class="separator:ae1deca44852b5bbfdcc82510d31db8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Extended ArgumentParser with MaCh3-specific functionality. </p>
@@ -147,6 +153,44 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9b5ed8a22ecbb4c93968e73207a9f891"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b5ed8a22ecbb4c93968e73207a9f891">&#9670;&nbsp;</a></span>get_long_option_names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; M3::MaCh3ArgumentParser::get_long_option_names </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return all long option names (&ndash;xxx) registered with this parser. </p>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00050">50</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                                                               {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                std::vector&lt;std::string&gt; names;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>, _] : this-&gt;m_argument_map) {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                    <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>.size() &gt;= 2 &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[0] == <span class="charliteral">&#39;-&#39;</span> &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[1] == <span class="charliteral">&#39;-&#39;</span>)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                        names.push_back(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                <span class="keywordflow">return</span> names;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            }</div>
+<div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a02b7bee87741f76204d89ed52b1c3168"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">M3::MaCh3ArgumentParser::name</a></div><div class="ttdeci">const std::string name() const</div><div class="ttdoc">Get the name of this parser/subcommand.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00024">m3argparse.hpp:24</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ae4202f8c5464c41255fd881019b3f6be"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae4202f8c5464c41255fd881019b3f6be">&#9670;&nbsp;</a></span>get_subcommand_used()</h2>
 
@@ -216,6 +260,42 @@ Public Member Functions</h2></td></tr>
 <div class="fragment"><div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;                                        {</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;                <span class="keywordflow">return</span> this-&gt;m_program_name;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;            }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae1deca44852b5bbfdcc82510d31db8de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1deca44852b5bbfdcc82510d31db8de">&#9670;&nbsp;</a></span>option_takes_value()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool M3::MaCh3ArgumentParser::option_takes_value </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return true if the named option expects a value (not a flag) </p>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00060">60</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                                 {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="keyword">auto</span> it = this-&gt;m_argument_map.find(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keywordflow">if</span> (it == this-&gt;m_argument_map.end()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="comment">// get_usage_full() appends a metavar when max nargs &gt; 0</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="keywordflow">return</span> it-&gt;second-&gt;get_usage_full().find(<span class="charliteral">&#39; &#39;</span>) != std::string::npos;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            }</div>
 </div><!-- fragment -->
 </div>
 </div>

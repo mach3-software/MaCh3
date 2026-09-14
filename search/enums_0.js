@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['biasfunction_4158',['BiasFunction',['../namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7',1,'M3']]]
+  ['alignment_4233',['Alignment',['../namespaceM3_1_1Utils.html#afd16809dc4d7eef736cc3c3b32d9dfce',1,'M3::Utils']]]
 ];

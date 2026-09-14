@@ -1,14 +1,10 @@
 var searchData=
 [
-  ['open_3042',['Open',['../namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d',1,'M3']]],
-  ['operator_3d_3043',['operator=',['../structEventInfo.html#a479a617ccb00881e4275db85e5951212',1,'EventInfo::operator=(EventInfo const &amp;other)=delete'],['../structEventInfo.html#a50d577a79d3b55e860a8dce93d4d89e4',1,'EventInfo::operator=(EventInfo &amp;&amp;other)=delete']]],
-  ['oscillationhandler_3044',['OscillationHandler',['../classOscillationHandler.html#ad01644810f20eec2a89036a09aaae24d',1,'OscillationHandler']]],
-  ['oscprocessor_3045',['OscProcessor',['../classOscProcessor.html#a4f6aea5665b9966d7fe42b53805e7305',1,'OscProcessor']]],
-  ['overflowintegral_3046',['OverflowIntegral',['../HistogramUtils_8cpp.html#a34345b88bcd0e45db5612d58a972a154',1,'OverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a34345b88bcd0e45db5612d58a972a154',1,'OverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp']]],
-  ['overlaypredicitve_3047',['OverlayPredicitve',['../PredictivePlotting_8cpp.html#a2fa44e505362cc02bf851a700f4f6383',1,'PredictivePlotting.cpp']]],
-  ['overlaypredicitvebymode_3048',['OverlayPredicitveByMode',['../PredictivePlotting_8cpp.html#a707919499efa54e308e45bc3b0c53d56',1,'PredictivePlotting.cpp']]],
-  ['overlaysigvar1d_3049',['OverlaySigVar1D',['../PlotSigmaVariation_8cpp.html#a517e313804d4c6e71a606aadd81bedbf',1,'PlotSigmaVariation.cpp']]],
-  ['overlayviolin_3050',['OverlayViolin',['../PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321',1,'PredictivePlotting.cpp']]],
-  ['overrideconfig_3051',['OverrideConfig',['../YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, TValue val):&#160;YamlHelper.h'],['../YamlHelper_8h.html#a55f0b8c6b5d52b5c269ce26c7d3853f5',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, Args... args):&#160;YamlHelper.h']]],
-  ['overridesettings_3052',['OverrideSettings',['../classManager.html#addc463be80b958bf10456586e6e042da',1,'Manager']]]
+  ['name_3093',['name',['../classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168',1,'M3::MaCh3ArgumentParser']]],
+  ['nooverflowintegral_3094',['NoOverflowIntegral',['../HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d',1,'NoOverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#ab18c6b2408d7b9021bad06d47a06ee8d',1,'NoOverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp']]],
+  ['normalisepoly_3095',['NormalisePoly',['../HistogramUtils_8cpp.html#a5120d5e5313573682a208f5f7abb5e70',1,'NormalisePoly(TH2Poly *Histogram):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a5120d5e5313573682a208f5f7abb5e70',1,'NormalisePoly(TH2Poly *Histogram):&#160;HistogramUtils.cpp']]],
+  ['normaliseth2poly_3096',['NormaliseTH2Poly',['../HistogramUtils_8cpp.html#a2fc5d92fb039ba3c886404100876a511',1,'NormaliseTH2Poly(TH2Poly *Histogram):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a2fc5d92fb039ba3c886404100876a511',1,'NormaliseTH2Poly(TH2Poly *Histogram):&#160;HistogramUtils.cpp']]],
+  ['nowtalk_3097',['NowTalk',['../classSampleHandlerInterface.html#a9f6224faa89615c78c7489d5c8fa549f',1,'SampleHandlerInterface']]],
+  ['nthreadssanity_3098',['NThreadsSanity',['../namespaceM3_1_1Utils.html#a357e4fd9163d29d0cf9dfd3841786559',1,'M3::Utils']]],
+  ['nudockserverbase_3099',['NuDockServerBase',['../classNuDockServerBase.html#a4df3e07921e190204dc0eb56caf69acc',1,'NuDockServerBase']]]
 ];

@@ -100,7 +100,7 @@ HELP! My posteriors are miles away where I expect them to be!!!!</h2>
 <h2><a class="anchor" id="autotoc_md160"></a>
 When does it Work?</h2>
 <p>Adaptive MCMC works really well when all your parameters are Gaussian! This is typically the case for ND-only fits and most cross-section/flux parameters. As a rule of thumb it's best to start throwing from your covariance matrix about 1000 - 10,000 steps into running your fit. You can see the effects of changing the adaption starting step as well as how well tuned the initial step sizes here:</p>
-<p>&lt;image src=https://github.com/user-attachments/assets/fd968ef5-f6e6-4a5d-bdcb-0cbe31beb39c width="500"&gt;</p>
+<p><img src="https://github.com/user-attachments/assets/fd968ef5-f6e6-4a5d-bdcb-0cbe31beb39c" alt="" width="500" class="inline"/></p>
 <p><em>MCMC traces for chains with manual tuning (top), adaption applied from the first step (middle) and adaption applied from step 10,000. The chain with adaption from 10,000 shows the best fit with the lowest auto-correlation and a trace that rapidly improves before stabilising.</em></p>
 <p>In order to ensure a "valid" fit, adaption should be stopped at some point! You can pick this either totally arbitrarily or by looking the MCMC trace. If it seems like the trace has stopped improving for ~100,000 steps or so then you're safe to assume the throw matrix has more or less converged and you can run the fit with it switched off.</p>
 <h2><a class="anchor" id="autotoc_md161"></a>

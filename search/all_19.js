@@ -1,6 +1,18 @@
 var searchData=
 [
-  ['xcoeff_5farr_2051',['xcoeff_arr',['../classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836',1,'BinnedSplineHandler']]],
-  ['xpos_2052',['XPos',['../classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79',1,'TSpline3_red']]],
-  ['xpts_2053',['xPts',['../structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb',1,'FastSplineInfo']]]
+  ['w2_5fhist_5ftoy_2075',['W2_Hist_Toy',['../classPredictiveThrower.html#a5ffe917a37de1051af5abbedf89c5b45',1,'PredictiveThrower']]],
+  ['w2_5fnom_5fhist_2076',['W2_Nom_Hist',['../classPredictiveThrower.html#a4c1f45b7af9a0244f6d6ef6987aba12e',1,'PredictiveThrower']]],
+  ['w2hist_2077',['W2Hist',['../structSampleInfo.html#a0f8d75a7d509d12c0e91ea7eba140569',1,'SampleInfo']]],
+  ['weightbranchname_2078',['weightBranchName',['../structReweightConfig.html#a2f118ccc5cf3b9bb8c72a4ee713741e2',1,'ReweightConfig']]],
+  ['weightvalue_2079',['WeightValue',['../classMCMCProcessor.html#a39d4d6d8cfccf1974a6b084f808211a9',1,'MCMCProcessor']]],
+  ['what_2080',['what',['../classMaCh3Exception.html#a190396baf266a982d8458cd786dcb435',1,'MaCh3Exception']]],
+  ['width_2081',['width',['../structWindowConfig.html#a5b233679b7d412fe9c0715be9809f4f4',1,'WindowConfig']]],
+  ['windowconfig_2082',['WindowConfig',['../structWindowConfig.html',1,'']]],
+  ['windows_2083',['windows',['../structUmbrellaConfig.html#a32ea31b05e5424460212445cd3bc3a94',1,'UmbrellaConfig']]],
+  ['write_5ffile_2084',['write_file',['../classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e',1,'M3::MaCh3Program']]],
+  ['writebymodetoys_2085',['WriteByModeToys',['../classPredictiveThrower.html#a32e9c19a90f4e6fdc00f13d5c4b18d45',1,'PredictiveThrower']]],
+  ['writehistograms_2086',['WriteHistograms',['../FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4',1,'FitterBase.cpp']]],
+  ['writehistogramsbymode_2087',['WriteHistogramsByMode',['../FitterBase_8cpp.html#a0b58cbc96f7743f380b800732dd4624e',1,'FitterBase.cpp']]],
+  ['writeoutput_2088',['WriteOutput',['../classPSO.html#af2a3d758cc67e9b6b6a9a96499345b5b',1,'PSO']]],
+  ['writetoy_2089',['WriteToy',['../classPredictiveThrower.html#a1cc9f5e098d5d527b662ae1b9a47a1dc',1,'PredictiveThrower']]]
 ];

@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParameterHandlerBase &mdash; pyMaCh3  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyMaCh3
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html">Welcome To MaCh3!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mainpage.html#mach3">MaCh3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyMaCh3.html">pyMaCh3</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyMaCh3</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ParameterHandlerBase</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parameterhandlerbase">
+<h1>ParameterHandlerBase<a class="headerlink" href="#parameterhandlerbase" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyMaCh3._pyMaCh3.parameters.</span></span><span class="sig-name descname"><span class="pre">ParameterHandlerBase</span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.calculate_likelihood" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.calculate_likelihood"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_likelihood</span></code></a>(self)</p></td>
+<td><p>Calculate penalty term based on inverted covariance matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_fancy_par_name" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_fancy_par_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fancy_par_name</span></code></a>(self, index)</p></td>
+<td><p>Get the name of this parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_flat_prior" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_flat_prior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_flat_prior</span></code></a>(self, index)</p></td>
+<td><p>Is the parameter at index i flat?.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_internal_par_name" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_internal_par_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_internal_par_name</span></code></a>(self, index)</p></td>
+<td><p>Get the internally used name of this parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_lower_bound" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_lower_bound"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lower_bound</span></code></a>(self, index)</p></td>
+<td><p>Get the lower bound of parameter at index i.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_n_pars" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_n_pars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_n_pars</span></code></a>(self)</p></td>
+<td><p>Get the number of parameters that this ParameterHandler object knows about.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_error" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_par_error</span></code></a>(self, index)</p></td>
+<td><p>The prior error on parameter at index i</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_fixed" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_fixed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_par_fixed</span></code></a>(self, index)</p></td>
+<td><p>Is the parameter at index i fixed</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_init" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_par_init</span></code></a>(self, index)</p></td>
+<td><p>Get initial value of parameter at index i</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_prior_cov" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_prior_cov"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prior_cov</span></code></a>(self)</p></td>
+<td><p>Get the prior covariance</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_proposal_array" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_proposal_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_proposal_array</span></code></a>(self)</p></td>
+<td><p>Get the parameter proposal values as a numpy array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_upper_bound" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_upper_bound"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_upper_bound</span></code></a>(self, index)</p></td>
+<td><p>Get the upper bound of parameter at index i.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.propose_step" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.propose_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propose_step</span></code></a>(self)</p></td>
+<td><p>Propose a step based on the covariances.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.set_parameters" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.set_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_parameters</span></code></a>(self[, pars])</p></td>
+<td><p>Set parameter values using array.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.calculate_likelihood">
+<span class="sig-name descname"><span class="pre">calculate_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.calculate_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Calculate penalty term based on inverted covariance matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_fancy_par_name">
+<span class="sig-name descname"><span class="pre">get_fancy_par_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_fancy_par_name" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get the name of this parameter.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The global index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_flat_prior">
+<span class="sig-name descname"><span class="pre">get_flat_prior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_flat_prior" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Is the parameter at index i flat?.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_internal_par_name">
+<span class="sig-name descname"><span class="pre">get_internal_par_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_internal_par_name" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get the internally used name of this parameter.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The global index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_lower_bound">
+<span class="sig-name descname"><span class="pre">get_lower_bound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_lower_bound" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get the lower bound of parameter at index i.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_n_pars">
+<span class="sig-name descname"><span class="pre">get_n_pars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_n_pars" title="Link to this definition"></a></dt>
+<dd><p>Get the number of parameters that this ParameterHandler object knows about.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_error">
+<span class="sig-name descname"><span class="pre">get_par_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_error" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>The prior error on parameter at index i</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_fixed">
+<span class="sig-name descname"><span class="pre">get_par_fixed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_fixed" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Is the parameter at index i fixed</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_init">
+<span class="sig-name descname"><span class="pre">get_par_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_par_init" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get initial value of parameter at index i</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_prior_cov">
+<span class="sig-name descname"><span class="pre">get_prior_cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float32</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_prior_cov" title="Link to this definition"></a></dt>
+<dd><p>Get the prior covariance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_proposal_array">
+<span class="sig-name descname"><span class="pre">get_proposal_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_proposal_array" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get the parameter proposal values as a numpy array.</dt><dd><p>This returns a copy of the current proposal values.
+:return: A numpy array containing the proposal values for all parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_upper_bound">
+<span class="sig-name descname"><span class="pre">get_upper_bound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.get_upper_bound" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Get the upper bound of parameter at index i.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param index<span class="colon">:</span></dt>
+<dd class="field-odd"><p>index of the parameter</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.propose_step">
+<span class="sig-name descname"><span class="pre">propose_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.propose_step" title="Link to this definition"></a></dt>
+<dd><p>Propose a step based on the covariances. Also feel free to overwrite if you want something more funky.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase" title="pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase"><span class="pre">pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyMaCh3._pyMaCh3.parameters.ParameterHandlerBase.set_parameters" title="Link to this definition"></a></dt>
+<dd><p>Set parameter values using array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pars</strong> (<em>numpy.ndarray</em><em> or </em><em>list</em><em> of </em><em>float</em><em>, </em><em>optional</em>) – Array holding new values for every parameter.
+Must have same size as the number of parameters in the covariance class.
+If not provided, parameters are set to their pre-fit values.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handler</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handler</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handler</span><span class="o">.</span><span class="n">set_parameters</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
