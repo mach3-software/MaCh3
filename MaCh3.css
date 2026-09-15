@@ -1,5 +1,33 @@
 /* MaCh3 doxygen HTML_EXTRA_STYLESHEET */
 
+:root {
+    --mach3-navy:   #062B43;
+    --mach3-blue:   #4389C4;
+    --mach3-red:    #9D1725;
+    --mach3-gold:   #FFB000;
+    --mach3-orange: #CD4E08;
+
+    --mach3-ink:    #243746;
+    --mach3-muted:  #667785;
+    --mach3-bg:     #F7F9FB;
+    --mach3-border: #DCE4EA;
+    --mach3-white:  #FFFFFF;
+}
+
+/* Main page style */
+body {
+    background: var(--mach3-white);
+    color: var(--mach3-ink);
+}
+
+/* Fancy project name */
+#projectname,
+#projectnumber,
+#projectbrief
+.title {
+    font-weight: 700;
+}
+
 /* Main content container */
 div.contents {
     max-width: 100em;
@@ -7,12 +35,21 @@ div.contents {
     margin-left: 5em;
 }
 
+/* Subtle accent under major headings */
+div.PageDoc h1,
+div.PageDoc h2 {
+    border-bottom: 2px solid var(--mach3-blue);
+    padding-bottom: 0.25em;
+}
+
 /* Main page text styling */
 div.PageDoc div.textblock {
     font-size: 1.2em;
+    line-height: 1.6; /* Slightly more breathing room */
 }
 
 /* Footer styling */
+/* Inspired by Edwin Varghese poster */
 .mach3-footer {
     background-image: url('OscPattern.png');
     background-size: contain;
@@ -20,11 +57,60 @@ div.PageDoc div.textblock {
     background-repeat: no-repeat;
     padding: 20px;
     text-align: center;
-    border-top: 1px solid #dee2e6;
+    border-top: 2px solid var(--mach3-gold);
     color: #333;
 }
 
 .mach3-footer .last-updated {
     font-size: 0.9em;
-    color: #6c757d;
+    color: var(--mach3-muted);
+}
+
+/* ==========================================================
+ *  Main page: Introduction + MCMC video
+ *  ========================================================== */
+.mach3-intro {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.mach3-intro-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.mach3-mcmc-demo {
+    flex: 0 0 60%;
+    max-width: 640px;
+    margin-top: 35px;
+}
+
+.mach3-mcmc-demo video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.mach3-mcmc-caption {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.85em;
+    opacity: 0.65;
+}
+
+
+/* Mobile */
+@media (max-width: 900px) {
+    .mach3-intro {
+        display: block;
+    }
+
+    .mach3-mcmc-demo {
+        width: 100%;
+        max-width: none;
+        margin-top: 30px;
+    }
 }
