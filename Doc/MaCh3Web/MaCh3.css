@@ -35,6 +35,13 @@ div.contents {
     margin-left: 5em;
 }
 
+/* Subtle accent under major headings */
+div.PageDoc h1,
+div.PageDoc h2 {
+    border-bottom: 2px solid var(--mach3-blue);
+    padding-bottom: 0.25em;
+}
+
 /* Main page text styling */
 div.PageDoc div.textblock {
     font-size: 1.2em;
@@ -42,6 +49,7 @@ div.PageDoc div.textblock {
 }
 
 /* Footer styling */
+/* Inspired by Edwin Varghese poster */
 .mach3-footer {
     background-image: url('OscPattern.png');
     background-size: contain;
@@ -49,13 +57,13 @@ div.PageDoc div.textblock {
     background-repeat: no-repeat;
     padding: 20px;
     text-align: center;
-    border-top: 1px solid #dee2e6;
+    border-top: 2px solid var(--mach3-gold);
     color: #333;
 }
 
 .mach3-footer .last-updated {
     font-size: 0.9em;
-    color: #6c757d;
+    color: var(--mach3-muted);
 }
 
 /* ==========================================================

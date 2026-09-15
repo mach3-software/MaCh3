@@ -1241,6 +1241,7 @@ HTML_EXTRA_STYLESHEET  = Doc/MaCh3Web/MaCh3.css
 HTML_EXTRA_FILES       = Doc/MaCh3Web/OscPattern.png \
                          Doc/MaCh3Web/MCMC_Example.mp4 \
                          Doc/MaCh3Web/posterior_predictive_Example.mp4 \
+                         Doc/MaCh3Web/umbrella_sampling_delta_cp.mp4 \
                          Doc/mach3logo.png           \
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen

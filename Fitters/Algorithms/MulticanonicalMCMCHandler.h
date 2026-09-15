@@ -33,8 +33,16 @@ namespace M3 {
 /// With a bias function defined chains run as normal and are combined after the fact using the information
 /// stored in the chains saved yaml configuration file.
 ///
-/// @author David Riley
 /// @cite Matthews2018umbrella
+/// @author David Riley
+///
+/// The method is visualised below:
+///
+/// @htmlonly
+/// <video controls autoplay loop muted playsinline style="width: 50%;">
+///     <source src="umbrella_sampling_delta_cp.mp4" type="video/mp4">
+/// </video>
+/// @endhtmlonly
 class MulticanonicalMCMCHandler {
 public:
   /// @brief Constructor
