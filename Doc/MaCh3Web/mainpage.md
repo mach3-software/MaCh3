@@ -1,5 +1,12 @@
 # MaCh3
 
+\htmlonly[block]
+<div class="mach3-intro">
+
+<div class="mach3-intro-text">
+\endhtmlonly
+
+
 ## Introduction
 Welcome to %MaCh3!
 
@@ -30,7 +37,26 @@ If something is unclear please contact us via
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Indico](https://indico.global/category/1289/) If you need a password, please reach out to MaCh3-leadership for access.
 
+\htmlonly
+</div>
+
+<div class="mach3-mcmc-demo">
+
+<video controls autoplay loop muted playsinline>
+    <source src="MCMC_Example.mp4" type="video/mp4">
+</video>
+
+<div class="mach3-mcmc-caption">
+    Markov-Chain Monte Carlo sampling
+</div>
+
+</div>
+
+</div>
+\endhtmlonly
+
 ## About us
-The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the DUNE and HK oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
+The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis.
+It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the DUNE and HK oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
