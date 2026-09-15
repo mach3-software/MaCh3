@@ -7,6 +7,10 @@ add_library(CLIModules SHARED
     ProcessMCMCModule.cpp
     DiagMCMCModule.cpp
     GetPenaltyTermModule.cpp
+    RHatModule.cpp
+    SmearModule.cpp
+    ReweightModule.cpp
+    CombineModule.cpp
 )
 
 target_link_libraries(CLIModules PRIVATE MaCh3::All)
