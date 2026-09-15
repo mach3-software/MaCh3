@@ -1,5 +1,33 @@
 /* MaCh3 doxygen HTML_EXTRA_STYLESHEET */
 
+:root {
+    --mach3-navy:   #062B43;
+    --mach3-blue:   #4389C4;
+    --mach3-red:    #9D1725;
+    --mach3-gold:   #FFB000;
+    --mach3-orange: #CD4E08;
+
+    --mach3-ink:    #243746;
+    --mach3-muted:  #667785;
+    --mach3-bg:     #F7F9FB;
+    --mach3-border: #DCE4EA;
+    --mach3-white:  #FFFFFF;
+}
+
+/* Main page style */
+body {
+    background: var(--mach3-white);
+    color: var(--mach3-ink);
+}
+
+/* Fancy project name */
+#projectname,
+#projectnumber,
+#projectbrief
+.title {
+    font-weight: 700;
+}
+
 /* Main content container */
 div.contents {
     max-width: 100em;
@@ -10,6 +38,7 @@ div.contents {
 /* Main page text styling */
 div.PageDoc div.textblock {
     font-size: 1.2em;
+    line-height: 1.6; /* Slightly more breathing room */
 }
 
 /* Footer styling */
