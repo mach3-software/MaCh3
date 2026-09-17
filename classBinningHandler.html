@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.7.0</span>
+   &#160;<span id="projectnumber">2.7.1</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -169,7 +169,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: Class handling binning for multiple samples. </p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 Introduction</h2>
 <p>Each sample can define its own binning in an arbitrary number of dimensions. Internally, every sample's multi-dimensional binning is linearised into a single 1D array. All samples are then concatenated into one global bin index space, allowing the entire analysis to be treated as a single large vector of bins.</p>
 <p>The concept of a "global bin" refers to the position of a bin in this linearised, analysis-wide bin index space. Local (sample) bins are always enumerated starting from zero, while global bins span all samples consecutively.</p>
@@ -189,7 +189,7 @@ Introduction</h2>
 <div class="line">------------------------------------------------</div>
 <div class="line">| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |</div>
 <div class="line">------------------------------------------------</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md176"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md178"></a>
 Uniform and Non-Uniform Binning Scheme</h2>
 <p>MaCh3 supports Uniform and Non-Uniform binning scheme</p>
 <p>Uniform binning uses a regular Cartesian grid. Bins are constructed as the Cartesian product of 1D bin edges, forming axis-aligned rectangles (or hyper-rectangles in higher dimensions). Bin widths may be equal or variable, but the grid structure is regular.</p>
@@ -215,20 +215,20 @@ Uniform and Non-Uniform Binning Scheme</h2>
 <div class="line">| Bin 7  |            |       |         Bin 9       |</div>
 <div class="line">|        |            | Bin 8 |                     |</div>
 <div class="line">+--------+------------+-------+---------------------+</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md177"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md179"></a>
 Bin Finding Algorithm</h2>
 <p>Since MaCh3 supports event migration bin finding algorithm must be fast to efficiently be able find bin during running fit. MaCh3 is caching nominal bin with idea that during fit migration should be around this nominal bin. Thus MaCh3 first checks if after shift event falls into Nom-bin and later adjacent. If not backs to binary search.</p>
-<h3><a class="anchor" id="autotoc_md178"></a>
+<h3><a class="anchor" id="autotoc_md180"></a>
 Uniform</h3>
 <p>In case of uniform binning above algorithm is easy to test as one performs it for every dimension independently i.e. find X-bin, then Y etc. After which can find bin in flattened 1D space.</p>
-<h3><a class="anchor" id="autotoc_md179"></a>
+<h3><a class="anchor" id="autotoc_md181"></a>
 Non-Uniform</h3>
 <p>Internally, non-uniform binning is implemented using two levels:</p>
 <ol type="1">
 <li><b>MegaBins (mapping bins)</b> These form a coarse, <em>uniform</em> grid that spans the full phase space. Each MegaBin acts as a container for one or more non-uniform bins.</li>
 <li><b>Non-Uniform bins</b> The actual analysis bins, defined as hyper-rectangles with arbitrary extents inside a MegaBin.</li>
 </ol>
-<h4><a class="anchor" id="autotoc_md180"></a>
+<h4><a class="anchor" id="autotoc_md182"></a>
 Bin finding procedure</h4>
 <p>For a given event, the bin-finding algorithm proceeds as follows:</p>
 <ol type="1">

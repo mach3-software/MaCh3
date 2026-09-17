@@ -47,5 +47,5 @@ var searchData=
   ['use_5frobbins_5fmonro_2057',['use_robbins_monro',['../classAdaptiveMCMCHandler.html#ae3b83d270492a7775e0ebb4ac9d57791',1,'AdaptiveMCMCHandler']]],
   ['usefftautocorrelation_2058',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]],
   ['usegpu_2059',['useGPU',['../classSplineBase.html#ab3d55f65dfbe924683a4e463b3acb016',1,'SplineBase']]],
-  ['userguide_2060',['UserGuide',['../UserGuide.html',1,'']]]
+  ['user_20guide_2060',['User Guide',['../UserGuide.html',1,'']]]
 ];

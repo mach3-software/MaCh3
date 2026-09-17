@@ -37,7 +37,7 @@ var menudata={children:[
 {text:"Project Info",url:"ReleaseNotes.html",children:[
 {text:"Release Notes",url:"ReleaseNotes.html"},
 {text:"Results and Publications",url:"ResultsPublications.html"}]},
-{text:"Interface",url:"modules.html"},
+{text:"API Reference",url:"modules.html"},
 {text:"Namespaces",url:"namespaces.html",children:[
 {text:"Namespace List",url:"namespaces.html"},
 {text:"Namespace Members",url:"namespacemembers.html",children:[

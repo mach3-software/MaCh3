@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.7.0</span>
+   &#160;<span id="projectnumber">2.7.1</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -78,10 +78,10 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_Python_Binding"></a></p>
 <p>MaCh3 provides python bindings for all of the public interface of the classes in the core code which are created using <a href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>. This means that all functionality available in the c++ interface is also available in python.</p>
-<h1><a class="anchor" id="autotoc_md169"></a>
+<h1><a class="anchor" id="autotoc_md171"></a>
 Binding Experiment Code</h1>
 <p>Functionality is also provided to create a python module for experiment specific MaCh3 code. To do this you simply need to create a c++ file that defines the bindings, and create the python module using the <code>setup_pyMaCh3</code> cmake function. Details on how to do this are given below.</p>
-<h2><a class="anchor" id="autotoc_md170"></a>
+<h2><a class="anchor" id="autotoc_md172"></a>
 Binding File</h2>
 <p>The first step is to include the <code><a class="el" href="pyMaCh3_8h.html">pyMaCh3.h</a></code> header in your binding file (which for this example we will call pyMaCh3Experiment.cpp).</p>
 <div class="fragment"><div class="line">{pyMaCh3Experiment.cpp} </div>
@@ -126,7 +126,7 @@ Binding File</h2>
 </div><!-- fragment --><p> and it will have all of the functionality of the virtual interface described by the base sample handler.</p>
 <p>The final step is to initialise the module using the <code><a class="el" href="pyMaCh3_8h.html#a40e4d2598692d367470d564a9c1e7fc3" title="Initialises the pyMaCh3 module.">MAKE_PYMACH3_MDULE()</a></code> macro. You just need to pass your MaCh3 py binder class into this like so: </p><div class="fragment"><div class="line">{pyMaCh3Experiment.cpp} </div>
 <div class="line">MAKE_PYMACH3_MDULE( MaCh3ExperimentPyBinder )</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md171"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md173"></a>
 CMake</h2>
 <p>Once you have your binding file (for our example, <code>pyMaCh3Experiment.cpp</code>), you need to tell cmake to install the python module for your experiment. This is done by using the <code>setup_pyMaCh3</code> function defined in <code>&lt;MaCh3 core path&gt;/cmake/Modules/pyMaCh3.cmake</code> by adding something like the following to your CMakeLists.txt:</p>
 <div class="fragment"><div class="line">include(${MaCh3_PREFIX}/cmake/Modules/pyMaCh3.cmake)</div>

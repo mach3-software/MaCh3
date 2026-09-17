@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.7.0</span>
+   &#160;<span id="projectnumber">2.7.1</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -126,14 +126,14 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Parses YAML node describing multidim uniform binning. </p>
-<h1><a class="anchor" id="autotoc_md172"></a>
+<h1><a class="anchor" id="autotoc_md174"></a>
 dimensional list implicit for 1D binnings</h1>
 <p>BinEdges: [&lt;dim0bin0lowedge&gt;, &lt;dim0bin1upedge&gt;, &lt;dim0bin2upedge&gt;, ... &lt;dim0binNupedge&gt;]</p>
 <p>BinEdges: [ [&lt;dim0bin0lowedge&gt;, &lt;dim0bin1upedge&gt;, &lt;dim0bin2upedge&gt;, ... &lt;dim0binNupedge&gt;], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ]</p>
-<h1><a class="anchor" id="autotoc_md173"></a>
+<h1><a class="anchor" id="autotoc_md175"></a>
 bin edge list implicit for 1D range-only binnings</h1>
 <p>BinEdges: { linspace: { nb: 100, low: 0, up: 10} } </p>
-<h1><a class="anchor" id="autotoc_md174"></a>
+<h1><a class="anchor" id="autotoc_md176"></a>
 mixed syntax binnings allowed</h1>
 <p>BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} } ] # for ND range-only binnings, lists are required to disambiguate 1D mixed specifier binnings from ND binnings BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} } ], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ] BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} } ], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ] </p>
 

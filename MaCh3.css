@@ -1,5 +1,5 @@
-/* MaCh3 doxygen HTML_EXTRA_STYLESHEET */
 
+/* MaCh3 doxygen HTML_EXTRA_STYLESHEET */
 :root {
     --mach3-navy:   #062B43;
     --mach3-blue:   #4389C4;
@@ -75,9 +75,10 @@ div.PageDoc div.textblock {
     align-items: flex-start;
 }
 
+/* Main page introduction text */
 .mach3-intro-text {
-    flex: 1;
-    min-width: 0;
+    font-size: 1.10em;
+    line-height: 1.65;
 }
 
 .mach3-mcmc-demo {
@@ -107,10 +108,242 @@ div.PageDoc div.textblock {
     .mach3-intro {
         display: block;
     }
-
     .mach3-mcmc-demo {
         width: 100%;
         max-width: none;
         margin-top: 30px;
     }
+}
+
+/* ==========================================================
+ * "Start Here" cards
+ * ========================================================== */
+.mach3-start-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+
+    margin: 1.5em 0 2em 0;
+}
+
+.mach3-start-card {
+    display: block;
+
+    padding: 1.5em 1.6em;
+
+    border: 1px solid var(--mach3-border);
+    border-radius: 10px;
+
+    background: var(--mach3-white);
+    color: var(--mach3-ink);
+
+    text-decoration: none;
+
+    transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Hover effect */
+.mach3-start-card:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--mach3-blue);
+
+    box-shadow:
+    0 8px 24px rgba(6, 43, 67, 0.10);
+}
+
+.mach3-start-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    color: var(--mach3-navy);
+
+    font-size: 1.25em;
+    font-weight: 700;
+}
+
+/* Card heading: icon + title */
+.mach3-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65em;
+}
+
+/* Icon box */
+.mach3-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.2em;
+    height: 2.2em;
+
+    border-radius: 8px;
+
+    background: var(--mach3-bg);
+
+    font-size: 1.15em;
+    line-height: 1;
+}
+
+/* Arrow */
+.mach3-card-arrow {
+    color: var(--mach3-blue);
+    font-size: 1.2em;
+
+    transition: transform 0.15s ease;
+}
+
+.mach3-start-card:hover .mach3-card-arrow {
+    transform: translateX(4px);
+}
+
+.mach3-start-card:hover .mach3-card-icon {
+    background: #EAF3FA;
+}
+
+.mach3-start-card-text {
+    margin-top: 0.65em;
+
+    color: var(--mach3-muted);
+
+    font-size: 1.05em;
+    line-height: 1.6;
+}
+
+/* Highlight the main entry point */
+.mach3-start-card:first-child {
+    border-color: var(--mach3-blue);
+}
+
+
+/* ==========================================================
+ * Secondary cards: Bibliography + Python
+ * ========================================================== */
+.mach3-extra-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+
+    margin: 0 0 3em 0;
+}
+
+.mach3-extra-card {
+    display: block;
+
+    padding: 1.5em 1.6em;
+
+    border: 1px solid var(--mach3-border);
+    border-radius: 10px;
+
+    background: var(--mach3-bg);
+    color: var(--mach3-ink);
+
+    text-decoration: none;
+
+    transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Hover effect */
+.mach3-extra-card:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--mach3-gold);
+
+    box-shadow:
+    0 8px 24px rgba(6, 43, 67, 0.10);
+}
+
+.mach3-extra-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    color: var(--mach3-navy);
+
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+/* Secondary card icon */
+.mach3-extra-card .mach3-card-icon {
+    background: var(--mach3-white);
+}
+
+.mach3-extra-card:hover .mach3-card-icon {
+    background: #FFF5D9;
+}
+
+/* Secondary card arrow */
+.mach3-extra-card .mach3-card-arrow {
+    color: var(--mach3-orange);
+}
+
+.mach3-extra-card:hover .mach3-card-arrow {
+    transform: translateX(4px);
+}
+
+.mach3-extra-card-text {
+    margin-top: 0.55em;
+
+    color: var(--mach3-muted);
+
+    font-size: 0.92em;
+    line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .mach3-start-grid,
+    .mach3-extra-grid {
+        grid-template-columns: 1fr;
+}
+
+
+/* Recent Results & Publications Section */
+.mach3-recent-results table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.mach3-recent-results-icon {
+    width: 60px;
+    vertical-align: middle;
+    padding-right: 20px;
+}
+
+.mach3-recent-results-text {
+    vertical-align: middle;
+    color: var(--mach3-blue);
+    font-size: 22px;
+    line-height: 1.4;
+}
+
+.mach3-recent-results-text > div {
+    margin-bottom: 5px;
+}
+
+.mach3-recent-results-link-icon {
+    width: 45px;
+    vertical-align: middle;
+    padding-left: 40px;
+    padding-right: 12px;
+}
+
+.mach3-recent-results-link {
+    vertical-align: middle;
+}
+
+.mach3-recent-results-link a {
+    color: var(--mach3-blue);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 20px;
 }
