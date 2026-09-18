@@ -1084,7 +1084,8 @@ void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
   manycoeff_arr = new M3::float_t[CoeffIndex * _nCoeff_];
   MonolithTree->SetBranchAddress("manycoeff", manycoeff_arr);
   cpu_spline_weights.resize(NSplines_valid);
-  MonolithTree->SetBranchAddress("monolith_index", &monolith_index);
+  std::vector<int>* monolith_index_temp = nullptr;
+  MonolithTree->SetBranchAddress("monolith_index", &monolith_index_temp);
 
   // Load vectors
   std::vector<unsigned int>* nKnots_arr_temp = nullptr;
@@ -1100,9 +1101,10 @@ void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
 
   MonolithTree->GetEntry(0);
 
-  nKnots_arr       = *nKnots_arr_temp;
+  nKnots_arr  = *nKnots_arr_temp;
   paramNo_arr = *paramNo_arr_temp;
   UniqueSystIndices = *UniqueSystIndices_temp;
+  monolith_index = *monolith_index_temp;
 }
 
 // *****************************************
