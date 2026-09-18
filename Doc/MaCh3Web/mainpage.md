@@ -135,6 +135,7 @@ If something is unclear please contact us via
 <div class="mach3-recent-results">
     <table>
         <tr>
+            <!-- Paper icon -->
             <td class="mach3-recent-results-icon">
                 <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
@@ -154,37 +155,54 @@ If something is unclear please contact us via
                           stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </td>
-            <td class="mach3-recent-results-text">
+            <!-- Counter of publication -->
+            <td class="mach3-recent-results-text" style="white-space: nowrap; min-width: 300px;">
                 <div>14+ papers using MaCh3</div>
-                <div>34+ theses and dissertations</div>
+                <div>33+ theses and dissertations</div>
                 <div>2013 → present</div>
             </td>
+            <!-- Two boxes -->
+            <td style="display: flex; gap: 40px; align-items: stretch;">
+                <div class="mach3-extra-card" style="flex: 1; min-width: 0;">
+                    <div class="mach3-extra-card-title">
+                        <span class="mach3-card-heading">
+                            <span class="mach3-card-icon">📄</span>
+                            Most Recent Publication
+                        </span>
+                    </div>
+                    <div class="mach3-extra-card-text">
+                        The DUNE Collaboration. A Bayesian approach to the long-baseline neutrino oscillation sensitivity of DUNE.
+                    </div>
+                </div>
+                <div class="mach3-extra-card" style="flex: 1; min-width: 0;">
+                    <div class="mach3-extra-card-title">
+                        <span class="mach3-card-heading">
+                            <span class="mach3-card-icon">🎓</span>
+                            Most Recent PhD
+                        </span>
+                    </div>
+                    <div class="mach3-extra-card-text">
+                        Naseem Khan — Prototyping of and sensitivity studies for a gaseous argon near detector for the deep underground neutrino experiment
+                    </div>
+                </div>
+            </td>
+            <!-- Arrow icon -->
             <td class="mach3-recent-results-link-icon">
                 <svg width="70" height="30" viewBox="0 0 70 30" fill="none"
                     xmlns="http://www.w3.org/2000/svg">
-                    <!-- Neutrino oscillation gradually becoming a direction -->
-                    <path d="
-                        M3 15
-                        C7 15, 9 6, 13 6
-                        C17 6, 19 24, 23 24
-                        C27 24, 29 7, 33 7
-                        C37 7, 39 23, 43 23
-                        C47 23, 49 12, 53 12
-                        C56 12, 58 15, 61 15
-                    "
-                    stroke="var(--mach3-blue)"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"/>
-                    <!-- Arrowhead, continuing from the curve -->
+                    <path d="M3 15 C7 15, 9 6, 13 6 C17 6, 19 24, 23 24 C27 24, 29 7, 33 7 C37 7, 39 23, 43 23 C47 23, 49 12, 53 12 C56 12, 58 15, 61 15"
+                          stroke="var(--mach3-blue)"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          fill="none"/>
                     <path d="M56 10L62 15L56 20"
-                        stroke="var(--mach3-blue)"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
+                          stroke="var(--mach3-blue)"
+                          stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </td>
+            <!-- Link -->
             <td class="mach3-recent-results-link">
                 <a href="ResultsPublications.html">
                     See the full list of results and publications
