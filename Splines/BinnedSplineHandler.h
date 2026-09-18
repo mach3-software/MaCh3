@@ -115,8 +115,8 @@ class BinnedSplineHandler : public SplineBase {
     unsigned int MonolithIndex;
     int CoeffIndex;
 
-    /// Need to keep track of which splines are flat and which aren't
-    bool *isflatarray;
+    /// keep track which splines are flat (-1) otherwise map with flattened splines
+    std::vector<int> monolith_index;
     /// x coefficients for each spline
     M3::float_t *xcoeff_arr;
     /// ybcd coefficients for each spline
