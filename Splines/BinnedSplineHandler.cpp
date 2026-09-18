@@ -193,7 +193,7 @@ void BinnedSplineHandler::TransferToMonolith() {
   PrepForReweight(); 
   auto NSplines_All = CountNumberOfLoadedSplines(false, 1);
   NSplines_valid = CountNumberOfLoadedSplines(true, 0);
-  if(NSplines_All != MonolithIndex) {
+  if (static_cast<unsigned int>(NSplines_All) != MonolithIndex) {
     InvestigateMissingSplines();
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
     MACH3LOG_ERROR("NSplines_valid is {}", NSplines_valid);
