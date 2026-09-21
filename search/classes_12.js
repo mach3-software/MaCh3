@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['windowconfig_2236',['WindowConfig',['../structWindowConfig.html',1,'']]]
+  ['windowconfig_2238',['WindowConfig',['../structWindowConfig.html',1,'']]]
 ];

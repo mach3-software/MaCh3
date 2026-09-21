@@ -1,0 +1,21 @@
+Manager
+=======
+
+.. currentmodule:: pyMaCh3._pyMaCh3.manager
+
+.. autoclass:: Manager
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Manager.get_test_stat
+      ~Manager.print
+      ~Manager.raw
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_test_stat
+   .. automethod:: print
+   .. automethod:: raw

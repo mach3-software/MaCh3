@@ -1,0 +1,4 @@
+<map id="PySplineBase" name="PySplineBase">
+<area shape="rect" id="node1" title="EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="5,80,109,107"/>
+<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="13,5,101,32"/>
+</map>
