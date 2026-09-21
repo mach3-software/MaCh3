@@ -56,7 +56,7 @@ If something is unclear please contact us via
     </div>
 </a>
 
-<a class="mach3-start-card" href="userguide.html">
+<a class="mach3-start-card" href="UserGuide.html">
     <div class="mach3-start-card-title">
         <span class="mach3-card-heading">
             <span class="mach3-card-icon">📖</span>
@@ -158,7 +158,7 @@ If something is unclear please contact us via
             <!-- Counter of publication -->
             <td class="mach3-recent-results-text" style="white-space: nowrap; min-width: 300px;">
                 <div>14+ papers using MaCh3</div>
-                <div>33+ theses and dissertations</div>
+                <div>34+ theses and dissertations</div>
                 <div>2013 → present</div>
             </td>
             <!-- Two boxes -->

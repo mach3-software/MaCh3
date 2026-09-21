@@ -51,19 +51,29 @@ div.PageDoc div.textblock {
 /* Footer styling */
 /* Inspired by Edwin Varghese poster */
 .mach3-footer {
-    background-image: url('OscPattern.png');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 20px;
-    text-align: center;
+    margin-top: 4em;
+    padding: 2.5em 1.5em 1.8em 1.5em;
+
+    background: var(--mach3-white);
     border-top: 2px solid var(--mach3-gold);
-    color: #333;
+
+    text-align: center;
+    color: var(--mach3-ink);
 }
 
 .mach3-footer .last-updated {
     font-size: 0.9em;
     color: var(--mach3-muted);
+}
+
+.mach3-footer select:hover {
+    border-color: var(--mach3-blue) !important;
+}
+
+.mach3-footer select:focus {
+    outline: none;
+    border-color: var(--mach3-blue) !important;
+    box-shadow: 0 0 0 3px rgba(67, 137, 196, 0.12);
 }
 
 /* ==========================================================
@@ -100,19 +110,6 @@ div.PageDoc div.textblock {
     text-align: center;
     font-size: 0.85em;
     opacity: 0.65;
-}
-
-
-/* Mobile */
-@media (max-width: 900px) {
-    .mach3-intro {
-        display: block;
-    }
-    .mach3-mcmc-demo {
-        width: 100%;
-        max-width: none;
-        margin-top: 30px;
-    }
 }
 
 /* ==========================================================
@@ -299,14 +296,6 @@ div.PageDoc div.textblock {
     line-height: 1.5;
 }
 
-/* Mobile */
-@media (max-width: 700px) {
-    .mach3-start-grid,
-    .mach3-extra-grid {
-        grid-template-columns: 1fr;
-}
-
-
 /* Recent Results & Publications Section */
 .mach3-recent-results table {
     border-collapse: collapse;
@@ -346,4 +335,28 @@ div.PageDoc div.textblock {
     text-decoration: none;
     font-weight: 500;
     font-size: 20px;
+}
+
+
+/* Mobile */
+@media (max-width: 700px) {
+    .mach3-intro {
+        display: block;
+    }
+    .mach3-mcmc-demo {
+        width: 100%;
+        max-width: none;
+        margin-top: 30px;
+    }
+    .mach3-start-grid,
+    .mach3-extra-grid {
+        grid-template-columns: 1fr;
+    }
+    .mach3-recent-results tr > td {
+        display: block !important;
+        width: 100%;
+        box-sizing: border-box;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
