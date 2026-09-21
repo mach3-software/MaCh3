@@ -1,0 +1,8 @@
+<map id="inheritance5053777a71" name="inheritance5053777a71">
+<area shape="rect" id="node1" href="api/pyMaCh3._pyMaCh3.fitters.DelayedMCMC.html#pyMaCh3._pyMaCh3.fitters.DelayedMCMC" target="_top" title="DelayedMCMC" alt="" coords="319,5,437,31"/>
+<area shape="rect" id="node2" href="api/pyMaCh3._pyMaCh3.fitters.FitterBase.html#pyMaCh3._pyMaCh3.fitters.FitterBase" target="_top" title="FitterBase" alt="" coords="183,55,271,80"/>
+<area shape="rect" id="node4" href="api/pyMaCh3._pyMaCh3.fitters.LikelihoodFit.html#pyMaCh3._pyMaCh3.fitters.LikelihoodFit" target="_top" title="LikelihoodFit" alt="" coords="326,55,430,80"/>
+<area shape="rect" id="node7" href="api/pyMaCh3._pyMaCh3.fitters.mcmc.html#pyMaCh3._pyMaCh3.fitters.mcmc" target="_top" title="mcmc" alt="" coords="342,104,414,129"/>
+<area shape="rect" id="node5" href="api/pyMaCh3._pyMaCh3.fitters.MinuitFit.html#pyMaCh3._pyMaCh3.fitters.MinuitFit" target="_top" title="MinuitFit" alt="" coords="485,31,564,56"/>
+<area shape="rect" id="node6" href="api/pyMaCh3._pyMaCh3.fitters.PSO.html#pyMaCh3._pyMaCh3.fitters.PSO" target="_top" title="PSO" alt="" coords="489,80,561,105"/>
+</map>

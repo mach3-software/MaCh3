@@ -1,0 +1,4 @@
+<map id="OscProcessor" name="OscProcessor">
+<area shape="rect" id="node1" title="This class extends MCMC and allow specialised for Oscillation parameters analysis which require speci..." alt="" coords="14,80,119,107"/>
+<area shape="rect" id="node2" href="$classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="5,5,128,32"/>
+</map>
