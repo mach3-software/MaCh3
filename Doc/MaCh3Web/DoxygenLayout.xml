@@ -21,7 +21,7 @@
       <tab type="user" visible="yes" title="Results and Publications" url="ResultsPublications.html"/>
     </tab>
 
-    <tab type="modules" visible="yes" title="Interface" intro=""/>
+    <tab type="modules" visible="yes" title="API Reference" intro=""/>
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>
