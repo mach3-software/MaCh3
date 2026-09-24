@@ -99,7 +99,7 @@ class SampleHandlerInterface
   /// @brief Return the binning used to draw a kinematic parameter
   /// @param iSample Index of the sample.
   /// @param KinematicParameter name of variable
-  virtual std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const = 0;
+  virtual std::vector<double> ReturnKinematicParameterBinning(const int iSample, const std::string &KinematicParameter) const = 0;
 
   /// @brief Build a 1D histogram for a given variable, optionally filtered by mode and channel.
   /// @param iSample Index of the sample.
