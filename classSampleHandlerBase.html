@@ -117,12 +117,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a94e7901871d0c630c9db9688d5089cd1"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a94e7901871d0c630c9db9688d5089cd1">GetName</a> () const final</td></tr>
 <tr class="memdesc:a94e7901871d0c630c9db9688d5089cd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get name for Sample Handler.  <a href="classSampleHandlerBase.html#a94e7901871d0c630c9db9688d5089cd1">More...</a><br /></td></tr>
 <tr class="separator:a94e7901871d0c630c9db9688d5089cd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe15ec2e473d44a12a61f5a9f3bf08ac"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a> (const int Sample) const final</td></tr>
-<tr class="memdesc:abe15ec2e473d44a12a61f5a9f3bf08ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get fancy title for specified samples.  <a href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">More...</a><br /></td></tr>
-<tr class="separator:abe15ec2e473d44a12a61f5a9f3bf08ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f685b9898162aa483b183c2f59ee357"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a> (const int Sample) const</td></tr>
-<tr class="memdesc:a8f685b9898162aa483b183c2f59ee357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sample name tag used only for getting relevant uncertainties.  <a href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">More...</a><br /></td></tr>
-<tr class="separator:a8f685b9898162aa483b183c2f59ee357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdf70f90efa5aa3fa4cc0d95c059e372"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a> (const int iSample) const final</td></tr>
+<tr class="memdesc:afdf70f90efa5aa3fa4cc0d95c059e372"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get fancy title for specified samples.  <a href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">More...</a><br /></td></tr>
+<tr class="separator:afdf70f90efa5aa3fa4cc0d95c059e372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65a7cd38082064ce5802d375f9d11385"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a> (const int iSample) const</td></tr>
+<tr class="memdesc:a65a7cd38082064ce5802d375f9d11385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sample name tag used only for getting relevant uncertainties.  <a href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">More...</a><br /></td></tr>
+<tr class="separator:a65a7cd38082064ce5802d375f9d11385"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d1b68d0a602d5a71aa2901ed4528b40"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a> (const int iSample, const int Dimension) const final</td></tr>
 <tr class="memdesc:a1d1b68d0a602d5a71aa2901ed4528b40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy".  <a href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">More...</a><br /></td></tr>
 <tr class="separator:a1d1b68d0a602d5a71aa2901ed4528b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,9 +141,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab29aef72deea0e36df36b2144ab014a6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab29aef72deea0e36df36b2144ab014a6">GetLikelihood</a> () const override</td></tr>
 <tr class="memdesc:ab29aef72deea0e36df36b2144ab014a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return likelihood (-LogL) for all samples.  <a href="classSampleHandlerBase.html#ab29aef72deea0e36df36b2144ab014a6">More...</a><br /></td></tr>
 <tr class="separator:ab29aef72deea0e36df36b2144ab014a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a734f65161335db4474c2f26a3e173ee0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a734f65161335db4474c2f26a3e173ee0">GetSampleLikelihood</a> (const int isample) const override</td></tr>
-<tr class="memdesc:a734f65161335db4474c2f26a3e173ee0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get likelihood (-logL) for a single sample.  <a href="classSampleHandlerBase.html#a734f65161335db4474c2f26a3e173ee0">More...</a><br /></td></tr>
-<tr class="separator:a734f65161335db4474c2f26a3e173ee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75ac605efa73b0ce24330abf4d88466d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a75ac605efa73b0ce24330abf4d88466d">GetSampleLikelihood</a> (const int iSample) const override</td></tr>
+<tr class="memdesc:a75ac605efa73b0ce24330abf4d88466d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get likelihood (-logL) for a single sample.  <a href="classSampleHandlerBase.html#a75ac605efa73b0ce24330abf4d88466d">More...</a><br /></td></tr>
+<tr class="separator:a75ac605efa73b0ce24330abf4d88466d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa549bd920fe57fcf751d1f1fe02231d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#aa549bd920fe57fcf751d1f1fe02231d8">GetSampleIndex</a> (const std::string &amp;SampleTitle) const</td></tr>
 <tr class="memdesc:aa549bd920fe57fcf751d1f1fe02231d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get index of sample based on name.  <a href="classSampleHandlerBase.html#aa549bd920fe57fcf751d1f1fe02231d8">More...</a><br /></td></tr>
 <tr class="separator:aa549bd920fe57fcf751d1f1fe02231d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -630,18 +630,18 @@ Ed Atkin </dd></dl>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a08992db69b6f16d33aaefa3714c566bd"><div class="ttname"><a href="classSampleHandlerBase.html#a08992db69b6f16d33aaefa3714c566bd">SampleHandlerBase::SampleHandlerName</a></div><div class="ttdeci">std::string SampleHandlerName</div><div class="ttdoc">Identifier of this Sample Handler, mostly used for fancy printing in FitterBase.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00413">SampleHandlerBase.h:413</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a0aabf4d88374017481704de07f9b43ce"><div class="ttname"><a href="classSampleHandlerBase.html#a0aabf4d88374017481704de07f9b43ce">SampleHandlerBase::ReversedKinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicParameters</div><div class="ttdoc">Mapping between kinematic enum and string.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00428">SampleHandlerBase.h:428</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a0c19e81e996011167bdde29eba8e36ba"><div class="ttname"><a href="classSampleHandlerBase.html#a0c19e81e996011167bdde29eba8e36ba">SampleHandlerBase::Oscillator</a></div><div class="ttdeci">std::shared_ptr&lt; OscillationHandler &gt; Oscillator</div><div class="ttdoc">Contains oscillator handling calculating oscillation probabilities.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00385">SampleHandlerBase.h:385</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a19685a38f2f60acd25489d34cb90b7c2"><div class="ttname"><a href="classSampleHandlerBase.html#a19685a38f2f60acd25489d34cb90b7c2">SampleHandlerBase::SampleManager</a></div><div class="ttdeci">std::unique_ptr&lt; Manager &gt; SampleManager</div><div class="ttdoc">The manager object used to read the sample yaml file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00436">SampleHandlerBase.h:436</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a3be3d4a35c7d673e0ec5d00a98294391"><div class="ttname"><a href="classSampleHandlerBase.html#a3be3d4a35c7d673e0ec5d00a98294391">SampleHandlerBase::KinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicParameters</div><div class="ttdoc">Mapping between string and kinematic enum.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00426">SampleHandlerBase.h:426</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a5ab7211224de4eac17cbec1e3e4f2648"><div class="ttname"><a href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">SampleHandlerBase::Binning</a></div><div class="ttdeci">std::unique_ptr&lt; BinningHandler &gt; Binning</div><div class="ttdoc">KS: This stores binning information, in future could be come vector to store binning for every used s...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00390">SampleHandlerBase.h:390</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a5aeed5cc0ac410533911665a8c124099"><div class="ttname"><a href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">SampleHandlerBase::ParHandler</a></div><div class="ttdeci">ParameterHandlerGeneric * ParHandler</div><div class="ttdoc">ETA - All experiments will need an xsec, det and osc cov.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00409">SampleHandlerBase.h:409</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a63d3669e7fc3c091b90ba569c60aa4a7"><div class="ttname"><a href="classSampleHandlerBase.html#a63d3669e7fc3c091b90ba569c60aa4a7">SampleHandlerBase::UpdateW2</a></div><div class="ttdeci">bool UpdateW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00447">SampleHandlerBase.h:447</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6543dc1cbfc50fe4d1ae8079cfafcfad"><div class="ttname"><a href="classSampleHandlerBase.html#a6543dc1cbfc50fe4d1ae8079cfafcfad">SampleHandlerBase::ReversedKinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00432">SampleHandlerBase.h:432</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa297a81b6ec840d1799d32a5ace3272b"><div class="ttname"><a href="classSampleHandlerBase.html#aa297a81b6ec840d1799d32a5ace3272b">SampleHandlerBase::KinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00431">SampleHandlerBase.h:431</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00468">SampleHandlerBase.h:468</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aff34f7df7134b0eb6011f19fd72af1e5"><div class="ttname"><a href="classSampleHandlerBase.html#aff34f7df7134b0eb6011f19fd72af1e5">SampleHandlerBase::FirstTimeW2</a></div><div class="ttdeci">bool FirstTimeW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00445">SampleHandlerBase.h:445</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a08992db69b6f16d33aaefa3714c566bd"><div class="ttname"><a href="classSampleHandlerBase.html#a08992db69b6f16d33aaefa3714c566bd">SampleHandlerBase::SampleHandlerName</a></div><div class="ttdeci">std::string SampleHandlerName</div><div class="ttdoc">Identifier of this Sample Handler, mostly used for fancy printing in FitterBase.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00414">SampleHandlerBase.h:414</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a0aabf4d88374017481704de07f9b43ce"><div class="ttname"><a href="classSampleHandlerBase.html#a0aabf4d88374017481704de07f9b43ce">SampleHandlerBase::ReversedKinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicParameters</div><div class="ttdoc">Mapping between kinematic enum and string.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00429">SampleHandlerBase.h:429</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a0c19e81e996011167bdde29eba8e36ba"><div class="ttname"><a href="classSampleHandlerBase.html#a0c19e81e996011167bdde29eba8e36ba">SampleHandlerBase::Oscillator</a></div><div class="ttdeci">std::shared_ptr&lt; OscillationHandler &gt; Oscillator</div><div class="ttdoc">Contains oscillator handling calculating oscillation probabilities.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00386">SampleHandlerBase.h:386</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a19685a38f2f60acd25489d34cb90b7c2"><div class="ttname"><a href="classSampleHandlerBase.html#a19685a38f2f60acd25489d34cb90b7c2">SampleHandlerBase::SampleManager</a></div><div class="ttdeci">std::unique_ptr&lt; Manager &gt; SampleManager</div><div class="ttdoc">The manager object used to read the sample yaml file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00437">SampleHandlerBase.h:437</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a3be3d4a35c7d673e0ec5d00a98294391"><div class="ttname"><a href="classSampleHandlerBase.html#a3be3d4a35c7d673e0ec5d00a98294391">SampleHandlerBase::KinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicParameters</div><div class="ttdoc">Mapping between string and kinematic enum.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00427">SampleHandlerBase.h:427</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a5ab7211224de4eac17cbec1e3e4f2648"><div class="ttname"><a href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">SampleHandlerBase::Binning</a></div><div class="ttdeci">std::unique_ptr&lt; BinningHandler &gt; Binning</div><div class="ttdoc">KS: This stores binning information, in future could be come vector to store binning for every used s...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00391">SampleHandlerBase.h:391</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a5aeed5cc0ac410533911665a8c124099"><div class="ttname"><a href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">SampleHandlerBase::ParHandler</a></div><div class="ttdeci">ParameterHandlerGeneric * ParHandler</div><div class="ttdoc">ETA - All experiments will need an xsec, det and osc cov.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00410">SampleHandlerBase.h:410</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a63d3669e7fc3c091b90ba569c60aa4a7"><div class="ttname"><a href="classSampleHandlerBase.html#a63d3669e7fc3c091b90ba569c60aa4a7">SampleHandlerBase::UpdateW2</a></div><div class="ttdeci">bool UpdateW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00448">SampleHandlerBase.h:448</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6543dc1cbfc50fe4d1ae8079cfafcfad"><div class="ttname"><a href="classSampleHandlerBase.html#a6543dc1cbfc50fe4d1ae8079cfafcfad">SampleHandlerBase::ReversedKinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00433">SampleHandlerBase.h:433</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa297a81b6ec840d1799d32a5ace3272b"><div class="ttname"><a href="classSampleHandlerBase.html#aa297a81b6ec840d1799d32a5ace3272b">SampleHandlerBase::KinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00432">SampleHandlerBase.h:432</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00469">SampleHandlerBase.h:469</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aff34f7df7134b0eb6011f19fd72af1e5"><div class="ttname"><a href="classSampleHandlerBase.html#aff34f7df7134b0eb6011f19fd72af1e5">SampleHandlerBase::FirstTimeW2</a></div><div class="ttdeci">bool FirstTimeW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00446">SampleHandlerBase.h:446</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_a7547c7aaf6cc3b82157c934f6f294ea1"><div class="ttname"><a href="classSampleHandlerInterface.html#a7547c7aaf6cc3b82157c934f6f294ea1">SampleHandlerInterface::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8h_source.html#l00265">SampleHandlerInterface.h:265</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_ac70e34d77f506cb7201ee95cd2d0b3e8"><div class="ttname"><a href="classSampleHandlerInterface.html#ac70e34d77f506cb7201ee95cd2d0b3e8">SampleHandlerInterface::SampleHandlerInterface</a></div><div class="ttdeci">SampleHandlerInterface()</div><div class="ttdoc">The main constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8cpp_source.html#l00004">SampleHandlerInterface.cpp:4</a></div></div>
 </div><!-- fragment -->
@@ -678,7 +678,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">THStackLeg</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code" href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">THStackLeg</a>;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa9553ca3e218efa88593e22a0fe26e23"><div class="ttname"><a href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">SampleHandlerBase::THStackLeg</a></div><div class="ttdeci">TLegend * THStackLeg</div><div class="ttdoc">DB: Legend associated with stacked histograms produced by this class.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00442">SampleHandlerBase.h:442</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa9553ca3e218efa88593e22a0fe26e23"><div class="ttname"><a href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">SampleHandlerBase::THStackLeg</a></div><div class="ttdeci">TLegend * THStackLeg</div><div class="ttdoc">DB: Legend associated with stacked histograms produced by this class.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00443">SampleHandlerBase.h:443</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -755,7 +755,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> ExpectedSize = End - Start;</div>
 <div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160; </div>
 <div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;  <span class="keywordflow">if</span> (<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Data_Array.size()) != ExpectedSize) {</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Data_Array size mismatch for sample &#39;{}&#39;.&quot;</span>, <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(Sample));</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Data_Array size mismatch for sample &#39;{}&#39;.&quot;</span>, <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(Sample));</div>
 <div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Expected size: {}, received size: {}.&quot;</span>, ExpectedSize, Data_Array.size());</div>
 <div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Start bin: {}, End bin: {}.&quot;</span>, Start, End);</div>
 <div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This likely indicates a binning or sample slicing bug.&quot;</span>);</div>
@@ -768,9 +768,9 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a7e5e3a56a714872c009042f5c5bf1907"><div class="ttname"><a href="classSampleHandlerBase.html#a7e5e3a56a714872c009042f5c5bf1907">SampleHandlerBase::FillHist</a></div><div class="ttdeci">void FillHist(const int Sample, TH1 *Hist, std::vector&lt; double &gt; &amp;Array)</div><div class="ttdoc">Fill a histogram with the event-level information used in the fit.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00274">SampleHandlerBase.cpp:274</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab9e5a615c44606b3b413f4a29e76315f"><div class="ttname"><a href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleHandlerBase::SampleDetails</a></div><div class="ttdeci">std::vector&lt; SampleInfo &gt; SampleDetails</div><div class="ttdoc">Stores info about currently initialised sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00403">SampleHandlerBase.h:403</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_abe15ec2e473d44a12a61f5a9f3bf08ac"><div class="ttname"><a href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">SampleHandlerBase::GetSampleTitle</a></div><div class="ttdeci">std::string GetSampleTitle(const int Sample) const final</div><div class="ttdoc">Get fancy title for specified samples.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00051">SampleHandlerBase.h:51</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ac19a764b8c2ee49fdeff205db0713a72"><div class="ttname"><a href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandlerBase::SampleHandler_data</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_data</div><div class="ttdoc">DB Array to be filled in AddData.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00396">SampleHandlerBase.h:396</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab9e5a615c44606b3b413f4a29e76315f"><div class="ttname"><a href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleHandlerBase::SampleDetails</a></div><div class="ttdeci">std::vector&lt; SampleInfo &gt; SampleDetails</div><div class="ttdoc">Stores info about currently initialised sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00404">SampleHandlerBase.h:404</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ac19a764b8c2ee49fdeff205db0713a72"><div class="ttname"><a href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandlerBase::SampleHandler_data</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_data</div><div class="ttdoc">DB Array to be filled in AddData.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00397">SampleHandlerBase.h:397</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_afdf70f90efa5aa3fa4cc0d95c059e372"><div class="ttname"><a href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">SampleHandlerBase::GetSampleTitle</a></div><div class="ttdeci">std::string GetSampleTitle(const int iSample) const final</div><div class="ttdoc">Get fancy title for specified samples.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00051">SampleHandlerBase.h:51</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -932,9 +932,9 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160; </div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  <a class="code" href="classSampleHandlerBase.html#a96df4941a46e1c3c35a8dc4649975428">FinaliseShifts</a>(iEvent);</div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a713a15d658bb003be6313a1aa928e1cb"><div class="ttname"><a href="classSampleHandlerBase.html#a713a15d658bb003be6313a1aa928e1cb">SampleHandlerBase::functional</a></div><div class="ttdeci">M3::detail::Functional functional</div><div class="ttdoc">Helper object for storing/updating information related to functional shift parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00465">SampleHandlerBase.h:465</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a96df4941a46e1c3c35a8dc4649975428"><div class="ttname"><a href="classSampleHandlerBase.html#a96df4941a46e1c3c35a8dc4649975428">SampleHandlerBase::FinaliseShifts</a></div><div class="ttdeci">virtual void FinaliseShifts([[maybe_unused]] const int iEvent)</div><div class="ttdoc">LP - Optionally calculate derived observables after all shifts have been applied.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00314">SampleHandlerBase.h:314</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a991fc640f716b3bcd98efe7a9980939f"><div class="ttname"><a href="classSampleHandlerBase.html#a991fc640f716b3bcd98efe7a9980939f">SampleHandlerBase::ResetShifts</a></div><div class="ttdeci">virtual void ResetShifts([[maybe_unused]] const int iEvent)</div><div class="ttdoc">HH - reset the shifted values to the original values.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00309">SampleHandlerBase.h:309</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a713a15d658bb003be6313a1aa928e1cb"><div class="ttname"><a href="classSampleHandlerBase.html#a713a15d658bb003be6313a1aa928e1cb">SampleHandlerBase::functional</a></div><div class="ttdeci">M3::detail::Functional functional</div><div class="ttdoc">Helper object for storing/updating information related to functional shift parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00466">SampleHandlerBase.h:466</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a96df4941a46e1c3c35a8dc4649975428"><div class="ttname"><a href="classSampleHandlerBase.html#a96df4941a46e1c3c35a8dc4649975428">SampleHandlerBase::FinaliseShifts</a></div><div class="ttdeci">virtual void FinaliseShifts([[maybe_unused]] const int iEvent)</div><div class="ttdoc">LP - Optionally calculate derived observables after all shifts have been applied.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00315">SampleHandlerBase.h:315</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a991fc640f716b3bcd98efe7a9980939f"><div class="ttname"><a href="classSampleHandlerBase.html#a991fc640f716b3bcd98efe7a9980939f">SampleHandlerBase::ResetShifts</a></div><div class="ttdeci">virtual void ResetShifts([[maybe_unused]] const int iEvent)</div><div class="ttdoc">HH - reset the shifted values to the original values.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00310">SampleHandlerBase.h:310</a></div></div>
 <div class="ttc" id="astructM3_1_1detail_1_1Functional_html_ae9640be3674dc00e744e6a27ff19b1f4"><div class="ttname"><a href="structM3_1_1detail_1_1Functional.html#ae9640be3674dc00e744e6a27ff19b1f4">M3::detail::Functional::shifts</a></div><div class="ttdeci">std::vector&lt; Shift &gt; shifts</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFunctional_8h_source.html#l00036">SampleHandlerFunctional.h:36</a></div></div>
 <div class="ttc" id="astructM3_1_1detail_1_1Functional_html_af8be78832093661914a2cf170fec6ed7"><div class="ttname"><a href="structM3_1_1detail_1_1Functional.html#af8be78832093661914a2cf170fec6ed7">M3::detail::Functional::event_shifts</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; event_shifts</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFunctional_8h_source.html#l00042">SampleHandlerFunctional.h:42</a></div></div>
 </div><!-- fragment -->
@@ -995,7 +995,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160; </div>
 <div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;  <span class="keywordflow">return</span> originalSelection;</div>
 <div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa6b04b2821b71787507d4ebc43e082f0"><div class="ttname"><a href="classSampleHandlerBase.html#aa6b04b2821b71787507d4ebc43e082f0">SampleHandlerBase::Selection</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; KinematicCut &gt; &gt; Selection</div><div class="ttdoc">a way to store selection cuts which you may push back in the get1DVar functions most of the time this...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00422">SampleHandlerBase.h:422</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa6b04b2821b71787507d4ebc43e082f0"><div class="ttname"><a href="classSampleHandlerBase.html#aa6b04b2821b71787507d4ebc43e082f0">SampleHandlerBase::Selection</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; KinematicCut &gt; &gt; Selection</div><div class="ttdoc">a way to store selection cuts which you may push back in the get1DVar functions most of the time this...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00423">SampleHandlerBase.h:423</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1034,7 +1034,7 @@ Ed Atkin </dd></dl>
 <p>Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Sample</td><td>Index of the sample. </td></tr>
+    <tr><td class="paramname">iSample</td><td>Index of the sample. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1089,7 +1089,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160; </div>
 <div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;  <span class="keywordflow">return</span> SelectionVec;</div>
 <div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_abaf72a0f2591c851bfe18d647b4c74b2"><div class="ttname"><a href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">SampleHandlerBase::GetNOscChannels</a></div><div class="ttdeci">int GetNOscChannels(const int iSample) const final</div><div class="ttdoc">Get number of oscillation channels for a single sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00107">SampleHandlerBase.h:107</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_abaf72a0f2591c851bfe18d647b4c74b2"><div class="ttname"><a href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">SampleHandlerBase::GetNOscChannels</a></div><div class="ttdeci">int GetNOscChannels(const int iSample) const final</div><div class="ttdoc">Get number of oscillation channels for a single sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00108">SampleHandlerBase.h:108</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ade73b3eb8a5624e910fa3006f6e3da4b"><div class="ttname"><a href="classSampleHandlerBase.html#ade73b3eb8a5624e910fa3006f6e3da4b">SampleHandlerBase::ReturnKinematicParameterFromString</a></div><div class="ttdeci">int ReturnKinematicParameterFromString(const std::string &amp;KinematicStr) const</div><div class="ttdoc">ETA function to generically convert a string from param handler to a kinematic type.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01521">SampleHandlerBase.cpp:1521</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_a83750d52aacd5e5fc935cfba16b62ac6"><div class="ttname"><a href="classSampleHandlerInterface.html#a83750d52aacd5e5fc935cfba16b62ac6">SampleHandlerInterface::Modes</a></div><div class="ttdeci">std::unique_ptr&lt; MaCh3Modes &gt; Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8h_source.html#l00268">SampleHandlerInterface.h:268</a></div></div>
 <div class="ttc" id="astructKinematicCut_html"><div class="ttname"><a href="structKinematicCut.html">KinematicCut</a></div><div class="ttdoc">KS: Small struct used for applying kinematic cuts.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00168">SampleStructs.h:168</a></div></div>
@@ -1210,9 +1210,9 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00033">MaCh3Logger.h:33</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a1ec5463105a10e35c706da03b9ac3e1d"><div class="ttname"><a href="classSampleHandlerBase.html#a1ec5463105a10e35c706da03b9ac3e1d">SampleHandlerBase::PassesSelection</a></div><div class="ttdeci">bool PassesSelection(const ParT &amp;Par, std::size_t iEvent)</div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6ceca02f83e878ef1aec6e54e7b2f331"><div class="ttname"><a href="classSampleHandlerBase.html#a6ceca02f83e878ef1aec6e54e7b2f331">SampleHandlerBase::GetNEvents</a></div><div class="ttdeci">unsigned int GetNEvents() const</div><div class="ttdoc">Return total number of events.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00176">SampleHandlerBase.h:176</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aad10d94881c0dc8f55429cb2745e6a52"><div class="ttname"><a href="classSampleHandlerBase.html#aad10d94881c0dc8f55429cb2745e6a52">SampleHandlerBase::ReturnKinematicParameter</a></div><div class="ttdeci">double ReturnKinematicParameter(const std::string &amp;KinematicParameter, int iEvent) const</div><div class="ttdoc">Return the value of an associated kinematic parameter for an event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00337">SampleHandlerBase.h:337</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab580c921f52a9dd5403ebb7b327e3957"><div class="ttname"><a href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">SampleHandlerBase::MCEvents</a></div><div class="ttdeci">std::vector&lt; EventInfo &gt; MCEvents</div><div class="ttdoc">Stores information about every MC event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00401">SampleHandlerBase.h:401</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6ceca02f83e878ef1aec6e54e7b2f331"><div class="ttname"><a href="classSampleHandlerBase.html#a6ceca02f83e878ef1aec6e54e7b2f331">SampleHandlerBase::GetNEvents</a></div><div class="ttdeci">unsigned int GetNEvents() const</div><div class="ttdoc">Return total number of events.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00177">SampleHandlerBase.h:177</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aad10d94881c0dc8f55429cb2745e6a52"><div class="ttname"><a href="classSampleHandlerBase.html#aad10d94881c0dc8f55429cb2745e6a52">SampleHandlerBase::ReturnKinematicParameter</a></div><div class="ttdeci">double ReturnKinematicParameter(const std::string &amp;KinematicParameter, int iEvent) const</div><div class="ttdoc">Return the value of an associated kinematic parameter for an event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00338">SampleHandlerBase.h:338</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab580c921f52a9dd5403ebb7b327e3957"><div class="ttname"><a href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">SampleHandlerBase::MCEvents</a></div><div class="ttdeci">std::vector&lt; EventInfo &gt; MCEvents</div><div class="ttdoc">Stores information about every MC event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00402">SampleHandlerBase.h:402</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_a4df77c93c26edfbc21953d063c92da43"><div class="ttname"><a href="classSampleHandlerInterface.html#a4df77c93c26edfbc21953d063c92da43">SampleHandlerInterface::MatchCondition</a></div><div class="ttdeci">bool MatchCondition(const std::vector&lt; T &gt; &amp;allowedValues, const T &amp;value)</div><div class="ttdoc">check if event is affected by following conditions, for example pdg, or modes etc</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8h_source.html#l00249">SampleHandlerInterface.h:249</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1244,8 +1244,8 @@ Ed Atkin </dd></dl>
 <p>Calculate weights for function parameters. </p>
 <p>First you need to setup additional pointers in you experiment code in SetupWeightPointers Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer This way func weight shall be used in GetEventWeight </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00334">334</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;{<span class="keywordflow">return</span>;};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00335">335</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;{<span class="keywordflow">return</span>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1321,7 +1321,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandler_array</a>[iBin] == 0) {</div>
 <div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;      iCounter++;</div>
 <div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Bin {}, for sample {}, has 0 entries&quot;</span>,</div>
-<div class="line"><a name="l01949"></a><span class="lineno"> 1949</span>&#160;                     <a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetBinName(iBin), <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(<a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetSampleIndex(iBin)));</div>
+<div class="line"><a name="l01949"></a><span class="lineno"> 1949</span>&#160;                     <a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetBinName(iBin), <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(<a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetSampleIndex(iBin)));</div>
 <div class="line"><a name="l01950"></a><span class="lineno"> 1950</span>&#160;    }</div>
 <div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;  }</div>
 <div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160; </div>
@@ -1331,7 +1331,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160;  }</div>
 <div class="line"><a name="l01957"></a><span class="lineno"> 1957</span>&#160;}</div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a94e7901871d0c630c9db9688d5089cd1"><div class="ttname"><a href="classSampleHandlerBase.html#a94e7901871d0c630c9db9688d5089cd1">SampleHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const final</div><div class="ttdoc">Get name for Sample Handler.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01071">SampleHandlerBase.cpp:1071</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ae99d4a3f9c51f9348d3c925547bf5e38"><div class="ttname"><a href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandlerBase::SampleHandler_array</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_array</div><div class="ttdoc">DB Array to be filled after reweighting.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00392">SampleHandlerBase.h:392</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ae99d4a3f9c51f9348d3c925547bf5e38"><div class="ttname"><a href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandlerBase::SampleHandler_array</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_array</div><div class="ttdoc">DB Array to be filled after reweighting.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00393">SampleHandlerBase.h:393</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1408,7 +1408,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;  }</div>
 <div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;}</div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a000d8e34ac84ccabdfd0ed871fa43377"><div class="ttname"><a href="classSampleHandlerBase.html#a000d8e34ac84ccabdfd0ed871fa43377">SampleHandlerBase::GetEventWeight</a></div><div class="ttdeci">M3::float_t GetEventWeight(const int iEvent)</div><div class="ttdoc">Computes the total event weight for a given entry.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01084">SampleHandlerBase.cpp:1084</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a018501b77a65784a3cd1ad40f0dcbf74"><div class="ttname"><a href="classSampleHandlerBase.html#a018501b77a65784a3cd1ad40f0dcbf74">SampleHandlerBase::ReturnKinematicVector</a></div><div class="ttdeci">std::vector&lt; double &gt; ReturnKinematicVector(const std::string &amp;KinematicParameter, const int iEvent) const</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00344">SampleHandlerBase.h:344</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a018501b77a65784a3cd1ad40f0dcbf74"><div class="ttname"><a href="classSampleHandlerBase.html#a018501b77a65784a3cd1ad40f0dcbf74">SampleHandlerBase::ReturnKinematicVector</a></div><div class="ttdeci">std::vector&lt; double &gt; ReturnKinematicVector(const std::string &amp;KinematicParameter, const int iEvent) const</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00345">SampleHandlerBase.h:345</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a4b76e1d8360faaae4393296de48ac041"><div class="ttname"><a href="classSampleHandlerBase.html#a4b76e1d8360faaae4393296de48ac041">SampleHandlerBase::IsEventSelected</a></div><div class="ttdeci">bool IsEventSelected(const int iSample, const int iEvent) _noexcept_</div><div class="ttdoc">DB Function which determines if an event is selected based on KinematicCut.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00313">SampleHandlerBase.cpp:313</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_adef816e5128269500006cf55be37a937"><div class="ttname"><a href="classSampleHandlerBase.html#adef816e5128269500006cf55be37a937">SampleHandlerBase::IsSubEventSelected</a></div><div class="ttdeci">bool IsSubEventSelected(const std::vector&lt; KinematicCut &gt; &amp;SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents)</div><div class="ttdoc">JM Function which determines if a subevent is selected.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00329">SampleHandlerBase.cpp:329</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_aecb6fd69f8ab2fa673aa0a49c08bc9e1"><div class="ttname"><a href="classSampleHandlerBase.html#aecb6fd69f8ab2fa673aa0a49c08bc9e1">SampleHandlerBase::ReturnKinematicVectorFromString</a></div><div class="ttdeci">int ReturnKinematicVectorFromString(const std::string &amp;KinematicStr) const</div><div class="ttdoc">JM: Convert a kinematic vector name to its corresponding integer ID.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01548">SampleHandlerBase.cpp:1548</a></div></div>
@@ -1614,11 +1614,11 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  }</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;}</div>
 <div class="ttc" id="aCore_8h_html_ab6a7e23420f0bcfb04f42f45f8283101"><div class="ttname"><a href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a></div><div class="ttdeci">#define _restrict_</div><div class="ttdoc">KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I foun...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00108">Core.h:108</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a2707678d865cf2ca1c7596c6d08167e4"><div class="ttname"><a href="classSampleHandlerBase.html#a2707678d865cf2ca1c7596c6d08167e4">SampleHandlerBase::StoredSelection</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; KinematicCut &gt; &gt; StoredSelection</div><div class="ttdoc">DB Vectors to store which kinematic cuts we apply. Gets used in IsEventSelected Read in from sample y...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00419">SampleHandlerBase.h:419</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6ccec381c8cc3a97b8af996fea9843c5"><div class="ttname"><a href="classSampleHandlerBase.html#a6ccec381c8cc3a97b8af996fea9843c5">SampleHandlerBase::CalcWeightFunc</a></div><div class="ttdeci">virtual void CalcWeightFunc([[maybe_unused]] const int iEvent)</div><div class="ttdoc">Calculate weights for function parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00334">SampleHandlerBase.h:334</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a2707678d865cf2ca1c7596c6d08167e4"><div class="ttname"><a href="classSampleHandlerBase.html#a2707678d865cf2ca1c7596c6d08167e4">SampleHandlerBase::StoredSelection</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; KinematicCut &gt; &gt; StoredSelection</div><div class="ttdoc">DB Vectors to store which kinematic cuts we apply. Gets used in IsEventSelected Read in from sample y...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00420">SampleHandlerBase.h:420</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6ccec381c8cc3a97b8af996fea9843c5"><div class="ttname"><a href="classSampleHandlerBase.html#a6ccec381c8cc3a97b8af996fea9843c5">SampleHandlerBase::CalcWeightFunc</a></div><div class="ttdeci">virtual void CalcWeightFunc([[maybe_unused]] const int iEvent)</div><div class="ttdoc">Calculate weights for function parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00335">SampleHandlerBase.h:335</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a6d8d735298494165affcfec559886b98"><div class="ttname"><a href="classSampleHandlerBase.html#a6d8d735298494165affcfec559886b98">SampleHandlerBase::ApplyShifts</a></div><div class="ttdeci">virtual void ApplyShifts(const int iEvent)</div><div class="ttdoc">ETA - generic function applying shifts.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00454">SampleHandlerBase.cpp:454</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ab6b95e738b130c2d0a7bf2c3448d128f"><div class="ttname"><a href="classSampleHandlerBase.html#ab6b95e738b130c2d0a7bf2c3448d128f">SampleHandlerBase::CalcWeightTotal</a></div><div class="ttdeci">M3::float_t CalcWeightTotal(const EventInfo *_restrict_ MCEvent) const _noexcept_</div><div class="ttdoc">Calculate the total weight weight for a given event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00475">SampleHandlerBase.cpp:475</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ac28950a384b0f477e6b9d044f85a9941"><div class="ttname"><a href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandlerBase::SampleHandler_array_w2</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_array_w2</div><div class="ttdoc">KS Array used for MC stat.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00394">SampleHandlerBase.h:394</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ac28950a384b0f477e6b9d044f85a9941"><div class="ttname"><a href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandlerBase::SampleHandler_array_w2</a></div><div class="ttdeci">std::vector&lt; double &gt; SampleHandler_array_w2</div><div class="ttdoc">KS Array used for MC stat.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00395">SampleHandlerBase.h:395</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aadca64372617e10cf9fdf70d0b0eb23f"><div class="ttname"><a href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a></div><div class="ttdeci">constexpr static const int UnderOverFlowBin</div><div class="ttdoc">Mark bin which is overflow or underflow in MaCh3 binning.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00091">Core.h:91</a></div></div>
 <div class="ttc" id="astructEventInfo_html"><div class="ttname"><a href="structEventInfo.html">EventInfo</a></div><div class="ttdoc">Stores info about each MC event used during reweighting routine.</div><div class="ttdef"><b>Definition:</b> <a href="EventInfo_8h_source.html#l00013">EventInfo.h:13</a></div></div>
 </div><!-- fragment -->
@@ -1733,8 +1733,8 @@ Ed Atkin </dd></dl>
 <p>LP - Optionally calculate derived observables after all shifts have been applied. </p>
 <p>For example, have shifts that varied lepton energy and hadron energy separately in a subclass implementation of this method you may add the shifted quantities together to build a shifted neutrino energy estimator </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00314">314</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00315">315</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1785,7 +1785,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;      <a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim] = <a class="code" href="classSampleHandlerBase.html#ae7bc1e221c27386d60e8db1b4a035ba8">GetPointerToKinematicParameter</a>(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(Sample, iDim), event_i);</div>
 <div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;      <span class="keywordflow">if</span> (std::isnan(*<a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim]) || std::isinf(*<a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim])) {</div>
 <div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Variable {} for sample {} and dimension {} is ill-defined and equal to {}&quot;</span>,</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;                       <a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(Sample, iDim), <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(Sample), dim, *<a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim]);</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;                       <a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(Sample, iDim), <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(Sample), dim, *<a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim]);</div>
 <div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;      }</div>
 <div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> bin = <a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;FindNominalBin(Sample, iDim, *<a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[event_i].KinVar[iDim]);</div>
@@ -1794,7 +1794,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    }</div>
 <div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;  }</div>
 <div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ae7bc1e221c27386d60e8db1b4a035ba8"><div class="ttname"><a href="classSampleHandlerBase.html#ae7bc1e221c27386d60e8db1b4a035ba8">SampleHandlerBase::GetPointerToKinematicParameter</a></div><div class="ttdeci">const double * GetPointerToKinematicParameter(const std::string &amp;KinematicParameter, int iEvent) const</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00354">SampleHandlerBase.h:354</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ae7bc1e221c27386d60e8db1b4a035ba8"><div class="ttname"><a href="classSampleHandlerBase.html#ae7bc1e221c27386d60e8db1b4a035ba8">SampleHandlerBase::GetPointerToKinematicParameter</a></div><div class="ttdeci">const double * GetPointerToKinematicParameter(const std::string &amp;KinematicParameter, int iEvent) const</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00355">SampleHandlerBase.h:355</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2262,10 +2262,10 @@ Ed Atkin </dd></dl>
 
 <p>Return array storing data entries for every bin. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00179">179</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;                            {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandler_data</a>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00180">180</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                            {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandler_data</a>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2301,10 +2301,10 @@ Ed Atkin </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00195">195</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                                                         {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandler_data</a>);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00196">196</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                                                         {</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ac19a764b8c2ee49fdeff205db0713a72">SampleHandler_data</a>);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
 <div class="ttc" id="aclassSampleHandlerBase_html_adf8b2731234787c0275f6697a7b72780"><div class="ttname"><a href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">SampleHandlerBase::GetArrayForSample</a></div><div class="ttdeci">std::vector&lt; double &gt; GetArrayForSample(const int Sample, std::vector&lt; double &gt; const &amp;array) const</div><div class="ttdoc">Return a sub-array for a given sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l02023">SampleHandlerBase.cpp:2023</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2460,9 +2460,9 @@ Ed Atkin </dd></dl>
 
 <p>Retrieve the final neutrino PDG code associated with a given input file name. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00452">452</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a357c1f76b7b19bf25e29664c05b4fbf3">FileToFinalPDGMap</a>.at(FileName);}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a357c1f76b7b19bf25e29664c05b4fbf3"><div class="ttname"><a href="classSampleHandlerBase.html#a357c1f76b7b19bf25e29664c05b4fbf3">SampleHandlerBase::FileToFinalPDGMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, NuPDG &gt; FileToFinalPDGMap</div><div class="ttdoc">Mapping from input file names to final neutrino PDG codes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00462">SampleHandlerBase.h:462</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00453">453</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a357c1f76b7b19bf25e29664c05b4fbf3">FileToFinalPDGMap</a>.at(FileName);}</div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a357c1f76b7b19bf25e29664c05b4fbf3"><div class="ttname"><a href="classSampleHandlerBase.html#a357c1f76b7b19bf25e29664c05b4fbf3">SampleHandlerBase::FileToFinalPDGMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, NuPDG &gt; FileToFinalPDGMap</div><div class="ttdoc">Mapping from input file names to final neutrino PDG codes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00463">SampleHandlerBase.h:463</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2511,14 +2511,14 @@ Ed Atkin </dd></dl>
 
 <p>Implements <a class="el" href="classSampleHandlerInterface.html#a53dd4f0eb3e051ce1bd8264ac28ebe06">SampleHandlerInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00109">109</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                                                                              {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span> (iChannel &lt; 0 || iChannel &gt; <a class="code" href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">GetNOscChannels</a>(iSample)) {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid Channel Requested: {}&quot;</span>, iChannel);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].OscChannels[iChannel].flavourName;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00110">110</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                                                                              {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">if</span> (iChannel &lt; 0 || iChannel &gt; <a class="code" href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">GetNOscChannels</a>(iSample)) {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid Channel Requested: {}&quot;</span>, iChannel);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].OscChannels[iChannel].flavourName;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2548,9 +2548,9 @@ Ed Atkin </dd></dl>
 
 <p>Retrieve the initial neutrino PDG code associated with a given input file name. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00450">450</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a52106f52f8e7c8c51a42ae3085a8a17d">FileToInitPDGMap</a>.at(FileName);}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a52106f52f8e7c8c51a42ae3085a8a17d"><div class="ttname"><a href="classSampleHandlerBase.html#a52106f52f8e7c8c51a42ae3085a8a17d">SampleHandlerBase::FileToInitPDGMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, NuPDG &gt; FileToInitPDGMap</div><div class="ttdoc">Mapping from input file names to initial neutrino PDG codes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00460">SampleHandlerBase.h:460</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00451">451</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a52106f52f8e7c8c51a42ae3085a8a17d">FileToInitPDGMap</a>.at(FileName);}</div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a52106f52f8e7c8c51a42ae3085a8a17d"><div class="ttname"><a href="classSampleHandlerBase.html#a52106f52f8e7c8c51a42ae3085a8a17d">SampleHandlerBase::FileToInitPDGMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, NuPDG &gt; FileToInitPDGMap</div><div class="ttdoc">Mapping from input file names to initial neutrino PDG codes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00461">SampleHandlerBase.h:461</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2603,7 +2603,7 @@ Ed Atkin </dd></dl>
 <div class="fragment"><div class="line"><a name="l02013"></a><span class="lineno"> 2013</span>&#160;                                                                                       {</div>
 <div class="line"><a name="l02014"></a><span class="lineno"> 2014</span>&#160;<span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a name="l02015"></a><span class="lineno"> 2015</span>&#160;  <span class="keywordflow">if</span>(Dimension &gt; <a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample)) {</div>
-<div class="line"><a name="l02016"></a><span class="lineno"> 2016</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Asking for dimension {}, while sample: {} only has {}&quot;</span>, Dimension, <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample), <a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample));</div>
+<div class="line"><a name="l02016"></a><span class="lineno"> 2016</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Asking for dimension {}, while sample: {} only has {}&quot;</span>, Dimension, <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample), <a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample));</div>
 <div class="line"><a name="l02017"></a><span class="lineno"> 2017</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l02018"></a><span class="lineno"> 2018</span>&#160;  }</div>
 <div class="line"><a name="l02019"></a><span class="lineno"> 2019</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].VarStr[Dimension];</div>
@@ -2685,10 +2685,10 @@ Ed Atkin </dd></dl>
 
 <p>Return array storing MC entries for every bin. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00183">183</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                          {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandler_array</a>;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00184">184</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                          {</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandler_array</a>;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2724,10 +2724,10 @@ Ed Atkin </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00200">200</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                                                       {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandler_array</a>);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00201">201</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                                                       {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ae99d4a3f9c51f9348d3c925547bf5e38">SampleHandler_array</a>);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2917,8 +2917,8 @@ Ed Atkin </dd></dl>
 
 <p>Return total number of events. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00176">176</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a>;}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00177">177</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a>;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2956,8 +2956,8 @@ Ed Atkin </dd></dl>
 
 <p>Implements <a class="el" href="classSampleHandlerInterface.html#a6ed06b2a12cd589090ee76c682bc679b">SampleHandlerInterface</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00107">107</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;{<span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].OscChannels.size());};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00108">108</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;{<span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].OscChannels.size());};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3112,10 +3112,10 @@ Ed Atkin </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00354">354</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;                                                                                                      {</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ae7bc1e221c27386d60e8db1b4a035ba8">GetPointerToKinematicParameter</a>(<a class="code" href="classSampleHandlerBase.html#ade73b3eb8a5624e910fa3006f6e3da4b">ReturnKinematicParameterFromString</a>(KinematicParameter), iEvent);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00355">355</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;                                                                                                      {</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ae7bc1e221c27386d60e8db1b4a035ba8">GetPointerToKinematicParameter</a>(<a class="code" href="classSampleHandlerBase.html#ade73b3eb8a5624e910fa3006f6e3da4b">ReturnKinematicParameterFromString</a>(KinematicParameter), iEvent);</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3238,7 +3238,7 @@ Ed Atkin </dd></dl>
 <div class="fragment"><div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;                                                                        {</div>
 <div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;<span class="comment">// ************************************************</span></div>
 <div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> iSample = 0; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a7547c7aaf6cc3b82157c934f6f294ea1">nSamples</a>; ++iSample) {</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keywordflow">if</span> (SampleTitle == <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample)) {</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keywordflow">if</span> (SampleTitle == <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample)) {</div>
 <div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;      <span class="keywordflow">return</span> iSample;</div>
 <div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    }</div>
 <div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;  }</div>
@@ -3249,8 +3249,8 @@ Ed Atkin </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a734f65161335db4474c2f26a3e173ee0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a734f65161335db4474c2f26a3e173ee0">&#9670;&nbsp;</a></span>GetSampleLikelihood()</h2>
+<a id="a75ac605efa73b0ce24330abf4d88466d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75ac605efa73b0ce24330abf4d88466d">&#9670;&nbsp;</a></span>GetSampleLikelihood()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3262,7 +3262,7 @@ Ed Atkin </dd></dl>
           <td class="memname">double SampleHandlerBase::GetSampleLikelihood </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>isample</em></td><td>)</td>
+          <td class="paramname"><em>iSample</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -3307,8 +3307,8 @@ Ed Atkin </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a8f685b9898162aa483b183c2f59ee357"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f685b9898162aa483b183c2f59ee357">&#9670;&nbsp;</a></span>GetSampleName()</h2>
+<a id="a65a7cd38082064ce5802d375f9d11385"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65a7cd38082064ce5802d375f9d11385">&#9670;&nbsp;</a></span>GetSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3320,7 +3320,7 @@ Ed Atkin </dd></dl>
           <td class="memname">std::string SampleHandlerBase::GetSampleName </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>Sample</em></td><td>)</td>
+          <td class="paramname"><em>iSample</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -3334,18 +3334,18 @@ Ed Atkin </dd></dl>
 <p>Sample name tag used only for getting relevant uncertainties. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Sample</td><td>Index of the sample. </td></tr>
+    <tr><td class="paramname">iSample</td><td>Index of the sample. </td></tr>
   </table>
   </dd>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00054">54</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[Sample].SampleName;}</div>
+<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].SampleName;}</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="abe15ec2e473d44a12a61f5a9f3bf08ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe15ec2e473d44a12a61f5a9f3bf08ac">&#9670;&nbsp;</a></span>GetSampleTitle()</h2>
+<a id="afdf70f90efa5aa3fa4cc0d95c059e372"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdf70f90efa5aa3fa4cc0d95c059e372">&#9670;&nbsp;</a></span>GetSampleTitle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3357,7 +3357,7 @@ Ed Atkin </dd></dl>
           <td class="memname">std::string SampleHandlerBase::GetSampleTitle </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>Sample</em></td><td>)</td>
+          <td class="paramname"><em>iSample</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -3379,7 +3379,7 @@ Ed Atkin </dd></dl>
 <p>Implements <a class="el" href="classSampleHandlerInterface.html#aae76c70b169011d66d18e9998955f3ec">SampleHandlerInterface</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00051">51</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[Sample].SampleTitle;}</div>
+<div class="fragment"><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample].SampleTitle;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3430,7 +3430,7 @@ Ed Atkin </dd></dl>
 <div class="fragment"><div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;                                                                                                                                  {</div>
 <div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;<span class="comment">// ************************************************</span></div>
 <div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> SampleIndex = <a class="code" href="classSampleHandlerBase.html#ab580c921f52a9dd5403ebb7b327e3957">MCEvents</a>[Event].NominalSample;</div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> SampleTitle = <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(SampleIndex);</div>
+<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> SampleTitle = <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(SampleIndex);</div>
 <div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;  <span class="keywordtype">bool</span> NoOscChannels = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSampleHandlerBase.html#a0c19e81e996011167bdde29eba8e36ba">Oscillator</a> == <span class="keyword">nullptr</span> &amp;&amp; <a class="code" href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">GetNOscChannels</a>(SampleIndex) == 1) {</div>
 <div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Assuming there are no osc channels in {}&quot;</span>, __func__);</div>
@@ -3459,7 +3459,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;  }</div>
 <div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;  <span class="keywordflow">return</span> EventSplines;</div>
 <div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;}</div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a3ef85c5970620b7974ffadd06c5c376b"><div class="ttname"><a href="classBinnedSplineHandler.html#a3ef85c5970620b7974ffadd06c5c376b">BinnedSplineHandler::GetEventSplines</a></div><div class="ttdeci">std::vector&lt; SplineIndex &gt; GetEventSplines(const std::string &amp;SampleTitle, int iOscChan, int EventMode, const std::vector&lt; double &gt; &amp;VarVals)</div><div class="ttdoc">Return the splines which affect a given event.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00734">BinnedSplineHandler.cpp:734</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a3ef85c5970620b7974ffadd06c5c376b"><div class="ttname"><a href="classBinnedSplineHandler.html#a3ef85c5970620b7974ffadd06c5c376b">BinnedSplineHandler::GetEventSplines</a></div><div class="ttdeci">std::vector&lt; SplineIndex &gt; GetEventSplines(const std::string &amp;SampleTitle, int iOscChan, int EventMode, const std::vector&lt; double &gt; &amp;VarVals)</div><div class="ttdoc">Return the splines which affect a given event.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00740">BinnedSplineHandler.cpp:740</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3488,10 +3488,10 @@ Ed Atkin </dd></dl>
 
 <p>Return array storing W2 entries for every bin. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00187">187</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                          {</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandler_array_w2</a>;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00188">188</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                          {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandler_array_w2</a>;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3527,10 +3527,10 @@ Ed Atkin </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00205">205</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                                                       {</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandler_array_w2</a>);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00206">206</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                                                       {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#adf8b2731234787c0275f6697a7b72780">GetArrayForSample</a>(Sample, <a class="code" href="classSampleHandlerBase.html#ac28950a384b0f477e6b9d044f85a9941">SampleHandler_array_w2</a>);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3716,7 +3716,7 @@ Ed Atkin </dd></dl>
 <div class="ttc" id="aclassSampleHandlerBase_html_a6aed7bf064bdb460d7201f92d6b992a1"><div class="ttname"><a href="classSampleHandlerBase.html#a6aed7bf064bdb460d7201f92d6b992a1">SampleHandlerBase::SetupMC</a></div><div class="ttdeci">virtual void SetupMC()=0</div><div class="ttdoc">Function which translates experiment struct into core struct.</div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a6b87245e3e19c2802e6ea493241ad1fe"><div class="ttname"><a href="classSampleHandlerBase.html#a6b87245e3e19c2802e6ea493241ad1fe">SampleHandlerBase::InititialiseData</a></div><div class="ttdeci">virtual void InititialiseData()=0</div><div class="ttdoc">Function responsible for loading data from file or loading from file.</div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a6f63253957df6c57b6636d64a37e6174"><div class="ttname"><a href="classSampleHandlerBase.html#a6f63253957df6c57b6636d64a37e6174">SampleHandlerBase::SetupSplines</a></div><div class="ttdeci">virtual void SetupSplines()=0</div><div class="ttdoc">initialise your splineXX object and then use InitialiseSplineObject to conveniently setup everything ...</div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a75006ae444497d6cde38b33758805b75"><div class="ttname"><a href="classSampleHandlerBase.html#a75006ae444497d6cde38b33758805b75">SampleHandlerBase::RegisterFunctionalParameters</a></div><div class="ttdeci">virtual void RegisterFunctionalParameters()</div><div class="ttdoc">HH - a experiment-specific function where the maps to actual functions are set up.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00269">SampleHandlerBase.h:269</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a75006ae444497d6cde38b33758805b75"><div class="ttname"><a href="classSampleHandlerBase.html#a75006ae444497d6cde38b33758805b75">SampleHandlerBase::RegisterFunctionalParameters</a></div><div class="ttdeci">virtual void RegisterFunctionalParameters()</div><div class="ttdoc">HH - a experiment-specific function where the maps to actual functions are set up.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00270">SampleHandlerBase.h:270</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a79e2b8debafb63aaae1cdbaf188940d7"><div class="ttname"><a href="classSampleHandlerBase.html#a79e2b8debafb63aaae1cdbaf188940d7">SampleHandlerBase::AddAdditionalWeightPointers</a></div><div class="ttdeci">virtual void AddAdditionalWeightPointers()=0</div><div class="ttdoc">DB Function to determine which weights apply to which types of samples.</div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a873283adbeae19bc19b3d422bb346db0"><div class="ttname"><a href="classSampleHandlerBase.html#a873283adbeae19bc19b3d422bb346db0">SampleHandlerBase::SetupExperimentMC</a></div><div class="ttdeci">virtual int SetupExperimentMC()=0</div><div class="ttdoc">Experiment specific setup, returns the number of events which were loaded.</div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ad837aea3fa92940bb6f6fbb02eef2bf2"><div class="ttname"><a href="classSampleHandlerBase.html#ad837aea3fa92940bb6f6fbb02eef2bf2">SampleHandlerBase::SetupOscParameters</a></div><div class="ttdeci">void SetupOscParameters()</div><div class="ttdoc">Setup the osc parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00492">SampleHandlerBase.cpp:492</a></div></div>
@@ -3762,7 +3762,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;    }</div>
 <div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;  }</div>
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;  <span class="comment">// get osc params for sample 0, later we check all have same number</span></div>
-<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;  <span class="keyword">auto</span> OscParams = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(0));</div>
+<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;  <span class="keyword">auto</span> OscParams = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(0));</div>
 <div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;  <span class="keywordflow">if</span> (OscParams.empty()) {</div>
 <div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;OscParams is empty for sample &#39;{}&#39;.&quot;</span>, <a class="code" href="classSampleHandlerBase.html#a94e7901871d0c630c9db9688d5089cd1">GetName</a>());</div>
 <div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This likely indicates an error in your oscillation YAML configuration.&quot;</span>);</div>
@@ -3777,10 +3777,10 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;  }</div>
 <div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160; </div>
 <div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iSample = 1; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>(); iSample++) {</div>
-<div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;    <span class="keyword">auto</span> OscParamsCrossCheck = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(iSample));</div>
+<div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;    <span class="keyword">auto</span> OscParamsCrossCheck = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(iSample));</div>
 <div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;    <span class="keywordflow">if</span> (OscParamsCrossCheck.size() != OscParams.size()) {</div>
 <div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Sample {} has {} osc params while sample {} has {}&quot;</span>,</div>
-<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;                     <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample), OscParamsCrossCheck.size(), 0, <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(0));</div>
+<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;                     <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample), OscParamsCrossCheck.size(), 0, <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(0));</div>
 <div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;    }</div>
 <div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;  }</div>
@@ -3832,7 +3832,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a979bbd3065e85989adf489dfc8ad85b3"><div class="ttname"><a href="classParameterHandlerBase.html#a979bbd3065e85989adf489dfc8ad85b3">ParameterHandlerBase::RetPointer</a></div><div class="ttdeci">const M3::float_t * RetPointer(const int iParam) const</div><div class="ttdoc">DB Pointer return to param position.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00206">ParameterHandlerBase.h:206</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_a480dc0d9bf395eb973b6c75480b4b82a"><div class="ttname"><a href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">ParameterHandlerGeneric::GetOscParsFromSampleName</a></div><div class="ttdeci">const std::vector&lt; OscillationParameter &gt; GetOscParsFromSampleName(const std::string &amp;SampleName) const</div><div class="ttdoc">KS Grab the Osc parameters for the relevant SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00578">ParameterHandlerGeneric.cpp:578</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a8f685b9898162aa483b183c2f59ee357"><div class="ttname"><a href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">SampleHandlerBase::GetSampleName</a></div><div class="ttdeci">std::string GetSampleName(const int Sample) const</div><div class="ttdoc">Sample name tag used only for getting relevant uncertainties.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00054">SampleHandlerBase.h:54</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a65a7cd38082064ce5802d375f9d11385"><div class="ttname"><a href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">SampleHandlerBase::GetSampleName</a></div><div class="ttdeci">std::string GetSampleName(const int iSample) const</div><div class="ttdoc">Sample name tag used only for getting relevant uncertainties.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00054">SampleHandlerBase.h:54</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_a796e1e6a949f193cea287543055cd360"><div class="ttname"><a href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">SampleHandlerInterface::GetNSamples</a></div><div class="ttdeci">virtual M3::int_t GetNSamples()</div><div class="ttdoc">returns total number of samples</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8h_source.html#l00047">SampleHandlerInterface.h:47</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3886,7 +3886,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;          SplineVarNames.push_back(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(iSample, 0));</div>
 <div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;          SplineVarNames.push_back(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(iSample, 1));</div>
 <div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;        }</div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;        BinnedSplines-&gt;AddSample(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(iSample), <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample), spline_filepaths, SplineVarNames);</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;        BinnedSplines-&gt;AddSample(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(iSample), <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample), spline_filepaths, SplineVarNames);</div>
 <div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;      }</div>
 <div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;      BinnedSplines-&gt;CountNumberOfLoadedSplines(<span class="keyword">false</span>, 1);</div>
 <div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;      BinnedSplines-&gt;TransferToMonolith();</div>
@@ -3910,7 +3910,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;}</div>
 <div class="ttc" id="aclassBinnedSplineHandler_html"><div class="ttname"><a href="classBinnedSplineHandler.html">BinnedSplineHandler</a></div><div class="ttdoc">Bin-by-bin class calculating response for spline parameters.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00011">BinnedSplineHandler.h:11</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a548f0c748db7ce79f3662bdc71bb88f1"><div class="ttname"><a href="classSampleHandlerBase.html#a548f0c748db7ce79f3662bdc71bb88f1">SampleHandlerBase::SetSplinePointers</a></div><div class="ttdeci">void SetSplinePointers()</div><div class="ttdoc">Set pointers for each event to appropriate weights, for unbinned based on event number while for binn...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01136">SampleHandlerBase.cpp:1136</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab8701960f7603136984174763400a4ec"><div class="ttname"><a href="classSampleHandlerBase.html#ab8701960f7603136984174763400a4ec">SampleHandlerBase::SplineHandler</a></div><div class="ttdeci">std::unique_ptr&lt; SplineBase &gt; SplineHandler</div><div class="ttdoc">Contains all your splines (binned or unbinned) and handles the setup and the returning of weights fro...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00382">SampleHandlerBase.h:382</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab8701960f7603136984174763400a4ec"><div class="ttname"><a href="classSampleHandlerBase.html#ab8701960f7603136984174763400a4ec">SampleHandlerBase::SplineHandler</a></div><div class="ttdeci">std::unique_ptr&lt; SplineBase &gt; SplineHandler</div><div class="ttdoc">Contains all your splines (binned or unbinned) and handles the setup and the returning of weights fro...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00383">SampleHandlerBase.h:383</a></div></div>
 <div class="ttc" id="aclassUnbinnedSplineHandler_html"><div class="ttname"><a href="classUnbinnedSplineHandler.html">UnbinnedSplineHandler</a></div><div class="ttdoc">Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleratio...</div><div class="ttdef"><b>Definition:</b> <a href="UnbinnedSplineHandler_8h_source.html#l00008">UnbinnedSplineHandler.h:8</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -4300,8 +4300,8 @@ template&lt;typename ParT &gt; </div>
 
 <p>Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in FillArray. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00271">271</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00272">272</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4344,6 +4344,12 @@ template&lt;typename ParT &gt; </div>
 </div><div class="memdoc">
 
 <p>Computes and prints the integral breakdown of all modes and oscillation channels for a given sample. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">iSample</td><td>Index of the sample. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l01713">1713</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;                                                                                                                                               {</div>
@@ -4391,8 +4397,8 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;  <span class="keywordflow">if</span> (printToFile) {</div>
 <div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\begin{table}[ht]&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\begin{center}&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\caption{Integral breakdown for sample: &quot;</span> &lt;&lt; <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample) &lt;&lt; <span class="stringliteral">&quot;}&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\label{&quot;</span> &lt;&lt; <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample) &lt;&lt; <span class="stringliteral">&quot;-EventRate}&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\caption{Integral breakdown for sample: &quot;</span> &lt;&lt; <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample) &lt;&lt; <span class="stringliteral">&quot;}&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    outfile &lt;&lt; <span class="stringliteral">&quot;\\label{&quot;</span> &lt;&lt; <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample) &lt;&lt; <span class="stringliteral">&quot;-EventRate}&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160; </div>
 <div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;    TString nColumns;</div>
 <div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;<a class="code" href="classSampleHandlerBase.html#abaf72a0f2591c851bfe18d647b4c74b2">GetNOscChannels</a>(iSample);i++) {nColumns+=<span class="stringliteral">&quot;|c&quot;</span>;}</div>
@@ -4403,10 +4409,10 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160; </div>
 <div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  <span class="keywordflow">if</span>(printToCSV){</div>
 <div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;    <span class="comment">// HW Probably a better way but oh well, here I go making MaCh3 messy again</span></div>
-<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;    outcsv&lt;&lt;<span class="stringliteral">&quot;Integral Breakdown for sample :&quot;</span>&lt;&lt;<a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample)&lt;&lt;<span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;    outcsv&lt;&lt;<span class="stringliteral">&quot;Integral Breakdown for sample :&quot;</span>&lt;&lt;<a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample)&lt;&lt;<span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;  }</div>
 <div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160; </div>
-<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Integral breakdown for sample: {}&quot;</span>, <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample));</div>
+<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Integral breakdown for sample: {}&quot;</span>, <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample));</div>
 <div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160; </div>
 <div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;  <span class="keywordflow">if</span> (printToFile) {outfile &lt;&lt; std::setw(space) &lt;&lt; <span class="stringliteral">&quot;Mode:&quot;</span>;}</div>
@@ -4487,7 +4493,7 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;    outfile.close();</div>
 <div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;  }</div>
 <div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a31e3f141b65fa36e87e3f746d514b35b"><div class="ttname"><a href="classSampleHandlerBase.html#a31e3f141b65fa36e87e3f746d514b35b">SampleHandlerBase::GetFlavourName</a></div><div class="ttdeci">std::string GetFlavourName(const int iSample, const int iChannel) const final</div><div class="ttdoc">Get the flavour name for a given sample and oscillation channel.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00109">SampleHandlerBase.h:109</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a31e3f141b65fa36e87e3f746d514b35b"><div class="ttname"><a href="classSampleHandlerBase.html#a31e3f141b65fa36e87e3f746d514b35b">SampleHandlerBase::GetFlavourName</a></div><div class="ttdeci">std::string GetFlavourName(const int iSample, const int iChannel) const final</div><div class="ttdoc">Get the flavour name for a given sample and oscillation channel.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00110">SampleHandlerBase.h:110</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a4dd3508afd2d075ad3270f7429e1ecfb"><div class="ttname"><a href="classSampleHandlerBase.html#a4dd3508afd2d075ad3270f7429e1ecfb">SampleHandlerBase::ReturnHistsBySelection2D</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TH2 &gt; &gt; ReturnHistsBySelection2D(const int iSample, const std::string &amp;KinematicProjectionX, const std::string &amp;KinematicProjectionY, const SamplePlotType Selection1, const int Selection2=-1, const int WeightStyle=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01900">SampleHandlerBase.cpp:1900</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_abbe7f92ead2f5d13105d7bc967441518"><div class="ttname"><a href="classSampleHandlerBase.html#abbe7f92ead2f5d13105d7bc967441518">SampleHandlerBase::ReturnHistsBySelection1D</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TH1 &gt; &gt; ReturnHistsBySelection1D(const int iSample, const std::string &amp;KinematicProjection, const SamplePlotType Selection1, const int Selection2=-1, const int WeightStyle=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01872">SampleHandlerBase.cpp:1872</a></div></div>
 </div><!-- fragment -->
@@ -4551,7 +4557,7 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01981"></a><span class="lineno"> 1981</span>&#160;  <span class="keywordtype">double</span> likelihood = 0.0;</div>
 <div class="line"><a name="l01982"></a><span class="lineno"> 1982</span>&#160; </div>
 <div class="line"><a name="l01983"></a><span class="lineno"> 1983</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>(); ++iSample) {</div>
-<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;    std::string name = <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample);</div>
+<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;    std::string name = <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample);</div>
 <div class="line"><a name="l01985"></a><span class="lineno"> 1985</span>&#160;    std::vector&lt;double&gt; DataArray = <a class="code" href="classSampleHandlerBase.html#ab73a1de915992fa7ce1e8118f1daaa5c">GetDataArray</a>(iSample);</div>
 <div class="line"><a name="l01986"></a><span class="lineno"> 1986</span>&#160;    <span class="keywordtype">double</span> dataIntegral = std::accumulate(DataArray.begin(), DataArray.end(), 0.0);</div>
 <div class="line"><a name="l01987"></a><span class="lineno"> 1987</span>&#160;    sumData += dataIntegral;</div>
@@ -4559,7 +4565,7 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01989"></a><span class="lineno"> 1989</span>&#160;      std::vector&lt;double&gt; MCArray = <a class="code" href="classSampleHandlerBase.html#aeeba81f96c2dc0de9a8bd91ca6e393d6">GetMCArray</a>(iSample);</div>
 <div class="line"><a name="l01990"></a><span class="lineno"> 1990</span>&#160;      <span class="keywordtype">double</span> mcIntegral = std::accumulate(MCArray.begin(), MCArray.end(), 0.0);</div>
 <div class="line"><a name="l01991"></a><span class="lineno"> 1991</span>&#160;      sumMC += mcIntegral;</div>
-<div class="line"><a name="l01992"></a><span class="lineno"> 1992</span>&#160;      likelihood = <a class="code" href="classSampleHandlerBase.html#a734f65161335db4474c2f26a3e173ee0">GetSampleLikelihood</a>(iSample);</div>
+<div class="line"><a name="l01992"></a><span class="lineno"> 1992</span>&#160;      likelihood = <a class="code" href="classSampleHandlerBase.html#a75ac605efa73b0ce24330abf4d88466d">GetSampleLikelihood</a>(iSample);</div>
 <div class="line"><a name="l01993"></a><span class="lineno"> 1993</span>&#160; </div>
 <div class="line"><a name="l01994"></a><span class="lineno"> 1994</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;40}{:&lt;15.2f}{:&lt;15.2f}{:&lt;10.2f}|&quot;</span>, name, dataIntegral, mcIntegral, likelihood);</div>
 <div class="line"><a name="l01995"></a><span class="lineno"> 1995</span>&#160;    } <span class="keywordflow">else</span> {</div>
@@ -4577,10 +4583,10 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l02007"></a><span class="lineno"> 2007</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, sep_data);</div>
 <div class="line"><a name="l02008"></a><span class="lineno"> 2008</span>&#160;  }</div>
 <div class="line"><a name="l02009"></a><span class="lineno"> 2009</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a734f65161335db4474c2f26a3e173ee0"><div class="ttname"><a href="classSampleHandlerBase.html#a734f65161335db4474c2f26a3e173ee0">SampleHandlerBase::GetSampleLikelihood</a></div><div class="ttdeci">double GetSampleLikelihood(const int isample) const override</div><div class="ttdoc">Get likelihood (-logL) for a single sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01178">SampleHandlerBase.cpp:1178</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a75ac605efa73b0ce24330abf4d88466d"><div class="ttname"><a href="classSampleHandlerBase.html#a75ac605efa73b0ce24330abf4d88466d">SampleHandlerBase::GetSampleLikelihood</a></div><div class="ttdeci">double GetSampleLikelihood(const int iSample) const override</div><div class="ttdoc">Get likelihood (-logL) for a single sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01178">SampleHandlerBase.cpp:1178</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ab29aef72deea0e36df36b2144ab014a6"><div class="ttname"><a href="classSampleHandlerBase.html#ab29aef72deea0e36df36b2144ab014a6">SampleHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() const override</div><div class="ttdoc">Return likelihood (-LogL) for all samples.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l01200">SampleHandlerBase.cpp:1200</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab73a1de915992fa7ce1e8118f1daaa5c"><div class="ttname"><a href="classSampleHandlerBase.html#ab73a1de915992fa7ce1e8118f1daaa5c">SampleHandlerBase::GetDataArray</a></div><div class="ttdeci">auto GetDataArray() const</div><div class="ttdoc">Return array storing data entries for every bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00179">SampleHandlerBase.h:179</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aeeba81f96c2dc0de9a8bd91ca6e393d6"><div class="ttname"><a href="classSampleHandlerBase.html#aeeba81f96c2dc0de9a8bd91ca6e393d6">SampleHandlerBase::GetMCArray</a></div><div class="ttdeci">auto GetMCArray() const</div><div class="ttdoc">Return array storing MC entries for every bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00183">SampleHandlerBase.h:183</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab73a1de915992fa7ce1e8118f1daaa5c"><div class="ttname"><a href="classSampleHandlerBase.html#ab73a1de915992fa7ce1e8118f1daaa5c">SampleHandlerBase::GetDataArray</a></div><div class="ttdeci">auto GetDataArray() const</div><div class="ttdoc">Return array storing data entries for every bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00180">SampleHandlerBase.h:180</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aeeba81f96c2dc0de9a8bd91ca6e393d6"><div class="ttname"><a href="classSampleHandlerBase.html#aeeba81f96c2dc0de9a8bd91ca6e393d6">SampleHandlerBase::GetMCArray</a></div><div class="ttdeci">auto GetMCArray() const</div><div class="ttdoc">Return array storing MC entries for every bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00184">SampleHandlerBase.h:184</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4668,7 +4674,7 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;}</div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a></div><div class="ttdeci">TestStatistic</div><div class="ttdoc">Make an enum of the test statistic that we're using.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00105">SampleStructs.h:105</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad2340a340fd6649a6d220abc16d4757b"><div class="ttname"><a href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a></div><div class="ttdeci">bool CheckNodeExists(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">KS: Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00059">YamlHelper.h:59</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a42639b039695ec4bffc4e40b4aceaede"><div class="ttname"><a href="classSampleHandlerBase.html#a42639b039695ec4bffc4e40b4aceaede">SampleHandlerBase::_modeNomWeightMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, double &gt; _modeNomWeightMap</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00438">SampleHandlerBase.h:438</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a42639b039695ec4bffc4e40b4aceaede"><div class="ttname"><a href="classSampleHandlerBase.html#a42639b039695ec4bffc4e40b4aceaede">SampleHandlerBase::_modeNomWeightMap</a></div><div class="ttdeci">std::unordered_map&lt; std::string, double &gt; _modeNomWeightMap</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00439">SampleHandlerBase.h:439</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ac12717d3517e24086705d0c4240a5ee6"><div class="ttname"><a href="classSampleHandlerBase.html#ac12717d3517e24086705d0c4240a5ee6">SampleHandlerBase::LoadSingleSample</a></div><div class="ttdeci">void LoadSingleSample(const int iSample, const YAML::Node &amp;Settings)</div><div class="ttdoc">Initialise single sample from config file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00114">SampleHandlerBase.cpp:114</a></div></div>
 <div class="ttc" id="aclassSampleHandlerInterface_html_a2ad6bf728ee4aba096485eaa8a7dfc4c"><div class="ttname"><a href="classSampleHandlerInterface.html#a2ad6bf728ee4aba096485eaa8a7dfc4c">SampleHandlerInterface::fTestStatistic</a></div><div class="ttdeci">TestStatistic fTestStatistic</div><div class="ttdoc">Test statistic tells what kind of likelihood sample is using.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerInterface_8h_source.html#l00257">SampleHandlerInterface.h:257</a></div></div>
 </div><!-- fragment -->
@@ -4701,8 +4707,8 @@ template&lt;typename ParT &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classPySampleHandlerBase.html#ae8b236b748288e114386a3be667e6960">PySampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00269">269</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00270">270</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4866,8 +4872,8 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>HH - reset the shifted values to the original values. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00309">309</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00310">310</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5093,10 +5099,10 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Return the value of an associated kinematic parameter for an event. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00337">337</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;                                                                                         {</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#aad10d94881c0dc8f55429cb2745e6a52">ReturnKinematicParameter</a>(<a class="code" href="classSampleHandlerBase.html#ade73b3eb8a5624e910fa3006f6e3da4b">ReturnKinematicParameterFromString</a>(KinematicParameter), iEvent);</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00338">338</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                                                                                         {</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#aad10d94881c0dc8f55429cb2745e6a52">ReturnKinematicParameter</a>(<a class="code" href="classSampleHandlerBase.html#ade73b3eb8a5624e910fa3006f6e3da4b">ReturnKinematicParameterFromString</a>(KinematicParameter), iEvent);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5144,7 +5150,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>might be useful to allow overwriting this </dd></dl>
 
-<p>Implements <a class="el" href="classSampleHandlerInterface.html#a59db8b28b1ab17dc91b451e316678fd9">SampleHandlerInterface</a>.</p>
+<p>Implements <a class="el" href="classSampleHandlerInterface.html#a68f452002f343895f24b244c1bb4a7e9">SampleHandlerInterface</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l01574">1574</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;                                                                                                                                {</div>
@@ -5175,8 +5181,8 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l01600"></a><span class="lineno"> 1600</span>&#160;  <span class="comment">// We first check if binning for a sample has been specified</span></div>
 <div class="line"><a name="l01601"></a><span class="lineno"> 1601</span>&#160;  <span class="keyword">auto</span> BinningConfig = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(<a class="code" href="classSampleHandlerBase.html#a19685a38f2f60acd25489d34cb90b7c2">SampleManager</a>-&gt;raw()[<span class="stringliteral">&quot;BinningFile&quot;</span>].as&lt;std::string&gt;());</div>
 <div class="line"><a name="l01602"></a><span class="lineno"> 1602</span>&#160;  <span class="keywordtype">bool</span> found_range_specifier = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01603"></a><span class="lineno"> 1603</span>&#160;  <span class="keywordflow">if</span>(BinningConfig[<a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(Sample)] &amp;&amp; BinningConfig[<a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(Sample)][KinematicParameter]){</div>
-<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;    BinningVect = <a class="code" href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a>(BinningConfig[<a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(Sample)][KinematicParameter], found_range_specifier);</div>
+<div class="line"><a name="l01603"></a><span class="lineno"> 1603</span>&#160;  <span class="keywordflow">if</span>(BinningConfig[<a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(Sample)] &amp;&amp; BinningConfig[<a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(Sample)][KinematicParameter]){</div>
+<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;    BinningVect = <a class="code" href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a>(BinningConfig[<a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(Sample)][KinematicParameter], found_range_specifier);</div>
 <div class="line"><a name="l01605"></a><span class="lineno"> 1605</span>&#160;  } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;    BinningVect = <a class="code" href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a>(BinningConfig[KinematicParameter], found_range_specifier);</div>
 <div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;  }</div>
@@ -5272,8 +5278,8 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00347">347</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;                                                                                             {<span class="keywordflow">return</span> {};};</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00348">348</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;                                                                                             {<span class="keywordflow">return</span> {};};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5311,10 +5317,10 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00344">344</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                                                                                                       {</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a018501b77a65784a3cd1ad40f0dcbf74">ReturnKinematicVector</a>(<a class="code" href="classSampleHandlerBase.html#aecb6fd69f8ab2fa673aa0a49c08bc9e1">ReturnKinematicVectorFromString</a>(KinematicParameter), iEvent);</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00345">345</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;                                                                                                       {</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#a018501b77a65784a3cd1ad40f0dcbf74">ReturnKinematicVector</a>(<a class="code" href="classSampleHandlerBase.html#aecb6fd69f8ab2fa673aa0a49c08bc9e1">ReturnKinematicVectorFromString</a>(KinematicParameter), iEvent);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5398,7 +5404,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="fragment"><div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;                                                                                                                                             {</div>
 <div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;<span class="comment">// ************************************************</span></div>
 <div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;  <span class="keyword">auto</span> HistList = <a class="code" href="classSampleHandlerBase.html#abbe7f92ead2f5d13105d7bc967441518">ReturnHistsBySelection1D</a>(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);</div>
-<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="keyword">auto</span> StackHist = std::make_unique&lt;THStack&gt;((<a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample)+<span class="stringliteral">&quot;_&quot;</span>+KinematicProjection+<span class="stringliteral">&quot;_Stack&quot;</span>).c_str(),<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="keyword">auto</span> StackHist = std::make_unique&lt;THStack&gt;((<a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample)+<span class="stringliteral">&quot;_&quot;</span>+KinematicProjection+<span class="stringliteral">&quot;_Stack&quot;</span>).c_str(),<span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;  <span class="comment">// Note: we use .release() to transfer ownership of each TH1 to THStack.</span></div>
 <div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0;i&lt;HistList.size();i++) {</div>
 <div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;    StackHist-&gt;Add(HistList[i].release());</div>
@@ -5433,8 +5439,8 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Return the legend used for stacked histograms with sample info. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00158">158</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">THStackLeg</a>;}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00159">159</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classSampleHandlerBase.html#aa9553ca3e218efa88593e22a0fe26e23">THStackLeg</a>;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5561,7 +5567,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classSampleHandlerBase.html#a63d3669e7fc3c091b90ba569c60aa4a7">UpdateW2</a>) <a class="code" href="classSampleHandlerBase.html#aff34f7df7134b0eb6011f19fd72af1e5">FirstTimeW2</a> = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;}</div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a200e5fe7f8fcd5c13310495f231de30d"><div class="ttname"><a href="classSampleHandlerBase.html#a200e5fe7f8fcd5c13310495f231de30d">SampleHandlerBase::ResetHistograms</a></div><div class="ttdeci">void ResetHistograms() _noexcept_</div><div class="ttdoc">Helper function to reset histograms.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00442">SampleHandlerBase.cpp:442</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a4e9e53aae409e7f401eab6a70a489a18"><div class="ttname"><a href="classSampleHandlerBase.html#a4e9e53aae409e7f401eab6a70a489a18">SampleHandlerBase::PrepFunctionalParameters</a></div><div class="ttdeci">virtual void PrepFunctionalParameters()</div><div class="ttdoc">Update the functional parameter values to the latest proposed values. Needs to be called before every...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00271">SampleHandlerBase.h:271</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a4e9e53aae409e7f401eab6a70a489a18"><div class="ttname"><a href="classSampleHandlerBase.html#a4e9e53aae409e7f401eab6a70a489a18">SampleHandlerBase::PrepFunctionalParameters</a></div><div class="ttdeci">virtual void PrepFunctionalParameters()</div><div class="ttdoc">Update the functional parameter values to the latest proposed values. Needs to be called before every...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00272">SampleHandlerBase.h:272</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_af877ab6d5733f4c8d168ad60fa9f71b3"><div class="ttname"><a href="classSampleHandlerBase.html#af877ab6d5733f4c8d168ad60fa9f71b3">SampleHandlerBase::FillArray</a></div><div class="ttdeci">void FillArray()</div><div class="ttdoc">Function which does the core reweighting. This assumes that oscillation weights have already been cal...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00378">SampleHandlerBase.cpp:378</a></div></div>
 <div class="ttc" id="astructM3_1_1detail_1_1Functional_html_a92a4a702138c2403261fd9f3a9d15795"><div class="ttname"><a href="structM3_1_1detail_1_1Functional.html#a92a4a702138c2403261fd9f3a9d15795">M3::detail::Functional::update_vals</a></div><div class="ttdeci">void update_vals()</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFunctional_8h_source.html#l00037">SampleHandlerFunctional.h:37</a></div></div>
 </div><!-- fragment -->
@@ -5613,20 +5619,20 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;    std::unique_ptr&lt;TH1&gt; data_hist;</div>
 <div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160; </div>
 <div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample) == 1) {</div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;      data_hist = M3::Clone&lt;TH1D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH1D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample));</div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;      data_hist = M3::Clone&lt;TH1D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH1D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample));</div>
 <div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;      data_hist-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(iSample, 0).c_str());</div>
 <div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;      data_hist-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Number of Events&quot;</span>);</div>
 <div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample) == 2) {</div>
 <div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;IsUniform(iSample)) {</div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;        data_hist = M3::Clone&lt;TH2D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH2D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample));</div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;        data_hist = M3::Clone&lt;TH2D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH2D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample));</div>
 <div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;        data_hist = M3::Clone&lt;TH2Poly&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample));</div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;        data_hist = M3::Clone&lt;TH2Poly&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH2Poly*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample));</div>
 <div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;      }</div>
 <div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;      data_hist-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(iSample, 0).c_str());</div>
 <div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;      data_hist-&gt;GetYaxis()-&gt;SetTitle(<a class="code" href="classSampleHandlerBase.html#a1d1b68d0a602d5a71aa2901ed4528b40">GetKinVarName</a>(iSample, 1).c_str());</div>
 <div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;      data_hist-&gt;GetZaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Number of Events&quot;</span>);</div>
 <div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;      data_hist = M3::Clone&lt;TH1D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH1D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample));</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;      data_hist = M3::Clone&lt;TH1D&gt;(<span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>TH1D*<span class="keyword">&gt;</span>(<a class="code" href="classSampleHandlerBase.html#a2d9dfac91f6d2fadcfa36c54b14ab8f4">GetDataHist</a>(iSample)), <span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample));</div>
 <div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;      <span class="keywordtype">int</span> nbins = <a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetNBins(iSample);</div>
 <div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iBin = 0; iBin &lt; nbins; iBin++) {</div>
 <div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;        <span class="keyword">auto</span> BinName = <a class="code" href="classSampleHandlerBase.html#a5ab7211224de4eac17cbec1e3e4f2648">Binning</a>-&gt;GetBinName(iSample, iBin);</div>
@@ -5640,7 +5646,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;    }</div>
 <div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160; </div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;    data_hist-&gt;SetTitle((<span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample)).c_str());</div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;    data_hist-&gt;SetTitle((<span class="stringliteral">&quot;data_&quot;</span> + <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample)).c_str());</div>
 <div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;    data_hist-&gt;Write();</div>
 <div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;  }</div>
 <div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;}</div>
@@ -5679,7 +5685,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>(); iSample++)</div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;  {</div>
 <div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <span class="keywordtype">int</span> Dimension = <a class="code" href="classSampleHandlerBase.html#a104a7b0301558b7758a21fadb9ae2535">GetNDim</a>(iSample);</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    std::string HistTitle = <a class="code" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">GetSampleTitle</a>(iSample);</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    std::string HistTitle = <a class="code" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">GetSampleTitle</a>(iSample);</div>
 <div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160; </div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keyword">auto</span>* SamDet = &amp;<a class="code" href="classSampleHandlerBase.html#ab9e5a615c44606b3b413f4a29e76315f">SampleDetails</a>[iSample];</div>
 <div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="keywordflow">if</span>(Dimension == 1) {</div>
@@ -5812,7 +5818,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160; </div>
 <div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;    std::vector&lt; std::vector&lt;SplineParameter&gt; &gt; SplineParsVec(<a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>());</div>
 <div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>(); ++iSample) {</div>
-<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;      SplineParsVec[iSample] = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a819070e379db0ddec32c5a87c67d6bdb">GetSplineParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(iSample));</div>
+<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;      SplineParsVec[iSample] = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a819070e379db0ddec32c5a87c67d6bdb">GetSplineParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(iSample));</div>
 <div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;    }</div>
 <div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classSampleHandlerBase.html#a6ceca02f83e878ef1aec6e54e7b2f331">GetNEvents</a>(); ++j) {</div>
 <div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;      <span class="keyword">auto</span> EventSplines = <a class="code" href="classSampleHandlerBase.html#a9701af29952feeb2101378cf05b6751c">GetSplineBins</a>(j, BinnedSpline, ThrowCrititcal);</div>
@@ -6003,7 +6009,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;  std::vector&lt; std::vector&lt;NormParameter&gt;&gt; norm_parameters(<a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>());</div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160; </div>
 <div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classSampleHandlerInterface.html#a796e1e6a949f193cea287543055cd360">GetNSamples</a>(); ++iSample) {</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;   norm_parameters[iSample] = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a1564cde885453c57312f769e57d627ac">GetNormParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(iSample));</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;   norm_parameters[iSample] = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a1564cde885453c57312f769e57d627ac">GetNormParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(iSample));</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  }</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>) {</div>
 <div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;ParHandler is not setup!&quot;</span>);</div>
@@ -6107,7 +6113,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  <span class="comment">// KS: Only make sense to setup osc if you have ParHandler</span></div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a> == <span class="keyword">nullptr</span> ) <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160; </div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="keyword">auto</span> OscParams = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a8f685b9898162aa483b183c2f59ee357">GetSampleName</a>(0));</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="keyword">auto</span> OscParams = <a class="code" href="classSampleHandlerBase.html#a5aeed5cc0ac410533911665a8c124099">ParHandler</a>-&gt;<a class="code" href="classParameterHandlerGeneric.html#a480dc0d9bf395eb973b6c75480b4b82a">GetOscParsFromSampleName</a>(<a class="code" href="classSampleHandlerBase.html#a65a7cd38082064ce5802d375f9d11385">GetSampleName</a>(0));</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  <span class="keywordflow">if</span> (OscParams.size() &gt; 0) {</div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting up NuOscillator..&quot;</span>);</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerBase.html#a0c19e81e996011167bdde29eba8e36ba">Oscillator</a> != <span class="keyword">nullptr</span>) {</div>
@@ -6228,7 +6234,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00438">438</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00439">439</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6254,7 +6260,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>KS: This stores binning information, in future could be come vector to store binning for every used sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00390">390</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00391">391</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6280,7 +6286,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Mapping from input file names to final neutrino PDG codes. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00462">462</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00463">463</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6306,7 +6312,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Mapping from input file names to initial neutrino PDG codes. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00460">460</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00461">461</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6332,7 +6338,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>KS:Super hacky to update W2 or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00445">445</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00446">446</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6358,7 +6364,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Helper object for storing/updating information related to functional shift parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00465">465</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00466">466</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6384,7 +6390,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Mapping between string and kinematic enum. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00426">426</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00427">427</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6408,7 +6414,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00431">431</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00432">432</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6434,7 +6440,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Stores information about every MC event. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00401">401</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00402">402</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6460,7 +6466,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Number of MC events are there. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00468">468</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00469">469</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6486,7 +6492,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Contains oscillator handling calculating oscillation probabilities. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00385">385</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00386">386</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6512,7 +6518,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>ETA - All experiments will need an xsec, det and osc cov. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00409">409</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00410">410</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6538,7 +6544,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Mapping between kinematic enum and string. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00428">428</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00429">429</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6562,7 +6568,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00432">432</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00433">433</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6588,7 +6594,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Stores info about currently initialised sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00403">403</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00404">404</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6614,7 +6620,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>DB Array to be filled after reweighting. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00392">392</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00393">393</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6640,7 +6646,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>KS Array used for MC stat. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00394">394</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00395">395</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6666,7 +6672,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>DB Array to be filled in AddData. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00396">396</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00397">397</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6692,7 +6698,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Identifier of this Sample Handler, mostly used for fancy printing in <a class="el" href="classFitterBase.html" title="Base class for implementing fitting algorithms.">FitterBase</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00413">413</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00414">414</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6718,7 +6724,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>The manager object used to read the sample yaml file. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00436">436</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00437">437</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6744,7 +6750,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>a way to store selection cuts which you may push back in the get1DVar functions most of the time this is just the same as StoredSelection </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00422">422</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00423">423</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6770,7 +6776,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00382">382</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00383">383</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6796,7 +6802,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>DB Vectors to store which kinematic cuts we apply. Gets used in IsEventSelected Read in from sample yaml file. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00419">419</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00420">420</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6822,7 +6828,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>DB: Legend associated with stacked histograms produced by this class. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00442">442</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00443">443</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -6848,7 +6854,7 @@ template&lt;typename EventType , typename SFType &gt; </div>
 
 <p>KS:Super hacky to update W2 or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00447">447</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00448">448</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>

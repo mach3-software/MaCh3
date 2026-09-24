@@ -160,9 +160,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a53dd4f0eb3e051ce1bd8264ac28ebe06"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerInterface.html#a53dd4f0eb3e051ce1bd8264ac28ebe06">GetFlavourName</a> (const int iSample, const int iChannel) const =0</td></tr>
 <tr class="memdesc:a53dd4f0eb3e051ce1bd8264ac28ebe06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the flavour name for a given sample and oscillation channel.  <a href="classSampleHandlerInterface.html#a53dd4f0eb3e051ce1bd8264ac28ebe06">More...</a><br /></td></tr>
 <tr class="separator:a53dd4f0eb3e051ce1bd8264ac28ebe06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59db8b28b1ab17dc91b451e316678fd9"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerInterface.html#a59db8b28b1ab17dc91b451e316678fd9">ReturnKinematicParameterBinning</a> (const int Sample, const std::string &amp;KinematicParameter) const =0</td></tr>
-<tr class="memdesc:a59db8b28b1ab17dc91b451e316678fd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the binning used to draw a kinematic parameter.  <a href="classSampleHandlerInterface.html#a59db8b28b1ab17dc91b451e316678fd9">More...</a><br /></td></tr>
-<tr class="separator:a59db8b28b1ab17dc91b451e316678fd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68f452002f343895f24b244c1bb4a7e9"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerInterface.html#a68f452002f343895f24b244c1bb4a7e9">ReturnKinematicParameterBinning</a> (const int iSample, const std::string &amp;KinematicParameter) const =0</td></tr>
+<tr class="memdesc:a68f452002f343895f24b244c1bb4a7e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the binning used to draw a kinematic parameter.  <a href="classSampleHandlerInterface.html#a68f452002f343895f24b244c1bb4a7e9">More...</a><br /></td></tr>
+<tr class="separator:a68f452002f343895f24b244c1bb4a7e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00dc43bcb9f9479b262df6940a85c7ed"><td class="memItemLeft" align="right" valign="top">virtual std::unique_ptr&lt; TH1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerInterface.html#a00dc43bcb9f9479b262df6940a85c7ed">Get1DVarHistByModeAndChannel</a> (const int iSample, const std::string &amp;ProjectionVar_Str, const int kModeToFill=-1, const int kChannelToFill=-1, const int WeightStyle=0)=0</td></tr>
 <tr class="memdesc:a00dc43bcb9f9479b262df6940a85c7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a 1D histogram for a given variable, optionally filtered by mode and channel.  <a href="classSampleHandlerInterface.html#a00dc43bcb9f9479b262df6940a85c7ed">More...</a><br /></td></tr>
 <tr class="separator:a00dc43bcb9f9479b262df6940a85c7ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1047,7 +1047,7 @@ Richard Calland </dd></dl>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classSampleHandlerBase.html#a734f65161335db4474c2f26a3e173ee0">SampleHandlerBase</a>, and <a class="el" href="classPySampleHandlerInterface.html#a5b8213af3f911e0ad382e85eaedf5810">PySampleHandlerInterface</a>.</p>
+<p>Implemented in <a class="el" href="classSampleHandlerBase.html#a75ac605efa73b0ce24330abf4d88466d">SampleHandlerBase</a>, and <a class="el" href="classPySampleHandlerInterface.html#a5b8213af3f911e0ad382e85eaedf5810">PySampleHandlerInterface</a>.</p>
 
 </div>
 </div>
@@ -1083,7 +1083,7 @@ Richard Calland </dd></dl>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classSampleHandlerBase.html#abe15ec2e473d44a12a61f5a9f3bf08ac">SampleHandlerBase</a>, and <a class="el" href="classPySampleHandlerInterface.html#a51b7b63fc7567545a973bf42049a04e7">PySampleHandlerInterface</a>.</p>
+<p>Implemented in <a class="el" href="classPySampleHandlerInterface.html#a51b7b63fc7567545a973bf42049a04e7">PySampleHandlerInterface</a>, and <a class="el" href="classSampleHandlerBase.html#afdf70f90efa5aa3fa4cc0d95c059e372">SampleHandlerBase</a>.</p>
 
 </div>
 </div>
@@ -1573,8 +1573,8 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a59db8b28b1ab17dc91b451e316678fd9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59db8b28b1ab17dc91b451e316678fd9">&#9670;&nbsp;</a></span>ReturnKinematicParameterBinning()</h2>
+<a id="a68f452002f343895f24b244c1bb4a7e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68f452002f343895f24b244c1bb4a7e9">&#9670;&nbsp;</a></span>ReturnKinematicParameterBinning()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1586,7 +1586,7 @@ template&lt;typename T &gt; </div>
           <td class="memname">virtual std::vector&lt;double&gt; SampleHandlerInterface::ReturnKinematicParameterBinning </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>Sample</em>, </td>
+          <td class="paramname"><em>iSample</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
