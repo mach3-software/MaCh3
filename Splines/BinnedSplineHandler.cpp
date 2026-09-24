@@ -592,11 +592,17 @@ void BinnedSplineHandler::PrepForReweight() {
       SplineInfoArray[iSpline].xPts[iKnot] = xPoint;
     }
   }
+  M3::Utils::TablePrinter table({{"Spline Index", 10, 15, M3::Utils::Alignment::Left},
+                                {"Syst Name",    10, 20, M3::Utils::Alignment::Left},
+                                {"nKnots",       10,  6, M3::Utils::Alignment::Right}});
+
   MACH3LOG_INFO("nUniqueSysts: {}", nParams);
-  MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", "Spline Index", "Syst Name", "nKnots");
-  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
-  {
-    MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
+  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++) {
+    table.AddRow(iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
+  }
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
   }
 
   int nCombinations_FlatSplines = 0;

@@ -20,12 +20,26 @@ body {
     color: var(--mach3-ink);
 }
 
-/* Fancy project name */
-#projectname,
-#projectnumber,
-#projectbrief
-.title {
-    font-weight: 700;
+#titlearea {
+border-bottom: 3px solid var(--mach3-blue);
+}
+
+/* Project header */
+#projectname {
+color: var(--mach3-navy);
+font-size: 2em;
+font-weight: 800;
+}
+
+#projectnumber {
+color: var(--mach3-blue);
+font-weight: 600;
+}
+
+#projectbrief {
+color: var(--mach3-muted);
+font-size: 0.95em;
+font-weight: 700;
 }
 
 /* Main content container */
@@ -74,6 +88,61 @@ div.PageDoc div.textblock {
     outline: none;
     border-color: var(--mach3-blue) !important;
     box-shadow: 0 0 0 3px rgba(67, 137, 196, 0.12);
+}
+
+
+/* ==========================================================
+ * MaCh3 navigation bar
+ * ========================================================== */
+#main-nav,
+#main-menu,
+#main-menu li {
+  background: var(--mach3-navy) !important;
+  background-image: none !important;
+}
+
+/* Normal + focus + active + highlighted states */
+#main-menu.sm-dox a,
+#main-menu.sm-dox a:link,
+#main-menu.sm-dox a:visited,
+#main-menu.sm-dox a:focus,
+#main-menu.sm-dox a:active,
+#main-menu.sm-dox a.highlighted {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}
+
+/* Mouse hover */
+#main-menu.sm-dox a:hover {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-blue) !important;
+    background-image: none !important;
+}
+
+/* Dropdown */
+#main-menu.sm-dox ul,
+#main-menu.sm-dox ul li {
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+}
+
+#main-menu.sm-dox ul a,
+#main-menu.sm-dox ul a:link,
+#main-menu.sm-dox ul a:visited,
+#main-menu.sm-dox ul a:focus,
+#main-menu.sm-dox ul a:active,
+#main-menu.sm-dox ul a.highlighted {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+}
+
+#main-menu.sm-dox ul a:hover {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-blue) !important;
 }
 
 /* ==========================================================

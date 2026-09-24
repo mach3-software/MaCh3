@@ -140,7 +140,7 @@ std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra, const std::str
 std::vector<double> BuildBinEdgesFromNode(YAML::Node const &bin_edges_node, bool &found_range_specifier);
 
 /// @brief Converts a range (linspace/logspace) to a std::vector<double>
-/// @param bin_edges_node Yaml node containing binning
+/// @param bin_range Yaml node containing binning
 std::vector<double> BinRangeToBinEdges(YAML::Node const &bin_range);
 
 namespace M3 {
