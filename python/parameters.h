@@ -162,7 +162,11 @@ void initParametersModule(py::module &m_parameters){
             "Get initial value of parameter at index i\n\
             :param index: index of the parameter")
 
-
+        .def("get_par_index", &ParameterHandlerBase::GetParIndex, py::arg("name"),
+            "Get index of parameter from its name\n\
+            :param name: name of the parameter")
+            
+        
         .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg("index"), 
             "Get the lower bound of parameter at index i. \n\
             :param index: index of the parameter")
