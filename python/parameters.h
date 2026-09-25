@@ -162,6 +162,7 @@ void initParametersModule(py::module &m_parameters){
             "Get initial value of parameter at index i\n\
             :param index: index of the parameter")
 
+
         .def("get_lower_bound", &ParameterHandlerBase::GetLowerBound, py::arg("index"), 
             "Get the lower bound of parameter at index i. \n\
             :param index: index of the parameter")
@@ -180,6 +181,10 @@ void initParametersModule(py::module &m_parameters){
 
         .def("get_par_fixed", static_cast<bool (ParameterHandlerBase::*)(const int) const>(&ParameterHandlerBase::IsParameterFixed), py::arg("index"), 
             "Is the parameter at index i fixed \n\
+            :param index: index of the parameter")
+
+        .def("set_par_fixed", static_cast<void (ParameterHandlerBase::*)(const int)>(&ParameterHandlerBase::SetFixParameter), py::arg("index"),
+            "Set parameter at index i to be fixed\n\
             :param index: index of the parameter")
 
         .def("get_prior_cov", [](ParameterHandlerBase &self)
