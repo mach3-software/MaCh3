@@ -1,45 +1,15 @@
-#include "Fitters/Processing/MCMCProcessor.h"
-#include "Samples/HistogramUtils.h"
-#include "Manager/Manager.h"
+#include "Manager/MaCh3Logger.h"
+#include "CLI/Modules/SmearModule.hpp"
 
-/// @file SmearChain.cpp
-/// @brief Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour.
-/// @ingroup MaCh3DiagnosticProcessing
-
-/// @brief Main function  creating MCMCProcessor and calling Smear Chain
-/// @param inputFile MCMC Chain
-/// @param config Config file with settings
-void SmearChain(const std::string& inputFile, const std::string& config)
-{
-  MACH3LOG_INFO("File for study: {}", inputFile);
-
-  YAML::Node Settings = M3OpenConfig(config);
-
-  // Make the processor
-  auto Processor = std::make_unique<MCMCProcessor>(inputFile);
-  Processor->SetOutputSuffix("_Smear_MCMC");
-  Processor->Initialise();
-
-  const auto& Smear = Settings["SmearChain"];
-
-  std::vector<std::string> Names = Get<std::vector<std::string>>(Smear["Smear"][0], __FILE__, __LINE__);
-  std::vector<double> ErrorValue = Get<std::vector<double>>(Smear["Smear"][1], __FILE__, __LINE__);
-
-  bool SaveUnsmearedBranch = GetFromManager<bool>(Smear["SaveUnsmearedBranch"], false, __FILE__ , __LINE__);
-  Processor->SmearChain(Names, ErrorValue, SaveUnsmearedBranch);
-}
-
-int main(int argc, char *argv[]) {
-  SetMaCh3LoggerFormat();
-  if (argc != 3)
-  {
-    MACH3LOG_ERROR("How to use: {} MCMC_Output.root config", argv[0]);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  MACH3LOG_INFO("Producing single fit output");
-  std::string filename = argv[1];
-  std::string config = argv[2];
-  SmearChain(filename, config);
-
-  return 0;
+int main(int argc, char const* argv[]){
+    MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
+    MACH3LOG_WARN("                   : you can use 'mach3 smear' as a direct replacement instead.");
+    argv[0] = "smear";
+    M3::SmearModule proc;
+    ArgumentParser* parser = proc.get_parser();
+    parser->parse_args(argc, argv);
+    proc.Run();
+    MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
+    MACH3LOG_WARN("                   : you can use 'mach3 smear' as a direct replacement instead.");
+    return 0;
 }
