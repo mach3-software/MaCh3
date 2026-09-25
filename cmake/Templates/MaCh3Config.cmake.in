@@ -65,7 +65,7 @@ find_path(MaCh3_INCLUDE_DIR
 )
 
 find_path(MaCh3_LIB_DIR
-  NAMES libFitters.so
+  NAMES libFitters.so libFitters.dylib
   PATHS ${MaCh3_CMAKE_DIR}/lib/
 )
 

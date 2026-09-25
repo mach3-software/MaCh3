@@ -167,12 +167,17 @@ add_subdirectory(Utils)
 add_subdirectory(CLI)
 add_subdirectory(python)
 
-foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+if(APPLE)
+  set(MaCh3_RPATH_ORIGIN "@loader_path")
+else()
+  set(MaCh3_RPATH_ORIGIN "$ORIGIN")
+endif()
+foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Plotting;Oscillator;OscProbCalcer;CLIModules )
   set_property(
     TARGET
     ${lib}
     PROPERTY
-      INSTALL_RPATH "$ORIGIN"
+      INSTALL_RPATH "${MaCh3_RPATH_ORIGIN}"
   )
 endforeach()
 
