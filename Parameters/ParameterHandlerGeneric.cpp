@@ -225,7 +225,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     }
 
     if(param["Systematic"]["SpecialProposal"]) {
-      if _fCyclicalPrior[i]{
+      if(_fCyclicalPrior[i]){
         MACH3LOG_ERROR("Cannot set param {} to have cyclical prior AND special proposal", _fFancyNames[i]);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
