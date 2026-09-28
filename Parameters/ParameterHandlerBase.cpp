@@ -750,13 +750,19 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
       //HW: Flat prior, no need to calculate anything
       continue;
     }
+    if(_fCyclicalPrior[i]){
+      double sin_term = TMath::Sin((_fPropVal[i]+2*TMath::Pi())/4);
+      logL += sin_term*sin_term/(2*TMath::Pi());
+      continue;
+    }
+
     // KS: Precalculate Diff once per "i" without doing this for every "j"
     const double Diff = _fPropVal[i] - _fPreFitValue[i];
     #ifdef MULTITHREAD
     #pragma omp simd
     #endif
     for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[j]) {
+      if (!_fFlatPrior[j] && !_fCyclicalPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         double scale = (i != j) ? 1. : 0.5;
         logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
@@ -987,6 +993,26 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
     _fFlatPrior[i] = eL;
   }
 }
+
+
+void ParameterHandlerBase::SetCyclicalPrior(const int i, const bool eL){
+  if (i > _fNumPar) {
+    MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
+    MACH3LOG_ERROR("Fix this in your config file please!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  } else {
+    if(eL){
+      MACH3LOG_INFO("Setting {} (parameter {}) to cyclical prior", GetParName(i), i);
+    }
+    else{
+      // HW :: This is useful
+      MACH3LOG_INFO("Setting {} (parameter {}) to non-cyclical prior", GetParName(i), i);
+    }
+    _fCyclicalPrior[i] = eL;
+  }
+
+}
+
 
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {

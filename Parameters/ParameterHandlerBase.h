@@ -70,6 +70,9 @@ class ParameterHandlerBase {
   /// @param eL bool telling if it will be flat or not
   void SetFlatPrior(const int i, const bool eL);
 
+  void SetCyclicalPrior(const int i, const bool eL);
+
+
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
