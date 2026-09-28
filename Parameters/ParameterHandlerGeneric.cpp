@@ -228,6 +228,14 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     //ETA - now for parameters which are optional and have default values
     _fFlatPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
 
+    _fCyclicalPrior[i] = GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__);
+
+    if(_fFlatPrior[i] && _fCyclicalPrior[i]){
+      MACH3LOG_ERROR("Cannot set parameter {} to both flat and cyclical", _fFancyNames[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+
+    }
+
     // Allow to fix param, this setting should be used only for params which are permanently fixed like baseline, please use global config for fixing param more flexibly
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
       SetFixParameter(_fFancyNames[i]);

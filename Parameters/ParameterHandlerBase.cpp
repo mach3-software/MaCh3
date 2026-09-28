@@ -581,6 +581,12 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
       //HW: Flat prior, no need to calculate anything
       continue;
     }
+
+    if(_fCyclicalPrior[i]){
+      double sin_term = TMath::Sin((_fPropVal[i]+2*TMath::Pi())/4);
+      logL += sin_term*sin_term/(2*TMath::Pi());
+    }
+
     // KS: Precalculate Diff once per "i" without doing this for every "j"
     const double Diff = _fPropVal[i] - _fPreFitValue[i];
     #ifdef MULTITHREAD
@@ -818,6 +824,24 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
     }
     _fFlatPrior[i] = eL;
   }
+}
+
+void ParameterHandlerBase::SetCyclicalPrior(const int i, const bool eL){
+  if (i > _fNumPar) {
+    MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
+    MACH3LOG_ERROR("Fix this in your config file please!");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  } else {
+    if(eL){
+      MACH3LOG_INFO("Setting {} (parameter {}) to cyclical prior", GetParName(i), i);
+    }
+    else{
+      // HW :: This is useful
+      MACH3LOG_INFO("Setting {} (parameter {}) to non-cyclical prior", GetParName(i), i);
+    }
+    _fCyclicalPrior[i] = eL;
+  }
+
 }
 
 // ********************************************
