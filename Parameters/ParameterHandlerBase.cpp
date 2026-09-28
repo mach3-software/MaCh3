@@ -585,7 +585,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
     if(_fCyclicalPrior[i]){
       double sin_term = TMath::Sin((_fPropVal[i]+2*TMath::Pi())/4);
       logL += sin_term*sin_term/(2*TMath::Pi());
-      continue
+      continue;
     }
 
     // KS: Precalculate Diff once per "i" without doing this for every "j"
