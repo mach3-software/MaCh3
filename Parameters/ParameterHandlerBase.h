@@ -442,6 +442,7 @@ class ParameterHandlerBase {
   std::vector<double> _fIndivStepScale;
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
+  std::vector<bool> _fCyclicalPrior;
 
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
