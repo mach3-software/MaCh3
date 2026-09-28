@@ -340,6 +340,8 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fLowBound        = std::vector<double>(SizeVec, -999.99);
   _fUpBound         = std::vector<double>(SizeVec, 999.99);
   _fFlatPrior       = std::vector<bool>(SizeVec, false);
+  _fCyclicalPrior   = std::vector<bool>(SizeVec, false);
+
   _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
 
   corr_throw = new double[SizeVec];
