@@ -585,6 +585,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
     if(_fCyclicalPrior[i]){
       double sin_term = TMath::Sin((_fPropVal[i]+2*TMath::Pi())/4);
       logL += sin_term*sin_term/(2*TMath::Pi());
+      continue
     }
 
     // KS: Precalculate Diff once per "i" without doing this for every "j"
@@ -593,7 +594,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
     #pragma omp simd
     #endif
     for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[j]) {
+      if (!_fFlatPrior[j] && !_fCyclicalPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         double scale = (i != j) ? 1. : 0.5;
         logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
