@@ -239,3 +239,6 @@ are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 ✅ - Fully working with every feature fully tested by CI/CD <br>
 ❔ - Not every feature may work, only compilation being tested by CI/CD <br>
 ❌ - Not supported and no plans right now <br>
+
+
+<img width="1800" height="340" alt="mach3_banner" src="https://github.com/user-attachments/assets/8dcd0595-27e0-4b5f-a673-455d69fce03a" />
