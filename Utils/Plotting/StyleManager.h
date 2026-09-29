@@ -60,7 +60,7 @@ public:
   };
 
   /// @brief Get bin-width scaling factor for a given kinematic variable
-  /// @param variable Name of the kinematic variable (e.g. RecoNeutrinoEnergy, TrueQ2)
+  /// @param Name Name of the kinematic variable (e.g. RecoNeutrinoEnergy, TrueQ2)
   double getBinWidthScale(const std::string &Name) const;
 
   // style setting options
@@ -70,7 +70,7 @@ public:
   void setPalette(const int rootPlotStyle) const;
 
   /// @brief Set the root colour palette to one of the ones defined in the style config
-  /// @param rootPlotStyle The name of the palette you want to use, should be the same as it appears
+  /// @param configStyleName The name of the palette you want to use, should be the same as it appears
   /// in the style config
   void setPalette(const std::string& configStyleName) const;
 
