@@ -1,4 +1,7 @@
-Welcome To MaCh3!
+Welcome To pyMaCh3!
 =================
 
-.. mdinclude:: ../../MaCh3Web/mainpage.md
+This is the reference for Python interface to MaCh3.
+
+**Version:** |release|
+

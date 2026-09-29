@@ -9,6 +9,8 @@
 project = 'pyMaCh3'
 author = 'The MaCh3 Collaboration'
 
+version = '@MaCh3_VERSION@'
+release = '@MaCh3_VERSION@'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -36,4 +38,6 @@ source_suffix = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_logo = 'pymach3logo.png'
+html_favicon = 'pymach3logo.png'
+
