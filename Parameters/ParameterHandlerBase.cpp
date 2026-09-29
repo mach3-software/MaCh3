@@ -644,7 +644,10 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 // *************************************
   const FlipGroup& flip_group = FlipGroups.at(group);
-  // all standard and functional flip groups use the same 50% gate
+  // All standard and functional flip groups use the same 50% gate
+  // The exact value doesn't matter: studies with different probabilities showed
+  // it doesn't help exploration even for very unlikely hypotheses, because once
+  // the chain flips to a state, it stays there for a very long time regardless.
   if (M3::rand::Uniform() >= 0.5) {
     return;
   }
@@ -673,7 +676,6 @@ void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
     _fPropVal[functional_flip.target_index] = EvaluateFunctionalFlip(functional_flip, proposed_values);
   }
 }
-
 
 
 // *************************************
