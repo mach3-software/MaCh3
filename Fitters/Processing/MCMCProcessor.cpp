@@ -198,7 +198,6 @@ void MCMCProcessor::MakeOutputFile() {
 // ***************
   //KS: ROOT hates me... but we can create several instances of MCMC Processor, each with own TCanvas ROOT is mad and will delete if there is more than one canvas with the same name, so we add random number to avoid issue
   // KS: Update, now we also check if such canvas already exist, hence while/do loop
-  auto rand = std::make_unique<TRandom3>(0);
   std::string name = "";
   do {
     const int uniform = M3::rand::UniformInt(0, 9999);

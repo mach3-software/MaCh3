@@ -17,7 +17,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TMath.h"
 #include "TFile.h"
 #include "TROOT.h"
-#include "TRandom3.h"
 #include "TString.h"
 _MaCh3_Safe_Include_End_ //}
 
