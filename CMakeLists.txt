@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.7.1 LANGUAGES CXX)
+project(MaCh3 VERSION 2.8.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -296,3 +296,4 @@ endif()
 
 # KS: Configure the Doxygen input file, this is to ensure whenever we update MaCh3 version Doxyfile will have same version.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doc/Doxyfile @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/conf.py.in ${CMAKE_CURRENT_SOURCE_DIR}/sphinx/source/Doxyfile @ONLY)
