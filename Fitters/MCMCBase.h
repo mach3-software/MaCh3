@@ -50,6 +50,9 @@ class MCMCBase : public FitterBase {
     /// @brief Accept a step
     void AcceptStep();
 
+    /// @brief Reject a step
+    void RejectStep();
+
     /// @brief Adaptive MCMC step
     inline void AdaptiveStep();
 

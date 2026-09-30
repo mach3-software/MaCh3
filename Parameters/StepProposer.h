@@ -136,8 +136,15 @@ struct StepProposer {
   void EnableAdaption(YAML::Node const &) {}
 
   Eigen::ArrayXd const &Propose();
+
   void Accept() {
     proposal_basis.current = proposal_basis.proposed;
+    if (adaptive.enabled) {
+      adaptive.update_running_estimates(proposal_basis.current);
+    }
+  }
+
+  void Reject() {
     if (adaptive.enabled) {
       adaptive.update_running_estimates(proposal_basis.current);
     }

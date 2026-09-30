@@ -18,6 +18,10 @@ void MR2T2::DoStep() {
     {
         AcceptStep();
     }
+    else
+    {
+        RejectStep();
+    }
 }
 
 // *******************

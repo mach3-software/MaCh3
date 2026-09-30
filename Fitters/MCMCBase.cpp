@@ -202,3 +202,12 @@ void MCMCBase::AcceptStep() {
     systematics[s]->AcceptStep();
   }
 }
+
+// *************************
+void MCMCBase::RejectStep() {
+  // *************************
+  // Loop over systematics and reject
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    systematics[s]->RejectStep();
+  }
+}

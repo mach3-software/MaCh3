@@ -378,6 +378,8 @@ public:
 
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
+  /// @brief Rejected this step
+  void RejectStep() _noexcept_;
 
   /// @brief Set all parameters to be fixed at prior values
   void SetFixAllParameters();

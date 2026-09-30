@@ -229,6 +229,13 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
 }
 
 // ********************************************
+// Rejecting the proposed step, so current step remains the same
+void ParameterHandlerBase::RejectStep() _noexcept_ {
+  // ********************************************
+  proposer.Reject();
+}
+
+// ********************************************
 // Throw the proposed parameter by mag sigma
 // Should really just have the user specify this throw by having argument double
 void ParameterHandlerBase::ThrowParProp(const double mag) {
