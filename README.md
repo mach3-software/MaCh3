@@ -119,7 +119,7 @@ Following neutrino oscillation calculators are available:
 | CUDAProb3Linear  | CPU/GPU    | Beam       | PMNS       |            |
 | CUDAProb3        | CPU/GPU    | Atm        | PMNS       | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
 | ProbGPULinear    | GPU        | Beam       | PMNS       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
-| Prob3++Linear    | CPU        | Beam       | PMNS       |            |
+| Prob3++          | CPU        | Beam/Atm   | PMNS       |            |
 | NuFastLinear     | CPU        | Beam       | PMNS       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 | NuFastEarth      | CPU        | ATM        | PMNS       | [Ref](https://arxiv.org/abs/2511.04735)                 |
 | OscProb | CPU | Beam/Atm | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Scalar NSI (SNSI), Sterile Neutrinos (+1, +2, +3), Neutrino Decay, Decoherence, Non-Unitarity (NUNM), Lorentz Invariance Violation (LIV), Sidereal LIV, Open Quantum Systems (OPS)</details> | [Ref](https://doi.org/10.5281/zenodo.6347002) |
@@ -132,7 +132,7 @@ Following neutrino oscillation calculators are available:
 If nothing is specified in cmake build then `NuFastLinear_ENABLED` and `CUDAProb3_ENABLED` will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3pp_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DOscProb_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DGLoBESLinear_ENABLED=ON -DCHIC_ENABLED=ON -DOscLib_ENABLED=ON
 ```
 You can specify more than one engine, and MaCh3 support different engines for different samples.
 For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
