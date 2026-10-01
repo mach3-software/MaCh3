@@ -340,8 +340,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fLowBound        = std::vector<double>(SizeVec, -999.99);
   _fUpBound         = std::vector<double>(SizeVec, 999.99);
   _fFlatPrior       = std::vector<bool>(SizeVec, false);
-  _fCyclicalPrior   = std::vector<bool>(SizeVec, false);
-
   _fIndivStepScale  = std::vector<double>(SizeVec, 1.0);
 
   corr_throw = new double[SizeVec];
@@ -646,7 +644,10 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
 // *************************************
   const FlipGroup& flip_group = FlipGroups.at(group);
-  // all standard and functional flip groups use the same 50% gate
+  // All standard and functional flip groups use the same 50% gate
+  // The exact value doesn't matter: studies with different probabilities showed
+  // it doesn't help exploration even for very unlikely hypotheses, because once
+  // the chain flips to a state, it stays there for a very long time regardless.
   if (M3::rand::Uniform() >= 0.5) {
     return;
   }
@@ -675,7 +676,6 @@ void ParameterHandlerBase::FlipParameterGroup(const std::string& group) {
     _fPropVal[functional_flip.target_index] = EvaluateFunctionalFlip(functional_flip, proposed_values);
   }
 }
-
 
 
 // *************************************
@@ -752,19 +752,13 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
       //HW: Flat prior, no need to calculate anything
       continue;
     }
-    if(_fCyclicalPrior[i]){
-      double sin_term = TMath::Sin((_fPropVal[i]+2*TMath::Pi())/4);
-      logL -= TMath::Log(sin_term*sin_term/(2*TMath::Pi()));
-      continue;
-    }
-
     // KS: Precalculate Diff once per "i" without doing this for every "j"
     const double Diff = _fPropVal[i] - _fPreFitValue[i];
     #ifdef MULTITHREAD
     #pragma omp simd
     #endif
     for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[j] && !_fCyclicalPrior[j]) {
+      if (!_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         double scale = (i != j) ? 1. : 0.5;
         logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
@@ -995,26 +989,6 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
     _fFlatPrior[i] = eL;
   }
 }
-
-
-void ParameterHandlerBase::SetCyclicalPrior(const int i, const bool eL){
-  if (i > _fNumPar) {
-    MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
-    MACH3LOG_ERROR("Fix this in your config file please!");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  } else {
-    if(eL){
-      MACH3LOG_INFO("Setting {} (parameter {}) to cyclical prior", GetParName(i), i);
-    }
-    else{
-      // HW :: This is useful
-      MACH3LOG_INFO("Setting {} (parameter {}) to non-cyclical prior", GetParName(i), i);
-    }
-    _fCyclicalPrior[i] = eL;
-  }
-
-}
-
 
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(const std::vector<double>& stepscale) {
