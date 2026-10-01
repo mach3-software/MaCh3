@@ -132,7 +132,7 @@ Following neutrino oscillation calculators are available:
 If nothing is specified in cmake build then `NuFastLinear_ENABLED` and `CUDAProb3_ENABLED` will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3pp_ENABLED=ON -DNuFastEarth_ENABLED=ON -DNuFastEarth_ENABLED=ON -NuFastEarth_ENABLED=ON -DOscProb_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DGLoBESLinear_ENABLED=ON -DCHIC_ENABLED=ON -DOscLib_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3pp_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DOscProb_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DGLoBESLinear_ENABLED=ON -DCHIC_ENABLED=ON -DOscLib_ENABLED=ON
 ```
 You can specify more than one engine, and MaCh3 support different engines for different samples.
 For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
