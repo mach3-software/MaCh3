@@ -65,7 +65,7 @@ void MR2T2::ProposeStep() {
 
         llh += multicanonical_penalty;
 
-        MACH3LOG_DEBUG("Delta CP value: {}", delta_cp_value);
+        MACH3LOG_DEBUG("Delta CP value: {}", *multicanonicalHandler->multicanonicalVarValue);
         MACH3LOG_DEBUG("Multicanonical penalty: {}", multicanonical_penalty);
         MACH3LOG_DEBUG("LLH after multicanonical penalty: {}", llh);
     }
