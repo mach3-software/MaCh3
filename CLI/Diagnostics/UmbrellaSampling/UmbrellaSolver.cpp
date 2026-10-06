@@ -12,7 +12,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TSystem.h"
 #include "TChain.h"
 #include "TSystemDirectory.h"
-#include "TEntryList.h"
 _MaCh3_Safe_Include_End_ //}
 
 bool debug_mode = false;
@@ -40,7 +39,6 @@ struct UmbrellaConfig {
   double tolerance;
   int print_frequency;
   bool use_openmp;
-  int burnin_cut;
 };
 
 /// YAML-based config parser using yaml-cpp library
@@ -565,7 +563,6 @@ void UmbrellaSolver(const std::string &config_file) {
   }
   std::vector<TFile *> input_files;
   std::vector<TTree *> input_trees;
-  std::vector<TEntryList *> input_lists;
 
   if (!config.dynamic_files) {
     MACH3LOG_INFO("Using static input files from configuration.");
@@ -580,29 +577,8 @@ void UmbrellaSolver(const std::string &config_file) {
         continue;
       }
 
-      std::string list_name = Form("filter_%zu", i);
-
-      Long64_t nselected = tree->Draw(
-        Form(">>%s", list_name.c_str()), Form("step>%d", config.burnin_cut), "entrylist"
-      );
-
-      if (nselected < 0) {
-        MACH3LOG_ERROR("TTree::Draw failed for {}", config.windows[i].input_file);
-        file->Close();
-        continue;
-      }
-
-      TObject *obj = gDirectory->Get(list_name.c_str());
-      TEntryList *elist = dynamic_cast<TEntryList*>(obj);
-      //tree->SetEntryList(elist);
-
-      if (!elist) {
-        throw MaCh3Exception(__FILE__, __LINE__, "Object '" + list_name + "' is not a TEntryList; it is " + obj->ClassName());
-      }
-
       input_files.push_back(file);
       input_trees.push_back(tree);
-      input_lists.push_back(elist);
     }
   } else {
     MACH3LOG_INFO("Dynamic file loading enabled. Searching for files in directory: {}", config.dynamic_pattern);
@@ -633,23 +609,8 @@ void UmbrellaSolver(const std::string &config_file) {
         }
         file_count++;
 
-        std::string list_name = Form("filter_%d", file_count);
-
-        tree->Draw(
-          Form(">>%s", list_name.c_str()), Form("step>%d", config.burnin_cut), "entrylist"
-        );
-
-        TObject *obj = gDirectory->Get(list_name.c_str());
-        TEntryList *elist = dynamic_cast<TEntryList*>(obj);
-        //tree->SetEntryList(elist);
-
-        if (!elist) {
-          throw MaCh3Exception(__FILE__, __LINE__, "Object '" + list_name + "' is not a TEntryList; it is " + obj->ClassName());
-        }
-
         input_files.push_back(root_file);
         input_trees.push_back(tree);
-        input_lists.push_back(elist);
         MACH3LOG_INFO("Loaded tree 'posteriors' from file: {}", full_path);
       }
     } else {
@@ -725,25 +686,16 @@ void UmbrellaSolver(const std::string &config_file) {
       }
     }
 
-    tree->SetBranchStatus("*", 0);
-    tree->SetBranchStatus(config.variable_of_interest.c_str(), 1);
-    tree->SetBranchStatus("LogL", 1);
-
     double var_value;
     double logL_value;
     tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value);
     tree->SetBranchAddress("LogL", &logL_value);
 
-    //Long64_t nentries = tree->GetEntries();
-    TEntryList *elist = input_lists[i];
+    Long64_t nentries = tree->GetEntries();
     //Long64_t filtered_entries = 0;
-    //MACH3LOG_INFO("Window {}: {} entries", i, nentries);
-    MACH3LOG_INFO("Window {}: {} entries", i, elist->GetN());
+    MACH3LOG_INFO("Window {}: {} entries", i, nentries);
 
-    //for (Long64_t entry = 0; entry < nentries; entry++) {
-    for (Long64_t j = 0; j < elist->GetN(); ++j) {
-      //tree->GetEntry(entry);
-      const Long64_t entry = elist->GetEntry(j);
+    for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
       //if (logL_value > 50.0) { // logl cut no longer needed as the posterior
       //                         // chain start has been fixed
@@ -768,7 +720,6 @@ void UmbrellaSolver(const std::string &config_file) {
         std::swap(samples[i], samples[j]);
         std::swap(input_trees[i], input_trees[j]);
         std::swap(input_files[i], input_files[j]);
-        std::swap(input_lists[i], input_lists[j]);
       }
     }
   }
@@ -1053,7 +1004,7 @@ void UmbrellaSolver(const std::string &config_file) {
   for (size_t i = 0; i < input_trees.size(); i++) {
     TTree *tree = input_trees[i];
 
-    //Long64_t nentries = tree->GetEntries();
+    Long64_t nentries = tree->GetEntries();
 
     // KS: This is to avoid warnings about missing umbrella branches...
     int oldLevel = gErrorIgnoreLevel;
@@ -1071,11 +1022,7 @@ void UmbrellaSolver(const std::string &config_file) {
     }
     window_id = static_cast<int>(i);
 
-    tree->SetBranchStatus("*",1);
-    TEntryList *elist = input_lists[i];
-
-    for (Long64_t j = 0; j < elist->GetN(); ++j) {
-      Long64_t entry = elist->GetEntry(j);
+    for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
 
       if (z_current[i] == 0) {
