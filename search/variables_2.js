@@ -12,5 +12,6 @@ var searchData=
   ['bins_3654',['Bins',['../structSampleBinningInfo.html#a0f2d528b70dca063f8c9847fb3b409fe',1,'SampleBinningInfo']]],
   ['branchnames_3655',['BranchNames',['../classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a',1,'MCMCProcessor::BranchNames()'],['../classRHatCalculator.html#a6fa44a6df57d8ac358c5bcb03c645543',1,'RHatCalculator::BranchNames()']]],
   ['buf_3656',['buf',['../classSampleHandlerInterface.html#a4e72e84121e8feddd515866614f3245b',1,'SampleHandlerInterface']]],
-  ['burnincut_3657',['BurnInCut',['../classMCMCProcessor.html#afca259b5bdee2b248d4b1a64ac3e7930',1,'MCMCProcessor']]]
+  ['burnin_5fcut_3657',['burnin_cut',['../structUmbrellaConfig.html#a6ffb50ffc52166bd2d8ab11ae3fa9f39',1,'UmbrellaConfig']]],
+  ['burnincut_3658',['BurnInCut',['../classMCMCProcessor.html#afca259b5bdee2b248d4b1a64ac3e7930',1,'MCMCProcessor']]]
 ];

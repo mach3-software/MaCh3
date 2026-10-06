@@ -96,7 +96,6 @@ $(function() {
 <code>#include &quot;TLegend.h&quot;</code><br />
 <code>#include &quot;TString.h&quot;</code><br />
 <code>#include &quot;TH1.h&quot;</code><br />
-<code>#include &quot;TRandom3.h&quot;</code><br />
 <code>#include &quot;TStopwatch.h&quot;</code><br />
 <code>#include &quot;TColor.h&quot;</code><br />
 <code>#include &quot;TStyle.h&quot;</code><br />
@@ -144,14 +143,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RHatCalculator_8cpp_source.html#l00047">47</a> of file <a class="el" href="RHatCalculator_8cpp_source.html">RHatCalculator.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                                {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">// *******************</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  std::sort(arr, arr+size);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span> (size % 2 != 0)</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">return</span> arr[size/2];</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">return</span> (arr[(size-1)/2] + arr[size/2])/2.0;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="RHatCalculator_8cpp_source.html#l00046">46</a> of file <a class="el" href="RHatCalculator_8cpp_source.html">RHatCalculator.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                                {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// *******************</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::sort(arr, arr+size);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">if</span> (size % 2 != 0)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">return</span> arr[size/2];</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> (arr[(size-1)/2] + arr[size/2])/2.0;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -181,11 +180,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="RHatCalculator_8cpp_source.html#l00057">57</a> of file <a class="el" href="RHatCalculator_8cpp_source.html">RHatCalculator.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                                               {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// *******************</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">if</span>(std::isnan(var) || !std::isfinite(var)) var = cap;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="RHatCalculator_8cpp_source.html#l00056">56</a> of file <a class="el" href="RHatCalculator_8cpp_source.html">RHatCalculator.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                                               {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// *******************</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keywordflow">if</span>(std::isnan(var) || !std::isfinite(var)) var = cap;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>

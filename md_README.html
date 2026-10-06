@@ -149,7 +149,7 @@ Oscillator &lt;img src="https://github.com/dbarrow257/NuOscillator/blob/main/Doc
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">ProbGPULinear   </td><td class="markdownTableBodyNone">GPU   </td><td class="markdownTableBodyNone">Beam   </td><td class="markdownTableBodyNone">PMNS   </td><td class="markdownTableBodyNone"><a href="http://dx.doi.org/10.3204/DESY-PROC-2014-05/23">Ref</a>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Prob3++Linear   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam   </td><td class="markdownTableBodyNone">PMNS   </td><td class="markdownTableBodyNone"></td></tr>
+<td class="markdownTableBodyNone">Prob3++   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam/Atm   </td><td class="markdownTableBodyNone">PMNS   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">NuFastLinear   </td><td class="markdownTableBodyNone">CPU   </td><td class="markdownTableBodyNone">Beam   </td><td class="markdownTableBodyNone">PMNS   </td><td class="markdownTableBodyNone"><a href="https://doi.org/10.48550/arXiv.2405.02400">Ref</a>    </td></tr>
 <tr class="markdownTableRowEven">
@@ -184,7 +184,7 @@ Oscillator &lt;img src="https://github.com/dbarrow257/NuOscillator/blob/main/Doc
 <p>Non-Standard Interactions (NSI))&lt;/details&gt;   </p>
 <p><a href="https://github.com/cafana/OscLib">Ref</a>   </p>
 <p>If nothing is specified in cmake build then <code>NuFastLinear_ENABLED</code> and <code>CUDAProb3_ENABLED</code> will be used. To control which oscillation calculators you want to use here is syntax:</p>
-<div class="fragment"><div class="line">cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON</div>
+<div class="fragment"><div class="line">cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3pp_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DOscProb_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DGLoBESLinear_ENABLED=ON -DCHIC_ENABLED=ON -DOscLib_ENABLED=ON</div>
 </div><!-- fragment --><p> You can specify more than one engine, and MaCh3 support different engines for different samples. For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.</p>
 <h1><a class="anchor" id="autotoc_md9"></a>
 Fitting algorithms</h1>
