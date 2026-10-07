@@ -24,6 +24,7 @@ struct WindowConfig {
   double width;
   std::string input_file;
   double vonMises_kappa;
+  double temperature = 1.0;
 };
 
 /// Structure to hold umbrella configuration
@@ -39,6 +40,8 @@ struct UmbrellaConfig {
   double tolerance;
   int print_frequency;
   bool use_openmp;
+  std::string bias_mode;
+  double log_bias_offset = 0.0;
 };
 
 /// YAML-based config parser using yaml-cpp library
@@ -51,7 +54,17 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
 
     // Parse other configuration
     config.output_file = Get<std::string>(yaml_config["output_file"], __FILE__ , __LINE__);
-    config.variable_of_interest = Get<std::string>(yaml_config["variable_of_interest"], __FILE__ , __LINE__);
+    config.bias_mode = GetFromManager<std::string>(yaml_config["bias_mode"], "collective_variable", __FILE__, __LINE__);
+    if (config.bias_mode != "collective_variable" && config.bias_mode != "temperature") {
+      MACH3LOG_ERROR("Unrecognised UmbrellaSolver bias_mode '{}'. Use 'collective_variable' or 'temperature'.", config.bias_mode);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if (config.bias_mode == "temperature") {
+      // Temperature biasing always uses the LogL branch.
+      config.variable_of_interest = "LogL";
+    } else {
+      config.variable_of_interest = Get<std::string>(yaml_config["variable_of_interest"], __FILE__, __LINE__);
+    }
     config.max_iterations = Get<int>(yaml_config["max_iterations"], __FILE__ , __LINE__);
     config.tolerance = Get<double>(yaml_config["tolerance"], __FILE__ , __LINE__);
     config.print_frequency = GetFromManager<int>(yaml_config["print_frequency"], 0, __FILE__ , __LINE__);
@@ -68,9 +81,9 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
         const YAML::Node &windows = yaml_config["windows"];
         for (size_t i = 0; i < windows.size(); i++) {
           WindowConfig window;
-          window.name = Get<std::string>(windows[i]["name"], __FILE__, __LINE__);
-          window.center = Get<double>(windows[i]["center"], __FILE__, __LINE__);
-          window.width = Get<double>(windows[i]["width"], __FILE__, __LINE__);
+          window.name = GetFromManager<std::string>(windows[i]["name"], "Window_" + std::to_string(i), __FILE__, __LINE__);
+          window.center = GetFromManager<double>(windows[i]["center"], 0.0, __FILE__, __LINE__);
+          window.width = GetFromManager<double>(windows[i]["width"], 1.0, __FILE__, __LINE__);
           config.windows.push_back(window);
         }
       }
@@ -146,23 +159,65 @@ double GetMulticanonicalWeightGenGaussian(double deltacp, double mean, double wi
   return (g0 + g1 + g2) * (multicanonicalBeta);
 }
 
-// A sub calculation for the overlap matrix
-// Sum of all windows weighted by z values
-double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows, const std::vector<double> &z_values) {
+// Evaluate one collective-variable window bias.
+double evaluateWindowBias(double x, const WindowConfig &window) {
+  if (window.umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
+    return vonMisesWindow(x, window.center, window.vonMises_kappa);
+  }
+  if (window.umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
+    return gaussianWindow(x, window.center, window.width);
+  }
+  if (window.umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
+    return GetMulticanonicalWeightGenGaussian(x, window.center, window.width);
+  }
+  MACH3LOG_ERROR("Unrecognised BiasFunction!!");
+  throw MaCh3Exception(__FILE__, __LINE__);
+}
+
+// Sum of all windows weighted by z values.
+double evaluateWindowCacheValue(double x, const WindowConfig &window, const UmbrellaConfig &config) {
+  if (config.bias_mode == "temperature") {
+    return (1.0 - 1.0 / window.temperature) * x - config.log_bias_offset;
+  }
+  return evaluateWindowBias(x, window);
+}
+
+template <typename LogBiasGetter>
+double logSumExpWindowDenominator(const std::vector<double> &z_values,
+                                  LogBiasGetter get_log_bias) {
+  double max_log_term = -std::numeric_limits<double>::infinity();
+  for (size_t k = 0; k < z_values.size(); ++k) {
+    if (z_values[k] <= 0.0) continue;
+    const double term = get_log_bias(k) - std::log(z_values[k]);
+    if (term == std::numeric_limits<double>::infinity()) return term;
+    if (std::isfinite(term)) max_log_term = std::max(max_log_term, term);
+  }
+  if (!std::isfinite(max_log_term)) return max_log_term;
+
+  double scaled_sum = 0.0;
+  for (size_t k = 0; k < z_values.size(); ++k) {
+    if (z_values[k] <= 0.0) continue;
+    const double term = get_log_bias(k) - std::log(z_values[k]);
+    if (std::isfinite(term)) scaled_sum += std::exp(term - max_log_term);
+  }
+  if (!(scaled_sum > 0.0) || !std::isfinite(scaled_sum)) {
+    return -std::numeric_limits<double>::infinity();
+  }
+  return max_log_term + std::log(scaled_sum);
+}
+
+double temperatureLogDenominator(double logL, const std::vector<WindowConfig> &windows,
+                                const std::vector<double> &z_values, double log_bias_offset) {
+  return logSumExpWindowDenominator(z_values, [&](size_t k) {
+    return (1.0 - 1.0 / windows[k].temperature) * logL - log_bias_offset;
+  });
+}
+
+double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
+                             const std::vector<double> &z_values) {
   double sum = 0.0;
   for (size_t k = 0; k < windows.size(); k++) {
-    double window_val;
-    if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-      window_val = vonMisesWindow(x, windows[k].center, windows[k].vonMises_kappa);
-    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-      window_val = gaussianWindow(x, windows[k].center, windows[k].width);
-    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-      window_val = GetMulticanonicalWeightGenGaussian(x, windows[k].center, windows[k].width);
-    } else {
-      MACH3LOG_ERROR("Unrecognised BiasFunction!!");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    sum += window_val / z_values[k];
+    sum += evaluateWindowBias(x, windows[k]) / z_values[k];
   }
   return sum;
 }
@@ -171,7 +226,7 @@ double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows,
 // at samples[i][s]
 // Memory heavy depending on number of steps/cores/windows
 std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector<WindowConfig> &windows,
-                                                               const std::vector<std::vector<double>> &samples, bool use_openmp = true) {
+                                                               const std::vector<std::vector<double>> &samples, const UmbrellaConfig &config, bool use_openmp = true) {
   int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<std::vector<double>>> cache(n_windows);
 
@@ -189,16 +244,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-            cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-            cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-            cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
-          } else {
-            MACH3LOG_ERROR("Unrecognised BiasFunction!!");
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
+          cache[i][j][s] = evaluateWindowCacheValue(samples[i][s], windows[j], config);
         }
       }
     }
@@ -206,16 +252,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-            cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-            cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-            cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
-          } else {
-            MACH3LOG_ERROR("Unrecognised function!!!!!");
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
+          cache[i][j][s] = evaluateWindowCacheValue(samples[i][s], windows[j], config);
         }
       }
     }
@@ -275,7 +312,8 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
 std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             const std::vector<WindowConfig> &windows,
             const std::vector<std::vector<double>> &samples,
-            const std::vector<std::vector<std::vector<double>>> &window_cache) {
+            const std::vector<std::vector<std::vector<double>>> &window_cache,
+            const UmbrellaConfig &config) {
   int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
 
@@ -296,11 +334,17 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
   for (int i = 0; i < n_windows; i++) {
     std::vector<double> denominator_cache(samples[i].size(), 0.0);
     for (size_t s = 0; s < samples[i].size(); s++) {
-      double denominator = 0.0;
-      for (int k = 0; k < n_windows; k++) {
-        denominator += window_cache[i][k][s] * z_inv[k];
+      if (config.bias_mode == "temperature") {
+        denominator_cache[s] = logSumExpWindowDenominator(z_current, [&](size_t k) {
+          return window_cache[i][k][s];
+        });
+      } else {
+        double denominator = 0.0;
+        for (int k = 0; k < n_windows; k++) {
+          denominator += window_cache[i][k][s] * z_inv[k];
+        }
+        denominator_cache[s] = denominator > 0.0 ? 1.0 / denominator : 0.0;
       }
-      denominator_cache[s] = 1 / denominator;
     }
 
     for (int j = 0; j < n_windows; j++) {
@@ -309,15 +353,23 @@ std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
 
       for (size_t s = 0; s < samples[i].size(); s++) {
         double sample = samples[i][s];
-        double window_j = window_cache[i][j][s];
         double denominator = denominator_cache[s];
-
-        if (denominator > 0) {
-          double integrand = (window_j * z_inv[i]) * denominator;
+        double integrand = 0.0;
+        bool valid_integrand = false;
+        if (config.bias_mode == "temperature") {
+          if (z_current[i] > 0.0 && std::isfinite(denominator)) {
+            integrand = std::exp(window_cache[i][j][s] - std::log(z_current[i]) - denominator);
+            valid_integrand = std::isfinite(integrand);
+          }
+        } else if (denominator > 0.0 && std::isfinite(denominator)) {
+          integrand = (window_cache[i][j][s] * z_inv[i]) * denominator;
+          valid_integrand = std::isfinite(integrand);
+        }
+        if (valid_integrand) {
           sum += integrand;
           count++;
         } else if (debug_mode) {
-          MACH3LOG_WARN("Denominator is zero for sample {} in window {}, skipping...", sample, i);
+          MACH3LOG_WARN("Invalid or zero denominator for sample {} in window {}, skipping...", sample, i);
         }
       }
 
@@ -339,7 +391,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
         const std::vector<WindowConfig> &windows,
         const std::vector<std::vector<double>> &samples,
         const std::vector<std::vector<std::vector<double>>> &window_cache,
-        bool use_openmp = true, bool verbose = false,
+        const UmbrellaConfig &config, bool use_openmp = true, bool verbose = false,
         [[maybe_unused]] int *total_lines = nullptr) {
   int n_windows = static_cast<int>(windows.size());
   if (verbose && !use_openmp) {
@@ -349,7 +401,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
   // F matrix and update z values
   std::vector<double> z_working = z_current;
   std::vector<std::vector<double>> F =
-      calcFmatrix(z_working, windows, samples, window_cache);
+      calcFmatrix(z_working, windows, samples, window_cache, config);
 
   // if (verbose) {
   //     if (total_lines) *total_lines = 1; // Start counting from F matrix
@@ -396,6 +448,11 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
     z_magnitude += z_new[i] * z_new[i];
   }
   z_magnitude = sqrt(z_magnitude);
+  if (!std::isfinite(z_magnitude) || z_magnitude <= 0.0 ||
+      std::any_of(z_new.begin(), z_new.end(), [](double value) { return !std::isfinite(value); })) {
+    MACH3LOG_ERROR("Z iteration produced a non-finite or zero vector; check overlap and bias values.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   if (z_magnitude > 0) {
     for (int i = 0; i < n_windows; i++) {
       z_new[i] /= z_magnitude;
@@ -408,6 +465,10 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
 /// A few different convergence checks
 // Check convergence
 bool checkConvergence(const std::vector<double> &z_current, const std::vector<double> &z_prev, double tolerance) {
+  if (z_current.empty() || z_current.size() != z_prev.size()) return false;
+  for (size_t i = 0; i < z_current.size(); ++i) {
+    if (!std::isfinite(z_current[i]) || !std::isfinite(z_prev[i])) return false;
+  }
   double sum_diffs = 0.0;
   for (size_t i = 0; i < z_current.size(); i++) {
     // if (std::abs(z_current[i] - z_prev[i]) > tolerance *
@@ -452,8 +513,11 @@ bool checkConvergenceStalled(const std::vector<double> &z_current, const std::ve
   constexpr int stagnant_required = 500;
   const double bound = tolerance;
 
-  if (z_current.empty()) {
+  if (z_current.empty() || z_current.size() != z_prev.size()) {
     return false;
+  }
+  for (double value : z_current) {
+    if (!std::isfinite(value)) return false;
   }
 
   // Reset state safely if number of windows changes between solver runs.
@@ -533,7 +597,9 @@ void UmbrellaSolver(const std::string &config_file) {
     return;
   }
 
-  MACH3LOG_INFO("Variable of interest: {}", config.variable_of_interest);
+  MACH3LOG_INFO("Bias mode: {}", config.bias_mode);
+  if (config.bias_mode == "collective_variable") MACH3LOG_INFO("Variable of interest: {}", config.variable_of_interest);
+  else MACH3LOG_INFO("Temperature-mode variable of interest: {}", config.variable_of_interest);
   MACH3LOG_INFO("Output file: {}", config.output_file);
 
 // Check OpenMP status with detailed debugging
@@ -626,6 +692,11 @@ void UmbrellaSolver(const std::string &config_file) {
     }
   }
 
+  if (input_trees.size() != config.windows.size()) {
+    MACH3LOG_ERROR("Loaded {} chains for {} configured windows.", input_trees.size(), config.windows.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   for (size_t i = 0; i < input_trees.size(); i++) {
     TTree *tree = input_trees[i];
     TFile *file = input_files[i];
@@ -647,6 +718,22 @@ void UmbrellaSolver(const std::string &config_file) {
         YAML::Node macro_yaml = YAML::Load(yaml_text.str());
         YAML::Node umbrellaConfig =
             macro_yaml["General"]["MCMC"]["Multicanonical"];
+        if (config.bias_mode == "temperature") {
+          YAML::Node temperature = macro_yaml["General"]["MCMC"]["Temp"];
+
+          if (!temperature || !temperature.IsScalar()) {
+            MACH3LOG_ERROR("Temperature mode: no scalar temperature found at General.MCMC.Temp in MaCh3_Config for {}.", file->GetName());
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          config.windows[i].temperature = temperature.as<double>();
+          if (!(config.windows[i].temperature > 0.0) || !std::isfinite(config.windows[i].temperature)) {
+            MACH3LOG_ERROR("Invalid temperature {} in {}", config.windows[i].temperature, file->GetName());
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          config.windows[i].center = 0.0;
+          config.windows[i].width = 1.0;
+          MACH3LOG_INFO("Window {} temperature read from embedded config: {}", i, config.windows[i].temperature);
+        } else {
         // Extract window parameters
         config.windows[i].center = Get<double>(umbrellaConfig["Umbrella"]["UmbrellaMean"], __FILE__, __LINE__);
         MACH3LOG_INFO("Window {} center updated to {}", i, config.windows[i].center);
@@ -682,15 +769,23 @@ void UmbrellaSolver(const std::string &config_file) {
           config.windows[i].vonMises_kappa = -1.0; // Not using von Mises
           MACH3LOG_INFO("Window {} using Gaussian: width = {}", i, config.windows[i].width);
         }
+        }
       } catch (const std::exception &e) {
+        if (config.bias_mode == "temperature") throw;
         MACH3LOG_WARN("Could not parse macro as YAML: {}", e.what());
       }
+    } else if (config.bias_mode == "temperature") {
+      MACH3LOG_ERROR("Temperature mode requires MaCh3_Config metadata in {}", file->GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    double var_value;
-    double logL_value;
+    double var_value = 0.0;
+    TBranch *bias_branch = tree->GetBranch(config.variable_of_interest.c_str());
+    if (!bias_branch) {
+      MACH3LOG_ERROR("Required branch '{}' missing from {}", config.variable_of_interest, file->GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value);
-    tree->SetBranchAddress("LogL", &logL_value);
 
     Long64_t nentries = tree->GetEntries();
     //Long64_t filtered_entries = 0;
@@ -698,23 +793,14 @@ void UmbrellaSolver(const std::string &config_file) {
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
-      //if (logL_value > 50.0) { // logl cut no longer needed as the posterior
-      //                         // chain start has been fixed
-      //  filtered_entries++;
-      //  continue;
-      //}
       samples[i].push_back(var_value);
     }
-    //if (filtered_entries > 0) {
-    //  std::cout << "Filtered " << filtered_entries
-    //            << " entries with LogL > 500 from window " << i << std::endl;
-    //}
   }
 
   // Sort by window center and keep all per-window containers aligned.
   // The final weighting stage loops over input_trees by index, so those indices
   // must track the same sorted window order used by z_current.
-  for (size_t i = 0; i < config.windows.size(); i++) {
+  if (config.bias_mode == "collective_variable") for (size_t i = 0; i < config.windows.size(); i++) {
     for (size_t j = i + 1; j < config.windows.size(); j++) {
       if (config.windows[i].center > config.windows[j].center) {
         std::swap(config.windows[i], config.windows[j]);
@@ -808,10 +894,21 @@ void UmbrellaSolver(const std::string &config_file) {
     }
   }
 
+  if (config.bias_mode == "temperature") {
+    double max_log_bias = -std::numeric_limits<double>::infinity();
+    for (size_t i = 0; i < config.windows.size(); ++i) {
+      const double beta = 1.0 - 1.0 / config.windows[i].temperature;
+      for (double sample : samples[i]) {
+        max_log_bias = std::max(max_log_bias, beta * sample);
+      }
+    }
+    config.log_bias_offset = std::isfinite(max_log_bias) ? max_log_bias : 0.0;
+  }
+
   MACH3LOG_INFO("Precomputing window cache...");
   // TODO: this is slow as hell and causes massive memory usage, what's a smarter
   // way to do this? break out to a file? RDataFrame?
-  std::vector<std::vector<std::vector<double>>> window_cache = buildWindowCache(config.windows, samples, openmp_works);
+  std::vector<std::vector<std::vector<double>>> window_cache = buildWindowCache(config.windows, samples, config, openmp_works);
 
   // TFile to hold the F matrix evolution for the first 15 iterations if needed
   bool save_matrix = true; // Set to true to enable saving F matrix evolution
@@ -826,7 +923,7 @@ void UmbrellaSolver(const std::string &config_file) {
       save_matrix = false; // Disable saving if file cannot be created
     }
     // add an initial FMatrix with the initial z values for reference
-    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache);
+    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache, config);
     int n_windows = static_cast<int>(config.windows.size());
     TH2D initial_F_TH2D("F_matrix_initial", "Initial F matrix;Window j;Window i", n_windows, 0, n_windows, n_windows, 0, n_windows);
     for (int i = 0; i < n_windows; i++) {
@@ -895,7 +992,7 @@ void UmbrellaSolver(const std::string &config_file) {
     }
 
     z_prev = z_current;
-    z_current = zSolver(z_current, config.windows, samples, window_cache, openmp_works, iteration % config.print_frequency == 0, &total_output_lines);
+    z_current = zSolver(z_current, config.windows, samples, window_cache, config, openmp_works, iteration % config.print_frequency == 0, &total_output_lines);
     z_evolution.push_back(z_current);
 
     // save the first 15 iterations of the F matrix to check convergence
@@ -903,7 +1000,7 @@ void UmbrellaSolver(const std::string &config_file) {
     // plotting in root, with axes of iteration number and window index, and the
     // value being the F matrix element
     if (save_matrix && (iteration < 15 || iteration % config.print_frequency == 0)) {
-      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache);
+      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache, config);
       // convert F_matrix to Th2D for saving to root file
       int n_windows = static_cast<int>(config.windows.size());
       TH2D F_TH2D(Form("F_matrix_iter_%02d", iteration),Form("F matrix at iteration %02d;Window j;Window i", iteration), n_windows, 0, n_windows, n_windows, 0, n_windows);
@@ -984,6 +1081,29 @@ void UmbrellaSolver(const std::string &config_file) {
   oss << "]";
   MACH3LOG_INFO("{}", oss.str());
 
+  // z is normalized to unit magnitude, so event weights are only defined up to
+  // one common factor. Scale by the largest log weight to keep them finite.
+  double log_weight_scale = 0.0;
+  if (config.bias_mode == "temperature") {
+    log_weight_scale = -std::numeric_limits<double>::infinity();
+    for (const auto &chain_samples : samples) {
+      for (double logL : chain_samples) {
+        const double log_denominator = temperatureLogDenominator(
+            logL, config.windows, z_current, config.log_bias_offset);
+        if (!std::isfinite(log_denominator)) {
+          MACH3LOG_ERROR("Non-finite temperature-weight denominator while determining weight scale.");
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        log_weight_scale = std::max(log_weight_scale, -log_denominator);
+      }
+    }
+    if (!std::isfinite(log_weight_scale)) {
+      MACH3LOG_ERROR("Could not determine a finite temperature-weight scale.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    MACH3LOG_INFO("Scaling temperature weights by exp(-{}) so the largest event weight is 1.", log_weight_scale);
+  }
+
   std::filesystem::copy_file(input_files[0]->GetName(), config.output_file,
                              std::filesystem::copy_options::overwrite_existing);
   // Create output file
@@ -997,10 +1117,15 @@ void UmbrellaSolver(const std::string &config_file) {
   // Variables for the combined tree
   double umbrella_weight;
   int window_id;
-  double delta_cp;
+  double delta_cp = 0.0;
+  double logl_value = 0.0;
 
   combined_tree->Branch("umbrella_weight", &umbrella_weight, "umbrella_weight/D");
   combined_tree->Branch("window_id", &window_id, "window_id/I");
+  double chain_temperature = 1.0;
+  if (config.bias_mode == "temperature") {
+    combined_tree->Branch("chain_temperature", &chain_temperature, "chain_temperature/D");
+  }
 
   // Fill combined tree
   for (size_t i = 0; i < input_trees.size(); i++) {
@@ -1014,15 +1139,21 @@ void UmbrellaSolver(const std::string &config_file) {
     combined_tree->CopyAddresses(tree);
     gErrorIgnoreLevel = oldLevel;
 
-    /// @todo code now assumes it is only for delta CP
     tree->SetBranchAddress("delta_cp", &delta_cp);
-    // KS: SetBranchAddress above decouples the input branch address, so update the
-    // copied output branch address to use the current delta_cp value.
     combined_tree->GetBranch("delta_cp")->SetAddress(&delta_cp);
+    if (config.bias_mode == "temperature") {
+      if (!tree->GetBranch(config.variable_of_interest.c_str())) {
+        MACH3LOG_ERROR("Required branch '{}' missing from {}", config.variable_of_interest, tree->GetCurrentFile()->GetName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      tree->SetBranchAddress(config.variable_of_interest.c_str(), &logl_value);
+      combined_tree->GetBranch(config.variable_of_interest.c_str())->SetAddress(&logl_value);
+    }
     if (z_current[i] == 0) {
       MACH3LOG_WARN("Z value for window {} is zero, skipping weighting for this window to avoid division by zero.", i);
     }
     window_id = static_cast<int>(i);
+    if (config.bias_mode == "temperature") chain_temperature = config.windows[i].temperature;
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
@@ -1032,10 +1163,18 @@ void UmbrellaSolver(const std::string &config_file) {
       } else {
         // Calculate umbrella weight for this event
         // The umbrella weight corrects for the bias introduced by the window function Weight is 1 / sum of all window contributions (equation 4 from paper)
-        double denominator = 1 / summedWindowsWeighted(delta_cp, config.windows, z_current);
-
-        // umbrella_weight = z_current[i] / denominator; // with or without z_current[i] / denominator? why did I have this originally
-        umbrella_weight = denominator; // This is the correct form based on the paper - the z_current[i] factor is already included in the summedWindowsWeighted function
+        const double bias_value = config.bias_mode == "temperature" ? logl_value : delta_cp;
+        if (config.bias_mode == "temperature") {
+          const double log_denominator = temperatureLogDenominator(
+              bias_value, config.windows, z_current, config.log_bias_offset);
+          umbrella_weight = std::exp(-log_denominator - log_weight_scale);
+          if (!std::isfinite(umbrella_weight)) {
+            MACH3LOG_ERROR("Non-finite scaled umbrella weight for LogL {}", bias_value);
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+        } else {
+          umbrella_weight = 1 / summedWindowsWeighted(bias_value, config.windows, z_current);
+        }
       }
 
       if (combined_tree->Fill() < 0) {
