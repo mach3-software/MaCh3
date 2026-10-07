@@ -21,6 +21,12 @@
 /// \f]
 /// where \f$T_\text{anneal}\f$ is the current annealing temperature and \f$\text{step}\f$ is the iteration index.
 ///
+/// If likelihood tempering is enabled, the acceptance probability is modified as
+/// \f[
+/// \alpha = \min \Biggl( 1, \exp\biggl( \frac{\log \mathcal{L}_\text{prop} - \log \mathcal{L}_\text{curr}}{T} \biggr) \Biggr),
+/// \f]
+/// where \f$T\f$ is the temperature.
+///
 /// @author Asher Kaboth
 ///
 /// @ingroup FittingAlgorithms

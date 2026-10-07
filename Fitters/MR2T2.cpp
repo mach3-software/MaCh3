@@ -128,10 +128,12 @@ double MR2T2::AcceptanceProbability() {
     double acc_prob = 0.0;
 
     // Calculate acceptance probability
-    if (anneal)
-        acc_prob = std::min(1., std::exp(-(logLProp - logLCurr) / (std::exp(-step / AnnealTemp))));
+    if (tempered)
+	 acc_prob = std::min(1., std::exp((logLCurr - logLProp) / Temp));
+    else if (anneal)
+	 acc_prob = std::min(1., std::exp(-(logLProp - logLCurr) / (std::exp(-step / AnnealTemp))));
     else
-        acc_prob = std::min(1., std::exp(logLCurr - logLProp));
+	 acc_prob = std::min(1., std::exp(logLCurr - logLProp));
 
     return acc_prob;
 }

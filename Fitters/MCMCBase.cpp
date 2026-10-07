@@ -16,6 +16,15 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
+    Temp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["Temp"], -999, __FILE__ , __LINE__);
+    if (Temp < 0)
+        tempered = false;
+    else
+    {
+        MACH3LOG_INFO("Enabling likelihood tempering with T = {}", Temp);
+        tempered = true;
+    }
+
     AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
     if (AnnealTemp < 0)
         anneal = false;
