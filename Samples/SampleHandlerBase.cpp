@@ -1020,10 +1020,6 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
         channel_energy_array(GetNSamples()),
         channel_cosz_array(GetNSamples());
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-      if (MCEvents[iEvent].NominalSample <
-          0) { // skip events marked as sampleless
-        continue;
-      }
       if (MCEvents[iEvent].NominalSample >= GetNSamples()) {
         MACH3LOG_ERROR("Encountered Event with NominalSample: {}, but "
                        "SampleHandler {} only has {} samples.",
