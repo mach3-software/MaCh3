@@ -39,6 +39,12 @@ class OscillationHandler
 
   /// @brief return size of oscillation parameter pointer vector
   unsigned int GetOscParamsSize() const {return static_cast<unsigned int>(OscParams.size());};
+
+  /// @brief HH - Replace the pointer used by NuOsc by another pointer (intended for T2KNOvA nightmare studies)
+  /// @param OldPar Pointer currently read, i.e. ParameterHandlerBase::RetPointer of the parameter to replace
+  /// @param NewPar Pointer to read instead. 
+  /// @warning Throws if @p OldPar is not a part of OscParams
+  void ReplaceOscParamPointer(const M3::float_t* OldPar, const M3::float_t* NewPar);
  private:
   /// flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel;

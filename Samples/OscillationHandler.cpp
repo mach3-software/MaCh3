@@ -1,5 +1,7 @@
 #include "OscillationHandler.h"
 
+#include <algorithm>
+
 _MaCh3_Safe_Include_Start_ //{
 #include "Oscillator/OscillatorFactory.h"
 #include "Constants/OscillatorConstants.h"
@@ -104,6 +106,19 @@ void OscillationHandler::Evaluate() {
       }
     }
   }
+}
+
+// ************************************************
+void OscillationHandler::ReplaceOscParamPointer(const M3::float_t* OldPar, const M3::float_t* NewPar) {
+// ************************************************
+  auto Slot = std::find(OscParams.begin(), OscParams.end(), OldPar);
+  if (Slot == OscParams.end()) {
+    MACH3LOG_ERROR("Asked to replace an oscillation parameter this oscillator does not read.");
+    MACH3LOG_ERROR("Either it doesn't apply to this oscillator's samples, or it has already been replaced,");
+    MACH3LOG_ERROR("e.g. by another SampleHandler sharing this oscillator.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  *Slot = NewPar;
 }
 
 
