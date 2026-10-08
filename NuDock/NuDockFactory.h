@@ -7,7 +7,7 @@
 /// as well as conversion utilities between MaCh3 and NuDock oscillation parameter conventions.
 /// @author Hank Hua
 
-#include <Manager/Manager.h>
+#include "Manager/Manager.h"
 _MaCh3_Safe_Include_Start_ //{
 #include "nudock.hpp"
 _MaCh3_Safe_Include_End_ //}

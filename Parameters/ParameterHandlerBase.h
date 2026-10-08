@@ -6,6 +6,8 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
+#include "Manager/TablePrinter.h"
+#include "Parameters/SpecialProposals.h"
 
 /// @brief Base class for handling systematic uncertainty parameters.
 /// @details Provides core functionality for managing systematic parameters,
@@ -92,8 +94,6 @@ class ParameterHandlerBase {
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param stepscale Vector of individual step scale, should have same
   void SetIndivStepScale(const std::vector<double>& stepscale);
-  /// @brief KS: In case someone really want to change this
-  void SetPrintLength(const unsigned int PriLen) { PrintLength = PriLen; }
 
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
@@ -338,8 +338,6 @@ class ParameterHandlerBase {
   ///    are in `FancyNames`. This is useful for studies where one performs ND fits and passes
   ///    them to FD fits, which may have additional parameters (e.g., oscillations).
   ///  - If `FancyNames` is empty, it matches all parameters in the systematic handler.
-  ///
-  /// @throws MaCh3Exception if any parameter branch is uninitialized.
   void MatchMaCh3OutputBranches(TTree *PosteriorFile,
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames,
@@ -366,10 +364,14 @@ class ParameterHandlerBase {
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
   /// @brief Perform sanity check to ensure adaption isn't misbehaving before fit starts
   void SanitizeAdaption() const;
-  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
-  /// @param index parameter index you want to flip
-  /// @param FlipPoint Value around which flipping is done
-  void FlipParameterValue(const int index, const double FlipPoint);
+
+  /// @brief With a 50% chance, flip all parameters in a group around their respective flip points
+  /// @param group Name of the flip group
+  void FlipParameterGroup(const std::string& group);
+
+  /// @brief Evaluate a formula-driven flip for a target parameter.
+  /// @param flip Functional flip configuration.
+  M3::float_t EvaluateFunctionalFlip(const FunctionalFlipProposal& flip, const std::vector<double>& proposed_values) const;
 
   /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
   /// @author Henry Wallace
@@ -377,6 +379,15 @@ class ParameterHandlerBase {
 
   /// @brief Enable special proposal
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
+
+  /// @brief Parse and register a functional flip defined in YAML.
+  void AddFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
+
+  /// @brief Queue a functional flip until all parameters have been loaded.
+  void QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
+
+  /// @brief Resolve queued functional flips after parameter names are known.
+  void ResolveFunctionalFlips();
 
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
@@ -397,18 +408,12 @@ class ParameterHandlerBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
 
-  /// KS: Set Random numbers for each thread so each thread has different seed
-  std::vector<std::unique_ptr<TRandom3>> random_number;
-
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
   /// Result of multiplication of Cholesky matrix and randParams
   double* corr_throw;
   /// Global step scale applied to all params in this class
   double _fGlobalStepScale;
-
-  /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
-  int PrintLength;
 
   /// ETA _fNames is set automatically in the covariance class to be something like param_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
@@ -461,10 +466,10 @@ class ParameterHandlerBase {
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
-  /// Indices of parameters with flip symmetry
-  std::vector<int>    FlipParameterIndex;
-  /// Central points around which parameters are flipped
-  std::vector<double> FlipParameterPoint;
+  /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
+  std::map<std::string, FlipGroup> FlipGroups;
+  /// Functional flips waiting for full parameter-name registration.
+  std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)

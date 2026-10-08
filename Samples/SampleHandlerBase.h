@@ -48,14 +48,15 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @copydoc SampleHandlerInterface::GetName
   std::string GetName() const final;
   /// @copydoc SampleHandlerInterface::GetSampleTitle
-  std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
+  std::string GetSampleTitle(const int iSample) const final {return SampleDetails[iSample].SampleTitle;}
   /// @brief Sample name tag used only for getting relevant uncertainties
-  /// @param Sample Index of the sample.
-  std::string GetSampleName(const int Sample) const {return SampleDetails[Sample].SampleName;}
+  /// @param iSample Index of the sample.
+  std::string GetSampleName(const int iSample) const {return SampleDetails[iSample].SampleName;}
   /// @copydoc SampleHandlerInterface::GetKinVarName
   std::string GetKinVarName(const int iSample, const int Dimension) const final;
 
   /// @brief Computes and prints the integral breakdown of all modes and oscillation channels for a given sample.
+  /// @param iSample Index of the sample.
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
 
   /// @brief DB: Add data for a given sample from a ROOT histogram.
@@ -73,7 +74,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
-  double GetSampleLikelihood(const int isample) const override;
+  double GetSampleLikelihood(const int iSample) const override;
   //===============================================================================
 
   /// @brief Get index of sample based on name
@@ -122,7 +123,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                     const std::vector< KinematicCut >& EventSelectionVec = {},
                                     int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
   /// @brief Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc.
-  /// @param Sample Index of the sample.
+  /// @param iSample Index of the sample.
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
   /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
@@ -267,7 +268,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   // ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters(){};
-  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
+  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in FillArray
   virtual void PrepFunctionalParameters(){};
 
   /// @brief LP - Registration template function for multi-dimensional functional shifts
@@ -369,18 +370,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// DB Replace previous implementation with reading bin contents from SampleHandler_array
   void FillHist(const int Sample, TH1* Hist, std::vector<double> &Array);
 
-  /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
-#ifdef MULTITHREAD
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting but multithreaded
-  void FillArray_MP();
-#endif
-  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerBase::SampleHandler_array
-  /// vector with the weight calculated from reweighting
+  /// @brief Function which does the core reweighting. This assumes that oscillation weights have
+  /// already been calculated.
   void FillArray();
 
   /// @brief Helper function to reset histograms
-  void ResetHistograms();
+  void ResetHistograms() _noexcept_;
   /// @brief Setup spline handler (both binned or unbinned)
   void InitialiseSplineObject();
 

@@ -35,13 +35,6 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>&
 
   InitParametersTypeFromConfig();
 
-  //ETA - again this really doesn't need to be hear...
-  for (int i = 0; i < _fNumPar; i++)
-  {
-    // Sort out the print length
-    if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
-  } // end the for loop
-
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   InitParameters();
   // Print
@@ -163,7 +156,8 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
       if(Correlations[index].find(_fFancyNames[j]) != Correlations[index].end()) {
         Corr2 = Correlations[index][_fFancyNames[j]];
         //Do they agree to better than float precision?
-        if(std::abs(Corr2 - Corr1) > FLT_EPSILON) {
+        constexpr double tolerance = 1e-6;
+        if(std::abs(Corr2 - Corr1) > tolerance) {
           MACH3LOG_ERROR("Correlations are not equal between {} and {}", _fFancyNames[j], key);
           MACH3LOG_ERROR("Got : {} and {}", Corr2, Corr1);
           throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -189,15 +183,6 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
   LoadAndMergeYAML(YAMLFile, ThrowSubMatrixOverrides);
 
-  const int nThreads = M3::GetNThreads();
-  //KS: set Random numbers for each thread so each thread has different seed
-  //or for one thread if without MULTITHREAD
-  random_number.reserve(nThreads);
-  for (int iThread = 0; iThread < nThreads; iThread++) {
-    random_number.emplace_back(std::make_unique<TRandom3>(0));
-  }
-  PrintLength = 35;
-
   // Set the covariance matrix
   _fNumPar = int(_fYAMLDoc["Systematics"].size());
 
@@ -214,7 +199,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);
@@ -254,6 +239,8 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     MACH3LOG_CRITICAL("Inconsistent number of params in Yaml  {} vs {}, this indicate wrong syntax", i, i, _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+
+  ResolveFunctionalFlips();
 
   // load correlation
   LoadCorrelationFromConfig(Correlations, CorrNamesMap);
@@ -567,6 +554,7 @@ OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAM
 // ********************************************
   OscillationParameter OscParamInfo;
   GetBaseParameter(param, Index, OscParamInfo);
+  OscParamInfo.NuOscName = Get<std::string>(param["NuOscName"], __FILE__ , __LINE__);
 
   return OscParamInfo;
 }
@@ -583,6 +571,13 @@ const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalPar
 const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
   return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Osc parameters for the relevant SampleName
+const std::vector<OscillationParameter> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kOsc], OscParams, SampleName);
 }
 
 // ********************************************
@@ -714,21 +709,34 @@ void ParameterHandlerGeneric::Print() const {
 // ********************************************
 void ParameterHandlerGeneric::PrintGlobablInfo() const {
 // ********************************************
-  MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", "#", "|", "Name", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
-  MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
-  for (int i = 0; i < GetNumParams(); i++) {
-    std::string ErrString = fmt::format("{:.2f}", _fError[i]);
-    std::string SampleNameString = "";
-    for (const auto& SampleName : _fSampleNames[i]) {
-      if (!SampleNameString.empty()) {
-        SampleNameString += ", ";
-      }
-      SampleNameString += SampleName;
-    }
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
+  M3::Utils::TablePrinter table({{"#",           5,  5,   M3::Utils::Alignment::Right},
+                                 {"Name",        10, 40,  M3::Utils::Alignment::Left},
+                                 {"Prior",       10, 15,  M3::Utils::Alignment::Right},
+                                 {"Error",       10, 15,  M3::Utils::Alignment::Right},
+                                 {"Lower",       10, 15,  M3::Utils::Alignment::Right},
+                                 {"Upper",       10, 15,  M3::Utils::Alignment::Right},
+                                 {"StepScale",   10, 15,  M3::Utils::Alignment::Right},
+                                 {"SampleNames", 10, 20,  M3::Utils::Alignment::Left},
+                                 {"Type",        10, 20,  M3::Utils::Alignment::Left},});
+
+  for (int i = 0; i < GetNumParams(); ++i) {
+    const std::string errorString = fmt::format("{:.2f}", _fError[i]);
+    const std::string sampleNameString = M3::Utils::join(_fSampleNames[i], ", ");
+
+    table.AddRow(i,
+                 GetParFancyName(i),
+                 M3::Utils::Cell(_fPreFitValue[i], "{:.2f}"),
+                 "+/- " + errorString,
+                 M3::Utils::Cell(_fLowBound[i], "{:.2f}"),
+                 M3::Utils::Cell(_fUpBound[i], "{:.2f}"),
+                 M3::Utils::Cell(_fIndivStepScale[i], "{:.2f}"),
+                 sampleNameString,
+                 SystType_ToString(_fParamType[i]));
   }
-  MACH3LOG_INFO("============================================================================================================================================================");
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
+  }
 }
 
 // ********************************************
@@ -738,67 +746,73 @@ void ParameterHandlerGeneric::PrintNormParams() const {
   MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
   if(_fSystToGlobalSystIndexMap[SystType::kNorm].size() == 0) return;
 
+  M3::Utils::TablePrinter table({{"#",        4,  4,   M3::Utils::Alignment::Right},
+                                {"Global #",  10, 10,  M3::Utils::Alignment::Right},
+                                {"Name",      10, 40,  M3::Utils::Alignment::Left},
+                                {"Int. mode", 10, 20,  M3::Utils::Alignment::Left},
+                                {"Target",    10, 20,  M3::Utils::Alignment::Left},
+                                {"pdg",       10, 20,  M3::Utils::Alignment::Left},});
+
   bool have_parameter_with_kin_bounds = false;
 
-  //KS: Consider making some class producing table..
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:20}│{5:20}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────┼────────────────────┤");
-
-  for (unsigned int i = 0; i < NormParams.size(); ++i)
-  {
-    std::string intModeString;
-    for (unsigned int j = 0; j < NormParams[i].modes.size(); j++) {
-      intModeString += std::to_string(NormParams[i].modes[j]);
-      intModeString += " ";
-    }
-    if (NormParams[i].modes.empty()) intModeString += "all";
-
-    std::string targetString;
-    for (unsigned int j = 0; j < NormParams[i].targets.size(); j++) {
-      targetString += std::to_string(NormParams[i].targets[j]);
-      targetString += " ";
-    }
-    if (NormParams[i].targets.empty()) targetString += "all";
-
-    std::string pdgString;
-    for (unsigned int j = 0; j < NormParams[i].pdgs.size(); j++) {
-      pdgString += std::to_string(NormParams[i].pdgs[j]);
-      pdgString += " ";
-    }
-    if (NormParams[i].pdgs.empty()) pdgString += "all";
-
-    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+  for (std::size_t i = 0; i < NormParams.size(); ++i) {
+    table.AddRow(i,
+                 NormParams[i].index,
+                 NormParams[i].name,
+                 NormParams[i].modes.empty()   ? "all" : M3::Utils::join(NormParams[i].modes),
+                 NormParams[i].targets.empty() ? "all" : M3::Utils::join(NormParams[i].targets),
+                 NormParams[i].pdgs.empty()    ? "all" : M3::Utils::join(NormParams[i].pdgs));
 
     if(NormParams[i].hasKinBounds) have_parameter_with_kin_bounds = true;
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
 
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
+  }
   if(have_parameter_with_kin_bounds) {
     MACH3LOG_INFO("Normalisation parameters KinematicCuts information");
-    MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────────────────────────┐");
-    MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
-    MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
-    for (unsigned int i = 0; i < NormParams.size(); ++i)
-    {
+
+    M3::Utils::TablePrinter kinTable({{"#",            4,  4,  M3::Utils::Alignment::Right},
+                                      {"Global #",     10, 10, M3::Utils::Alignment::Right},
+                                      {"Name",         10, 40, M3::Utils::Alignment::Left},
+                                      {"KinematicCut", 10, 20, M3::Utils::Alignment::Left},
+                                      {"Value",        10, 40, M3::Utils::Alignment::Left},});
+
+    for (std::size_t i = 0; i < NormParams.size(); ++i) {
       //skip parameters with no KinematicCuts
       if(!NormParams[i].hasKinBounds) continue;
 
-      const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
-      for(long unsigned int icut = 0; icut < ncuts; icut++) {
+      const std::size_t ncuts = NormParams[i].KinematicVarStr.size();
+
+      for(std::size_t icut = 0; icut < ncuts; ++icut) {
         std::string kinematicCutValueString;
-        for(const auto & value : NormParams[i].Selection[icut]) {
+
+        for(const auto& value : NormParams[i].Selection[icut]) {
           for (const auto& v : value) {
             kinematicCutValueString += fmt::format("{:.2f} ", v);
           }
         }
-        if(icut == 0)
-          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
-        else
-          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
-      }//icut
-    }//i
-    MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
+
+        if(icut == 0) {
+          kinTable.AddRow(i,
+                          NormParams[i].index,
+                          NormParams[i].name,
+                          NormParams[i].KinematicVarStr[icut],
+                          kinematicCutValueString);
+        }
+        else {
+          kinTable.AddRow("",
+                          "",
+                          "",
+                          NormParams[i].KinematicVarStr[icut],
+                          kinematicCutValueString);
+        }
+      }
+    }
+
+    for (const auto& line : kinTable.Render()) {
+      MACH3LOG_INFO("{}", line);
+    }
   }
   else
     MACH3LOG_INFO("No normalisation parameters have KinematicCuts defined");
@@ -809,21 +823,29 @@ void ParameterHandlerGeneric::PrintSplineParams() const {
 // ********************************************
   MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobalSystIndexMap[SystType::kSpline].size());
   if(_fSystToGlobalSystIndexMap[SystType::kSpline].size() == 0) return;
-  MACH3LOG_INFO("=====================================================================================================================================================================");
-  MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
-  MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
-    auto &SplineIndex = pair.first;
-    auto &GlobalIndex = pair.second;
 
-    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}",
-                  SplineIndex, "|", GetParFancyName(GlobalIndex), "|",
-                  SplineParams[SplineIndex]._fSplineNames, "|",
-                  SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
-                  GetParSplineKnotLowerBound(SplineIndex), "|",
-                  GetParSplineKnotUpperBound(SplineIndex), "|");
+  M3::Utils::TablePrinter table({{"#",                    4,  4,   M3::Utils::Alignment::Right},
+                                 {"Name",                 10, 40,  M3::Utils::Alignment::Left},
+                                 {"Spline Name",          10, 40,  M3::Utils::Alignment::Left},
+                                 {"Spline Interpolation", 10, 20,  M3::Utils::Alignment::Left},
+                                 {"Low Knot Bound",       10, 20,  M3::Utils::Alignment::Right},
+                                 {"Up Knot Bound",        10, 20,  M3::Utils::Alignment::Right},});
+
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    const auto& SplineIndex = pair.first;
+    const auto& GlobalIndex = pair.second;
+
+    table.AddRow(SplineIndex,
+                 GetParFancyName(GlobalIndex),
+                 SplineParams[SplineIndex]._fSplineNames,
+                 SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)),
+                 GetParSplineKnotLowerBound(SplineIndex),
+                 GetParSplineKnotUpperBound(SplineIndex));
   }
-  MACH3LOG_INFO("=====================================================================================================================================================================");
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
+  }
 }
 
 // ********************************************
@@ -831,15 +853,23 @@ void ParameterHandlerGeneric::PrintFunctionalParams() const {
 // ********************************************
   MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kFunc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kFunc].size() == 0) return;
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
-    auto &FuncIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(FuncIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+
+  M3::Utils::TablePrinter table({{"#",        4,  4,  M3::Utils::Alignment::Right},
+                                 {"Global #", 10, 10, M3::Utils::Alignment::Right},
+                                 {"Name",     10, 40, M3::Utils::Alignment::Left},});
+
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
+    const auto& FuncIndex = pair.first;
+    const auto& GlobalIndex = pair.second;
+
+    table.AddRow(FuncIndex,
+                 GlobalIndex,
+                 GetParFancyName(GlobalIndex));
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
+  }
 }
 
 // ********************************************
@@ -847,15 +877,25 @@ void ParameterHandlerGeneric::PrintOscillationParams() const {
 // ********************************************
   MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
-  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
-  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
-  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
-    auto &OscIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+
+  M3::Utils::TablePrinter table({{"#",         4,  4,  M3::Utils::Alignment::Right},
+                                 {"Global #",  10, 10, M3::Utils::Alignment::Right},
+                                 {"Name",      10, 40, M3::Utils::Alignment::Left},
+                                 {"NuOscName", 10, 40, M3::Utils::Alignment::Left},});
+
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    const auto& OscIndex = pair.first;
+    const auto& GlobalIndex = pair.second;
+
+    table.AddRow(OscIndex,
+                 GlobalIndex,
+                 GetParFancyName(GlobalIndex),
+                 OscParams[OscIndex].NuOscName);
   }
-  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+
+  for (const auto& line : table.Render()){
+    MACH3LOG_INFO("{}", line);
+  }
 }
 
 // ********************************************
@@ -1020,20 +1060,6 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
     if(IsParFromGroup(i, Group)) Counter++;
   }
   return Counter;
-}
-
-// ********************************************
-// DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) const {
-// ********************************************
-  std::vector<const M3::float_t*> returnVec;
-  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
-    const auto& globalIndex = pair.second;
-    if (AppliesToSample(globalIndex, SampleName)) {
-      returnVec.push_back(RetPointer(globalIndex));
-    }
-  }
-  return returnVec;
 }
 
 // ********************************************

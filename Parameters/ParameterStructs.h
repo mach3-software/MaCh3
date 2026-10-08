@@ -151,13 +151,20 @@ enum RespFuncType {
 
 /// Make an enum of the spline interpolation type
 enum SplineInterpolation {
-  kTSpline3,             //!< Default TSpline3 interpolation
-  kLinear,               //!< Linear interpolation between knots
-  kMonotonic,            //!< EM: DOES NOT make the entire spline monotonic, only the segments
-  kAkima,                //!< EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment
-  kKochanekBartels,      //!< KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias
-  kLinearFunc,           //!< Liner interpolation using TF1 not spline
-  kSplineInterpolations  //!< This only enumerates
+  /// Default TSpline3 interpolation @cite ROOT_NIMA_1997
+  kTSpline3,
+  /// Linear interpolation between knots
+  kLinear,
+  /// EM: DOES NOT make the entire spline monotonic, only the segments
+  kMonotonic,
+  /// EM: Akima spline are allowed to be discontinuous in 2nd derivative and coefficients in any segment @cite Akima1970
+  kAkima,
+  /// KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias @cite Kochanek1984
+  kKochanekBartels,
+  /// Liner interpolation using TF1 not spline
+  kLinearFunc,
+  /// This only enumerates
+  kSplineInterpolations
 };
 
 // **************************************************
@@ -314,4 +321,6 @@ inline std::string SystType_ToString(const SystType i) {
 /// @note right now it is empty
 struct OscillationParameter : public TypeParameterBase {
 // *******************
+  /// Parameter name in NuOscillator
+  std::string NuOscName;
 };

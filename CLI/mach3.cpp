@@ -20,15 +20,15 @@
 int main(int argc, char *argv[]) {
     M3::MaCh3Program program("mach3");
 
-    // // Hidden completion option
-    // program.add_argument("--complete")
-    //     .hidden()
-    //     .nargs(1);
+    // Hidden completion option — accepts prefix + preceding words as context
+    program.add_argument("--complete")
+        .hidden()
+        .nargs(argparse::nargs_pattern::any);
 
-    // // Hidden installer option
-    // program.add_argument("--install-completions")
-    //     .help("")
-    //     .flag();
+    // Hidden installer option
+    program.add_argument("--install-completions")
+        .help("")
+        .flag();
 
     M3::ProcessMCMCModule proc;
     M3::DiagMCMCModule diag;
@@ -39,15 +39,24 @@ int main(int argc, char *argv[]) {
     program.add_core_module(penterm);
     program.load_dynamic_plugins();
 
+    // Pre-scan for --complete before argparse processes the full command line,
+    // so incomplete commands (missing required args) still produce completions.
+    for (int i = 1; i < argc; i++) {
+        if (std::string_view(argv[i]) == "--complete") {
+            std::string prefix = (i + 1 < argc) ? argv[i + 1] : "";
+            std::vector<std::string> context;
+            for (int j = i + 2; j < argc; j++) {
+                context.emplace_back(argv[j]);
+            }
+            program.completions(prefix, context);
+            return 0;
+        }
+    }
+
     try {
         program.parse_args(argc, argv);
     }
     catch (const std::exception& err) {
-        // // completions count as parsing error
-        // if (auto prefix = program.present<std::string>("--complete")) {
-        //     program.completions(*prefix);
-        //     return 0;
-        // }
 
         std::cerr << err.what() << std::endl;
         std::cerr << program.get_subcommand_used();
@@ -66,10 +75,10 @@ int main(int argc, char *argv[]) {
     }
 
 
-    // if (program.get<bool>("--install-completions")) {
-    //     program.install_completions();
-    //     return 0;
-    // }
+    if (program.get<bool>("--install-completions")) {
+        program.install_completions();
+        return 0;
+    }
 
     try{
         program.Run();

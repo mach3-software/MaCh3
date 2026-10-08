@@ -5,6 +5,7 @@
 #include "Manager/YamlHelper.h"
 #include "Manager/Monitor.h"
 #include "Manager/MaCh3Exception.h"
+#include "Manager/Random.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;

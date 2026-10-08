@@ -18,7 +18,6 @@ namespace py = pybind11;
 
 
 void initPlottingModule(py::module &m_plotting){
-
     py::class_<M3::Plotting::PlottingManager>(m_plotting, "PlottingManager")
         .def(
             py::init<const std::string &>(),

@@ -36,7 +36,7 @@ Summary of currently implemented bots
 * Nothing to add, cool meme for PR
 
 ## Newsletter
-* Make weekly summary of
+* Make monthly summary of commits to MaCh3 repos
 
 ## PRtitleChecker
 * Ensures each PR starts with suffix like tidy: for example
@@ -50,8 +50,8 @@ Summary of currently implemented bots
 ## Telemetry
 * Add telemetry like RAM and CPU usage for each PR
 
-## WeeklyValgrind
-* Runs Valgrind over tutorial weekly so we always have up to date info about memory leaks etc.
+## MonthlyValgrind
+* Runs Valgrind over tutorial monthly so we always have up to date info about memory leaks etc.
 
 ## TaskChecker
 * We require every user before merging PR to tick that they have read contributing. This simply ensures people actually ticked it. We can't check people actually read it, for now ;)

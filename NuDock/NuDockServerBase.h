@@ -5,7 +5,7 @@
 ///        JSON-based request/response protocol.
 /// @author Hank Hua
 
-#include "Fitters/FitterBase.h"
+#include "Fitters/Algorithms/FitterBase.h"
 #include "NuDockFactory.h"
 _MaCh3_Safe_Include_Start_ //{
 #include <nlohmann/json.hpp>
@@ -115,7 +115,7 @@ public:
   virtual nlohmann::json getDataSpectrum(const nlohmann::json &request);
 
   /// @brief No-op implementation --- the server does not run own MCMC.
-  void RunMCMC() override {(void)0; /* do nothing */};
+  void RunMCMC() override {return; /* do nothing */};
 
 protected:
   /// @brief Flag controlling verbose logging of server operations.

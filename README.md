@@ -25,7 +25,7 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 <img width="200" alt="Delta" src="https://github.com/user-attachments/assets/ac267b79-999d-4911-8e6e-1932147d440b" />
 <img width="200" alt="Jarlskog" src="https://github.com/user-attachments/assets/67624cfd-89f0-4897-a9d2-485d295ac4c2" />
 
-## Cite
+## Cite 📚
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 Some BibTeX styles abbreviate the author name `The MaCh3 Collaboration` as `T. M. Collaboration`. To prevent this, wrap the collaboration name in an extra pair of braces so that BibTeX treats it as a single entity.
 
@@ -50,7 +50,7 @@ author = {The MaCh3 Collaboration},
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
 
-## How to Compile
+## How to Compile 🛠️
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
 ```bash
 mkdir build;
@@ -67,7 +67,7 @@ source bin/setup.MaCh3.sh
 
 If the build fails, check your [system/environment requirements](#system-requirements).
 
-## Building against MaCh3
+## Building against MaCh3 🔗
 To include MaCh3 in your cmake project you can use following syntax
 ```cmake
 CPMFindPackage(
@@ -101,13 +101,7 @@ This will give you a pyMaCh3 module with all functionality of core MaCh3. You ca
 
 You can also find documentation for the pyMaCh3 module [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html).
 
-## Multithreading
-MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use
-```bash
-cmake ../ -DMaCh3_MULTITHREAD_ENABLED=OFF
-```
-
-## CUDA
+## CUDA 
 If the system has access to GPU, MaCh3 will enable GPU functionality automatically. If you would like to CPU only despite having access to [CUDA](https://developer.nvidia.com/cuda-toolkit)
 ```bash
 mkdir build; cd build;
@@ -115,28 +109,30 @@ cmake ../ -DMaCh3_GPU_ENABLED=OFF
 ```
 MaCh3 supports quite a high range of CUDA architectures if something doesn't work on your GPU let us know. MaCh3 supports only NVIDIA GPUs.
 
-## Oscillator
+## Oscillator <img src="https://github.com/dbarrow257/NuOscillator/blob/main/Docs/NuOscillatorLogo.png" alt="NuOsc" align="center" width="100"/>
 MaCh3 has access to several neutrino oscillation calculators via [NuOscillator](https://github.com/dbarrow257/NuOscillator/tree/main) framework.
 
 Following neutrino oscillation calculators are available:
-|Oscillator        | Hardware   | Source     | Reference  |
-|------------------|------------|------------|------------|
-| CUDAProb3Linear  | CPU/GPU    | Beam       |            |
-| CUDAProb3        | CPU/GPU    | Atm        | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
-| ProbGPULinear    | GPU        | Beam       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
-| Prob3++Linear    | CPU        | Beam       |            |
-| NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
-| NuFastEarth      | CPU        | ATM        | [Ref](https://arxiv.org/abs/2511.04735)                 |
-| OscProb          | CPU        | Beam/Atm   | [Ref](https://doi.org/10.5281/zenodo.6347002)           |
-| NuSQUIDSLinear   | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2022.108346)        |
-| GLoBESLinear     | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003)        |
-| CHICLinear       | CPU        | Beam       | [Ref](https://arxiv.org/pdf/2512.16427)                 |
-| OscLib           | CPU        | Beam       | [Ref](https://github.com/cafana/OscLib)                 |
 
-If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
+| Oscillator       | Hardware   | Source     | Model      | Reference  |
+|------------------|------------|------------|------------|------------|
+| CUDAProb3Linear  | CPU/GPU    | Beam       | PMNS       |            |
+| CUDAProb3        | CPU/GPU    | Atm        | PMNS       | [Ref](https://doi.org/10.1016/j.cpc.2018.07.022)        |
+| ProbGPULinear    | GPU        | Beam       | PMNS       | [Ref](http://dx.doi.org/10.3204/DESY-PROC-2014-05/23)   |
+| Prob3++          | CPU        | Beam/Atm   | PMNS       |            |
+| NuFastLinear     | CPU        | Beam       | PMNS       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
+| NuFastEarth      | CPU        | ATM        | PMNS       | [Ref](https://arxiv.org/abs/2511.04735)                 |
+| OscProb | CPU | Beam/Atm | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Scalar NSI (SNSI), Sterile Neutrinos (+1, +2, +3), Neutrino Decay, Decoherence, Non-Unitarity (NUNM), Lorentz Invariance Violation (LIV), Sidereal LIV, Open Quantum Systems (OPS)</details> | [Ref](https://doi.org/10.5281/zenodo.6347002) |
+| NuSQUIDSLinear   | CPU        | Beam       | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI), Decoherence, Lorentz Invariance Violation (LIV)</details>           | [Ref](https://doi.org/10.1016/j.cpc.2022.108346)        |
+| GLoBESLinear     | CPU        | Beam       | PMNS       | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003)        |
+| CHIC             | CPU        | Beam/Atm   | PMNS       | [Ref](https://arxiv.org/pdf/2512.16427)                 |
+| OscLib           | CPU        | Beam       | <details><summary>PMNS + extensions</summary>Non-Standard Interactions (NSI))</details>       | [Ref](https://github.com/cafana/OscLib)                 |
+
+
+If nothing is specified in cmake build then `NuFastLinear_ENABLED` and `CUDAProb3_ENABLED` will be used. To control which oscillation calculators you want to use here is syntax:
 
 ```bash
-cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuFastLinear_ENABLED=ON -DOscProb_ENABLED=ON
+cmake ../ -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProbGPULinear_ENABLED=ON -DProb3pp_ENABLED=ON -DNuFastLinear_ENABLED=ON -DNuFastEarth_ENABLED=ON -DOscProb_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DGLoBESLinear_ENABLED=ON -DCHIC_ENABLED=ON -DOscLib_ENABLED=ON
 ```
 You can specify more than one engine, and MaCh3 support different engines for different samples.
 For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric samples.
@@ -144,12 +140,14 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm    | Reference        |Need Ext Lib  |
-|--------------|------------------|--------------|
-| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | No       |
-| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
-| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
-| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
+| Algorithm    | Reference        | Variants     |Need Ext Lib  |
+|--------------|------------------|--------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | <details><summary>Extensions </summary> Adaptive MR2T2, Multi-Canonical MR2T2, Temperature-Annealed MR2T2, (variants may be combined) </details> | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | Same as in MR2T2 | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | -                | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | -                | No       |
+
+To find more information about each we recomend reading [here](https://mach3-software.github.io/MaCh3/group__FittingAlgorithms.html).
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
@@ -171,12 +169,12 @@ You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cm
 
 ## Other CMake Options
 
-| Option                               | Meaning                                                                         |
-| ------                               | -------                                                                         |
-| `MaCh3_NATIVE_ENABLED`               | Enables native CPU optimizations for improved performance. Not recommended on clusters with multiple CPU configurations due to potential compatibility issues.   |
-| `MaCh3_NuOsc_GPU_ENABLED`            | By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled     |
-| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short int for many structures |
-
+| Option                               | Meaning                                                                         | Default |
+| ------                               | -------                                                                         | -------  |
+| `MaCh3_NATIVE_ENABLED`               | Enables native CPU optimizations for improved performance. Not recommended on clusters with multiple CPU configurations due to potential compatibility issues.   | Off |
+| `DMaCh3_MULTITHREAD_ENABLED`         | Enables multihreading (via OMP) in whole codebase   | On |
+| `MaCh3_NuOsc_GPU_ENABLED`            | By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled     | On |
+| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short int for many structures | Off |
 
 ## System Requirements
 MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https://cmake.org), and [ROOT](https://root.cern/). Based on several tests, recommended versions are:
@@ -242,30 +240,5 @@ are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 ❔ - Not every feature may work, only compilation being tested by CI/CD <br>
 ❌ - Not supported and no plans right now <br>
 
-## Plotting and Diagnostic 📊
-Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
-The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
 
-## How To Use
-This is an example how your executable can look like using MaCh3:
-```cpp
-  //Manager is responsible for reading from config
-  std::unique_ptr<manager> FitManager = MaCh3ManagerFactory(argc, argv);
-
-  std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
-  std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
-  MakeMaCh3Instance(FitManager.get(), sample, Cov); //Factory like function which initialises everything
-
-  // FitterBase class has implementation of validation procedures and fitting algorithms
-  std::unique_ptr<FitterBase> MarkovChain = MaCh3FitterFactory(FitManager.get());
-
-  //Adding samples and covariances to the Fitter class could be in the factory
-  for(unsigned int i = 0; sample.size(); i++)
-    MarkovChain->AddSampleHandler(sample[i]);
-  for(unsigned int i = 0; Cov.size(); i++)
-    MarkovChain->AddSystObj(Cov[i]);
-
-  MarkovChain->RunLLHScan(); // can run LLH scan
-  MarkovChain->RunMCMC(); //or run actual fit
-```
-For more see [here](https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp)
+<img width="1800" height="340" alt="mach3_banner" src="https://github.com/user-attachments/assets/8dcd0595-27e0-4b5f-a673-455d69fce03a" />

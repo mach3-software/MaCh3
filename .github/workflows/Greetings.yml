@@ -4,6 +4,8 @@ on: [pull_request_target, issues]
 
 jobs:
   greeting:
+    # Ignore for dependabots
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       issues: write

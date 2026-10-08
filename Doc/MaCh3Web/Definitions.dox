@@ -20,6 +20,28 @@
   /// - **DelayedMR2T2** — Extension including delayed rejection to improve
   ///   sampling efficiency and acceptance in difficult likelihood surfaces.
   ///
+  /// Implemented Variants:
+  /// There are multiple ways to modify algorithm by using so called variants.
+  /// This modifies only single aspect of algorithm and are enable or disabled on
+  /// on config level. This list includes
+  /// - Adaptive MCMC (**AdaptiveMCMCHandler**) - modifies proposal matrix resulting in better acceptance and smaller autocorrelations
+  /// - Multi-Canonical or Umbrella Sampling (**MulticanonicalMCMCHandler**) - modifies the sampling distribution to improve exploration of difficult
+  /// or multimodal posterior regions.
+  /// @code{.yaml}
+  /// General:
+  ///   MCMC:
+  ///     Multicanonical:
+  ///       Enabled: true
+  /// @endcode
+  /// - Temperature annealing (**MCMCBase::AnnealTemp**) - modifies the effective
+  /// sampling temperature, allowing the sampler to explore the parameter space
+  /// more broadly.
+  /// @code{.yaml}
+  /// General:
+  ///   MCMC:
+  ///     AnnealTemp: 0.5
+  /// @endcode
+  ///
   /// -----------------------------------------------------------------------------
   /// # Likelihood Minimizers
   /// These algorithms deterministically minimise the negative log-likelihood to
@@ -38,7 +60,7 @@
   /// Example configuration:
   /// @code{.yaml}
   /// General:
-  ///   FittingAlgorithm: "MCMC"
+  ///   FittingAlgorithm: "MR2T2"
   /// @endcode
   ///
   /// or
@@ -847,29 +869,27 @@
   /// in MaCh3, especially the @ref ParameterHandlerGeneric and @ref SplineBase. In turn, the @ref FitterBase class
   /// obtains likelihood values by comparing the MC prediction with data in the SampleHandler class.
   ///
-  /// Each experiment needs to create a SampleHandler experiment class that inherits from the @ref SampleHandlerFD
+  /// Each experiment needs to create a SampleHandler experiment class that inherits from the @ref SampleHandlerBase
   /// class in the core repository.
   ///
-  /// @warning The SampleHandlerFD class will be renamed in the future to avoid confusion, as it can be used
-  /// for the Near Detector as well, not only the Far Detector (FD).
   ///
   /// # Constructing a SampleHandler Experiment Class
   /// The main purpose of any SampleHandler class is to contain all information required to make MC predictions
   /// for a given set of systematic parameter values. To achieve this, the SampleHandler object reads information
   /// from different input files and keeps track of them in internal data structures.
   /// For flexibility in loading various experiment formats, the function
-  /// @ref SampleHandlerFD::SetupExperimentMC is declared pure virtual.
+  /// @ref SampleHandlerBase::SetupExperimentMC is declared pure virtual.
   ///
   /// ## The Event Struct
-  /// The @ref SampleHandlerFD class stores MC information using the @ref EventInfo struct.
+  /// The @ref SampleHandlerBase class stores MC information using the @ref EventInfo struct.
   /// Some variables of @ref EventInfo, such as @ref EventInfo::KinVar, need to refer to experiment-specific structures.
-  /// This is mostly handled via @ref SampleHandlerFD::GetPointerToKinematicParameter.
+  /// This is mostly handled via @ref SampleHandlerBase::GetPointerToKinematicParameter.
   ///
   /// # Setting Up Systematics
   /// Systematic parameters are handled via @ref TypeParameterBase.
   /// Note that the actual parameters, including prior values and errors,
   /// are defined in @ref ParameterHandlerGeneric. However, their impact
-  /// on samples is largely implemented in @ref SampleHandlerFD.
+  /// on samples is largely implemented in @ref SampleHandlerBase.
   ///
   /// ## Norm Parameters
   /// @ref NormParameter are Simple parameters that work as normalizations for subsets of events.
@@ -886,27 +906,26 @@
   ///     Type: Norm
   /// @endcode
   ///
-  /// The actual bins are defined when calling @ref SampleHandlerFD::SetupNormParameters,
-  /// while the actual values of TrueQ2 are returned using @ref SampleHandlerFD::ReturnKinematicParameter.
+  /// The actual bins are defined when calling @ref SampleHandlerBase::SetupNormParameters,
+  /// while the actual values of TrueQ2 are returned using @ref SampleHandlerBase::ReturnKinematicParameter.
   ///
   /// ## Spline Parameters
   /// @ref SplineParameter or response functions are parameters with more complex behavior, often requiring
   /// calculations of higher-order polynomials. Several types of interpolation are available via
   /// @ref SplineInterpolation. Actual weights are calculated via the Spline class, either in a binned
   /// approach via @ref BinnedSplineHandler or event-by-event via @ref SMonolith.
-  /// Initialization is handled via @ref SampleHandlerFD::SetupSplines.
+  /// Initialization is handled via @ref SampleHandlerBase::SetupSplines.
   ///
   /// ## Oscillation Parameter
   /// @ref OscillationParameter are handled via @ref OscillationHandler, which is a wrapper around
   /// [NuOscillator](https://github.com/dbarrow257/NuOscillator). This library provides access
   /// to a variety of oscillation engines.
-  /// @warning Parameters must be defined exactly as expected by [NuOscillator](https://github.com/dbarrow257/NuOscillator)!
   ///
   /// ## FunctionalParameters
   /// @ref FunctionalParameter represent shifts to kinematical variables or other complex responses
   /// that are not handled by other parameter types. Shifts are applied via
-  /// @ref SampleHandlerFD::ApplyShifts (virtual), which can be overridden to implement custom responses.
-  /// Functional parameters must be registered via @ref SampleHandlerFD::RegisterIndividualFunctionalParameter.
+  /// @ref SampleHandlerBase::ApplyShifts (virtual), which can be overridden to implement custom responses.
+  /// Functional parameters must be registered via @ref SampleHandlerBase::RegisterIndividualFunctionalParameter.
   /// This informs MaCh3 which functional parameters are available; the configuration file determines which are actually used.
   ///
   /// ## Special Step Proposal

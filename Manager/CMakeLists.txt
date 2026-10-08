@@ -2,10 +2,12 @@ set(HEADERS
     Manager.h
     MaCh3Modes.h
     YamlHelper.h
+    TablePrinter.h
     MaCh3Logger.h
     Monitor.h
     MaCh3Exception.h
     gpuUtils.cuh
+    Random.h
     Core.h
 )
 

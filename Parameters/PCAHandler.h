@@ -69,8 +69,7 @@ class PCAHandler{
   void TransferToParam();
 
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
-  void ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
-                       double** throwMatrixCholDecomp,
+  void ThrowParameters(double** throwMatrixCholDecomp,
                        double* randParams,
                        double* corr_throw,
                        const std::vector<double>& fPreFitValue,

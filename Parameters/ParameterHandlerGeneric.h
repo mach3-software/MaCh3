@@ -33,7 +33,10 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief Returns enum describing our param type
     /// @param i parameter index
     SystType GetParamType(const int i) const {return _fParamType[i];}
-
+    /// @brief Returns group of param
+    /// @param i parameter index
+    std::string GetParamGroup(const int i) const{return _ParameterGroup[i];};
+  
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}
@@ -82,6 +85,8 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName) const;
     /// @brief KS: Grab the Spline parameters for the relevant SampleName
     const std::vector<SplineParameter> GetSplineParsFromSampleName(const std::string& SampleName) const;
+    /// @brief KS Grab the Osc parameters for the relevant SampleName
+    const std::vector<OscillationParameter> GetOscParsFromSampleName(const std::string& SampleName) const;
 
     /// @brief Checks if parameter belongs to a given group
     /// @param i parameter index
@@ -121,9 +126,6 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Name Name of TFile to which we save stuff
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
-
-    /// @brief Get pointers to Osc params from Sample name
-    std::vector<const M3::float_t*> GetOscParsFromSampleName(const std::string& SampleName) const;
 
   protected:
     /// @brief Initialisation of the class using config

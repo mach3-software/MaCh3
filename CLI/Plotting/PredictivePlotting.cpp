@@ -134,6 +134,7 @@ void PretifyHistogram(TH1* Hist, const std::string& SampleName) {
   Hist->SetTitle(PlotMan->style().prettifySampleName(SampleName).c_str());
   auto BinWidthScale = PlotMan->style().getBinWidthScale(Hist->GetXaxis()->GetTitle());
   auto PrettyX = PlotMan->style().prettifyKinematicName(Hist->GetXaxis()->GetTitle());
+  PlotMan->style().setTH1XRange(Hist);
   Hist->GetXaxis()->SetTitle(PrettyX.c_str());
   Hist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", BinWidthScale).c_str());
   M3::ScaleHistogram(Hist, BinWidthScale);
@@ -252,6 +253,7 @@ void OverlayViolin(const YAML::Node& Settings,
         ViolinHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         ViolinHist[iFile]->SetFillStyle(1001);
+        PlotMan->style().setTH1XRange(ViolinHist[iFile].get());
         ViolinHist[iFile]->GetXaxis()->SetTitle(PlotMan->style().prettifyKinematicName(
                                                 ViolinHist[iFile]->GetXaxis()->GetTitle()).c_str());
         ViolinHist[iFile]->GetYaxis()->SetTitle("Events");
@@ -346,6 +348,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
         }
         PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>((HistLocation).c_str()));
         Integral[iFile] = PredHist[iFile]->Integral();
+        PlotMan->style().setTH1XRange(PredHist[iFile].get());
         PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
@@ -389,6 +392,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
         RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
         RatioPlot[ig]->SetFillStyle(1001);
         RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
+        PlotMan->style().setTH1XRange(RatioPlot[ig].get());
         auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
         RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
         RatioPlot[ig]->SetBit(TH1D::kNoTitle);

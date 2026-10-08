@@ -18,7 +18,7 @@ set_target_properties(MaCh3NuDock PROPERTIES
 CPMAddPackage(
     NAME NuDock
     GITHUB_REPOSITORY "NuDock/nudock"
-    GIT_TAG "0eef1a49df06b3a714ed2a9fc1cbed6f3151144d"
+    GIT_TAG "v0.0.2-mach3"
     GIT_SHALLOW NO
     GIT_SUBMODULES_RECURSE ON
 )

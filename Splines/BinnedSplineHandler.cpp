@@ -1,7 +1,9 @@
 #include "BinnedSplineHandler.h"
 #include <memory>
 
-#pragma GCC diagnostic ignored "-Wuseless-cast"
+#ifdef MaCh3_CUDA
+#include "Splines/gpuSplineUtils.cuh"
+#endif
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
@@ -9,8 +11,10 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TH3F.h"
 _MaCh3_Safe_Include_End_ //}
 
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 //****************************************
-BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, MaCh3Modes *Modes_) : SplineBase() {
+BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, MaCh3Modes *Modes_, bool Use_GPU) : SplineBase(Use_GPU) {
 //****************************************
   if (!ParHandler_) {
     MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized covariance object");
@@ -27,16 +31,24 @@ BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, M
   // Keep these in class scope, important for using 1 monolith/sample!
   MonolithIndex = 0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
   CoeffIndex = 0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
-  isflatarray = nullptr;
 }
 
 //****************************************
-BinnedSplineHandler::~BinnedSplineHandler(){
+BinnedSplineHandler::~BinnedSplineHandler() {
 //****************************************
   if(manycoeff_arr != nullptr) delete[] manycoeff_arr;
   if(xcoeff_arr != nullptr) delete[] xcoeff_arr;
-  if(SplineSegments != nullptr) delete[] SplineSegments;
-  if(ParamValues != nullptr) delete[] ParamValues;
+  #ifdef MaCh3_CUDA
+  if (useGPU) {
+  //KS: Since we declared them using CUDA alloc we have to free memory using also cuda functions
+  gpu_monolith->CleanupPinnedMemory(nullptr, SplineSegments, ParamValues);
+  delete gpu_monolith;
+  } else
+  #endif
+  {
+    if(SplineSegments != nullptr) delete[] SplineSegments;
+    if(ParamValues != nullptr) delete[] ParamValues;
+  }
 }
 
 //****************************************
@@ -61,7 +73,7 @@ void BinnedSplineHandler::CleanUpMemory() {
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
   CleanVector(UniqueSystIndices);
-  if(isflatarray) delete [] isflatarray;
+  CleanVector(monolith_index);
 }
 
 //****************************************
@@ -179,79 +191,87 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 void BinnedSplineHandler::TransferToMonolith() {
 //****************************************
   PrepForReweight(); 
-  MonolithSize = CountNumberOfLoadedSplines(false, 1);
-
-  if(MonolithSize != MonolithIndex){
+  auto NSplines_All = CountNumberOfLoadedSplines(false, 1);
+  NSplines_valid = CountNumberOfLoadedSplines(true, 0);
+  if (static_cast<unsigned int>(NSplines_All) != MonolithIndex) {
     InvestigateMissingSplines();
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
-    MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
+    MACH3LOG_ERROR("NSplines_valid is {}", NSplines_valid);
     MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  MACH3LOG_INFO("Now transferring splines to a monolith if size {}", MonolithSize);
+  MACH3LOG_INFO("Now transferring splines to a monolith if size {}", NSplines_valid);
   // Maps single spline object with single parameter
-  uniquesplinevec_Monolith.resize(MonolithSize);
-  weightvec_Monolith.resize(MonolithSize);
-  isflatarray = new bool[MonolithSize];
+  paramNo_arr.resize(NSplines_valid);
+  cpu_spline_weights.resize(NSplines_valid);
+  nKnots_arr.resize(NSplines_valid);
+  monolith_index.resize(NSplines_All);
   
-  xcoeff_arr = new M3::float_t[CoeffIndex];
+  xcoeff_arr = new M3::float_t[_max_knots * nParams];
   manycoeff_arr = new M3::float_t[CoeffIndex*_nCoeff_];
 
+  int ValidSplineCounter = 0;
+  int ValidKnotCounter = 0;
   for (const auto& entry : IndexVect) {
     int splineindex = entry.value;
-    weightvec_Monolith[splineindex] = 1.0;
+    if(splinevec_Monolith[splineindex]) {
+      cpu_spline_weights[ValidSplineCounter] = 1.0;
 
-    bool foundUniqueSpline = false;
-    // We are trying to match Spline Object with single parameter (like MAQE)
-    for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
-    {
-      if (SplineFileParPrefixNames[entry.iSample][entry.iSyst] == UniqueSystNames[iUniqueSyst])
-      {
-        uniquesplinevec_Monolith[splineindex] = iUniqueSyst;
-        foundUniqueSpline = true;
-        break;
-      }
-    } //unique syst loop end
-
-    // If current spline object hasn't been matched with actual parameter this means misconfiguration
-    if (!foundUniqueSpline)
-    {
-      MACH3LOG_ERROR("Unique spline index not found");
-      MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[entry.iSample][entry.iSyst]);
-      MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[entry.iSample][entry.iSyst], nParams);
+      bool foundUniqueSpline = false;
+      // We are trying to match Spline Object with single parameter (like MAQE)
       for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
       {
-        MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
-      }//unique syst loop end
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+        if (SplineFileParPrefixNames[entry.iSample][entry.iSyst] == UniqueSystNames[iUniqueSyst])
+        {
+          paramNo_arr[ValidSplineCounter] = static_cast<short int>(iUniqueSyst);
+          foundUniqueSpline = true;
+          break;
+        }
+      } //unique syst loop end
 
-    int splineKnots;
-    if(splinevec_Monolith[splineindex]){
-      isflatarray[splineindex] = false;
-      splineKnots=splinevec_Monolith[splineindex]->GetNp();
+      // If current spline object hasn't been matched with actual parameter this means misconfiguration
+      if (!foundUniqueSpline)
+      {
+        MACH3LOG_ERROR("Unique spline index not found");
+        MACH3LOG_ERROR("For Spline {}", SplineFileParPrefixNames[entry.iSample][entry.iSyst]);
+        MACH3LOG_ERROR("Couldn't match {} with any of the following {} systs:", SplineFileParPrefixNames[entry.iSample][entry.iSyst], nParams);
+        for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
+        {
+          MACH3LOG_ERROR("{},", UniqueSystNames.at(iUniqueSyst));
+        }//unique syst loop end
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
 
-      //Now to fill up our coefficient arrayss
+      monolith_index[splineindex] = ValidSplineCounter;
+      int splineKnots = splinevec_Monolith[splineindex]->GetNp();
+      //Now to fill up our coefficient arrays
       M3::float_t* tmpXCoeffArr = new M3::float_t[splineKnots];
       M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*_nCoeff_];
 
-      int iCoeff=coeffindexvec[splineindex];
       GetSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
 
+      nKnots_arr[ValidSplineCounter] = ValidKnotCounter;
       for(int i = 0; i < splineKnots; i++){
-        xcoeff_arr[iCoeff+i] = tmpXCoeffArr[i];
+        xcoeff_arr[paramNo_arr[ValidSplineCounter]*_max_knots + i] = tmpXCoeffArr[i];
 
         for(int j = 0; j < _nCoeff_; j++){
-          manycoeff_arr[(iCoeff+i)*_nCoeff_+j]=tmpManyCoeffArr[i*_nCoeff_+j];
+          manycoeff_arr[(ValidKnotCounter+i)*_nCoeff_+j]=tmpManyCoeffArr[i*_nCoeff_+j];
         }
       }
+      ValidKnotCounter += splineKnots;
       delete[] tmpXCoeffArr;
       delete[] tmpManyCoeffArr;
+      ValidSplineCounter++;
     } else {
-      isflatarray[splineindex]=true;
+      monolith_index[splineindex] = M3::_BAD_INT_;
     }
   }
+
+  MoveToGPU();
+
+  // initialise spline segment structure
+  SetupSegments();
 }
 
 // *****************************************
@@ -261,8 +281,19 @@ void BinnedSplineHandler::Evaluate() {
   // Find the spline segments
   FindSplineSegment();
 
-  //KS: Huge MP loop over all valid splines
-  CalcSplineWeights();
+  #ifdef MaCh3_CUDA
+  if (useGPU) { // GPU calculations
+    // The main call to the GPU
+    gpu_monolith->RunGPU_SplineMonolith_Binned(
+      cpu_spline_weights.data(),
+      ParamValues,
+      SplineSegments);
+  } else
+  #endif
+  { // CPU-only calculations
+    // KS: Huge MP loop over all valid splines
+    CalcSplineWeights();
+  }
 }
 
 //****************************************
@@ -271,35 +302,35 @@ void BinnedSplineHandler::CalcSplineWeights() {
   #ifdef MULTITHREAD
   #pragma omp parallel for simd
   #endif
-  for (size_t iCoeff = 0; iCoeff < uniquecoeffindices.size(); ++iCoeff)
+  for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
   {
-    const int iSpline = uniquecoeffindices[iCoeff];
-    const short int uniqueIndex = short(uniquesplinevec_Monolith[iSpline]);
-    const short int currentsegment = short(SplineSegments[uniqueIndex]);
+    //CW: Which Parameter we are accessing
+    const short int Param = paramNo_arr[splineNum];
+    //CW: Avoids doing costly binary search on GPU
+    const short int segment = short(SplineSegments[Param]);
 
-    const int segCoeff = coeffindexvec[iSpline]+currentsegment;
-    const int coeffOffset = segCoeff * _nCoeff_;
+    //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
+    const short int segment_X = short(Param*_max_knots+segment);
+
+    //KS: Find knot position in out monolithical structure
+    const unsigned int CurrentKnotPos = (nKnots_arr[splineNum]+segment) * _nCoeff_;
+
     // These are what we can extract from the TSpline3
-    const M3::float_t y = manycoeff_arr[coeffOffset+kCoeffY];
-    const M3::float_t b = manycoeff_arr[coeffOffset+kCoeffB];
-    const M3::float_t c = manycoeff_arr[coeffOffset+kCoeffC];
-    const M3::float_t d = manycoeff_arr[coeffOffset+kCoeffD];
+    const M3::float_t y = manycoeff_arr[CurrentKnotPos+kCoeffY];
+    const M3::float_t b = manycoeff_arr[CurrentKnotPos+kCoeffB];
+    const M3::float_t c = manycoeff_arr[CurrentKnotPos+kCoeffC];
+    const M3::float_t d = manycoeff_arr[CurrentKnotPos+kCoeffD];
 
     // Get the variation for this reconfigure for the i-th parameter
     /// @todo KS: Once could use "ParamValues" but this will result in tiny bit different results due to floating point precision
-    const M3::float_t xvar = (*SplineInfoArray[uniqueIndex].splineParsPointer);
+    const M3::float_t xvar = (*SplineInfoArray[Param].splineParsPointer);
     // The Delta(x) = xvar - x
-    const M3::float_t dx = xvar - xcoeff_arr[segCoeff];
+    const M3::float_t dx = xvar - xcoeff_arr[segment_X];
 
-    //Speedy 1% time boost https://en.cppreference.com/w/c/numeric/math/fma (see ND code!)
-    M3::float_t weight = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
-    //This is the speedy version of writing dx^3+b*dx^2+c*dx+d
-
-    //ETA - do we need this? We check later for negative weights and I wonder if this is even
-    //possible with the fmaf line above?
-    if(weight < 0){weight = 0.;}  //Stops is getting negative weights
-
-    weightvec_Monolith[iSpline] = weight;
+    //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
+    cpu_spline_weights[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
+    // Or for the more "easy to read" version:
+    //cpu_spline_weights[splineNum]  = (fY+dx*(fB+dx*(fC+dx*fD)));
   }
 }
 
@@ -316,40 +347,47 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
       int nModesInSyst = static_cast<int>(SplineModeVecs[iSample][iSyst].size());
       for (int iMode = 0; iMode < nModesInSyst; ++iMode)
       {
-        const int nBins1 = SplineBinning[iSample][iOscChan][0]->GetNbins();
-        const int nBins2 = SplineBinning[iSample][iOscChan][1]->GetNbins();
-        const int nBins3 = SplineBinning[iSample][iOscChan][2]->GetNbins();
-        for (int iVar1 = 0; iVar1 < nBins1; ++iVar1) {
-          for (int iVar2 = 0; iVar2 < nBins2; ++iVar2) {
-            for (int iVar3 = 0; iVar3 < nBins3; ++iVar3) {
-              SplineIndex entry;
-              entry.value    = -1;
-              entry.iSample  = iSample;
-              entry.iOscChan = iOscChan;
-              entry.iSyst    = iSyst;
-              entry.iMode    = iMode;
-              entry.iVar = {iVar1, iVar2, iVar3};
-              IndexVect.push_back(entry);
-              IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, std::vector<int>{iVar1, iVar2, iVar3})] = static_cast<int>(IndexVect.size() - 1);
-            }
-          }
+        const int nDims = static_cast<int>(SplineBinning[iSample][iOscChan].size());
+        std::vector<int> nBins(nDims);
+        for (int iDim = 0; iDim < nDims; ++iDim) {
+          nBins[iDim] = SplineBinning[iSample][iOscChan][iDim]->GetNbins();
         }
-      }
-    }
-  }
+        // Current bin index for each dimension, e.g. {0,0,0} for a 3D spline.
+        std::vector<int> iVar(nDims, 0);
+        // Loop over every possible combination of kinematic bins.
+        while (true)
+        {
+          SplineIndex entry;
+          entry.value    = -1;
+          entry.iSample  = iSample;
+          entry.iOscChan = iOscChan;
+          entry.iSyst    = iSyst;
+          entry.iMode    = iMode;
+          entry.iVar     = iVar;
+
+          IndexVect.push_back(entry);
+          IndexVectMap[std::make_tuple(iSample, iOscChan, iSyst, iMode, iVar)] = static_cast<int>(IndexVect.size() - 1);
+
+          int iDim = nDims - 1;
+          while (iDim >= 0 && ++iVar[iDim] == nBins[iDim]) {
+            iVar[iDim] = 0;
+            --iDim;
+          }
+
+          if (iDim < 0)
+            break;
+        } // Over kinematic variables
+      } // Over modes
+    } // Over systs
+  } // Over channels
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle) {
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName,
+                                                            const std::string& SampleTitle) {
 //****************************************
   int iSample = GetSampleIndex(SampleTitle);
-
-  //Try declaring these outside of TFile so they aren't owned by File
-  constexpr int nDummyBins = 1;
-  constexpr double DummyEdges[2] = {-1e15, 1e15};
-  TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
-  TH2F* Hist2D = nullptr;
-  TH3F* Hist3D = nullptr;
+  TH1* Axis_Hist = nullptr;
 
   auto File = std::unique_ptr<TFile>(TFile::Open(FileName.c_str(), "READ"));
   if (!File || File->IsZombie())
@@ -394,39 +432,29 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
       MACH3LOG_ERROR("Trying to load a 2D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    Hist2D = File->Get<TH2F>(TemplateName.c_str());
+    Axis_Hist = File->Get<TH2F>(TemplateName.c_str());
   }
 
   if (isHist3D)
   {
-    Hist3D = File->Get<TH3F>((TemplateName.c_str()));
-    if (Dimensions[iSample] != 3 && Hist3D->GetZaxis()->GetNbins() != 1)
+    Axis_Hist = File->Get<TH3F>((TemplateName.c_str()));
+    if (Dimensions[iSample] != 3 && Axis_Hist->GetZaxis()->GetNbins() != 1)
     {
       MACH3LOG_ERROR("Trying to load a 3D spline template when nDim={}", Dimensions[iSample]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
+  /// @todo KS: we should remove this hardcoding in future.
+  std::vector<TAxis*> ReturnVec(3);
+  ReturnVec[0] = static_cast<TAxis*>(Axis_Hist->GetXaxis()->Clone());
+  ReturnVec[1] = static_cast<TAxis*>(Axis_Hist->GetYaxis()->Clone());
 
-  std::vector<TAxis*> ReturnVec;
-  // KS: Resize to reduce impact of push back and memory fragmentation
-  ReturnVec.resize(3);
-  if (Dimensions[iSample] == 2) {
-    if (isHist2D) {
-      ReturnVec[0] = static_cast<TAxis*>(Hist2D->GetXaxis()->Clone());
-      ReturnVec[1] = static_cast<TAxis*>(Hist2D->GetYaxis()->Clone());
-      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
-    } else if (isHist3D) {
-      ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
-      ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
-      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
-    }
-  } else if (Dimensions[iSample] == 3) {
-    ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
-    ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
-    ReturnVec[2] = static_cast<TAxis*>(Hist3D->GetZaxis()->Clone());
+  if (Dimensions[iSample] == 3) {
+    ReturnVec[2] = static_cast<TAxis*>(Axis_Hist->GetZaxis()->Clone());
   } else {
-    MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
-    throw MaCh3Exception(__FILE__, __LINE__);
+    // creating dummy binning
+    constexpr double DummyEdges[2] = {-1e15, 1e15};
+    ReturnVec[2] = new TAxis(1, DummyEdges);
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis) {
@@ -434,17 +462,23 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
   }
 
   MACH3LOG_INFO("Left PrintBinning now tidying up");
-  delete DummyAxis;
-
   return ReturnVec;
 }
 
 //****************************************
 const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables) const {
 //****************************************
+  // index in global spline space
   int Index = IndexVectMap.at(std::make_tuple(Variables.iSample, Variables.iOscChan, Variables.iSyst,
                                               Variables.iMode, Variables.iVar));
-  return &weightvec_Monolith[IndexVect[Index].value];
+  // global in space after removing flat splines
+  auto index_flattened = monolith_index[IndexVect[Index].value];
+  // Very unlikely to get response from flat spline. Could perform some optimisation and remove these but leave for now.
+  if(index_flattened == M3::_BAD_INT_) {
+    return &M3::Unity;
+  } else {
+    return &cpu_spline_weights[index_flattened];
+  }
 }
 
 //****************************************
@@ -537,15 +571,13 @@ void BinnedSplineHandler::PrepForReweight() {
     if (FoundNonFlatSpline) {
       UniqueSystNames.push_back(SystName);
     } else {
-      MACH3LOG_INFO("{} syst has no response in sample {}", SystName, entry.iSample);
-      MACH3LOG_INFO("Whilst this isn't necessarily a problem, it seems odd");
+      MACH3LOG_DEBUG("{} syst has no response in sample {}", SystName, entry.iSample);
+      MACH3LOG_DEBUG("Whilst this isn't necessarily a problem, it seems odd");
     }
-  }  // end loop over indices
+  } // end loop over indices
   nParams = static_cast<short int>(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
-  SplineSegments = new short int[nParams]();
-  ParamValues = new float[nParams]();
   SplineInfoArray.resize(nParams);
   for (int iSpline = 0; iSpline < nParams; iSpline++)
   {
@@ -559,16 +591,18 @@ void BinnedSplineHandler::PrepForReweight() {
       UniqueSystSplines[iSpline]->GetKnot(iKnot, xPoint, yPoint);
       SplineInfoArray[iSpline].xPts[iKnot] = xPoint;
     }
-    //ETA - let this just be set as the first segment by default
-    SplineSegments[iSpline] = 0;
-    ParamValues[iSpline] = 0.;
   }
-  
+  M3::Utils::TablePrinter table({{"Spline Index", 10, 15, M3::Utils::Alignment::Left},
+                                {"Syst Name",    10, 20, M3::Utils::Alignment::Left},
+                                {"nKnots",       10,  6, M3::Utils::Alignment::Right}});
+
   MACH3LOG_INFO("nUniqueSysts: {}", nParams);
-  MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", "Spline Index", "Syst Name", "nKnots");
-  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++)
-  {
-    MACH3LOG_INFO("{:<15} | {:<20} | {:<6}", iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
+  for (int iUniqueSyst = 0; iUniqueSyst < nParams; iUniqueSyst++) {
+    table.AddRow(iUniqueSyst, UniqueSystNames[iUniqueSyst], SplineInfoArray[iUniqueSyst].nPts);
+  }
+
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
   }
 
   int nCombinations_FlatSplines = 0;
@@ -623,10 +657,9 @@ void BinnedSplineHandler::GetSplineCoeff_SepMany(int splineindex, M3::float_t* &
   splinevec_Monolith[splineindex] = nullptr;
 }
 
-
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const {
 //****************************************
   for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
     if (SampleTitle == SampleTitles[iSample]) {
@@ -705,8 +738,7 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const {
 
 //****************************************
 std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle,
-                                                              int iOscChan, int EventMode, double Var1Val,
-                                                              double Var2Val, double Var3Val) {
+                                                              int iOscChan, int EventMode, const std::vector<double>& VarVals) {
 //****************************************
   std::vector<SplineIndex> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
@@ -724,9 +756,8 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
   }
 
   std::vector<int> var_bins;
-  std::vector<double> vars = {Var1Val, Var2Val, Var3Val};
-  for (size_t i = 0; i < vars.size(); ++i) {
-    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(vars[i]) - 1;
+  for (size_t i = 0; i < VarVals.size(); ++i) {
+    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(VarVals[i]) - 1;
     if (bin < 0 || bin >= SplineBinning[SampleIndex][iOscChan][i]->GetNbins()) {
       return ReturnVec;
     }
@@ -745,7 +776,7 @@ std::vector<SplineIndex> BinnedSplineHandler::GetEventSplines(const std::string&
                                                     var_bins));
         int splineID = IndexVect[index].value;
         //Also check that the spline isn't flat
-        if(!isflatarray[splineID]) {
+        if(monolith_index[splineID] != M3::_BAD_INT_) {
           SplineIndex idx;
           idx.iSample  = SampleIndex;
           idx.iOscChan = iOscChan;
@@ -798,6 +829,41 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
   return ReturnVec;
 }
 
+//****************************************
+void BinnedSplineHandler::MoveToGPU() {
+//****************************************
+  #ifdef MaCh3_CUDA
+  if(!useGPU) return;
+  gpu_monolith = new SplineMonolithGPU();
+  unsigned int event_size_max = _max_knots * nParams;
+
+  gpu_monolith->InitGPU_SplineMonolith(
+    CoeffIndex,          // How many entries in coefficient array (*4 for the "many" array)
+    NSplines_valid,        // What's the number of splines we have (also number of entries in gpu_nPoints_arr)
+    0,
+    event_size_max       //Knots times event number of unique splines
+  );
+
+  gpu_monolith->CopyToGPU_SplineMonolith_Binned(
+    manycoeff_arr,
+    xcoeff_arr,
+    paramNo_arr,
+    nKnots_arr,
+
+    nParams,
+    NSplines_valid,
+    _max_knots,
+    CoeffIndex);
+
+  // Delete all the coefficient arrays from the CPU once they are on the GPU
+  delete[] manycoeff_arr; manycoeff_arr = nullptr;
+  delete[] xcoeff_arr; xcoeff_arr = nullptr;
+  CleanVector(paramNo_arr);
+  CleanVector(nKnots_arr);
+  MACH3LOG_INFO("Good GPU loading");
+  #endif
+}
+
 void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames)
 {
   int iSample = GetSampleIndex(SampleTitle);
@@ -834,18 +900,15 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       SplineFileNames.insert(FullSplineName);
 
       std::vector<std::string> Tokens = GetTokensFromSplineName(FullSplineName);
-
-      if (Tokens.size() != kNTokens) {
-        MACH3LOG_ERROR("Invalid tokens from spline name - Expected {} tokens. Check implementation in GetTokensFromSplineName()", static_cast<int>(kNTokens));
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
       
       TString Syst = Tokens[kSystToken];
       TString Mode = Tokens[kModeToken];
-      int Var1Bin = std::stoi(Tokens[kVar1BinToken]);
-      int Var2Bin = std::stoi(Tokens[kVar2BinToken]);
-      int Var3Bin = std::stoi(Tokens[kVar3BinToken]);
-      std::vector<int> VarBins = {Var1Bin, Var2Bin, Var3Bin};
+      std::vector<int> VarBins;
+      VarBins.reserve(Tokens.size() - kVarBinToken);
+      for (std::size_t i = kVarBinToken; i < Tokens.size(); ++i) {
+        VarBins.push_back(std::stoi(Tokens.at(i)));
+      }
+
       int SystNum = -1;
       for (unsigned iSyst = 0; iSyst < SplineFileParPrefixNames[iSample].size(); iSyst++) {
         if (Syst == SplineFileParPrefixNames[iSample][iSyst]) {
@@ -869,8 +932,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
       }
 
       if (ModeNum == -1) {
-      //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
-      //     Therefore include as debug warning and continue instead
+        //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+        //     Therefore include as debug warning and continue instead
         MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
         continue;
       }
@@ -895,7 +958,6 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
         //Rather than keeping a mega vector of splines then converting, this should just keep everything nice in memory!
         int index = IndexVectMap.at(std::make_tuple(iSample, iOscChan, SystNum, ModeNum, VarBins));
         IndexVect[index].value = MonolithIndex;
-        coeffindexvec.push_back(CoeffIndex);
         // Should save memory rather saving [x_i_0 ,... x_i_maxknots] for every spline!
         if (isFlat) {
           splinevec_Monolith.push_back(nullptr);
@@ -906,8 +968,8 @@ void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const 
           if(mySpline) delete mySpline;
 
           splinevec_Monolith.push_back(Spline);
-          uniquecoeffindices.push_back(MonolithIndex); //So we can get the unique coefficients and skip flat splines later on!
           CoeffIndex+=nKnots;
+          _max_knots = std::max(_max_knots, static_cast<short int>(nKnots));
         }
         //Incrementing MonolithIndex to keep track of number of valid spline indices
         MonolithIndex+=1;
@@ -960,6 +1022,11 @@ void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
     SplineInfoArray[iSpline].splineParsPointer = ParHandler->RetPointer(UniqueSystIndices[iSpline]);
   }
   SplineFile->Close();
+
+  MoveToGPU();
+
+  // initialise spline segment structure
+  SetupSegments();
 }
 
 // *****************************************
@@ -967,11 +1034,13 @@ void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
 void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
 // *****************************************
   TTree *Settings = SplineFile->Get<TTree>("Settings");
-  int CoeffIndex_temp, MonolithSize_temp;
-  short int nParams_temp;
+  int CoeffIndex_temp;
+  unsigned int NSplines_valid_temp;
+  short int nParams_temp, max_knots_temp;
   Settings->SetBranchAddress("CoeffIndex", &CoeffIndex_temp);
-  Settings->SetBranchAddress("MonolithSize", &MonolithSize_temp);
+  Settings->SetBranchAddress("NSplines_valid", &NSplines_valid_temp);
   Settings->SetBranchAddress("nParams", &nParams_temp);
+  Settings->SetBranchAddress("max_knots", &max_knots_temp);
 
   int SplineBinning_size1, SplineBinning_size2, SplineBinning_size3;
   Settings->SetBranchAddress("SplineBinning_size1", &SplineBinning_size1);
@@ -990,15 +1059,13 @@ void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
   Settings->GetEntry(0);
 
   CoeffIndex = CoeffIndex_temp;
-  MonolithSize = MonolithSize_temp;
+  NSplines_valid = NSplines_valid_temp;
   SampleNames = *SampleNames_temp;
   SampleTitles = *SampleTitles_temp;
   nSplineParams = *nSplineParams_temp;
 
   nParams = nParams_temp;
-
-  SplineSegments = new short int[nParams]();
-  ParamValues = new float[nParams]();
+  _max_knots  = max_knots_temp;
 
   auto Resize3D = [](auto& vec, int d1, int d2, int d3) {
     vec.resize(d1);
@@ -1022,30 +1089,28 @@ void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
 
   manycoeff_arr = new M3::float_t[CoeffIndex * _nCoeff_];
   MonolithTree->SetBranchAddress("manycoeff", manycoeff_arr);
-  isflatarray = new bool[MonolithSize];
-  weightvec_Monolith.resize(MonolithSize);
-  MonolithTree->SetBranchAddress("isflatarray", isflatarray);
+  cpu_spline_weights.resize(NSplines_valid);
+  std::vector<int>* monolith_index_temp = nullptr;
+  MonolithTree->SetBranchAddress("monolith_index", &monolith_index_temp);
 
   // Load vectors
-  std::vector<int>* coeffindexvec_temp = nullptr;
-  MonolithTree->SetBranchAddress("coeffindexvec", &coeffindexvec_temp);
-  std::vector<int>* uniquecoeffindices_temp = nullptr;
-  MonolithTree->SetBranchAddress("uniquecoeffindices", &uniquecoeffindices_temp);
-  std::vector<int>* uniquesplinevec_Monolith_temp = nullptr;
-  MonolithTree->SetBranchAddress("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<unsigned int>* nKnots_arr_temp = nullptr;
+  MonolithTree->SetBranchAddress("nKnots_arr", &nKnots_arr_temp);
+  std::vector<short int>* paramNo_arr_temp = nullptr;
+  MonolithTree->SetBranchAddress("paramNo_arr", &paramNo_arr_temp);
   std::vector<int>* UniqueSystIndices_temp = nullptr;
   MonolithTree->SetBranchAddress("UniqueSystIndices", &UniqueSystIndices_temp);
 
   // Allocate and load xcoeff_arr
-  xcoeff_arr = new M3::float_t[CoeffIndex];
+  xcoeff_arr = new M3::float_t[_max_knots * nParams];
   MonolithTree->SetBranchAddress("xcoeff", xcoeff_arr);
 
   MonolithTree->GetEntry(0);
 
-  coeffindexvec       = *coeffindexvec_temp;
-  uniquecoeffindices  = *uniquecoeffindices_temp;
-  uniquesplinevec_Monolith = *uniquesplinevec_Monolith_temp;
+  nKnots_arr  = *nKnots_arr_temp;
+  paramNo_arr = *paramNo_arr_temp;
   UniqueSystIndices = *UniqueSystIndices_temp;
+  monolith_index = *monolith_index_temp;
 }
 
 // *****************************************
@@ -1136,12 +1201,14 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
 // *****************************************
   TTree *Settings = new TTree("Settings", "Settings");
   int CoeffIndex_temp = CoeffIndex;
-  int MonolithSize_temp = MonolithSize;
+  unsigned int NSplines_valid_temp = NSplines_valid;
   short int nParams_temp = nParams;
+  short int max_knots_temp = _max_knots;
 
   Settings->Branch("CoeffIndex", &CoeffIndex_temp, "CoeffIndex/I");
-  Settings->Branch("MonolithSize", &MonolithSize_temp, "MonolithSize/I");
+  Settings->Branch("NSplines_valid", &NSplines_valid_temp, "NSplines_valid/i");
   Settings->Branch("nParams", &nParams_temp, "nParams/S");
+  Settings->Branch("max_knots", &max_knots_temp, "max_knots/S");
 
   int SplineBinning_size1 = static_cast<int>(SplineBinning.size());
   int SplineBinning_size2 = (SplineBinning_size1 > 0) ? static_cast<int>(SplineBinning[0].size()) : 0;
@@ -1175,19 +1242,23 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
 // *****************************************
 void BinnedSplineHandler::PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const {
 // *****************************************
+  if(manycoeff_arr == nullptr){
+    MACH3LOG_ERROR("{} Will not work as manycoeff_arr is nullptr :(", __func__);
+    MACH3LOG_ERROR("Could be GPU dysfunctionality");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   TTree *MonolithTree = new TTree("MonolithTree", "MonolithTree");
   MonolithTree->Branch("manycoeff", manycoeff_arr, Form("manycoeff[%d]/%s", CoeffIndex * _nCoeff_, M3::float_t_str_repr));
-  MonolithTree->Branch("isflatarray", isflatarray, Form("isflatarray[%d]/O", MonolithSize));
 
-  std::vector<int> coeffindexvec_temp = coeffindexvec;
-  MonolithTree->Branch("coeffindexvec", &coeffindexvec_temp);
-  std::vector<int> uniquecoeffindices_temp = uniquecoeffindices;
-  MonolithTree->Branch("uniquecoeffindices", &uniquecoeffindices_temp);
-  std::vector<int> uniquesplinevec_Monolith_temp = uniquesplinevec_Monolith;
-  MonolithTree->Branch("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<int> monolith_index_temp = monolith_index;
+  MonolithTree->Branch("monolith_index", &monolith_index_temp);
+  std::vector<unsigned int> nKnots_arr_temp = nKnots_arr;
+  MonolithTree->Branch("nKnots_arr", &nKnots_arr_temp);
+  std::vector<short int> paramNo_arr_temp = paramNo_arr;
+  MonolithTree->Branch("paramNo_arr", &paramNo_arr_temp);
   std::vector<int> UniqueSystIndices_temp = UniqueSystIndices;
   MonolithTree->Branch("UniqueSystIndices", &UniqueSystIndices_temp);
-  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", CoeffIndex, M3::float_t_str_repr));
+  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", _max_knots * nParams, M3::float_t_str_repr));
 
   MonolithTree->Fill();
   SplineFile->cd();

@@ -219,8 +219,12 @@ class AdaptiveMCMCHandler
   }
 
   /// Use Robbins-Monro approach?
-  bool GetUseRobbinsMonro() const
+  bool GetStartRobbinsMonro() const
   {
+    return use_robbins_monro && total_steps>start_adaptive_throw && total_steps<end_adaptive_update;
+  }
+
+  bool GetUseRobbinsMonro() const{
     return use_robbins_monro;
   }
 
@@ -285,11 +289,11 @@ private:
   /// Acceptance rate in the current batch
   int acceptance_rate_batch_size;
 
-  /// Use Robbins Monro https://arxiv.org/pdf/1006.3690
-  bool use_robbins_monro;
-
   /// Target acceptance rate for Robbins Monro
   double target_acceptance;
+
+  /// Use Robbins Monro https://arxiv.org/pdf/1006.3690
+  bool use_robbins_monro;
 
   /// Constant "step scaling" factor for Robbins-Monro
   double c_robbins_monro;

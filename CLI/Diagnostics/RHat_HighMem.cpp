@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "Fitters/RHatCalculator.h"
+#include "Fitters/Processing/RHatCalculator.h"
 
 /// @file RHat_HighMem.cpp
 /// @brief This executable calculates the \f$ \hat{R} \f$ estimator for Markov Chain Monte Carlo (MCMC) convergence.

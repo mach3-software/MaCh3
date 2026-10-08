@@ -17,7 +17,7 @@ SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandle
 
   //ETA - safety feature so you can't pass a NULL _ParHandler
   if(!_ParHandler) {
-    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
+    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any model parameter");
   }
   ParHandler = _ParHandler;
   nEvents = 0;
@@ -364,63 +364,17 @@ void SampleHandlerBase::Reweight() {
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
 
-  #ifdef MULTITHREAD
-  // Call entirely different routine if we're running with openMP
-  FillArray_MP();
-  #else
+  // Here we fill weights to MC predictions weights for splines and osc already have been filled
   FillArray();
-  #endif
 
   //KS: If you want to not update W2 wights then uncomment this line
   if(!UpdateW2) FirstTimeW2 = false;
 }
 
-//************************************************
-// Function which does the core reweighting. This assumes that oscillation weights have
-// already been calculated and stored in SampleHandlerBase.osc_w[iEvent]. This
-// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerBase
-// array array which is binned to match the sample binning, such that bin[1][1] is the
-// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
-void SampleHandlerBase::FillArray() {
-//************************************************
-  //DB Reset which cuts to apply
-  Selection = StoredSelection;
-
-  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    ApplyShifts(iEvent);
-    const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
-
-    if (!IsEventSelected(MCEvent->NominalSample, iEvent)) {
-      continue;
-    }
-
-    // Virtual by default does nothing, has to happen before CalcWeightTotal
-    CalcWeightFunc(iEvent);
-
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
-    if (totalweight <= 0.){
-      continue;
-    }
-
-    //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
-
-    //DB Fill relevant part of thread array
-    if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandler_array[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandler_array_w2[GlobalBin] += totalweight*totalweight;
-    }
-  }
-}
-
-#ifdef MULTITHREAD
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloca"
 // ************************************************
-/// Multithreaded version of fillArray @see fillArray()
-void SampleHandlerBase::FillArray_MP() {
+void SampleHandlerBase::FillArray() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
@@ -439,13 +393,14 @@ void SampleHandlerBase::FillArray_MP() {
   // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandler_array_class[yBin][xBin]
   //
   // We will hit <0.1 s/step eventually! :D
-  const auto TotalBins = Binning->GetNBins();
+  [[maybe_unused]] const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
-
+  #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
+  #endif
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -480,11 +435,10 @@ void SampleHandlerBase::FillArray_MP() {
   }
 }
 #pragma GCC diagnostic pop
-#endif
 
 // **************************************************
 // Helper function to reset the data and MC histograms
-void SampleHandlerBase::ResetHistograms() {
+void SampleHandlerBase::ResetHistograms() _noexcept_ {
 // **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
@@ -615,7 +569,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector <std::vector<NormParameter>>& 
       auto& NormParam = norm_parameters[SampleId];
       // Skip oscillated NC events
       // Not strictly needed, but these events don't get included in oscillated predictions, so
-      // no need to waste our time calculating and storing information about xsec parameters
+      // no need to waste our time calculating and storing information about xsec/flux etc. parameters
       // that will never be used.
       if (MCEvents[iEvent].isNC && (MCEvents[iEvent].nupdg != MCEvents[iEvent].nupdgUnosc) ) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
@@ -973,7 +927,7 @@ void SampleHandlerBase::AddData(const int Sample, const std::vector<double>& Dat
 
 // ************************************************
 void SampleHandlerBase::InitialiseNuOscillatorObjects() {
-// ************************************************
+  // ************************************************
   auto NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   auto EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
@@ -985,69 +939,67 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
     }
   }
 
-  std::vector<const M3::float_t *> OscParams{};
+  std::vector<OscillationParameter> OscParams{};
   for (int iSample = 0; iSample < GetNSamples(); iSample++) {
-    auto sample_osc_pars =
-        ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
+    auto sample_osc_pars = ParHandler->GetOscParsFromSampleName(GetSampleName(iSample));
     if (!iSample) {
       if (sample_osc_pars.empty()) {
-        MACH3LOG_ERROR("OscParams is empty for SampleHandler/Sample {}/{}.",
-                       GetName(), GetSampleName(iSample));
-        MACH3LOG_ERROR(
-            "This indicates an error in your oscillation YAML configuration.");
+        MACH3LOG_ERROR("OscParams is empty for SampleHandler/Sample {}/{}.", GetName(), GetSampleName(iSample));
+        MACH3LOG_ERROR("This indicates an error in your oscillation YAML configuration.");
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       OscParams = sample_osc_pars;
     } else {
       if (sample_osc_pars.size() != OscParams.size()) {
-        MACH3LOG_ERROR("SampleHandler/Sample {}/{} has {} osc params while "
-                       "Sample {} has {}",
-                       GetName(), GetSampleName(iSample),
-                       sample_osc_pars.size(), 0, GetSampleName(0));
+        MACH3LOG_ERROR("SampleHandler/Sample {}/{} has {} osc params while Sample {} has {}",
+                        GetName(), GetSampleName(iSample), sample_osc_pars.size(), 0, GetSampleName(0));
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }
   }
 
-  if (EqualBinningPerOscChannel) {
-    Oscillator = std::make_shared<OscillationHandler>(
-        NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams);
-  } else {
+  std::vector<const M3::float_t*> OscParamsValues(OscParams.size());
+  std::vector<std::string> NuOscName(OscParams.size());
+  for(size_t ij = 0; ij < OscParams.size(); ij++){
+    OscParamsValues[ij] = ParHandler->RetPointer(OscParams[ij].index);
+    NuOscName[ij] = OscParams[ij].NuOscName;
+  }
 
+  if (EqualBinningPerOscChannel) {
+    Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParamsValues,
+                                                      NuOscName, GetNOscChannels(0));
+  } else {
     // aim is to build energy/cosz arrays per oscillation channel so that
     // NuOscillator can decide on the binning
     std::vector<std::map<std::pair<int, int>, std::vector<M3::float_t>>>
-        channel_energy_array(GetNSamples()),
-        channel_cosz_array(GetNSamples());
+    channel_energy_array(GetNSamples()),
+    channel_cosz_array(GetNSamples());
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
       if (MCEvents[iEvent].NominalSample >= GetNSamples()) {
         MACH3LOG_ERROR("Encountered Event with NominalSample: {}, but "
-                       "SampleHandler {} only has {} samples.",
-                       MCEvents[iEvent].NominalSample, GetName(),
-                       GetNSamples());
+        "SampleHandler {} only has {} samples.",
+        MCEvents[iEvent].NominalSample, GetName(),
+                        GetNSamples());
         throw MaCh3Exception(__FILE__, __LINE__);
       }
 
       if (MCEvents[iEvent].isNC) { // skip NC events
         continue;
       }
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
       channel_energy_array[MCEvents[iEvent].NominalSample] // sample
-                          [std::make_pair(MCEvents[iEvent].nupdgUnosc,
-                                          MCEvents[iEvent].nupdg)] // osc chan
-                              .push_back(M3::float_t(
-                                  MCEvents[iEvent].enu_true)); // energy
+      [std::make_pair(MCEvents[iEvent].nupdgUnosc,
+                      MCEvents[iEvent].nupdg)] // osc chan
+                      .push_back(M3::float_t(MCEvents[iEvent].enu_true)); // energy
 
       // DB Atmospheric only part, can only happen if truecz has been
       // initialised within the experiment specific code
       if (MCEvents[0].coszenith_true != M3::_BAD_DOUBLE_) {
         channel_cosz_array[MCEvents[iEvent].NominalSample] // sample
-                          [std::make_pair(MCEvents[iEvent].nupdgUnosc,
-                                          MCEvents[iEvent].nupdg)] // osc chan
-                              .push_back(M3::float_t(
-                                  MCEvents[iEvent].coszenith_true)); // cosz
+        [std::make_pair(MCEvents[iEvent].nupdgUnosc,
+                        MCEvents[iEvent].nupdg)] // osc chan
+                        .push_back(M3::float_t(MCEvents[iEvent].coszenith_true)); // cosz
       }
 #pragma GCC diagnostic pop
     }
@@ -1061,38 +1013,34 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
       // them if not
       for (auto const &[osc_flavs, energies] : channel_energy_array[iSample]) {
         bool found = false;
-        for (size_t i = 0; i < SampleDetails[iSample].OscChannels.size();
-             ++i) {
-          if (osc_flavs.first ==
-                  SampleDetails[iSample].OscChannels[i].InitPDG &&
-              osc_flavs.second ==
-                  SampleDetails[iSample].OscChannels[i].FinalPDG) {
+        for (size_t i = 0; i < SampleDetails[iSample].OscChannels.size(); ++i) {
+          if (osc_flavs.first == SampleDetails[iSample].OscChannels[i].InitPDG &&
+            osc_flavs.second == SampleDetails[iSample].OscChannels[i].FinalPDG) {
             found = true;
             break;
           }
         }
-        if(found){ // already have this channel defined.
+        if(found) { // already have this channel defined.
           continue;
         }
 
-        static const std::map<int, std::pair<std::string, std::string>>
-            spec_defnames = {
-                {12, {"nue", "#nu_{e}"}},
-                {-12, {"nueb", "#bar{#nu}_{e}"}},
-                {14, {"numu", "#nu_{#mu}"}},
-                {-14, {"nuemub", "#bar{#nu}_{#mu}"}},
-                {16, {"nutau", "#nu_{#tau}"}},
-                {-16, {"nutaub", "#bar{#nu}_{#tau}"}},
-            };
+        static const std::map<int, std::pair<std::string, std::string>> spec_defnames = {
+          {12, {"nue", "#nu_{e}"}},
+          {-12, {"nueb", "#bar{#nu}_{e}"}},
+          {14, {"numu", "#nu_{#mu}"}},
+          {-14, {"nuemub", "#bar{#nu}_{#mu}"}},
+          {16, {"nutau", "#nu_{#tau}"}},
+          {-16, {"nutaub", "#bar{#nu}_{#tau}"}},
+        };
 
         OscChannelInfo oci;
         oci.InitPDG = osc_flavs.first;
         oci.FinalPDG = osc_flavs.second;
         oci.flavourName = fmt::format("{}_x_{}", spec_defnames.at(osc_flavs.first).first,
-                               spec_defnames.at(osc_flavs.second).first);
+                                      spec_defnames.at(osc_flavs.second).first);
         oci.flavourName_Latex =
-            fmt::format("{} #rightarrow {}", spec_defnames.at(osc_flavs.first).second,
-                 spec_defnames.at(osc_flavs.second).second);
+        fmt::format("{} #rightarrow {}", spec_defnames.at(osc_flavs.first).second,
+                    spec_defnames.at(osc_flavs.second).second);
         oci.ChannelIndex = double(SampleDetails[iSample].OscChannels.size());
 
         SampleDetails[iSample].OscChannels.push_back(oci);
@@ -1100,9 +1048,8 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
 
       // set up oscillator for this sample
       if (!Oscillator) {
-        Oscillator = std::make_shared<OscillationHandler>(
-            NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams,
-            GetNOscChannels(iSample));
+        Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParamsValues,
+                                                          NuOscName, GetNOscChannels(iSample));
       } else {
         Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
       }
@@ -1115,12 +1062,11 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
         std::sort(energies.begin(), energies.end());
         std::sort(channel_cosz_array[iSample][osc_flavs].begin(),
                   channel_cosz_array[iSample][osc_flavs].end());
-        Oscillator->SetOscillatorBinning(
-            iSample, iChannel, energies,
-            channel_cosz_array[iSample][osc_flavs]);
+        Oscillator->SetOscillatorBinning(iSample, iChannel, energies,
+                                         channel_cosz_array[iSample][osc_flavs]);
       }
-    }
-  }
+    } // end loop over samples
+  } // end EqualBinningPerOscChannel
 }
 
 // ************************************************
@@ -1229,10 +1175,10 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
   std::vector< SplineIndex > EventSplines;
   switch(GetNDim(SampleIndex)) {
     case 1:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), 0.);
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), 0.});
       break;
     case 2:
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
     default:
       if(ThrowCrititcal) {
@@ -1240,7 +1186,7 @@ std::vector< SplineIndex > SampleHandlerBase::GetSplineBins(int Event, BinnedSpl
         MACH3LOG_CRITICAL("Will use 2D like approach");
         ThrowCrititcal = false;
       }
-      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1]));
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, {Etrue, *(MCEvents[Event].KinVar[0]), *(MCEvents[Event].KinVar[1])});
       break;
   }
   return EventSplines;
@@ -1414,8 +1360,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
     SetSplinePointers();
 
     BinnedSplines->CleanUpMemory();
-  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
-    (void) UnbinnedSpline;
+  } else if (dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     SetSplinePointers();
   } else {
     MACH3LOG_ERROR("Unsupported spline type encountered.");

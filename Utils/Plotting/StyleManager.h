@@ -60,7 +60,7 @@ public:
   };
 
   /// @brief Get bin-width scaling factor for a given kinematic variable
-  /// @param variable Name of the kinematic variable (e.g. RecoNeutrinoEnergy, TrueQ2)
+  /// @param Name Name of the kinematic variable (e.g. RecoNeutrinoEnergy, TrueQ2)
   double getBinWidthScale(const std::string &Name) const;
 
   // style setting options
@@ -70,7 +70,7 @@ public:
   void setPalette(const int rootPlotStyle) const;
 
   /// @brief Set the root colour palette to one of the ones defined in the style config
-  /// @param rootPlotStyle The name of the palette you want to use, should be the same as it appears
+  /// @param configStyleName The name of the palette you want to use, should be the same as it appears
   /// in the style config
   void setPalette(const std::string& configStyleName) const;
 
@@ -79,6 +79,9 @@ public:
   /// @param styleName The name of the style you want to use, as it appears in the config file
   void setTH1Style(TH1 *hist, const std::string& styleName) const;
 
+  /// @brief Set plotting range for histogram
+  /// @param hist The TH1 that you wish to modify
+  void setTH1XRange(TH1 *hist) const;
 private:
   YAML::Node _styleConfig;
 

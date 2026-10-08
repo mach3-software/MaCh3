@@ -45,5 +45,23 @@ namespace M3 {
                 }
                 return (*this);
             }
+
+            /// @brief Return all long option names (--xxx) registered with this parser
+            std::vector<std::string> get_long_option_names() const {
+                std::vector<std::string> names;
+                for (const auto& [name, _] : this->m_argument_map) {
+                    if (name.size() >= 2 && name[0] == '-' && name[1] == '-')
+                        names.push_back(name);
+                }
+                return names;
+            }
+
+            /// @brief Return true if the named option expects a value (not a flag)
+            bool option_takes_value(const std::string& name) const {
+                auto it = this->m_argument_map.find(name);
+                if (it == this->m_argument_map.end()) return false;
+                // get_usage_full() appends a metavar when max nargs > 0
+                return it->second->get_usage_full().find(' ') != std::string::npos;
+            }
     };
 }

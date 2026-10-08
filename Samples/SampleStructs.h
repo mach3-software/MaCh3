@@ -177,14 +177,15 @@ struct KinematicCut {
 
 // ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
+/// @note members are assigned in order code access them, be careful in changing order
 struct BinShiftLookup {
 // ***************************
   /// lower to check if shift has moved the event to different bin
   double lower_binedge = M3::_BAD_DOUBLE_;
-  /// lower to check if shift has moved the event to different bin
-  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_binedge = M3::_BAD_DOUBLE_;
+  /// lower to check if shift has moved the event to different bin
+  double lower_lower_binedge = M3::_BAD_DOUBLE_;
   /// upper to check if shift has moved the event to different bin
   double upper_upper_binedge = M3::_BAD_DOUBLE_;
 };
@@ -256,7 +257,7 @@ struct SampleBinningInfo {
   bool Uniform = true;
   /// Bins used only for non-uniform
   std::vector<BinInfo> Bins;
-  /// This grid tells what bins are associated with with what BinEdges of Grid Binnins
+  /// This grid tells what bins are associated with with what BinEdges of Grid Binnings
   std::vector<std::vector<int>> BinGridMapping;
 
   /// @brief Initialise Uniform Binning
@@ -570,7 +571,7 @@ struct SampleBinningInfo {
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
-  int FindBin(const int Dimension, const double Var, const int NomBin) const {
+  int FindBin(const int Dimension, const double Var, const int NomBin) const _noexcept_ {
     return FindBin(Var, NomBin, AxisNBins[Dimension], BinEdges[Dimension], BinLookup[Dimension]);
   }
 
@@ -586,7 +587,7 @@ struct SampleBinningInfo {
               const int NomBin,
               const int N_Bins,
               const std::vector<double>& Bin_Edges,
-              const std::vector<BinShiftLookup>& Bin_Lookup) const {
+              const std::vector<BinShiftLookup>& Bin_Lookup) const _noexcept_ {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
     if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {

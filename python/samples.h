@@ -341,7 +341,6 @@ public:
 };
 
 void initSamplesModule(py::module &m_samples){
-
     // Bind the systematic type enum that lets us set different types of systematics
     py::enum_<TestStatistic>(m_samples, "TestStatistic")
         .value("Poisson", TestStatistic::kPoisson)
@@ -471,7 +470,6 @@ void initSamplesModule(py::module &m_samples){
 
                 auto edges = HistToNumpy(hist_original);
                 return edges;
-
             },
             py::arg("Dimension"),
             "Get Data histogram as numpy arrays.\n"
@@ -504,7 +502,6 @@ void initSamplesModule(py::module &m_samples){
                                     int WeightStyle = 0,
                                     const std::vector< KinematicCut >& SubEventSelectionVec = {})
             {
-
                 py::array_t<M3::float_t> edgesY, edgesX, contents;
                 std::unique_ptr<TH1> hist;
                 int dim;

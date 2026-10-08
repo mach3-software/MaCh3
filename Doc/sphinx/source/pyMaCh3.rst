@@ -5,8 +5,8 @@ pyMaCh3
    :maxdepth: 4
 
    manager.rst
-   sample-pdf.rst
+   samples.rst
    splines.rst
-   fitter.rst
-   covariance.rst
+   fitters.rst
+   parameters.rst
    plotting.rst

@@ -30,7 +30,7 @@ namespace M3 {
     /// @brief Alias for IPlugin, used for core modules
     typedef IPlugin IModule;
 
-    /// @class IModuleBase
+    /// @class PluginBase
     /// @brief Base class for core modules in MaCh3
     ///
     /// This class provides a common interface for core modules, allowing them
