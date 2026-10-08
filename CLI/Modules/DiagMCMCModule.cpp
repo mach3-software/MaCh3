@@ -14,15 +14,22 @@ namespace M3{
 
   MaCh3ArgumentParser* DiagMCMCModule::get_parser(){
     m_parser = std::make_unique<MaCh3ArgumentParser>("diag", "1.0", argparse::default_arguments::help);
+    m_default_parser = std::make_unique<MaCh3ArgumentParser>("diag__default__", "1.0", argparse::default_arguments::help);
+    m_default_parser->set_suppress(true);
+    m_parser->add_subparser(*m_default_parser.get());
+    m_parser->add_subparser(*m_plotModule.get_parser());
+    m_parser->set_default_subcommand(m_default_parser->name());
     m_parser->add_description("Tool for MCMC diagnostic like autocorrelations.");
-    m_parser->add_argument("mcmc-output")
+    m_default_parser->add_argument("mcmc-output")
       .help("MCMC chain root file.")
       .metavar("MCMC_CHAIN")
       .required();
-    m_parser->add_argument("config")
+    m_default_parser->add_argument("config")
       .help("Config file.")
       .metavar("CONFIG")
       .required();
+    m_default_parser->add_epilog("Optional subcommands:\n"
+                                 "  plot        Tool for plotting MCMC diagnostic like autocorrelations.");
     return m_parser.get();
   }
 
@@ -31,10 +38,11 @@ namespace M3{
   /// @param inputFile MCMC Chain
   /// @param config Config file with settings
   int DiagMCMCModule::Run() {
+    if (m_parser->is_subcommand_used("plot")) return m_plotModule.Run();
     SetMaCh3LoggerFormat();
     MACH3LOG_INFO("Producing single fit output");
-    std::string inputFile = m_parser->get<std::string>("mcmc-output");
-    std::string config = m_parser->get<std::string>("config");
+    std::string inputFile = m_default_parser->get<std::string>("mcmc-output");
+    std::string config = m_default_parser->get<std::string>("config");
 
     MACH3LOG_INFO("File for study: {}", inputFile);
 

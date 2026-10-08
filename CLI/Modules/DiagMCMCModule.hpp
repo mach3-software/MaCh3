@@ -3,6 +3,7 @@
 
 #pragma once
 #include "CLI/API/plugin.hpp"
+#include "CLI/Modules/DiagMCMCPlotModule.hpp"
 
 namespace M3{
 
@@ -24,5 +25,8 @@ namespace M3{
       /// @brief Execute the MCMC diagnostics
       /// @return Exit code (0 on success)
       int Run() override;
+    private:
+      std::unique_ptr<MaCh3ArgumentParser> m_default_parser;
+      DiagMCMCPlotModule m_plotModule;
   };
 }

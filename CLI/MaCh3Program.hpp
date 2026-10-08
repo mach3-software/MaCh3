@@ -26,6 +26,10 @@ namespace M3{
     class MaCh3Program: public MaCh3ArgumentParser{
         public:
             using MaCh3ArgumentParser::MaCh3ArgumentParser;
+            using MaCh3ArgumentParser::parse_args;
+
+            /// @brief Parse args after inserting any default subcommands
+            void parse_args(int argc, const char *const argv[]);
 
             /// @brief Destructor that unloads all dynamic plugins
             virtual ~MaCh3Program(){

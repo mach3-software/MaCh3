@@ -73,6 +73,12 @@ namespace M3{
         }
     }
 
+    void MaCh3Program::parse_args(int argc, const char *const argv[]) {
+        std::vector<std::string> args(argv, argv + argc);
+        this->insert_default_subcommands(args);
+        MaCh3ArgumentParser::parse_args(args);
+    }
+
     // void MaCh3Program::parse_args(int argc, const char *const argv[]) {
     //     try{
     //         MaCh3ArgumentParser::parse_args(argc, argv);
@@ -161,19 +167,14 @@ namespace M3{
     ///
     /// @return Exit code from the executed module (0 on success)
     int MaCh3Program::Run(){
-        const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
-        
-        if (sub_parser){
-            auto plugin_itr = m_module_map.find(&sub_parser);
-            if (plugin_itr != m_module_map.end()){
-                return plugin_itr->second->Run();
-            }
-            auto dplugin_itr = m_dynamic_plugin_map.find(&sub_parser);
-            if (dplugin_itr != m_dynamic_plugin_map.end()){
-                return dplugin_itr->second->Run();
-            }
+        // Dispatch to the top-level module; modules handle their own nested subcommands
+        for (const auto& [parser, module] : m_module_map) {
+            if (this->is_subcommand_used(*parser)) return module->Run();
         }
-        return 0;        
+        for (const auto& [parser, dplugin] : m_dynamic_plugin_map) {
+            if (this->is_subcommand_used(*parser)) return dplugin->Run();
+        }
+        return 0;
     }
 
 

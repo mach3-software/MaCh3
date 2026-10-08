@@ -6,6 +6,7 @@
 add_library(CLIModules SHARED
     ProcessMCMCModule.cpp
     DiagMCMCModule.cpp
+    DiagMCMCPlotModule.cpp
     GetPenaltyTermModule.cpp
     RHatModule.cpp
     SmearModule.cpp
