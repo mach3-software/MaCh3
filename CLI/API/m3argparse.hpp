@@ -25,6 +25,12 @@ namespace M3 {
                 return this->m_program_name;
             }
 
+            /// @brief Get the description of this parser/subcommand
+            /// @return The description string
+            const std::string& description() const{
+                return this->m_description;
+            }
+
             /// @brief Get the list of registered subparsers
             /// @return Reference to the list of subparsers
             const std::list<std::reference_wrapper<ArgumentParser>>& subparsers() const{
@@ -47,6 +53,7 @@ namespace M3 {
             }
 
             /// @brief Set a subcommand to use when none of the registered subcommands is given
+            /// @param name Name of the default subcommand
             void set_default_subcommand(const std::string& name){
                 m_default_subcommand = name;
             }
