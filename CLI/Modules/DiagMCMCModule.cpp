@@ -17,7 +17,8 @@ namespace M3{
     m_default_parser = std::make_unique<MaCh3ArgumentParser>("diag__default__", "1.0", argparse::default_arguments::help);
     m_default_parser->set_suppress(true);
     m_parser->add_subparser(*m_default_parser.get());
-    m_parser->add_subparser(*m_plotModule.get_parser());
+    auto* plotParser = m_plotModule.get_parser();
+    m_parser->add_subparser(*plotParser);
     m_parser->set_default_subcommand(m_default_parser->name());
     m_parser->add_description("Tool for MCMC diagnostic like autocorrelations.");
     m_default_parser->add_argument("mcmc-output")
@@ -28,8 +29,7 @@ namespace M3{
       .help("Config file.")
       .metavar("CONFIG")
       .required();
-    m_default_parser->add_epilog("Optional subcommands:\n"
-                                 "  plot        Tool for plotting MCMC diagnostic like autocorrelations.");
+    m_default_parser->add_epilog("Optional subcommands:\n  " + plotParser->name() + "        " + plotParser->description());
     return m_parser.get();
   }
 
