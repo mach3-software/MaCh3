@@ -11,6 +11,7 @@
 #include "CLI/Modules/SmearModule.hpp"
 #include "CLI/Modules/ReweightModule.hpp"
 #include "CLI/Modules/CombineModule.hpp"
+#include "CLI/Modules/Plot/PlotModule.hpp"
 #include "CLI/MaCh3Program.hpp"
 
 /// @brief Main entry point for the MaCh3 application
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
     M3::SmearModule smear;
     M3::ReweightModule reweight;
     M3::CombineModule combine;
+    M3::PlotModule plot;
 
     program.add_core_module(proc);
     program.add_core_module(diag);
@@ -49,6 +51,7 @@ int main(int argc, char *argv[]) {
     program.add_core_module(smear);
     program.add_core_module(reweight);
     program.add_core_module(combine);
+    program.add_core_module(plot);
     program.load_dynamic_plugins();
 
     try {
