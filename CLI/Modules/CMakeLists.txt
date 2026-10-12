@@ -2,6 +2,7 @@
 #     ProcessMCMCPlugin.hpp
 # )
 
+add_subdirectory(Plot)
 
 add_library(CLIModules SHARED
     ProcessMCMCModule.cpp
