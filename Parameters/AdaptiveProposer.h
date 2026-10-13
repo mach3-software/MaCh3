@@ -26,8 +26,11 @@ struct AdaptiveProposer {
     Eigen::MatrixXd accepted_parameter_covariance;
     Eigen::MatrixXd M2;
 
-    bool ShouldUpdateProposalMatrix() const {
-      return proposal_update_interval > 0 && nsteps_added > 0 && nsteps_added % proposal_update_interval == 0;
+    bool ShouldUpdateProposalMatrix(int proposal_dimension) const {
+      return proposal_update_interval > 0 &&
+      nsteps_added > 0 &&
+      nsteps_added % proposal_update_interval == 0 &&
+      nsteps_added >= proposal_dimension + 1;
     }
 
     void UpdateRunningEstimates(Eigen::ArrayXd const &params);

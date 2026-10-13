@@ -158,7 +158,7 @@ void StepProposer::Accept() {
   proposal_basis.current = proposal_basis.proposed;
   if (adaptive.enabled) {
     adaptive.UpdateRunningEstimates(proposal_basis.current);
-    if (adaptive.ShouldUpdateProposalMatrix()) {
+    if (adaptive.ShouldUpdateProposalMatrix(NumProposalBasisParameters())) {
       SetProposalMatrix(adaptive.accepted_parameter_covariance * adaptive.proposal_scale * adaptive.proposal_scale);
     }
   }
@@ -167,7 +167,7 @@ void StepProposer::Accept() {
 void StepProposer::Reject() {
   if (adaptive.enabled) {
     adaptive.UpdateRunningEstimates(proposal_basis.current);
-    if (adaptive.ShouldUpdateProposalMatrix()) {
+    if (adaptive.ShouldUpdateProposalMatrix(NumProposalBasisParameters())) {
       SetProposalMatrix(adaptive.accepted_parameter_covariance * adaptive.proposal_scale * adaptive.proposal_scale);
     }
   }
