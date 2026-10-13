@@ -7,6 +7,7 @@
 #include "CLI/Modules/Plot/LLHModule.hpp"
 #include "CLI/Modules/Plot/PostFitParamModule.hpp"
 #include "CLI/Modules/Plot/MatrixModule.hpp"
+#include "CLI/Modules/Plot/SigmaVariation.hpp"
 
 namespace M3{
 
@@ -33,5 +34,6 @@ namespace M3{
       LLHModule m_llhModule;
       PostFitParamModule m_postFitParamModule;
       MatrixModule m_matrixModule;
+      SigmaVariation m_sigmaVariation;
   };
 }
