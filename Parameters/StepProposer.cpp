@@ -2,7 +2,6 @@
 
 StepProposer::StepProposer() {
   special_proposal.enabled = false;
-  adaptive.enabled = false;
 
   rng.gaus = std::normal_distribution<double>(0);
   rng.unif = std::uniform_real_distribution<double>(0, 1);
@@ -174,17 +173,6 @@ void StepProposer::Reject() {
   }
 }
 
-void StepProposer::ConfigureAdaptive(YAML::Node const &adaption_config,
-                                     const std::string& matrix_name_str) {
-
-  auto const &matrix_config = adaption_config["AdaptiveOptions"]["Covariance"][matrix_name_str];
-
-  adaptive.enabled = matrix_config.IsDefined() &&GetFromManager<bool>(matrix_config["Enabled"], false);
-
-  if (adaptive.enabled) {
-    adaptive.covariance_estimation_start_step = GetFromManager<int>(adaption_config["AdaptiveOptions"]["Settings"]["CovarianceEstimationStartStep"], 0);
-    adaptive.proposal_update_interval = GetFromManager<int>(adaption_config["AdaptiveOptions"]["Settings"]["ProposalUpdateInterval"], 1000);
-    adaptive.proposal_scale = 2.38 / std::sqrt(double(NumProposalBasisParameters()));
-  }
-
+void StepProposer::ConfigureAdaptive(YAML::Node const &adapt_manager, const std::string &matrix_name_str) {
+  adaptive.Configure(adapt_manager, matrix_name_str, NumProposalBasisParameters());
 }
