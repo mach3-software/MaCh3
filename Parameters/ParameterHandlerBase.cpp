@@ -5,7 +5,7 @@
 // ********************************************
 ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file,
                                            double, int, int)
-    : inputFile(file) {
+    : matrixName(name), inputFile(file) {
   // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
 
@@ -684,10 +684,9 @@ const double *ParameterHandlerBase::RetPointer(const int i) {
 
 // ********************************************
 // HW : Here be adaption
-void ParameterHandlerBase::InitialiseAdaption(const YAML::Node &) {
-  // ********************************************
-  throw std::runtime_error(
-      "ParameterHandlerBase::InitialiseAdaption Not Yet Implemented");
+void ParameterHandlerBase::InitialiseAdaption(
+    const YAML::Node &adapt_manager) {
+  proposer.ConfigureAdaptive(adapt_manager, matrixName);
 }
 
 void ParameterHandlerBase::SaveAdaptiveToFile(const std::string &,

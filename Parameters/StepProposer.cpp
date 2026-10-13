@@ -154,3 +154,37 @@ Eigen::ArrayXd const &StepProposer::Propose() {
 
   return proposal_basis.proposed;
 }
+
+void StepProposer::Accept() {
+  proposal_basis.current = proposal_basis.proposed;
+  if (adaptive.enabled) {
+    adaptive.UpdateRunningEstimates(proposal_basis.current);
+    if (adaptive.ShouldUpdateProposalMatrix()) {
+      SetProposalMatrix(adaptive.accepted_parameter_covariance * adaptive.proposal_scale * adaptive.proposal_scale);
+    }
+  }
+}
+
+void StepProposer::Reject() {
+  if (adaptive.enabled) {
+    adaptive.UpdateRunningEstimates(proposal_basis.current);
+    if (adaptive.ShouldUpdateProposalMatrix()) {
+      SetProposalMatrix(adaptive.accepted_parameter_covariance * adaptive.proposal_scale * adaptive.proposal_scale);
+    }
+  }
+}
+
+void StepProposer::ConfigureAdaptive(YAML::Node const &adaption_config,
+                                     const std::string& matrix_name_str) {
+
+  auto const &matrix_config = adaption_config["AdaptiveOptions"]["Covariance"][matrix_name_str];
+
+  adaptive.enabled = matrix_config.IsDefined() &&GetFromManager<bool>(matrix_config["Enabled"], false);
+
+  if (adaptive.enabled) {
+    adaptive.covariance_estimation_start_step = GetFromManager<int>(adaption_config["AdaptiveOptions"]["Settings"]["CovarianceEstimationStartStep"], 0);
+    adaptive.proposal_update_interval = GetFromManager<int>(adaption_config["AdaptiveOptions"]["Settings"]["ProposalUpdateInterval"], 1000);
+    adaptive.proposal_scale = 2.38 / std::sqrt(double(NumProposalBasisParameters()));
+  }
+
+}
