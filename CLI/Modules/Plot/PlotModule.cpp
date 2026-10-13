@@ -8,11 +8,13 @@ namespace M3{
         m_parser = std::make_unique<MaCh3ArgumentParser>("plot", "1.0", argparse::default_arguments::help);
         m_parser->add_description("Plotting subcommand.");
         m_parser->add_subparser(*m_llhMapModule.get_parser());
+        m_parser->add_subparser(*m_llhModule.get_parser());
         return m_parser.get();
     }
 
     int PlotModule::Run() {
         // if (m_parser->is_subcommand_used("llhmap")) return m_llhMapModule.Run();
+        // if (m_parser->is_subcommand_used("llh")) return m_llhModule.Run();
         return 0;
     }
 } // namespace M3

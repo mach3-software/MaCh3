@@ -4,6 +4,7 @@
 #pragma once
 #include "CLI/API/plugin.hpp"
 #include "CLI/Modules/Plot/LLHMapModule.hpp"
+#include "CLI/Modules/Plot/LLHModule.hpp"
 
 namespace M3{
 
@@ -27,5 +28,6 @@ namespace M3{
       int Run() override;
     private:
       LLHMapModule m_llhMapModule;
+      LLHModule m_llhModule;
   };
 }
