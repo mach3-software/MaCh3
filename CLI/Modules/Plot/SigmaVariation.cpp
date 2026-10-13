@@ -1,4 +1,4 @@
-#include "CLI/Modules/Plot/SigmaVariation.h"
+#include "CLI/Modules/Plot/SigmaVariation.hpp"
 
 
 namespace M3 {
