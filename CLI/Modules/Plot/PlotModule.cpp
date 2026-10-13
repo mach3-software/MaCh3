@@ -9,6 +9,7 @@ namespace M3{
         m_parser->add_description("Plotting subcommand.");
         m_parser->add_subparser(*m_llhMapModule.get_parser());
         m_parser->add_subparser(*m_llhModule.get_parser());
+        m_parser->add_subparser(*m_postFitParamModule.get_parser());
         return m_parser.get();
     }
 
