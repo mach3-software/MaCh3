@@ -1,5 +1,6 @@
 add_library(CLIPlotModules SHARED
     LLHMapModule.cpp
+    LLHModule.cpp
     PlotModule.cpp
 )
 
