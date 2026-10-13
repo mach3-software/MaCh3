@@ -1,6 +1,5 @@
 #pragma once
 #include "CLI/API/plugin.hpp"
-#include "CLI/Modules/DiagMCMCPlotModule.hpp"
 
 #include <iostream>
 #include <sstream>

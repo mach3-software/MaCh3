@@ -2,6 +2,7 @@ add_library(CLIPlotModules SHARED
     LLHMapModule.cpp
     LLHModule.cpp
     PostFitParamModule.cpp
+    MatrixModule.cpp
     PlotModule.cpp
 )
 

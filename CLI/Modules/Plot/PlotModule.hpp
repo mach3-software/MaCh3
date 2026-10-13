@@ -6,6 +6,7 @@
 #include "CLI/Modules/Plot/LLHMapModule.hpp"
 #include "CLI/Modules/Plot/LLHModule.hpp"
 #include "CLI/Modules/Plot/PostFitParamModule.hpp"
+#include "CLI/Modules/Plot/MatrixModule.hpp"
 
 namespace M3{
 
@@ -31,5 +32,6 @@ namespace M3{
       LLHMapModule m_llhMapModule;
       LLHModule m_llhModule;
       PostFitParamModule m_postFitParamModule;
+      MatrixModule m_matrixModule;
   };
 }
