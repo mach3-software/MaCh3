@@ -10,12 +10,15 @@ namespace M3{
         m_parser->add_subparser(*m_llhMapModule.get_parser());
         m_parser->add_subparser(*m_llhModule.get_parser());
         m_parser->add_subparser(*m_postFitParamModule.get_parser());
+        m_parser->add_subparser(*m_matrixModule.get_parser());
         return m_parser.get();
     }
 
     int PlotModule::Run() {
         // if (m_parser->is_subcommand_used("llhmap")) return m_llhMapModule.Run();
         // if (m_parser->is_subcommand_used("llh")) return m_llhModule.Run();
+        // if (m_parser->is_subcommand_used("postfit")) return m_postFitParamModule.Run();
+        // if (m_parser->is_subcommand_used("matrix")) return m_matrixModule.Run();
         return 0;
     }
 } // namespace M3
