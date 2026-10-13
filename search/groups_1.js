@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fitting_20algorithms_4338',['Fitting Algorithms',['../group__FittingAlgorithms.html',1,'']]]
+  ['fitting_20algorithms_4348',['Fitting Algorithms',['../group__FittingAlgorithms.html',1,'']]]
 ];

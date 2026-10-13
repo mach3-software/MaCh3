@@ -78,8 +78,6 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">MulticanonicalMCMCHandler.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -97,55 +95,11 @@ Include dependency graph for MulticanonicalMCMCHandler.cpp:</div>
 </div>
 </div>
 <p><a href="MulticanonicalMCMCHandler_8cpp_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a5b9acf0497db36bdb1449fb8cd554832"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MulticanonicalMCMCHandler_8cpp.html#a5b9acf0497db36bdb1449fb8cd554832">ParseBiasFunction</a> (const std::string &amp;biasFunctionName)</td></tr>
-<tr class="separator:a5b9acf0497db36bdb1449fb8cd554832"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>David Riley </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a5b9acf0497db36bdb1449fb8cd554832"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b9acf0497db36bdb1449fb8cd554832">&#9670;&nbsp;</a></span>ParseBiasFunction()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a> ParseBiasFunction </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>biasFunctionName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html#l00011">11</a> of file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;                                                                    {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;gaussian&quot;</span>) {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::BiasFunction::kGaussian</a>;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  }</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;vonMises&quot;</span>) {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">M3::BiasFunction::kVonMises</a>;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  }</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;generalisedGaussian&quot;</span>) {</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">M3::BiasFunction::kGeneralisedGaussian</a>;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  }</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__, <span class="stringliteral">&quot;Unknown multicanonical bias function: &quot;</span> + biasFunctionName);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;}</div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
-<div class="ttc" id="anamespaceM3_html_aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575"><div class="ttname"><a href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">M3::BiasFunction::kVonMises</a></div><div class="ttdeci">@ kVonMises</div></div>
-<div class="ttc" id="anamespaceM3_html_aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c"><div class="ttname"><a href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">M3::BiasFunction::kGeneralisedGaussian</a></div><div class="ttdeci">@ kGeneralisedGaussian</div></div>
-<div class="ttc" id="anamespaceM3_html_afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2"><div class="ttname"><a href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::kGaussian</a></div><div class="ttdeci">@ kGaussian</div><div class="ttdoc">Assumes gaussian prior.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00034">ReweightMCMC.cpp:34</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-</div><!-- contents -->
+</div></div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
     <div style="margin-bottom: 15px;">

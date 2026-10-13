@@ -93,7 +93,7 @@ $(function() {
 <dd><a class="anchor" id="_todo000038"></a>add checks for stuff like bin content etc  </dd>
 <dt>Member <a class="el" href="classFitterBase.html#aed21cb87772dcaecb0bc5ccb44b6efd4">FitterBase::SanitiseInputs</a>  ()</dt>
 <dd><a class="anchor" id="_todo000015"></a>consider expanding into ParmaterHandler and add more sanitisers  </dd>
-<dt>Member <a class="el" href="UmbrellaSolver_8cpp.html#a787daaf8fc5271a3b2f92211166f58d6">GetMulticanonicalWeightGenGaussian</a>  (double deltacp, double mean, double width)</dt>
+<dt>Member <a class="el" href="UmbrellaSolver_8cpp.html#a2869061e4674913fe3b7445502a3ec39">GetMulticanonicalWeightGenGaussian</a>  (double deltacp, double mean, double width, double multicanonicalBeta)</dt>
 <dd><a class="anchor" id="_todo000045"></a>modify this to instead use atan2 implementation for wrapping  </dd>
 <dt>File <a class="el" href="GetPenaltyTermModule_8hpp.html">GetPenaltyTermModule.hpp</a>  </dt>
 <dd><p class="startdd"><a class="anchor" id="_todo000036"></a>This should really be moved to MCMC Processor</p>
@@ -147,7 +147,7 @@ $(function() {
 <dd><a class="anchor" id="_todo000019"></a>KS: Make this in future configurable, for more see: <a href="https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html">https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html</a>  </dd>
 <dt>Member <a class="el" href="classMulticanonicalMCMCHandler.html#a417536b58d823d79d42e61fe38d7fe80">MulticanonicalMCMCHandler::AdjustUmbrellaStepScale</a>  (const std::vector&lt; ParameterHandlerBase * &gt; &amp;systematics)</dt>
 <dd><a class="anchor" id="_todo000021"></a>grab the step scale from the object directly and update based on the radtio to the umbrella width, removing assumption that its dcp  </dd>
-<dt>Member <a class="el" href="classMulticanonicalMCMCHandler.html#aece12295d4a94025e75cdd6a7b3accc8">MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian</a>  (double deltacp)</dt>
+<dt>Member <a class="el" href="classMulticanonicalMCMCHandler.html#a33793f331279ce300d89222ceb8234e4">MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian</a>  (double deltacp) const</dt>
 <dd><p class="startdd"><a class="anchor" id="_todo000022"></a>implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary </p>
 <p class="enddd">implement the normalisation for n != 2, and allow n to be set in the yaml configuration file  </p>
 </dd>
@@ -166,10 +166,10 @@ $(function() {
 <dt>Member <a class="el" href="classPredictiveThrower.html#a82afeac5e03f7a84fed3f6a5b9b980df">PredictiveThrower::StudyByMode1DProjections</a>  (const std::vector&lt; TDirectory * &gt; &amp;SampleDirectories) const</dt>
 <dd><a class="anchor" id="_todo000023"></a>KS: Here we assume each sample has same modes, this is because ProduceSpectra function, expects vector [sample], [toy], [dim], so we make ProjectionToys with [mode], [sample], [toy], [dim] so we can reuse this functionality  </dd>
 <dt>Member <a class="el" href="ReweightMCMC_8cpp.html#a1ae25e08cf8515d260c0c19d05f89131">ReweightMCMC</a>  (const std::string &amp;configFile, const std::string &amp;inputFile)</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000044"></a>add tracking for how many events are outside the graph ranges for diagnostics DWR </p>
-<p class="interdd"><a class="anchor" id="_todo000043"></a>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000041"></a>add a generic 2D reweight that is not dm32 and theta13 specific DWR </p>
 <p class="interdd"><a class="anchor" id="_todo000042"></a>Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR </p>
-<p class="enddd"><a class="anchor" id="_todo000041"></a>add a generic 2D reweight that is not dm32 and theta13 specific DWR  </p>
+<p class="interdd"><a class="anchor" id="_todo000043"></a>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </p>
+<p class="enddd"><a class="anchor" id="_todo000044"></a>add tracking for how many events are outside the graph ranges for diagnostics DWR  </p>
 </dd>
 <dt>Member <a class="el" href="structSampleBinningInfo.html#a2cb3ae7a21eab84e153552f6442dff71">SampleBinningInfo::InitNonUniform</a>  (const std::vector&lt; std::vector&lt; std::vector&lt; double &gt;&gt;&gt; &amp;InputBins)</dt>
 <dd><a class="anchor" id="_todo000008"></a>KS: Now we create "Large Bins" automatically, in future we can expand to add more user control  </dd>
@@ -181,9 +181,7 @@ $(function() {
 <dd><a class="anchor" id="_todo000004"></a>add maybe some ifdef to avoid doing this when we actually have float  </dd>
 <dt>Member <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>  </dt>
 <dd><a class="anchor" id="_todo000009"></a>KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast  </dd>
-<dt>Member <a class="el" href="UmbrellaSolver_8cpp.html#a38014083e68f1b37583a81bfaddafe8c">UmbrellaSolver</a>  (const std::string &amp;config_file)</dt>
-<dd><a class="anchor" id="_todo000047"></a>code now assumes it is only for delta CP  </dd>
-<dt>Member <a class="el" href="UmbrellaSolver_8cpp.html#adb65d303c38d92aa484214f89d688125">zSolver</a>  (const std::vector&lt; double &gt; &amp;z_current, const std::vector&lt; WindowConfig &gt; &amp;windows, const std::vector&lt; std::vector&lt; double &gt;&gt; &amp;samples, const std::vector&lt; std::vector&lt; std::vector&lt; double &gt;&gt;&gt; &amp;window_cache, bool use_openmp=true, bool verbose=false, [[maybe_unused]] int *total_lines=nullptr)</dt>
+<dt>Member <a class="el" href="UmbrellaSolver_8cpp.html#af44f0c2d82fa229615b796caa1e07e00">zSolver</a>  (const std::vector&lt; double &gt; &amp;z_current, const std::vector&lt; WindowConfig &gt; &amp;windows, const std::vector&lt; std::vector&lt; double &gt;&gt; &amp;samples, const std::vector&lt; std::vector&lt; std::vector&lt; double &gt;&gt;&gt; &amp;window_cache, [[maybe_unused]] bool verbose=false, [[maybe_unused]] int *total_lines=nullptr)</dt>
 <dd><a class="anchor" id="_todo000046"></a>: try this with magnitude = 1, the absolute scale doesn't matter but maybee this condition is preventing elements meeting their required values? also just try completely disabled double z_sum = 0.0; for (int i = 0; i &lt; n_windows; i++) { z_sum += z_new[i]; } if (z_sum &gt; 0) { for (int i = 0; i &lt; n_windows; i++) { z_new[i] /= z_sum; } </dd>
 </dl>
 </div></div><!-- contents -->

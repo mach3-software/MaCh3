@@ -256,6 +256,10 @@ Functions</h2></td></tr>
 <tr class="memitem:af4a9244946bbdae4b7bfcdf38feda9fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#af4a9244946bbdae4b7bfcdf38feda9fb">DebugPCA</a> (const double sum, const TMatrixD &amp;temp, const TMatrixD &amp;eigen_vectors, const TVectorD &amp;eigen_values, const TMatrixD &amp;TransferMat, const TMatrixD &amp;TransferMatT, const int NumPar, const int FirstPCAdpar, const int LastPCAdpar, const int nKeptPCApars, const double eigen_threshold)</td></tr>
 <tr class="memdesc:af4a9244946bbdae4b7bfcdf38feda9fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Let's dump all useful matrices to properly validate PCA.  <a href="namespaceM3.html#af4a9244946bbdae4b7bfcdf38feda9fb">More...</a><br /></td></tr>
 <tr class="separator:af4a9244946bbdae4b7bfcdf38feda9fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a116e94960ba2df3ac2ec3ebe499307ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a116e94960ba2df3ac2ec3ebe499307ae">ParseBiasFunction</a> (const std::string &amp;biasFunctionName)</td></tr>
+<tr class="separator:a116e94960ba2df3ac2ec3ebe499307ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d1b944b696e99865fcaf038d828748d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a6d1b944b696e99865fcaf038d828748d">BiasFunction_ToString</a> (const <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a> &amp;biasFunction)</td></tr>
+<tr class="separator:a6d1b944b696e99865fcaf038d828748d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -685,6 +689,46 @@ Variables</h2></td></tr>
 <div class="ttc" id="anamespaceM3_1_1Utils_html_a9c1c1d6d38585550e356e7d36bfdb704"><div class="ttname"><a href="namespaceM3_1_1Utils.html#a9c1c1d6d38585550e356e7d36bfdb704">M3::Utils::FormatDouble</a></div><div class="ttdeci">std::string FormatDouble(const double value, const int precision)</div><div class="ttdoc">Convert double into string for precision, useful for playing with yaml if you don't want to have in c...</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00835">SampleStructs.h:835</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00154">HistogramUtils.h:154</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a68ab9b6b3d413a94604c740208c7895d"><div class="ttname"><a href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a></div><div class="ttdeci">void FixSampleNamesQuotes(std::string &amp;yamlStr)</div><div class="ttdoc">KS: Yaml emitter has problem and drops &quot;&quot;, if you have special signs in you like * then there is prob...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00197">ParameterHandlerUtils.h:197</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a6d1b944b696e99865fcaf038d828748d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d1b944b696e99865fcaf038d828748d">&#9670;&nbsp;</a></span>BiasFunction_ToString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string M3::BiasFunction_ToString </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a> &amp;&#160;</td>
+          <td class="paramname"><em>biasFunction</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8h_source.html#l00034">34</a> of file <a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                                                                             {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">switch</span> (biasFunction) {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::BiasFunction::kGaussian</a>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;gaussian&quot;</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">M3::BiasFunction::kVonMises</a>:</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;vonMises&quot;</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordflow">case</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">M3::BiasFunction::kGeneralisedGaussian</a>:</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;generalisedGaussian&quot;</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__, <span class="stringliteral">&quot;Unknown multicanonical bias function&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2608,6 +2652,46 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a116e94960ba2df3ac2ec3ebe499307ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a116e94960ba2df3ac2ec3ebe499307ae">&#9670;&nbsp;</a></span>ParseBiasFunction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7">M3::BiasFunction</a> M3::ParseBiasFunction </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>biasFunctionName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8h_source.html#l00021">21</a> of file <a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                                                                             {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;gaussian&quot;</span>) {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::BiasFunction::kGaussian</a>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    }</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;vonMises&quot;</span>) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">M3::BiasFunction::kVonMises</a>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    }</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">if</span> (biasFunctionName == <span class="stringliteral">&quot;generalisedGaussian&quot;</span>) {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">M3::BiasFunction::kGeneralisedGaussian</a>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__, <span class="stringliteral">&quot;Unknown multicanonical bias function: &quot;</span> + biasFunctionName);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="aeec45eef77225e7b06efc9d557d08321"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeec45eef77225e7b06efc9d557d08321">&#9670;&nbsp;</a></span>PolyToYaml()</h2>
 
@@ -3024,7 +3108,7 @@ template&lt;typename T &gt; </div>
 <p>Normalisation constant for the n=2 umbrella sampling Gaussian.</p>
 <p>The factor comes from: 2n / Gamma(1/(2n)) with n = 2: 4 / Gamma(1/4) = 0.906402477055 </p>
 
-<p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8h_source.html#l00027">27</a> of file <a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8h_source.html#l00053">53</a> of file <a class="el" href="MulticanonicalMCMCHandler_8h_source.html">MulticanonicalMCMCHandler.h</a>.</p>
 
 </div>
 </div>

@@ -132,92 +132,95 @@ $(function() {
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// if we&#39;re using the multicanonical method, we need to add the penalty to the</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="comment">// likelihood now prior to the Large LLH check</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classMCMCBase.html#ac1b019d760b4ff9ab764041030c92dd3">multicanonical</a>) {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// get the proposed value of delta_cp and apply the multicanonical penalty,</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">// weighting it using the beta value to increase or decrease the strength of</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="comment">// the penalty</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordtype">double</span> delta_cp_value = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;oscCovVar]-&gt;GetParProp(<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;multicanonicalVar);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">double</span> delm23_value = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;oscCovVar]-&gt;GetParProp(<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;multicanonicalVar_dm23);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">double</span> multicanonical_penalty = <a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;GetMulticanonicalWeight(delta_cp_value, delm23_value);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="comment">// Print the multicanonical penalty and the delta_cp and delm23 values to the debug file</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot; delta_cp: &quot;</span> &lt;&lt; delta_cp_value &lt;&lt; <span class="stringliteral">&quot; delm23: &quot;</span> &lt;&lt; delm23_value &lt;&lt; <span class="stringliteral">&quot; multicanonical_penalty: &quot;</span> &lt;&lt; multicanonical_penalty &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        llh += multicanonical_penalty;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Delta CP value: {}&quot;</span>, delta_cp_value);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Multicanonical penalty: {}&quot;</span>, multicanonical_penalty);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;LLH after multicanonical penalty: {}&quot;</span>, llh);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="comment">// Check if we&#39;ve hit a boundary in the systematics</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">// In this case we can save time by not having to reconfigure the simulation</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span> (llh &gt;= <a class="code" href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a>)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <a class="code" href="classMCMCBase.html#a8c81e543609bb3878b114f9f8b2c0393">out_of_bounds</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">if</span> (debug)</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            debugFile &lt;&lt; <span class="stringliteral">&quot;Rejecting based on boundary&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="comment">// Only reweight when we have a good parameter configuration</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">// This speeds things up considerably because for every bad parameter configuration we don&#39;t have to reweight the MC</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classMCMCBase.html#a8c81e543609bb3878b114f9f8b2c0393">out_of_bounds</a>)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="comment">// Could multi-thread this</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="comment">// But since sample reweight is multi-threaded it&#39;s probably better to do that</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>[i]-&gt;Reweight();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="comment">// DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            <span class="comment">// Get the sample likelihoods and add them</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>[i]-&gt;GetLikelihood();</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            llh += <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i];</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="keywordflow">if</span> (debug)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="comment">// For when we don&#39;t have to reweight, set sample to madness</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="comment">// Set the sample_llh[i] to be madly high also to signify a step out of bounds</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code" href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="keywordflow">if</span> (debug)</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after REJECT sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">// Save the proposed likelihood (class member)</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = llh;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;}</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="comment">// **********************</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment">// Do we accept the proposed step for all the parameters?</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno"><a class="line" href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">  124</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">MR2T2::AcceptanceProbability</a>() {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="comment">// get the proposed value of delta_cp and apply the multicanonical penalty,</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="comment">// weighting it using the beta value to increase or decrease the strength of</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="comment">// the penalty</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">double</span> multicanonical_penalty = <a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;GetMulticanonicalWeight();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="comment">// Print the multicanonical penalty and the delta_cp and delm23 values to the debug file</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordflow">if</span> (debug) {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            <span class="keyword">auto</span> delta_cp_value = *<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;multicanonicalVarValue;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keyword">auto</span> delm23_value = *<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;multicanonicalVar_dm23_value;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            debugFile &lt;&lt; <span class="stringliteral">&quot; delta_cp: &quot;</span> &lt;&lt; delta_cp_value &lt;&lt; <span class="stringliteral">&quot; delm23: &quot;</span> &lt;&lt; delm23_value &lt;&lt; <span class="stringliteral">&quot; multicanonical_penalty: &quot;</span> &lt;&lt; multicanonical_penalty &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        llh += multicanonical_penalty;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Delta CP value: {}&quot;</span>, *<a class="code" href="classMCMCBase.html#a10bcd611fe6e3ee29996ea28efd0a76f">multicanonicalHandler</a>-&gt;multicanonicalVarValue);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Multicanonical penalty: {}&quot;</span>, multicanonical_penalty);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;LLH after multicanonical penalty: {}&quot;</span>, llh);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">// Check if we&#39;ve hit a boundary in the systematics</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="comment">// In this case we can save time by not having to reconfigure the simulation</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordflow">if</span> (llh &gt;= <a class="code" href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a>)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <a class="code" href="classMCMCBase.html#a8c81e543609bb3878b114f9f8b2c0393">out_of_bounds</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">if</span> (debug)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            debugFile &lt;&lt; <span class="stringliteral">&quot;Rejecting based on boundary&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">// Only reweight when we have a good parameter configuration</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="comment">// This speeds things up considerably because for every bad parameter configuration we don&#39;t have to reweight the MC</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classMCMCBase.html#a8c81e543609bb3878b114f9f8b2c0393">out_of_bounds</a>)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="comment">// Could multi-thread this</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="comment">// But since sample reweight is multi-threaded it&#39;s probably better to do that</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        {</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>[i]-&gt;Reweight();</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="comment">// DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <span class="comment">// Get the sample likelihoods and add them</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>[i]-&gt;GetLikelihood();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            llh += <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i];</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            <span class="keywordflow">if</span> (debug)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="comment">// For when we don&#39;t have to reweight, set sample to madness</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#a815cce261b30828b67625b6c0d79f27f">samples</a>.size(); ++i)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="comment">// Set the sample_llh[i] to be madly high also to signify a step out of bounds</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <a class="code" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code" href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a>;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#ifdef MACH3_DEBUG</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            <span class="keywordflow">if</span> (debug)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after REJECT sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// Save the proposed likelihood (class member)</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = llh;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment">// **********************</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">// Set the acceptance probability to zero</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">double</span> acc_prob = 0.0;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// Calculate acceptance probability</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classMCMCBase.html#a1d98a1574482a1ec7a9e49496fb546f0">anneal</a>)</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        acc_prob = std::min(1., std::exp(-(<a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> - <a class="code" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a>) / (std::exp(-<a class="code" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> / <a class="code" href="classMCMCBase.html#a58aafc91f036ca781d5984781c8b61fc">AnnealTemp</a>))));</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        acc_prob = std::min(1., std::exp(<a class="code" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> - <a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a>));</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">return</span> acc_prob;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">// Do we accept the proposed step for all the parameters?</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno"><a class="line" href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">  127</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">MR2T2::AcceptanceProbability</a>() {</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="comment">// **********************</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// Set the acceptance probability to zero</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">double</span> acc_prob = 0.0;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">// Calculate acceptance probability</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classMCMCBase.html#a1d98a1574482a1ec7a9e49496fb546f0">anneal</a>)</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        acc_prob = std::min(1., std::exp(-(<a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> - <a class="code" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a>) / (std::exp(-<a class="code" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> / <a class="code" href="classMCMCBase.html#a58aafc91f036ca781d5984781c8b61fc">AnnealTemp</a>))));</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        acc_prob = std::min(1., std::exp(<a class="code" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> - <a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a>));</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">return</span> acc_prob;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
 <div class="ttc" id="aMR2T2_8h_html"><div class="ttname"><a href="MR2T2_8h.html">MR2T2.h</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00127">FitterBase.h:127</a></div></div>
@@ -239,7 +242,7 @@ $(function() {
 <div class="ttc" id="aclassMCMCBase_html_ac1b019d760b4ff9ab764041030c92dd3"><div class="ttname"><a href="classMCMCBase.html#ac1b019d760b4ff9ab764041030c92dd3">MCMCBase::multicanonical</a></div><div class="ttdeci">bool multicanonical</div><div class="ttdoc">multi-canonical method toggle on/off</div><div class="ttdef"><b>Definition:</b> <a href="MCMCBase_8h_source.html#l00084">MCMCBase.h:84</a></div></div>
 <div class="ttc" id="aclassMR2T2_html_a128619b70bc9cc104cfbbe4ab72402b6"><div class="ttname"><a href="classMR2T2.html#a128619b70bc9cc104cfbbe4ab72402b6">MR2T2::MR2T2</a></div><div class="ttdeci">MR2T2(Manager *const FitManager)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00004">MR2T2.cpp:4</a></div></div>
 <div class="ttc" id="aclassMR2T2_html_a73ef3e49bb7ce66cce4c6e886552412a"><div class="ttname"><a href="classMR2T2.html#a73ef3e49bb7ce66cce4c6e886552412a">MR2T2::ProposeStep</a></div><div class="ttdeci">void ProposeStep() final</div><div class="ttdoc">Propose a step.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00024">MR2T2.cpp:24</a></div></div>
-<div class="ttc" id="aclassMR2T2_html_a991bdcec55b12d179b85b0293313d682"><div class="ttname"><a href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">MR2T2::AcceptanceProbability</a></div><div class="ttdeci">double AcceptanceProbability() override</div><div class="ttdoc">Step acceptance probability.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00124">MR2T2.cpp:124</a></div></div>
+<div class="ttc" id="aclassMR2T2_html_a991bdcec55b12d179b85b0293313d682"><div class="ttname"><a href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">MR2T2::AcceptanceProbability</a></div><div class="ttdeci">double AcceptanceProbability() override</div><div class="ttdoc">Step acceptance probability.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00127">MR2T2.cpp:127</a></div></div>
 <div class="ttc" id="aclassMR2T2_html_ad31da602b4b1eca6d8b67cfe47aca8bc"><div class="ttname"><a href="classMR2T2.html#ad31da602b4b1eca6d8b67cfe47aca8bc">MR2T2::DoStep</a></div><div class="ttdeci">void DoStep() override</div><div class="ttdoc">The MCMC step proposal and acceptance.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00010">MR2T2.cpp:10</a></div></div>
 <div class="ttc" id="aclassManager_html"><div class="ttname"><a href="classManager.html">Manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00017">Manager.h:17</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a1a85b25da2b8b2cbb0993b15dcf77a6d"><div class="ttname"><a href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a></div><div class="ttdeci">constexpr static const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00080">Core.h:80</a></div></div>
