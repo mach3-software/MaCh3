@@ -426,11 +426,6 @@ void FitterBase::StartFromPreviousFit(const std::string &FitName) {
   infile->Close();
   delete infile;
 
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    if (systematics[s]->GetDoAdaption()) { // Use separate throw matrix for xsec
-      systematics[s]->SetNumberOfSteps(step_val);
-    }
-  }
 }
 
 // *******************

@@ -22,6 +22,9 @@ struct AdaptiveProposer {
     int covariance_estimation_start_step = 0;
     int covariance_estimation_reset = 0;
     double proposal_scale = 1.0;
+    std::string matrix_name;
+    std::string proposal_matrix_output_file;
+
     Eigen::VectorXd accepted_parameter_mean, last_parameter_mean;
     Eigen::MatrixXd accepted_parameter_covariance;
     Eigen::MatrixXd M2;
@@ -36,4 +39,6 @@ struct AdaptiveProposer {
     void UpdateRunningEstimates(Eigen::ArrayXd const &params);
     
     void Configure(YAML::Node const &adapt_manager, std::string const &matrix_name_str, int proposal_dimension);
+
+    void WriteProposalMatrixToFile(Eigen::MatrixXd const &proposal_matrix);
   };

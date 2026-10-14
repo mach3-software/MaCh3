@@ -58,12 +58,6 @@ void MCMCBase::RunMCMC() {
   // Process MCMC
   ProcessMCMC();
 
-  // Save the adaptive MCMC
-  for (const auto &syst : systematics) {
-    if (syst->GetDoAdaption()) {
-      throw std::runtime_error("Adaption not yet implemented");
-    }
-  }
 }
 
 // *******************
@@ -97,9 +91,6 @@ void MCMCBase::PostStepProcess() {
 
   // Write step to output tree
   outTree->Fill();
-
-  // Do Adaptive MCMC
-  AdaptiveStep();
 
   if (step % auto_save == 0) {
     outTree->AutoSave();
@@ -151,25 +142,8 @@ void MCMCBase::StartFromPreviousFit(const std::string &FitName) {
   posts->GetEntry(posts->GetEntries() - 1);
 
   stepStart = step_val;
-  // KS: Also update number of steps if using adaption
-  for (unsigned int i = 0; i < systematics.size(); ++i) {
-    if (systematics[i]->GetDoAdaption()) {
-      systematics[i]->SetNumberOfSteps(step_val);
-    }
-  }
   infile->Close();
   delete infile;
-}
-
-// *************************
-void MCMCBase::AdaptiveStep() {
-  // *************************
-  // Save the Adaptive output
-  for (const auto &syst : systematics) {
-    if (syst->GetDoAdaption()) {
-      syst->UpdateAdaptiveCovariance();
-    }
-  }
 }
 
 // *************************

@@ -53,9 +53,6 @@ class MCMCBase : public FitterBase {
     /// @brief Reject a step
     void RejectStep();
 
-    /// @brief Adaptive MCMC step
-    inline void AdaptiveStep();
-
     /// @brief Print the progress
     inline void PrintProgress(const bool StepsPrint = true);
 
