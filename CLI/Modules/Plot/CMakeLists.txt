@@ -4,6 +4,7 @@ add_library(CLIPlotModules SHARED
     PostFitParamModule.cpp
     MatrixModule.cpp
     SigmaVariationModule.cpp
+    PredictiveModule.cpp
     PlotModule.cpp
 )
 

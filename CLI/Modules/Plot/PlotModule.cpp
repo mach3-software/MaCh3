@@ -12,6 +12,7 @@ namespace M3{
         m_parser->add_subparser(*m_postFitParamModule.get_parser());
         m_parser->add_subparser(*m_matrixModule.get_parser());
         m_parser->add_subparser(*m_sigmaVariation.get_parser());
+        m_parser->add_subparser(*m_predictiveModule.get_parser());
         return m_parser.get();
     }
 
@@ -21,6 +22,7 @@ namespace M3{
         // if (m_parser->is_subcommand_used("postfit")) return m_postFitParamModule.Run();
         // if (m_parser->is_subcommand_used("matrix")) return m_matrixModule.Run();
         // if (m_parser->is_subcommand_used("sigmavar")) return m_sigmaVariation.Run();
+        // if (m_parser->is_subcommand_used("predictive")) return m_predictiveModule.Run();
         return 0;
     }
 } // namespace M3

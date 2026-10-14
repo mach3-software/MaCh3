@@ -8,6 +8,8 @@
 #include "CLI/Modules/Plot/PostFitParamModule.hpp"
 #include "CLI/Modules/Plot/MatrixModule.hpp"
 #include "CLI/Modules/Plot/SigmaVariationModule.hpp"
+#include "CLI/Modules/Plot/PredictiveModule.hpp"
+
 
 namespace M3{
 
@@ -35,5 +37,6 @@ namespace M3{
       PostFitParamModule m_postFitParamModule;
       MatrixModule m_matrixModule;
       SigmaVariationModule m_sigmaVariation;
+      PredictiveModule m_predictiveModule;
   };
 }
