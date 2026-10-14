@@ -1,11 +1,11 @@
-#include "CLI/Modules/Plot/SigmaVariation.hpp"
+#include "CLI/Modules/Plot/SigmaVariationModule.hpp"
 
 
 namespace M3 {
 
-    SigmaVariation::~SigmaVariation() = default;
+    SigmaVariationModule::~SigmaVariationModule() = default;
     
-    MaCh3ArgumentParser* SigmaVariation::get_parser(){
+    MaCh3ArgumentParser* SigmaVariationModule::get_parser(){
         m_parser = std::make_unique<MaCh3ArgumentParser>("sigmavar", "1.0", argparse::default_arguments::help);
         m_parser->add_description("Module for plotting and analyzing sigma variation outputs.");
         m_parser->add_argument("sigma-variation-output")
@@ -21,7 +21,7 @@ namespace M3 {
     }
 
 
-  int SigmaVariation::Run(){
+  int SigmaVariationModule::Run(){
     SetMaCh3LoggerFormat();
 
     std::string filename = m_parser->get<std::string>("sigma-variation-output");
@@ -49,7 +49,7 @@ namespace M3 {
 
 
   /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
-  void SigmaVariation::FindKnot(std::vector<double>& SigmaValues,
+  void SigmaVariationModule::FindKnot(std::vector<double>& SigmaValues,
                                 const std::string& dirname,
                                 const std::string& subdirname,
                                 const std::string& ProjName,
@@ -99,7 +99,7 @@ namespace M3 {
     SigmaValues.push_back(sigma);
   }
 
-  std::unique_ptr<TLegend> SigmaVariation::MakeLegend(double x1, double y1, double x2, double y2, double textSize)
+  std::unique_ptr<TLegend> SigmaVariationModule::MakeLegend(double x1, double y1, double x2, double y2, double textSize)
   {
     auto leg = std::make_unique<TLegend>(x1, y1, x2, y2);
     leg->SetTextSize(textSize);
@@ -113,7 +113,7 @@ namespace M3 {
   }
 
   /// @brief Scan inputs to figure out dial name and used sample names
-  void SigmaVariation::ScanInput(std::vector<std::string>& DialNameVecr,
+  void SigmaVariationModule::ScanInput(std::vector<std::string>& DialNameVecr,
                                   std::vector<std::string>& SampleNameVec,
                                   std::vector<int>& SampleDimVec,
                                   std::vector<double>& SigmaValues,
@@ -208,7 +208,7 @@ namespace M3 {
   }
 
   /// @brief Check whether to skip directory or not based on defined strings
-  bool SigmaVariation::SkipDirectory(const std::vector<std::string>& ExcludeString, const std::vector<std::string>& IncludeString, const std::string& dirname)
+  bool SigmaVariationModule::SkipDirectory(const std::vector<std::string>& ExcludeString, const std::vector<std::string>& IncludeString, const std::string& dirname)
   {
     bool Skip = false;
     for(unsigned int i = 0; i < ExcludeString.size(); i++)
@@ -223,7 +223,7 @@ namespace M3 {
   }
 
   /// @brief Extracts dial value for from histogram title
-  std::vector<double> SigmaVariation::GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly) {
+  std::vector<double> SigmaVariationModule::GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly) {
     std::vector<double> values;
     for (const auto& hist : Poly) {
         std::string title = hist->GetTitle();
@@ -242,7 +242,7 @@ namespace M3 {
   }
 
 
-  void SigmaVariation::InitializePads(TCanvas* canv, TPad*& pad1, TPad*& pad2, double Pad1Bottom, double Pad2Top)
+  void SigmaVariationModule::InitializePads(TCanvas* canv, TPad*& pad1, TPad*& pad2, double Pad1Bottom, double Pad2Top)
   {
     // Delete existing pads if they exist
     if (pad1) delete pad1;
@@ -273,7 +273,7 @@ namespace M3 {
     pad2->SetGrid();
   }
 
-  void SigmaVariation::MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
+  void SigmaVariationModule::MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                                  std::vector<std::unique_ptr<TH1D>>& Ratio) {
     size_t ratio_index = 0; // Track position in Ratio vector
     for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
@@ -289,7 +289,7 @@ namespace M3 {
     M3::Plotting::SetSymmetricRatioRange(Ratio);
   }
 
-  void SigmaVariation::PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
+  void SigmaVariationModule::PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                                  const std::unique_ptr<TCanvas>& canv,
                                  const std::string& Title,
                                  const std::string& outfilename)
@@ -380,7 +380,7 @@ namespace M3 {
     delete pad2;
   }
 
-  void SigmaVariation::CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
+  void SigmaVariationModule::CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
   {
     //Get input file, make canvas and output file
     auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
@@ -444,7 +444,7 @@ namespace M3 {
     delete infile;
   }
 
-  void SigmaVariation::PlotRatio2D(const std::vector<std::unique_ptr<TH2>>& Poly,
+  void SigmaVariationModule::PlotRatio2D(const std::vector<std::unique_ptr<TH2>>& Poly,
                                   const std::unique_ptr<TCanvas>& canv,
                                   const std::string& Title,
                                   const std::string& outfilename)
@@ -495,7 +495,7 @@ namespace M3 {
     }
   }
 
-  void SigmaVariation::CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
+  void SigmaVariationModule::CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
   {
     //Get input file, make canvas and output file
     auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
@@ -564,7 +564,7 @@ namespace M3 {
   }
 
 
-  void SigmaVariation::PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
+  void SigmaVariationModule::PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
                                      const std::unique_ptr<TCanvas>& canv,
                                      const std::string& Title,
                                      const std::string& outfilename)
@@ -647,7 +647,7 @@ namespace M3 {
     delete pad2;
   }
 
-  void SigmaVariation::MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
+  void SigmaVariationModule::MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
   {
     (void) Settings;
     //Get input file, make canvas and output file
@@ -703,7 +703,7 @@ namespace M3 {
     delete infile;
   }
 
-  void SigmaVariation::PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Projection,
+  void SigmaVariationModule::PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Projection,
                                     const std::unique_ptr<TCanvas>& canv,
                                     const std::string& Title,
                                     const std::string& outfilename,
@@ -764,7 +764,7 @@ namespace M3 {
     }
   }
 
-  void SigmaVariation::OverlaySigVar1D(const std::string& filename, const YAML::Node& Settings)
+  void SigmaVariationModule::OverlaySigVar1D(const std::string& filename, const YAML::Node& Settings)
   {
     auto ParamNames = GetFromManager<std::vector<std::string>>(Settings["ParamNames"], {}, __FILE__ , __LINE__);
     auto SigColours = GetFromManager<std::vector<int>>(Settings["Coulour"], {}, __FILE__ , __LINE__);

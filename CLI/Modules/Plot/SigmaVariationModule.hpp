@@ -15,15 +15,15 @@
 
 namespace M3{
 
-  /// @class SigmaVariation
+  /// @class SigmaVariationModule
   /// @brief Module for performing sigma variation analysis
   ///
   /// This module provides functionality for analyzing sigma variations in MCMC samples.
-  class SigmaVariation: public IModuleBase{
+  class SigmaVariationModule: public IModuleBase{
 
     public:
       /// @brief Destructor
-      virtual ~SigmaVariation();
+      virtual ~SigmaVariationModule();
 
       /// @brief Get the argument parser for this module
       /// @return Pointer to the configured MaCh3ArgumentParser

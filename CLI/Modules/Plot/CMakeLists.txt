@@ -3,7 +3,7 @@ add_library(CLIPlotModules SHARED
     LLHModule.cpp
     PostFitParamModule.cpp
     MatrixModule.cpp
-    SigmaVariation.cpp
+    SigmaVariationModule.cpp
     PlotModule.cpp
 )
 
