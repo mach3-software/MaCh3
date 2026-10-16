@@ -537,44 +537,63 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
 void BinnedSplineHandler::PrepForReweight() {
 //****************************************
   std::vector<TSpline3_red*> UniqueSystSplines;
-  bool FoundNonFlatSpline = false;
   int SampleCounter = M3::_BAD_INT_;
   int SystCounter = M3::_BAD_INT_;
+  std::pair<int, int> CounterIdx = {M3::_BAD_INT_, M3::_BAD_INT_};
   // DB Find all the Unique systs across each sample and oscillation channel
   //    This assumes that each occurrence of the same systematic spline has the same knot spacing
-  //    Which is a reasonable assumption for the current implementation of spline evaluations
+  //    Which is a reasonable assumption for the current implementation of spline evaluations 
+
+  // HW: Checker for N splines for a given systematic
+  // map of form {<sample id, syst id idx>: n splines}
+  // (maybe could do with a better data structure but this is ~okay...)
+  std::map<std::pair<int, int>, bool> HasNonFlatSpline = {};
+
   for (const auto& entry : IndexVect)
   {
     int splineindex = entry.value;
+
     // KS: reset if we moved to another sample or syst
     if(SampleCounter != entry.iSample || SystCounter != entry.iSyst) {
       SampleCounter = entry.iSample;
       SystCounter = entry.iSyst;
-      FoundNonFlatSpline = false;
-    }
-    std::string SystName = SplineFileParPrefixNames[entry.iSample][entry.iSyst];
-    bool FoundSyst = false;
-    for (unsigned int iFoundSyst = 0; iFoundSyst < UniqueSystNames.size(); iFoundSyst++) {
-      if (SystName == UniqueSystNames[iFoundSyst]) {
-        FoundSyst = true;
+      CounterIdx = {SampleCounter, SystCounter};
+
+      // HW: Find + set non-flat spline counter to 0 for this pairing
+      if(HasNonFlatSpline.find(CounterIdx) != HasNonFlatSpline.end()){
+        HasNonFlatSpline[CounterIdx] = false;
       }
     }
-    if (FoundSyst) continue;
+
+    // We've found a non-flat spline
+    if(HasNonFlatSpline[CounterIdx]){
+      continue;
+    }
 
     if (splinevec_Monolith[splineindex])
     {
       UniqueSystSplines.push_back(splinevec_Monolith[splineindex]);
       UniqueSystIndices.push_back(GlobalSystIndex[entry.iSample][entry.iSyst]);
 
-      FoundNonFlatSpline = true;
-    }
-    if (FoundNonFlatSpline) {
+      HasNonFlatSpline[CounterIdx] = true;
+      std::string SystName = SplineFileParPrefixNames[entry.iSample][entry.iSyst];
       UniqueSystNames.push_back(SystName);
-    } else {
-      MACH3LOG_DEBUG("{} syst has no response in sample {}", SystName, entry.iSample);
-      MACH3LOG_DEBUG("Whilst this isn't necessarily a problem, it seems odd");
     }
+
   } // end loop over indices
+
+  // We can the check the map for printing
+  for(const auto& [syst_sample, is_non_flat] : HasNonFlatSpline){
+    // We found at least 1 non-flat spline
+    if(is_non_flat){
+      continue;
+    }
+    // We can get the syst id + sample id from the counter
+    auto[sample, syst] = syst_sample;
+    auto syst_name = SplineFileParPrefixNames[sample][syst];
+    MACH3LOG_WARN("Could only find flat splines for {}. This might cause problems.", syst_name);
+  }
+
   nParams = static_cast<short int>(UniqueSystSplines.size());
 
   // DB Find the number of splines knots which assumes each instance of the syst has the same number of knots
