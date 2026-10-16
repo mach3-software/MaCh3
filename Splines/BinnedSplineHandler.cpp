@@ -591,7 +591,7 @@ void BinnedSplineHandler::PrepForReweight() {
     // We can get the syst id + sample id from the counter
     auto[sample, syst] = syst_sample;
     auto syst_name = SplineFileParPrefixNames[sample][syst];
-    MACH3LOG_WARN("Could only find flat splines for {}. This might cause problems.", syst_name);
+    MACH3LOG_WARN("Could only find flat splines for syst {} in sample {}. This might cause problems.", syst_name, sample);
   }
 
   nParams = static_cast<short int>(UniqueSystSplines.size());
