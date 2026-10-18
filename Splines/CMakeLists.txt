@@ -10,6 +10,9 @@ set(HEADERS
     SplineCommon.h
     SplineStructs.h
     gpuSplineUtils.cuh
+
+    BinnedSplineMakerSK.h
+    BinnedSplineMakerBase.h
 )
 
 add_library(Splines SHARED
@@ -17,6 +20,9 @@ add_library(Splines SHARED
     BinnedSplineHandler.cpp
     UnbinnedSplineHandler.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuSplineUtils.cu>
+
+    BinnedSplineMakerBase.cpp
+    BinnedSplineMakerSK.cpp
 )
 
 if(MaCh3_GPU_ENABLED)
