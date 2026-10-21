@@ -80,7 +80,8 @@ void UnbinnedSplineHandler::PrepareForGPU(std::vector<std::vector<TResponseFunct
 
   // Declare the {y,b,c,d} for each knot
   // float because GPU precision (could change to double, but will incur significant speed reduction on GPU unless you're very rich!)
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
+  const std::size_t totalCoefficients = static_cast<std::size_t>(nKnots) * static_cast<std::size_t>(_nCoeff_);
+  cpu_spline_handler->coeff_many.resize(totalCoefficients);// *4 because we store y,b,c,d parameters in this array
   //KS: For x coeff we assume that for given dial (MAQE) spacing is identical,
   // here we are sloppy and assume each dial has the same number of knots, not a big problem
   cpu_spline_handler->coeff_x.resize(event_size_max, -999);
