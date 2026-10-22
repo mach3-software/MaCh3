@@ -4,7 +4,7 @@ set(OSCILLATOR_OPTIONS
     CUDAProb3Linear
     CUDAProb3
     ProbGPULinear
-    Prob3ppLinear
+    Prob3pp
     NuFastLinear
     NuFastEarth
     NuSQUIDSLinear
@@ -66,7 +66,7 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v2.1.1")
+  set(MaCh3_NuOscillatorBranch "v2.2.0")
 endif()
 
 #Try adding Oscillator Class
@@ -83,7 +83,7 @@ CPMAddPackage(
     "UseCUDAProb3Linear ${USE_CUDAProb3Linear}"
     "UseCUDAProb3 ${USE_CUDAProb3}"
     "UseProbGPULinear ${USE_ProbGPULinear}"
-    "UseProb3ppLinear ${USE_Prob3ppLinear}"
+    "UseProb3pp ${USE_Prob3pp}"
     "UseNuFASTLinear  ${USE_NuFastLinear}"
     "UseNuFASTEarth  ${USE_NuFastEarth}"
     "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"

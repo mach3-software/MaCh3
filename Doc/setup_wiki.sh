@@ -1,4 +1,4 @@
-#Modules in case one neeeds them
+#Modules in case one needs them
 #dnf install -y texlive-scheme-basic texlive-latex
 #dnf install -y mathjax
 #dnf install -y perl

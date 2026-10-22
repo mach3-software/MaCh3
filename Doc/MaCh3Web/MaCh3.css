@@ -20,12 +20,71 @@ body {
     color: var(--mach3-ink);
 }
 
-/* Fancy project name */
-#projectname,
-#projectnumber,
-#projectbrief
-.title {
-    font-weight: 700;
+#titlearea {
+border-bottom: 3px solid var(--mach3-blue);
+}
+
+/* Project header */
+#projectname {
+color: var(--mach3-navy);
+font-size: 2em;
+font-weight: 800;
+}
+
+#projectnumber {
+color: var(--mach3-blue);
+font-weight: 600;
+}
+
+#projectbrief {
+color: var(--mach3-muted);
+font-size: 0.95em;
+font-weight: 700;
+}
+
+
+/* Top bar fancy banner */
+#titlearea {
+position: relative;
+overflow: hidden;
+
+background:
+radial-gradient(
+    circle at 90% 20%,
+    rgba(67, 137, 196, 0.14),
+                transparent 42%
+),
+linear-gradient(
+    135deg,
+    #FFFFFF 0%,
+    #F7F9FB 25%,
+    #EDF5FA 65%,
+    #E7F1F8 100%
+);
+
+border-bottom: 3px solid var(--mach3-blue);
+}
+
+#titlearea::after {
+content: "";
+position: absolute;
+
+width: 420px;
+height: 420px;
+
+right: -180px;
+top: -250px;
+
+border-radius: 50%;
+
+border: 1px solid rgba(67, 137, 196, 0.10);
+
+box-shadow:
+0 0 0 45px rgba(67, 137, 196, 0.025),
+0 0 0 90px rgba(67, 137, 196, 0.02),
+0 0 0 135px rgba(67, 137, 196, 0.015);
+
+pointer-events: none;
 }
 
 /* Main content container */
@@ -51,13 +110,13 @@ div.PageDoc div.textblock {
 /* Footer styling */
 /* Inspired by Edwin Varghese poster */
 .mach3-footer {
-    margin-top: 4em;
-    padding: 2.5em 1.5em 1.8em 1.5em;
-
-    background: var(--mach3-white);
-    border-top: 2px solid var(--mach3-gold);
-
+    background-image: url('OscPattern.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 20px;
     text-align: center;
+    border-top: 2px solid var(--mach3-gold);
     color: var(--mach3-ink);
 }
 
@@ -70,10 +129,58 @@ div.PageDoc div.textblock {
     border-color: var(--mach3-blue) !important;
 }
 
-.mach3-footer select:focus {
-    outline: none;
-    border-color: var(--mach3-blue) !important;
-    box-shadow: 0 0 0 3px rgba(67, 137, 196, 0.12);
+/* ==========================================================
+ * MaCh3 navigation bar
+ * ========================================================== */
+#main-nav,
+#main-menu,
+#main-menu li {
+  background: var(--mach3-navy) !important;
+  background-image: none !important;
+}
+
+/* Normal + focus + active + highlighted states */
+#main-menu.sm-dox a,
+#main-menu.sm-dox a:link,
+#main-menu.sm-dox a:visited,
+#main-menu.sm-dox a:focus,
+#main-menu.sm-dox a:active,
+#main-menu.sm-dox a.highlighted {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}
+
+/* Mouse hover */
+#main-menu.sm-dox a:hover {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-blue) !important;
+    background-image: none !important;
+}
+
+/* Dropdown */
+#main-menu.sm-dox ul,
+#main-menu.sm-dox ul li {
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+}
+
+#main-menu.sm-dox ul a,
+#main-menu.sm-dox ul a:link,
+#main-menu.sm-dox ul a:visited,
+#main-menu.sm-dox ul a:focus,
+#main-menu.sm-dox ul a:active,
+#main-menu.sm-dox ul a.highlighted {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-navy) !important;
+    background-image: none !important;
+}
+
+#main-menu.sm-dox ul a:hover {
+    color: var(--mach3-white) !important;
+    background: var(--mach3-blue) !important;
 }
 
 /* ==========================================================

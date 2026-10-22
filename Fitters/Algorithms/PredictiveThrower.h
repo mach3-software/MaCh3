@@ -94,7 +94,7 @@ class PredictiveThrower : public FitterBase {
   /// @brief Make Poisson fluctuation of TH1D hist
   /// @param FluctHist Histogram to store fluctuated values (must match Hist type)
   /// @param Hist Original histogram to fluctuate
-  void MakeFluctuatedHistogram(TH1* FluctHist, TH1* PolyHist);
+  void MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist);
 
   /// @brief Calculate Posterior Predictive LLH
   void PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
