@@ -64,6 +64,7 @@ class SampleHandlerInterface
   virtual void Reweight()=0;
   /// @brief Return likelihood (-LogL) for all samples
   virtual double GetLikelihood() const = 0;
+  virtual std::vector<double>  GetGradLikelihood() const {};
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates

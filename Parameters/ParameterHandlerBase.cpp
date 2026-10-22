@@ -769,6 +769,56 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 }
 
 // ********************************************
+// Get the likelihood in the case where we want to include priors on the parameters
+// _fFlatPrior stores if we want to evaluate the likelihood for the given parameter
+//                    true = don't evaluate likelihood (so run without a prior)
+//                    false = evaluate likelihood (so run with a prior)
+// double ParameterHandlerBase::CalcGradient() const _noexcept_ {
+// // ********************************************
+//   std::vector<double> gradLogL(GetNumParams, 0.0);
+//   #ifdef MULTITHREAD
+//   #pragma omp parallel for reduction(+:logL)
+//   #endif
+//   for(int i = 0; i < _fNumPar; ++i) {
+//     if(_fFlatPrior[i]){
+//       //HW: Flat prior, no need to calculate anything
+//       continue;
+//     }
+//     // KS: Precalculate Diff once per "i" without doing this for every "j"
+//     const double Diff = _fPropVal[i] - _fPreFitValue[i];
+//     #ifdef MULTITHREAD
+//     #pragma omp simd
+//     #endif
+//     for (int j = 0; j <= _fNumPar; ++j) {
+//       if (!_fFlatPrior[j]) {
+//         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
+//         // gradLogL[i] += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
+//         gradLogL[i] += InvertCovMatrix[i][j] * (_fPropVal[j] - _fPreFitValue[j]);
+//       }
+//     }
+//   }
+//   return logL;
+// }
+
+std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
+  std::vector<double> grad(GetNumParams(), 0.0);
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < _fNumPar; ++i) {
+    if (_fFlatPrior[i]) continue;           // flat prior -> zero gradient
+    double g = 0.0;
+    for (int j = 0; j < _fNumPar; ++j) {    // full row, not the triangle
+      if (!_fFlatPrior[j]) {
+        g += InvertCovMatrix[i][j] * (_fPropVal[j] - _fPreFitValue[j]);
+      }
+    }
+    grad[i] = g;
+  }
+  return grad;
+}
+
+// ********************************************
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
   int NOutside = 0;
@@ -776,9 +826,13 @@ int ParameterHandlerBase::CheckBounds() const _noexcept_ {
     // KS: Count how many parameters are outside bounds using branchless logic
     // faster by at least factor two
     // Do not multithread even with 5k params no gains
-    NOutside += (_fPropVal[i] > _fUpBound[i]) | (_fPropVal[i] < _fLowBound[i]);
+    NOutside += !(IsInBounds(i));
   }
   return NOutside;
+}
+
+bool ParameterHandlerBase::IsInBounds(const int i) const _noexcept_{
+  return (_fPropVal[i] < _fUpBound[i]) && (_fPropVal[i] > _fLowBound[i]);
 }
 
 // ********************************************

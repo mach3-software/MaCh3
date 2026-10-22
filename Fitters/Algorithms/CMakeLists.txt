@@ -9,6 +9,7 @@ set(HEADERS
     MaCh3Factory.h
     PredictiveThrower.h
     MulticanonicalMCMCHandler.h
+    HamiltonianMC.h
 )
 
 add_library(Fitters SHARED
@@ -22,6 +23,7 @@ add_library(Fitters SHARED
     PredictiveThrower.cpp
     MulticanonicalMCMCHandler.cpp
     MaCh3Factory.cpp
+    HamiltonianMC.cpp
 )
 
 set_target_properties(Fitters PROPERTIES

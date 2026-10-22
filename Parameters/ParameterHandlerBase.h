@@ -119,8 +119,11 @@ class ParameterHandlerBase {
   /// @note
   /// - If `_fFlatPrior[i]` is `true`, the parameter is excluded from the calculation.
   double CalcLikelihood() const _noexcept_;
+  std::vector<double> CalcGradient() const _noexcept_;
+
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
+  bool IsInBounds(const int i) const _noexcept_;
 
   /// @brief Return covariance matrix
   TMatrixDSym *GetCovMatrix() const { return covMatrix; }
@@ -204,6 +207,7 @@ class ParameterHandlerBase {
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
   const M3::float_t* RetPointer(const int iParam) const {return &(_fPropVal.data()[iParam]);}
+
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()

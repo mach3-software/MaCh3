@@ -38,6 +38,9 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* RetPointer(const SplineIndex& Variables) const;
+
+    const M3::float_t* RetGradPointer(const SplineIndex& Variables) const;
+
     /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
     /// @copydoc SplineBase::LoadSplineFile
@@ -124,6 +127,10 @@ class BinnedSplineHandler : public SplineBase {
 
     /// Stores weight from spline evaluation for each single spline
     std::vector<M3::float_t> cpu_spline_weights;
+
+    /// Stores gradient from spline evaluation (we assume each spline affects only 1 systematic)
+    std::vector<M3::float_t> cpu_spline_grad;
+
     /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> paramNo_arr;
 

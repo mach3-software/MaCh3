@@ -72,6 +72,10 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void PrintRates(const bool DataOnly = false) final;
   /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
+
+  std::vector<double>  GetGradLikelihood() const override;
+  std::vector<M3::float_t> CalcGradEvent(const EventInfo* _restrict_ MCEvent, M3::float_t total_weight)  const _noexcept_;
+
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
@@ -392,6 +396,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> SampleHandler_array;
   /// KS Array used for MC stat
   std::vector<double> SampleHandler_array_w2;
+
+  std::vector<std::vector<double>> SampleHandler_gradients;
+
   /// DB Array to be filled in AddData
   std::vector<double> SampleHandler_data;
   //===============================================================================

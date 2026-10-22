@@ -15,7 +15,7 @@ class MCMCBase : public FitterBase {
     virtual ~MCMCBase() = default;
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC() final;
+    void RunMCMC();
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain

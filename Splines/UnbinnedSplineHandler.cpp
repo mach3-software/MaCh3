@@ -18,6 +18,7 @@ void UnbinnedSplineHandler::Initialise() {
   NTF1_valid = 0;
 
   cpu_weights_spline_var = nullptr;
+  cpu_spline_grad = nullptr;
   cpu_weights_tf1_var = nullptr;
 
   cpu_total_weights = nullptr;
@@ -212,6 +213,7 @@ void UnbinnedSplineHandler::PrepareForGPU(std::vector<std::vector<TResponseFunct
   if (!useGPU) {
     cpu_total_weights = new M3::float_t[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
+    cpu_spline_grad = new M3::float_t[NSplines_valid]();
     cpu_weights_tf1_var = new float[NTF1_valid]();
   }
 
@@ -475,6 +477,7 @@ void UnbinnedSplineHandler::LoadSplineFile(std::string FileName) {
   if (!useGPU) {
     cpu_total_weights = new M3::float_t[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
+    cpu_spline_grad = new M3::float_t[NSplines_valid]();
     cpu_weights_tf1_var = new float[NTF1_valid]();
   }
 
@@ -606,6 +609,7 @@ UnbinnedSplineHandler::~UnbinnedSplineHandler() {
   }
 
   if(cpu_weights_spline_var != nullptr) delete[] cpu_weights_spline_var;
+  if(cpu_spline_grad != nullptr) delete[] cpu_spline_grad;
   if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
 
   if(cpu_monolith != nullptr) delete cpu_monolith;
@@ -728,6 +732,10 @@ void UnbinnedSplineHandler::CalcSplineWeights() {
 
       //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
       cpu_weights_spline_var[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
+    
+      // HW: the derivative
+      cpu_spline_grad[splineNum] = fmaf(dx, fmaf(dx, 3.0*fD, 2.0*fC), fB);
+
       // Or for the more "easy to read" version:
       //cpu_weights_spline_var[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
     }

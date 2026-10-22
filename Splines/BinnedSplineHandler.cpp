@@ -205,6 +205,8 @@ void BinnedSplineHandler::TransferToMonolith() {
   // Maps single spline object with single parameter
   paramNo_arr.resize(NSplines_valid);
   cpu_spline_weights.resize(NSplines_valid);
+  cpu_spline_grad.resize(NSplines_valid);
+
   nKnots_arr.resize(NSplines_valid);
   monolith_index.resize(NSplines_All);
   
@@ -217,6 +219,7 @@ void BinnedSplineHandler::TransferToMonolith() {
     int splineindex = entry.value;
     if(splinevec_Monolith[splineindex]) {
       cpu_spline_weights[ValidSplineCounter] = 1.0;
+      cpu_spline_grad[ValidSplineCounter] = 0.0;
 
       bool foundUniqueSpline = false;
       // We are trying to match Spline Object with single parameter (like MAQE)
@@ -329,6 +332,16 @@ void BinnedSplineHandler::CalcSplineWeights() {
 
     //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
     cpu_spline_weights[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
+
+    // We can also get the derivative here so might as well
+    if(cpu_spline_weights[splineNum]==0){
+      cpu_spline_grad[splineNum] = 0.0;
+    }
+    else{
+      cpu_spline_grad[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, 3.0*d, 2.0*c), b);
+    }
+
+    
     // Or for the more "easy to read" version:
     //cpu_spline_weights[splineNum]  = (fY+dx*(fB+dx*(fC+dx*fD)));
   }
@@ -480,6 +493,23 @@ const M3::float_t* BinnedSplineHandler::RetPointer(const SplineIndex& Variables)
     return &cpu_spline_weights[index_flattened];
   }
 }
+
+//****************************************
+const M3::float_t* BinnedSplineHandler::RetGradPointer(const SplineIndex& Variables) const {
+//****************************************
+  // index in global spline space
+  int Index = IndexVectMap.at(std::make_tuple(Variables.iSample, Variables.iOscChan, Variables.iSyst,
+                                              Variables.iMode, Variables.iVar));
+  // global in space after removing flat splines
+  auto index_flattened = monolith_index[IndexVect[Index].value];
+  // Very unlikely to get response from flat spline. Could perform some optimisation and remove these but leave for now.
+  if(index_flattened == M3::_BAD_INT_) {
+    return &M3::Unity;
+  } else {
+    return &cpu_spline_grad[index_flattened];
+  }
+}
+
 
 //****************************************
 int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity) const {
@@ -1086,6 +1116,9 @@ void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
   cpu_spline_weights.resize(NSplines_valid);
   std::vector<int>* monolith_index_temp = nullptr;
   MonolithTree->SetBranchAddress("monolith_index", &monolith_index_temp);
+
+  // For gradients (we store as param id, weight derivative)
+  cpu_spline_grad.resize(NSplines_valid);
 
   // Load vectors
   std::vector<unsigned int>* nKnots_arr_temp = nullptr;

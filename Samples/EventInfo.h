@@ -26,6 +26,8 @@ struct EventInfo {
 
   /// Pointers to weights like oscillation spline, normalisation etc
   std::vector<const M3::float_t*> total_weight_pointers;
+  std::vector<std::pair<int, const M3::float_t*>> total_weight_gradients;
+  
 
   /// The x_var and y_vars and beyond that you're binning in
   std::vector<const double*> KinVar;
