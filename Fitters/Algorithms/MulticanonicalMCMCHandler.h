@@ -18,6 +18,32 @@ namespace M3 {
     kGeneralisedGaussian
   };
 
+  inline M3::BiasFunction ParseBiasFunction(const std::string& biasFunctionName) {
+    if (biasFunctionName == "gaussian") {
+      return M3::BiasFunction::kGaussian;
+    }
+    if (biasFunctionName == "vonMises") {
+      return M3::BiasFunction::kVonMises;
+    }
+    if (biasFunctionName == "generalisedGaussian") {
+      return M3::BiasFunction::kGeneralisedGaussian;
+    }
+    throw MaCh3Exception(__FILE__, __LINE__, "Unknown multicanonical bias function: " + biasFunctionName);
+  }
+
+  inline std::string BiasFunction_ToString(const M3::BiasFunction& biasFunction) {
+    switch (biasFunction) {
+      case M3::BiasFunction::kGaussian:
+        return "gaussian";
+      case M3::BiasFunction::kVonMises:
+        return "vonMises";
+      case M3::BiasFunction::kGeneralisedGaussian:
+        return "generalisedGaussian";
+      default:
+        throw MaCh3Exception(__FILE__, __LINE__, "Unknown multicanonical bias function");
+    }
+  }
+
   /// Normalisation constant for the n=2 umbrella sampling Gaussian.
   ///
   /// The factor comes from:
@@ -44,7 +70,7 @@ namespace M3 {
 /// </video>
 /// @endhtmlonly
 class MulticanonicalMCMCHandler {
-public:
+ public:
   /// @brief Constructor
   MulticanonicalMCMCHandler();
   /// @brief Destructor
@@ -74,23 +100,23 @@ public:
   /// @brief Compute the multicanonical penalty for the configured bias mode.
   /// @details This wraps the various bias function implementations and returns the appropriate penalty
   /// @return Returns the log likelihood penalty for the selected bias function at the proposed parameter values.
-  double GetMulticanonicalWeight(double deltacp, double delm23_value);
+  double GetMulticanonicalWeight() const;
 
   /// @brief Compute the multicanonical penalty using a spline.
-  double GetMulticanonicalWeightSpline(double deltacp, double delm23_value);
+  double GetMulticanonicalWeightSpline(double deltacp, double delm23) const;
 
   /// @brief Compute a Gaussian multicanonical penalty.
-  double GetMulticanonicalWeightGaussian(double deltacp);
+  double GetMulticanonicalWeightGaussian(double deltacp) const;
 
   /// @brief Compute a triple-Gaussian multicanonical penalty.
   /// @details This was mostly for testing the first implementation, probably not used anymore.
-  double GetMulticanonicalWeightTripleGaussian(double deltacp);
+  double GetMulticanonicalWeightTripleGaussian(double deltacp) const;
 
   /// @brief Compute a von Mises multicanonical penalty.
   /// @details This is the circular analogue of a gaussian, meaning it handles the wrapping of the parameter space at 2pi automatically
   /// this avoids the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary
   /// the normalisation grows extremely quickly, widths of less that 0.05 should not be used until properly tested.
-  double GetMulticanonicalWeightVonMises(double deltacp);
+  double GetMulticanonicalWeightVonMises(double deltacp) const;
 
   /// @brief Compute a generalised-Gaussian multicanonical penalty.
   /// @details the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger 
@@ -98,21 +124,28 @@ public:
   /// This is the current recommended configuration for umbrella sampling.
   /// @todo implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary
   /// @todo implement the normalisation for n != 2, and allow n to be set in the yaml configuration file
-  double GetMulticanonicalWeightGenGaussian(double deltacp);
+  double GetMulticanonicalWeightGenGaussian(double deltacp) const;
 
   /// @brief Compute the circular distance between two angles.
   /// @details This is used to calculate the distance between two angles in a circular space, such as delta_cp. It returns the shortest distance between the two angles, taking into account the wrapping at 2pi.
-  double circularDistance(double x, double mean);
+  double circularDistance(double x, double mean) const;
 
   /// @brief Wraps the generalised gaussian function for a given x, mean, and width. Required to handle the wrapping of the parameter space at 2pi.
-  double generalisedGaussian2(double x, double mean, double width);
+  double generalisedGaussian2(double x, double mean, double width) const;
 
   /// @brief Index of the oscillation-covariance systematic in the current fit.
   int oscCovVar;
-  /// @brief Parameter index used for the multicanonical delta_cp weight.
+  /// @brief Parameter name used for the multicanonical weight, most often delta_cp.
+  std::string multicanonicalVarName;
+  /// @brief Parameter index used for the multicanonical weight, most often delta_cp.
   int multicanonicalVar;
   /// @brief Parameter index used for the multicanonical delm2_23 weight.
   int multicanonicalVar_dm23;
+
+  /// @brief Pointer to value of parameter vale used for multicanonical weight, most often delta_cp.
+  const M3::float_t* multicanonicalVarValue;
+  /// @brief Pointer to value of delm2_23 weight used for multicanonical weight.
+  const M3::float_t* multicanonicalVar_dm23_value;
 
   /// @brief Selected bias function for multicanonical weights.
   M3::BiasFunction umbrellaBiasFunction;
@@ -123,14 +156,9 @@ public:
   /// @brief Toggle for spline-based multicanonical weights.
   bool multicanonicalSpline;
 
-protected:
+ protected:
   /// @brief Global scale factor applied to the multicanonical penalty. 1 is full strength, 0 is no penalty.
   double multicanonicalBeta;
-
-  /// @brief delta_cp value used during proposal evaluation.
-  double delta_cp_value;
-  /// @brief delm2_23 value used during proposal evaluation.
-  double delm23_value;
 
   /// @brief Spline for the IO branch, if spline mode is enabled.
   TSpline3* dcp_spline_IO;

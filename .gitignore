@@ -10,8 +10,11 @@ Doc/html
 Doc/latex
 Doc/Doxyfile
 Doc/User-Guide
+Doc/sphinx/source/api/
+Doc/sphinx/source/conf.py
 .cache/
 
+sphinx_env/
 # Ignore emacs/vim stuff
 *#* 
 *~*

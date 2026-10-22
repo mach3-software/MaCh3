@@ -13,7 +13,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLegend.h"
 #include "TString.h"
 #include "TH1.h"
-#include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TColor.h"
 #include "TStyle.h"
@@ -83,8 +82,6 @@ void RHatCalculator::RunDiagnostic() {
 // Load chain and prepare toys
 void RHatCalculator::PrepareChains_HighMem() {
 // *******************
-  auto rnd = std::make_unique<TRandom3>(0);
-
   MACH3LOG_INFO("Generating {}", Ntoys);
 
   TStopwatch clock;
@@ -222,7 +219,7 @@ void RHatCalculator::PrepareChains_HighMem() {
     for (int i = 0; i < Ntoys; i++)
     {
       // Get a random entry after burn in
-      int entry = int(nEntries[m]*rnd->Rndm());
+      int entry = int(nEntries[m]*M3::rand::Uniform());
 
       Chain->GetEntry(entry);
 
