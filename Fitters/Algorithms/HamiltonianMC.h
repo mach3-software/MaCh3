@@ -3,6 +3,8 @@
 #include "Algorithms/MCMCBase.h"
 
 /// @brief Hamiltonian Monte Carlo.
+/// @details The mass matrix is each parameter handler's covariance, so DeltaT is in units of prior
+/// sigma rather than of the raw parameter values.
 /// @author Henry Wallace
 ///
 /// @ingroup FittingAlgorithms
@@ -22,7 +24,7 @@ protected:
     /// @brief The MCMC step proposal and acceptance
     void DoStep() override;
 
-    /// @brief Draw a fresh momentum and integrate a full leapfrog trajectory from the current state
+    /// @brief Draw a fresh velocity and integrate a full leapfrog trajectory from the current state
     /// @details Sets logLProp to \f$U\f$ at the end of the trajectory, as the base class expects
     void ProposeStep() override;
 
@@ -30,7 +32,7 @@ protected:
     double AcceptanceProbability() override;
 
     /// @brief Work out the flat parameter ordering and enable gradients in the samples
-    /// @details Called once at the start of the fit. The flat ordering used by #momentum and
+    /// @details Called once at the start of the fit. The flat ordering used by #velocity and
     /// #gradient is every systematic's parameters concatenated in the order they were added.
     void SetupGradients();
 
@@ -38,12 +40,37 @@ protected:
     /// @note Expects the samples to have been reweighted for the current proposed values already
     void UpdateGradU();
 
-    /// @brief Half a leapfrog kick, \f$p \rightarrow p - \frac{\Delta t}{2} \nabla U\f$
-    void UpdateMomentum();
+    /// @brief Build the mass matrix blocks from each parameter handler's covariance
+    /// @details Called once at the start of the fit, after SetupGradients()
+    void SetupMassMatrix();
 
-    /// @brief One leapfrog drift, \f$x \rightarrow x + \Delta t\, p\f$, then reweight the samples
-    /// @details Parameters which would land out of bounds are reflected back in, see the class docs
+    /// @brief Draw a fresh velocity \f$w \sim N(0, M^{-1})\f$
+    void ThrowVelocity();
+
+    /// @brief Kinetic energy \f$\frac{1}{2} w^T M w\f$ of the current velocity
+    double KineticEnergy();
+
+    /// @brief Half a leapfrog kick, \f$w \rightarrow w - \frac{\Delta t}{2} M^{-1} \nabla U\f$
+    void UpdateVelocity();
+
+    /// @brief One leapfrog drift, \f$x \rightarrow x + \Delta t\, w\f$, then reweight the samples
+    /// @details Parameters which would land out of bounds are reflected back in
     void UpdatePosition();
+
+    /// @brief Pin fixed parameters' velocities to zero so they never drift
+    void ZeroFixedVelocities();
+
+    /// One parameter handler's contribution to the block diagonal mass matrix
+    struct MassBlock {
+      /// Where this handler's parameters start in the flat vectors
+      int Offset = 0;
+      /// How many parameters this handler has
+      int NPars = 0;
+      /// \f$M^{-1}\f$, the handler's covariance with fixed parameters decoupled, row major
+      std::vector<double> InvMass;
+      /// Lower triangular \f$L\f$ with \f$L L^T = M^{-1}\f$, row major
+      std::vector<double> Chol;
+    };
 
     /// How many times one drift may bounce off a parameter's bounds before we give up on the step
     static constexpr int MaxReflections = 100;
@@ -53,17 +80,26 @@ protected:
     /// Leapfrog step size
     double delta_t;
 
-    /// Kinetic energy of the momentum the current trajectory started from
+    /// Kinetic energy of the velocity the current trajectory started from
     double ke_init;
     /// Potential energy, i.e. -logL, where the current trajectory started from
     double logL_init;
 
-    /// Momentum conjugate to every parameter, in the flat ordering from SetupGradients()
-    std::vector<double> momentum;
+    /// Velocity \f$w = M^{-1} p\f$ of every parameter, in the flat ordering from SetupGradients()
+    std::vector<double> velocity;
     /// \f$\nabla U\f$ for every parameter, in the flat ordering from SetupGradients()
     std::vector<double> gradient;
 
-    /// Where each systematic's parameters start in #momentum and #gradient
+    /// One mass matrix block per systematic, in the same order as #syst_offset
+    std::vector<MassBlock> mass;
+    /// Whether each parameter is fixed, cached when the mass matrix is built
+    std::vector<char> par_fixed;
+    /// Standard normal throws ThrowVelocity() correlates with the Cholesky factor
+    std::vector<double> rand_throw;
+    /// Scratch space for the triangular solve in KineticEnergy()
+    std::vector<double> chol_solve;
+
+    /// Where each systematic's parameters start in #velocity and #gradient
     std::vector<int> syst_offset;
     /// Where each sample's GetGradLikelihood() entries start in #gradient
     std::vector<int> sample_offset;
