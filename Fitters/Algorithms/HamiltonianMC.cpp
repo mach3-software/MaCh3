@@ -138,7 +138,7 @@ void HamiltonianMC::ProposeStep() {
     logL_init = 0.;
     for (const auto& syst : systematics) {
         logL_init += syst->GetLikelihood();
-    }`
+    }
     for (const auto& samp : samples) {
         logL_init += samp->GetLikelihood();
     }
