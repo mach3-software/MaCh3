@@ -708,6 +708,26 @@ void SampleHandlerBase::SetComputeGradients(const bool Enable) {
     MACH3LOG_ERROR("Parameter handler {} has no parameters to take gradients with respect to", ParHandler->GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+  //HW Experiments push their own functional weights into total_weight_pointers in SetupWeightPointers,
+  //which core never sees, so pad those with a zero derivative to keep the two arrays parallel
+  size_t NMissingDerivs = 0;
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
+    auto& Pointers = MCEvents[iEvent].total_weight_pointers;
+    auto& Derivs = MCEvents[iEvent].total_weight_gradients;
+    if (Derivs.size() == Pointers.size()) continue;
+    if (Derivs.size() > Pointers.size()) {
+      MACH3LOG_ERROR("Event {} of {} has {} weight derivatives but only {} weights, so they can't be "
+                     "matched up", iEvent, GetName(), Derivs.size(), Pointers.size());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    NMissingDerivs += Pointers.size() - Derivs.size();
+    Derivs.resize(Pointers.size(), {0, &M3::Zero});
+  }
+  if (NMissingDerivs > 0) {
+    MACH3LOG_WARN("{} has {} event weights with no registered derivative, most likely functional "
+                  "parameters. Their gradient is dropped", GetName(), NMissingDerivs);
+  }
+
   //HW Bin major, so one bin's parameters stay contiguous
   SampleHandler_gradients.assign(static_cast<size_t>(Binning->GetNBins()) * static_cast<size_t>(nGradPars), 0.);
   MACH3LOG_INFO("{} is now tracking gradients for {} parameters over {} bins",
@@ -1305,8 +1325,10 @@ void SampleHandlerBase::SetSplinePointers() {
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
         w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline]));
 
-        //HW Can do the same with the gradients, each spline only ever affects one systematic
-        w_grad_pointers.push_back({SystIndex, BinnedSpline->RetGradPointer(EventSplines[static_cast<size_t>(spline)])});
+        //HW Same for the gradients, each spline only ever affects one systematic. iSyst indexes this
+        //sample's spline params, so take .index off it for the global one the gradient array uses
+        const int GlobalParIndex = SplineParsVec[static_cast<size_t>(SampleId)][static_cast<size_t>(SystIndex)].index;
+        w_grad_pointers.push_back({GlobalParIndex, BinnedSpline->RetGradPointer(EventSplines[static_cast<size_t>(spline)])});
       } // end loop over splines
       w_pointers.shrink_to_fit();
       w_grad_pointers.shrink_to_fit();

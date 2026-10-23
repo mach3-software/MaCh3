@@ -114,69 +114,33 @@ void HamiltonianMC::ProposeStep() {
 
     // Start from the last accepted state. A rejected step leaves the proposed values at the end of
     // the trajectory we threw away, so this has to be done explicitly
-    for (size_t s = 0; s < systematics.size(); ++s) {
-        const int NPars = systematics[s]->GetNumParams();
-        for (int i = 0; i < NPars; ++i) {
-            systematics[s]->SetParProp(i, systematics[s]->GetParCurr(i));
-        }
-    }
+    RestoreCurrentPosition();
 
     // Keep the kinetic energy so we can compare the Hamiltonian at either end of the trajectory
     ThrowVelocity();
     ke_init = KineticEnergy();
 
     // The first half kick needs dU/dx where the trajectory starts
-    for (auto& samp : samples) {
-        samp->Reweight();
-    }
+    ReweightSamples();
     UpdateGradU();
 
     // Taking U here keeps the Hamiltonian self consistent instead of leaning on logLCurr, which
     // the base class only seeds after this function has already run once
-    logL_init = 0.;
-    for (const auto& syst : systematics) {
-        logL_init += syst->GetLikelihood();
-    }
-    for (const auto& samp : samples) {
-        logL_init += samp->GetLikelihood();
-    }
+    logL_init = PotentialEnergy();
 
     for (int f = 0; f < n_leapfrog; ++f) {
         // Half kick, drift, half kick. Adjacent half kicks compose into the usual full kick
-        UpdateVelocity();
-        UpdatePosition();
+        UpdateVelocity(delta_t);
+        UpdatePosition(delta_t);
         // A parameter couldn't be brought back inside its bounds, this trajectory is a write off
         if (out_of_bounds) break;
         UpdateGradU();
-        UpdateVelocity();
+        UpdateVelocity(delta_t);
     }
 
     // Finally the potential energy at the end of the trajectory, using the weights UpdatePosition left
-    double llh = 0.0;
-    for (size_t s = 0; s < systematics.size(); ++s)
-    {
-        syst_llh[s] = systematics[s]->GetLikelihood();
-        llh += syst_llh[s];
-    }
-
-    // A reflected parameter stays in bounds, so only a genuinely mad prior penalty gets us here
-    if (llh >= M3::_LARGE_LOGL_)
-    {
-        out_of_bounds = true;
-        for (size_t i = 0; i < samples.size(); ++i) {
-            sample_llh[i] = M3::_LARGE_LOGL_;
-        }
-    }
-    else
-    {
-        for (size_t i = 0; i < samples.size(); ++i)
-        {
-            sample_llh[i] = samples[i]->GetLikelihood();
-            llh += sample_llh[i];
-        }
-    }
-
-    logLProp = llh;
+    logLProp = PotentialEnergy();
+    if (logLProp >= M3::_LARGE_LOGL_) out_of_bounds = true;
 }
 
 // *******************
@@ -338,9 +302,115 @@ double HamiltonianMC::KineticEnergy() {
 }
 
 // *******************
-void HamiltonianMC::UpdateVelocity() {
+double HamiltonianMC::KineticEnergyAndMomentum(std::vector<double>& Momentum) {
 // *******************
-    //HW Half kick, which in velocity coordinates is w -> w - (dt/2) M^-1 grad U
+    //HW M^-1 = L L^T, so M = L^-T L^-1. Forward substituting L u = w gives the kinetic energy as
+    //1/2 |u|^2, and back substituting L^T p = u then gives p = M w, both without forming M
+    Momentum.resize(velocity.size());
+    double ke = 0.;
+    for (const auto& Block : mass) {
+        const int NPars = Block.NPars;
+        const double* _restrict_ L = Block.Chol.data();
+        const double* _restrict_ Vel = velocity.data() + Block.Offset;
+        double* _restrict_ u = chol_solve.data();
+        double* _restrict_ Mom = Momentum.data() + Block.Offset;
+
+        for (int i = 0; i < NPars; ++i) {
+            double Sum = Vel[i];
+            for (int j = 0; j < i; ++j) {
+                Sum -= L[i * NPars + j] * u[j];
+            }
+            u[i] = Sum / L[i * NPars + i];
+            ke += 0.5 * u[i] * u[i];
+        }
+
+        //HW L^T is upper triangular, so row i only touches the momenta already solved for
+        for (int i = NPars - 1; i >= 0; --i) {
+            double Sum = u[i];
+            for (int j = i + 1; j < NPars; ++j) {
+                Sum -= L[j * NPars + i] * Mom[j];
+            }
+            Mom[i] = Sum / L[i * NPars + i];
+        }
+    }
+    return ke;
+}
+
+// *******************
+void HamiltonianMC::RestoreCurrentPosition() {
+// *******************
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        const int NPars = systematics[s]->GetNumParams();
+        for (int i = 0; i < NPars; ++i) {
+            systematics[s]->SetParProp(i, systematics[s]->GetParCurr(i));
+        }
+    }
+}
+
+// *******************
+void HamiltonianMC::ReweightSamples() {
+// *******************
+    for (auto& samp : samples) {
+        samp->Reweight();
+    }
+}
+
+// *******************
+double HamiltonianMC::PotentialEnergy() {
+// *******************
+    double llh = 0.0;
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        syst_llh[s] = systematics[s]->GetLikelihood();
+        llh += syst_llh[s];
+    }
+
+    // A reflected parameter stays in bounds, so only a genuinely mad prior penalty gets us here,
+    // and then the samples aren't worth evaluating. The caller decides what that means for the step
+    if (llh >= M3::_LARGE_LOGL_) {
+        for (size_t i = 0; i < samples.size(); ++i) {
+            sample_llh[i] = M3::_LARGE_LOGL_;
+        }
+        return llh;
+    }
+
+    for (size_t i = 0; i < samples.size(); ++i) {
+        sample_llh[i] = samples[i]->GetLikelihood();
+        llh += sample_llh[i];
+    }
+    return llh;
+}
+
+// *******************
+void HamiltonianMC::SavePosition(std::vector<double>& Out) const {
+// *******************
+    Out.resize(velocity.size());
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        const int NPars = systematics[s]->GetNumParams();
+        const size_t Offset = static_cast<size_t>(syst_offset[s]);
+        for (int i = 0; i < NPars; ++i) {
+            Out[Offset + static_cast<size_t>(i)] = systematics[s]->GetParProp(i);
+        }
+    }
+}
+
+// *******************
+void HamiltonianMC::RestorePosition(const std::vector<double>& In) {
+// *******************
+    //HW In place, one parameter at a time. The samples and splines hold raw pointers into the
+    //proposed values, so the vector itself must never be swapped or resized under them
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        const int NPars = systematics[s]->GetNumParams();
+        const size_t Offset = static_cast<size_t>(syst_offset[s]);
+        for (int i = 0; i < NPars; ++i) {
+            systematics[s]->SetParProp(i, In[Offset + static_cast<size_t>(i)]);
+        }
+    }
+}
+
+// *******************
+void HamiltonianMC::UpdateVelocity(const double Step) {
+// *******************
+    //HW Half a kick, which in velocity coordinates is w -> w - (h/2) M^-1 grad U
     for (const auto& Block : mass) {
         const int NPars = Block.NPars;
         const double* _restrict_ InvMass = Block.InvMass.data();
@@ -358,7 +428,7 @@ void HamiltonianMC::UpdateVelocity() {
             for (int j = 0; j < NPars; ++j) {
                 Sum += InvMass[i * NPars + j] * Grad[j];
             }
-            Vel[i] -= 0.5 * delta_t * Sum;
+            Vel[i] -= 0.5 * Step * Sum;
         }
     }
     ZeroFixedVelocities();
@@ -374,7 +444,7 @@ void HamiltonianMC::ZeroFixedVelocities() {
 }
 
 // *******************
-void HamiltonianMC::UpdatePosition() {
+void HamiltonianMC::UpdatePosition(const double Step) {
 // *******************
     for (size_t s = 0; s < systematics.size(); ++s) {
         const int NPars = systematics[s]->GetNumParams();
@@ -384,7 +454,7 @@ void HamiltonianMC::UpdatePosition() {
             const size_t k = Offset + static_cast<size_t>(i);
             //HW Carrying the velocity rather than the momentum keeps the drift axis aligned, so the
             //reflection below stays a simple per parameter sign flip
-            double NewVal = systematics[s]->GetParProp(i) + delta_t * velocity[k];
+            double NewVal = systematics[s]->GetParProp(i) + Step * velocity[k];
 
             const double LowBound = systematics[s]->GetLowerBound(i);
             const double UpBound = systematics[s]->GetUpperBound(i);
@@ -398,9 +468,9 @@ void HamiltonianMC::UpdatePosition() {
                 if (++NReflections >= MaxReflections) {
                     // DeltaT is far too big for this parameter's range, give up on the trajectory
                     // rather than spin here
-                    MACH3LOG_WARN("Parameter {} bounced {} times in one drift, DeltaT = {} is too "
+                    MACH3LOG_WARN("Parameter {} bounced {} times in one drift, step {} is too "
                                   "large for its range [{}, {}]", systematics[s]->GetParFancyName(i),
-                                  NReflections, delta_t, LowBound, UpBound);
+                                  NReflections, Step, LowBound, UpBound);
                     out_of_bounds = true;
                     NewVal = systematics[s]->GetParCurr(i);
                     break;
@@ -411,9 +481,7 @@ void HamiltonianMC::UpdatePosition() {
     }
 
     // Both the gradient and the likelihood need the prediction at the new parameter values
-    for (auto& samp : samples) {
-        samp->Reweight();
-    }
+    ReweightSamples();
 }
 
 // **********************

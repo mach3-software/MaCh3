@@ -56,15 +56,47 @@ protected:
     /// @brief Kinetic energy \f$\frac{1}{2} w^T M w\f$ of the current velocity
     double KineticEnergy();
 
-    /// @brief Half a leapfrog kick, \f$w \rightarrow w - \frac{\Delta t}{2} M^{-1} \nabla U\f$
-    void UpdateVelocity();
+    /// @brief Kinetic energy, and the momentum \f$p = M w\f$ that goes with the current velocity
+    /// @param Momentum Filled with \f$p\f$ in the flat ordering, resized if needed
+    /// @details Gradient based stopping rules need the momentum rather than the velocity. It costs
+    /// one back substitution on top of the forward one KineticEnergy() already does
+    double KineticEnergyAndMomentum(std::vector<double>& Momentum);
 
-    /// @brief One leapfrog drift, \f$x \rightarrow x + \Delta t\, w\f$, then reweight the samples
+    /// @brief Reset the proposed parameter values back to the last accepted ones
+    void RestoreCurrentPosition();
+
+    /// @brief Half a leapfrog kick, \f$w \rightarrow w - \frac{h}{2} M^{-1} \nabla U\f$
+    /// @param Step The integrator step, negative to integrate backwards
+    void UpdateVelocity(const double Step);
+
+    /// @brief A leapfrog drift, \f$x \rightarrow x + h\, w\f$, then reweight the samples
+    /// @param Step The integrator step, negative to integrate backwards
     /// @details Parameters which would land out of bounds are reflected back in
-    void UpdatePosition();
+    void UpdatePosition(const double Step);
 
     /// @brief Pin fixed parameters' velocities to zero so they never drift
     void ZeroFixedVelocities();
+
+    /// @brief Reweight every sample for the current proposed parameter values
+    /// @details All that is needed after a position change, it drives the oscillator, splines and
+    /// functional parameters internally
+    void ReweightSamples();
+
+    /// @brief Potential energy \f$U = -\log\mathcal{L}\f$ at the current proposed values
+    /// @details Also fills syst_llh and sample_llh, which the output tree writes. Returns
+    /// M3::_LARGE_LOGL_ or more when the prior penalty alone is already mad, without evaluating the
+    /// samples; what that means for the step is the caller's call
+    /// @note Expects the samples to have been reweighted already
+    double PotentialEnergy();
+
+    /// @brief Copy the proposed parameter values into the flat ordering from SetupGradients()
+    /// @param Out Resized if needed
+    void SavePosition(std::vector<double>& Out) const;
+
+    /// @brief Write a flat position back into the parameter handlers
+    /// @param In Position in the flat ordering from SetupGradients()
+    /// @note Writes in place, the samples and splines cache raw pointers into the proposed values
+    void RestorePosition(const std::vector<double>& In);
 
     /// One parameter handler's contribution to the block diagonal mass matrix
     struct MassBlock {
