@@ -119,11 +119,23 @@ class ParameterHandlerBase {
   /// @note
   /// - If `_fFlatPrior[i]` is `true`, the parameter is excluded from the calculation.
   double CalcLikelihood() const _noexcept_;
+
+  /// @brief Gradient of CalcLikelihood with respect to every parameter
+  /// @return \f$\partial(-\log\mathcal{L})/\partial x_i\f$ for every parameter \f$i\f$
+  /// @details CalcLikelihood evaluates \f$\frac{1}{2}\Delta^T M^{-1} \Delta\f$ for
+  /// \f$\Delta_i = x_i - x_i^\text{prefit}\f$, so the gradient is simply \f$M^{-1}\Delta\f$.
+  /// Parameters with a flat prior get a zero gradient, matching their absence from CalcLikelihood.
   std::vector<double> CalcGradient() const _noexcept_;
 
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   virtual double GetLikelihood();
-  bool IsInBounds(const int i) const _noexcept_;
+
+  /// @brief Is the proposed value of a single parameter within its allowed bounds?
+  /// @param i Parameter index
+  bool IsInBounds(const int i) const _noexcept_ {
+    const size_t idx = static_cast<size_t>(i);
+    return (_fPropVal[idx] <= _fUpBound[idx]) && (_fPropVal[idx] >= _fLowBound[idx]);
+  }
 
   /// @brief Return covariance matrix
   TMatrixDSym *GetCovMatrix() const { return covMatrix; }
@@ -207,7 +219,6 @@ class ParameterHandlerBase {
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
   const M3::float_t* RetPointer(const int iParam) const {return &(_fPropVal.data()[iParam]);}
-
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()

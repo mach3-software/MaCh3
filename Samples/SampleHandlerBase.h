@@ -73,10 +73,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void PrintRates(const bool DataOnly = false) final;
   /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
-
-  std::vector<double>  GetGradLikelihood() const override;
-  std::vector<M3::float_t> CalcGradEvent(const EventInfo* _restrict_ MCEvent, M3::float_t total_weight)  const _noexcept_;
-
+  /// @copydoc SampleHandlerInterface::GetGradLikelihood
+  std::vector<double> GetGradLikelihood() const override;
+  /// @copydoc SampleHandlerInterface::SetComputeGradients
+  void SetComputeGradients(const bool Enable) override;
+  /// @copydoc SampleHandlerInterface::GetGradParHandler
+  const ParameterHandlerBase* GetGradParHandler() const override { return ParHandler; }
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int iSample) const override;
   //===============================================================================
@@ -191,6 +193,15 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Return array storing W2 entries for every bin
   auto GetW2Array() const {
     return SampleHandler_array_w2;
+  }
+  /// @brief Return flat array of d(bin content)/d(parameter) for every bin
+  /// @details Indexed as [iBin * GetNGradPars() + iPar], empty unless SetComputeGradients(true)
+  const std::vector<double>& GetGradArray() const {
+    return SampleHandler_gradients;
+  }
+  /// @brief Return the number of parameters GetGradArray() is indexed by, 0 when gradients are off
+  int GetNGradPars() const {
+    return nGradPars;
   }
   /// @brief Return a sub-array for a given sample.
   std::vector<double> GetArrayForSample(const int Sample, std::vector<double> const & array) const;
@@ -331,6 +342,17 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Calculate the total weight weight for a given event
   M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_;
 
+  /// @brief Accumulate one event's weight derivatives into the flat gradient array
+  /// @param MCEvent Event whose weight derivatives we want
+  /// @param TotalWeight The event's total weight, as returned by CalcWeightTotal
+  /// @param GlobalBin Global bin the event falls into
+  /// @param GradArray Flat NBins * nGradPars array to accumulate into, see SampleHandler_gradients
+  /// @details For \f$W = \prod_k w_k\f$ the chain rule gives
+  /// \f$\partial W/\partial x_p = W \sum_k w_k^{-1} \partial w_k/\partial x_p\f$. Only call this with
+  /// TotalWeight > 0, which guarantees no \f$w_k\f$ is zero and so the division is safe.
+  void FillGradientArray(const EventInfo* _restrict_ MCEvent, const double TotalWeight,
+                         const int GlobalBin, double* _restrict_ GradArray) const _noexcept_;
+
   /// @brief Calculate weights for function parameters
   ///
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
@@ -397,9 +419,14 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> SampleHandler_array;
   /// KS Array used for MC stat
   std::vector<double> SampleHandler_array_w2;
-
-  std::vector<std::vector<double>> SampleHandler_gradients;
-
+  /// HW Flat NBins * nGradPars array of d(bin content)/d(parameter), indexed as
+  /// [iBin * nGradPars + iPar] so the parameters of one bin are contiguous.
+  /// Empty unless SetComputeGradients(true) was called
+  std::vector<double> SampleHandler_gradients;
+  /// HW Number of parameters SampleHandler_gradients is indexed by, 0 when gradients are off
+  int nGradPars = 0;
+  /// HW Whether to fill SampleHandler_gradients during the reweight, see SetComputeGradients
+  bool ComputeGradients = false;
   /// DB Array to be filled in AddData
   std::vector<double> SampleHandler_data;
   //===============================================================================

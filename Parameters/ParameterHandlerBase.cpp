@@ -769,46 +769,24 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 }
 
 // ********************************************
-// Get the likelihood in the case where we want to include priors on the parameters
+// Gradient of CalcLikelihood with respect to every parameter
+// CalcLikelihood is 0.5 * Diff^T * InvertCovMatrix * Diff, so the gradient is InvertCovMatrix * Diff
 // _fFlatPrior stores if we want to evaluate the likelihood for the given parameter
-//                    true = don't evaluate likelihood (so run without a prior)
+//                    true = don't evaluate likelihood (so run without a prior, zero gradient)
 //                    false = evaluate likelihood (so run with a prior)
-// double ParameterHandlerBase::CalcGradient() const _noexcept_ {
-// // ********************************************
-//   std::vector<double> gradLogL(GetNumParams, 0.0);
-//   #ifdef MULTITHREAD
-//   #pragma omp parallel for reduction(+:logL)
-//   #endif
-//   for(int i = 0; i < _fNumPar; ++i) {
-//     if(_fFlatPrior[i]){
-//       //HW: Flat prior, no need to calculate anything
-//       continue;
-//     }
-//     // KS: Precalculate Diff once per "i" without doing this for every "j"
-//     const double Diff = _fPropVal[i] - _fPreFitValue[i];
-//     #ifdef MULTITHREAD
-//     #pragma omp simd
-//     #endif
-//     for (int j = 0; j <= _fNumPar; ++j) {
-//       if (!_fFlatPrior[j]) {
-//         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-//         // gradLogL[i] += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
-//         gradLogL[i] += InvertCovMatrix[i][j] * (_fPropVal[j] - _fPreFitValue[j]);
-//       }
-//     }
-//   }
-//   return logL;
-// }
-
 std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
-  std::vector<double> grad(GetNumParams(), 0.0);
+// ********************************************
+  std::vector<double> grad(static_cast<size_t>(_fNumPar), 0.0);
+  const size_t NPars = static_cast<size_t>(_fNumPar);
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (int i = 0; i < _fNumPar; ++i) {
-    if (_fFlatPrior[i]) continue;           // flat prior -> zero gradient
+  for (size_t i = 0; i < NPars; ++i) {
+    //HW: Flat prior means no penalty, so no gradient either
+    if (_fFlatPrior[i]) continue;
     double g = 0.0;
-    for (int j = 0; j < _fNumPar; ++j) {    // full row, not the triangle
+    //HW: The whole row here, unlike CalcLikelihood we can't exploit the symmetry to halve the work
+    for (size_t j = 0; j < NPars; ++j) {
       if (!_fFlatPrior[j]) {
         g += InvertCovMatrix[i][j] * (_fPropVal[j] - _fPreFitValue[j]);
       }
@@ -829,10 +807,6 @@ int ParameterHandlerBase::CheckBounds() const _noexcept_ {
     NOutside += !(IsInBounds(i));
   }
   return NOutside;
-}
-
-bool ParameterHandlerBase::IsInBounds(const int i) const _noexcept_{
-  return (_fPropVal[i] < _fUpBound[i]) && (_fPropVal[i] > _fLowBound[i]);
 }
 
 // ********************************************

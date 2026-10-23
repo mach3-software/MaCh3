@@ -398,7 +398,9 @@ void SampleHandlerBase::FillArray() {
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
-  std::vector<double>* _restrict_ Grad_Array_for_reduction = SampleHandler_gradients.data();
+  //HW Null unless SetComputeGradients(true) was called. Not part of the reduction below, a per-thread
+  //copy of a NBins * nGradPars array would dwarf the MC prediction itself, so we use atomics instead
+  double* _restrict_ Grad_Array = ComputeGradients ? SampleHandler_gradients.data() : nullptr;
 
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
@@ -418,9 +420,6 @@ void SampleHandlerBase::FillArray() {
     CalcWeightFunc(iEvent);
 
     const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-
-    const std::vector<M3::float_t> grad_weight = CalcGradEvent(MCEvent, totalweight);
-
     //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
       continue;
@@ -435,11 +434,8 @@ void SampleHandlerBase::FillArray() {
     //DB Fill relevant part of thread array
     if (GlobalBin > M3::UnderOverFlowBin) {
       MC_Array_for_reduction[GlobalBin] += totalweight;
-      
-      for(size_t i=0; i<grad_weight.size(); ++i){
-        Grad_Array_for_reduction[GlobalBin][i] += grad_weight[i];
-      }
-
+      //HW Safe to divide by the individual weights in here, totalweight > 0 means none of them is zero
+      if (Grad_Array != nullptr) FillGradientArray(MCEvent, totalweight, GlobalBin, Grad_Array);
       if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
     }
   }
@@ -456,6 +452,10 @@ void SampleHandlerBase::ResetHistograms() _noexcept_ {
   std::fill_n(SampleHandler_array.begin(), nBins, 0.0);
   if (FirstTimeW2) {
     std::fill_n(SampleHandler_array_w2.begin(), nBins, 0.0);
+  }
+  //HW The gradients accumulate the same way the MC prediction does, so they need wiping too
+  if (ComputeGradients) {
+    std::fill(SampleHandler_gradients.begin(), SampleHandler_gradients.end(), 0.0);
   }
 } // end function
 
@@ -497,24 +497,33 @@ M3::float_t SampleHandlerBase::CalcWeightTotal(const EventInfo* _restrict_ MCEve
 }
 
 // ***************************************************************************
-// Calculate the spline weight for one event
-std::vector<M3::float_t> SampleHandlerBase::CalcGradEvent(const EventInfo* _restrict_ MCEvent, M3::float_t total_weight) const _noexcept_ {
+// Accumulate the derivative of one event's total weight into the flat gradient array
+void SampleHandlerBase::FillGradientArray(const EventInfo* _restrict_ MCEvent, const double TotalWeight,
+                                          const int GlobalBin, double* _restrict_ GradArray) const _noexcept_ {
 // ***************************************************************************
-  std::vector<M3::float_t> gradient(ParHandler->GetNumParams(), 0.0);
+  //HW Flat array, so this bin's nGradPars entries start here and sit next to each other
+  const size_t BinOffset = static_cast<size_t>(GlobalBin) * static_cast<size_t>(nGradPars);
+  const size_t TotalWeights = MCEvent->total_weight_pointers.size();
 
-  const int n_weights = static_cast<int>(MCEvent->total_weight_pointers.size());
-  
   //DB Loop over stored pointers
-  // HW: No multithreading here sadly since we can't guarantee race condition safety
-  for (int iWeight = 0; iWeight < n_weights; ++iWeight) {
-    auto syst_weight = *(MCEvent->total_weight_pointers[iWeight]);
-    const auto& [iPar, xPtr] = MCEvent->total_weight_gradients[iWeight];
-    gradient[iPar] += (*xPtr) *syst_weight*total_weight;
+  //HW No omp simd here, several weights can land on the same parameter so the scatter into
+  //GradArray isn't vectorisable
+  for (size_t iWeight = 0; iWeight < TotalWeights; ++iWeight) {
+    const auto& [iPar, DerivPointer] = MCEvent->total_weight_gradients[iWeight];
+    //HW Weights we don't track a derivative for (oscillation, unbinned splines) point at M3::Zero
+    if (DerivPointer == &M3::Zero) continue;
+
+    const double Weight = *(MCEvent->total_weight_pointers[iWeight]);
+    const double Deriv = *DerivPointer;
+    //HW dW/dx_p = W * sum_k (1/w_k) dw_k/dx_p, the caller guarantees W > 0 so no w_k is zero
+    const double Contribution = TotalWeight * Deriv / Weight;
+
+    #ifdef MULTITHREAD
+    #pragma omp atomic
+    #endif
+    GradArray[BinOffset + static_cast<size_t>(iPar)] += Contribution;
   }
-
-  return gradient;
 }
-
 
 // ***************************************************************************
 // Setup the osc parameters
@@ -577,16 +586,18 @@ void SampleHandlerBase::SetupNormParameters() {
 
   //DB Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
-    int counter = 0;
+    size_t counter = 0;
     const size_t offset = MCEvents[iEvent].total_weight_pointers.size();
     const size_t addSize = norms_bins[iEvent].size();
     MCEvents[iEvent].total_weight_pointers.resize(offset + addSize);
-    MCEvents[iEvent].total_weight_gradients.resize(offset+addSize);
+    MCEvents[iEvent].total_weight_gradients.resize(offset + addSize);
 
     for(auto const & norm_bin: norms_bins[iEvent]) {
       MCEvents[iEvent].total_weight_pointers[offset + counter] = ParHandler->RetPointer(norm_bin);
-      // Norms are just y=x so always add 1/x to the gradient counter, we'll start with 1
+      //HW A norm weight is just w = x, so dw/dx is flat unity. The 1/w the chain rule needs is
+      //applied in FillGradientArray, which turns this into the expected W/x
       MCEvents[iEvent].total_weight_gradients[offset + counter] = {norm_bin, &M3::Unity};
+      counter += 1;
     }
   }
 }
@@ -666,6 +677,43 @@ void SampleHandlerBase::SetupReweightArrays() {
   SampleHandler_array = std::vector<double>(Binning->GetNBins(),0);
   SampleHandler_array_w2 = std::vector<double>(Binning->GetNBins(),0);
   SampleHandler_data = std::vector<double>(Binning->GetNBins(),0);
+  //HW Keep the gradient array in step with the binning if gradients were switched on before setup
+  if (ComputeGradients) SetComputeGradients(true);
+}
+
+// ************************************************
+void SampleHandlerBase::SetComputeGradients(const bool Enable) {
+// ************************************************
+  ComputeGradients = Enable;
+  if (!Enable) {
+    nGradPars = 0;
+    SampleHandler_gradients.clear();
+    SampleHandler_gradients.shrink_to_fit();
+    return;
+  }
+  if (ParHandler == nullptr) {
+    MACH3LOG_ERROR("Can't track gradients for {} without a parameter handler", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  //HW Called before the binning exists, SetupReweightArrays will come back to us once it does
+  if (Binning == nullptr) return;
+
+  /// @todo HW: UnbinnedSplineHandler doesn't expose spline derivatives, so gradient based fitters
+  /// can't be used with it yet. See SetSplinePointers
+  if (dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get()) != nullptr) {
+    MACH3LOG_WARN("{} uses unbinned splines, whose derivatives are not propagated. The gradient will "
+                  "be wrong for every spline parameter", GetName());
+  }
+
+  nGradPars = ParHandler->GetNumParams();
+  if (nGradPars <= 0) {
+    MACH3LOG_ERROR("Parameter handler {} has no parameters to take gradients with respect to", ParHandler->GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  //HW One flat NBins * nGradPars array, bin major so a bin's parameters stay contiguous
+  SampleHandler_gradients.assign(static_cast<size_t>(Binning->GetNBins()) * static_cast<size_t>(nGradPars), 0.);
+  MACH3LOG_INFO("{} is now tracking gradients for {} parameters over {} bins",
+                GetName(), nGradPars, Binning->GetNBins());
 }
 
 // ************************************************
@@ -1116,6 +1164,7 @@ void SampleHandlerBase::SetupNuOscillatorPointers() {
    // KS: Do not add unity
    if (osc_w_pointer != &M3::Unity) {
      MCEvents[iEvent].total_weight_pointers.push_back(osc_w_pointer);
+     //HW NuOscillator doesn't hand back derivatives, so oscillation parameter gradients are dropped
      MCEvents[iEvent].total_weight_gradients.push_back({0, &M3::Zero});
    }
   }
@@ -1244,7 +1293,7 @@ void SampleHandlerBase::SetSplinePointers() {
       auto& w_pointers = MCEvents[j].total_weight_pointers;
       auto& w_grad_pointers = MCEvents[j].total_weight_gradients;
       w_pointers.reserve(w_pointers.size() + NSplines);
-      w_grad_pointers.reserve(w_pointers.size()+NSplines);
+      w_grad_pointers.reserve(w_grad_pointers.size() + static_cast<size_t>(NSplines));
       const auto SampleId = MCEvents[j].NominalSample;
       for(int spline = 0; spline < NSplines; spline++) {
         int SystIndex = EventSplines[spline].iSyst;
@@ -1258,8 +1307,8 @@ void SampleHandlerBase::SetSplinePointers() {
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
         w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline]));
 
-        // Can do the same with the gradients
-        w_grad_pointers.push_back({SystIndex, BinnedSpline->RetGradPointer(EventSplines[spline])});        
+        //HW Can do the same with the gradients, each spline only ever affects one systematic
+        w_grad_pointers.push_back({SystIndex, BinnedSpline->RetGradPointer(EventSplines[static_cast<size_t>(spline)])});
       } // end loop over splines
       w_pointers.shrink_to_fit();
       w_grad_pointers.shrink_to_fit();
@@ -1267,9 +1316,9 @@ void SampleHandlerBase::SetSplinePointers() {
   } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
       MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->RetPointer(iEvent));
-      // We're ignoring these
+      //HW Unbinned splines don't expose a derivative, so the gradient of this weight is dropped.
+      //SetComputeGradients warns about it, see the @todo there
       MCEvents[iEvent].total_weight_gradients.push_back({0, &M3::Zero});
-
     }
   } else {
     MACH3LOG_ERROR("Not supported splines");
@@ -1321,24 +1370,41 @@ double SampleHandlerBase::GetLikelihood() const {
 // ************************************************
 std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
 // ************************************************
-  std::vector<double> gradLogL(ParHandler->GetNumParams(), 0.);
-  for (int idx = 0; idx < Binning->GetNBins(); ++idx)
+  if (!ComputeGradients) {
+    MACH3LOG_ERROR("Asked {} for the likelihood gradient without calling SetComputeGradients(true) first", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  //HW The pre-factor below is the derivative of the Poisson test statistic only, the others don't
+  //share it and the MC stat ones pick up a dependence on w2 we don't track derivatives for
+  if (fTestStatistic != kPoisson) {
+    MACH3LOG_ERROR("Likelihood gradients are only implemented for the {} test statistic, you asked for {}",
+                   TestStatistic_ToString(kPoisson), TestStatistic_ToString(fTestStatistic));
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  const int NBins = Binning->GetNBins();
+  std::vector<double> gradLogL(static_cast<size_t>(nGradPars), 0.);
+  double* _restrict_ gradOut = gradLogL.data();
+
+  //HW Not multithreaded over bins, that would need a reduction over the whole gradLogL array
+  for (int idx = 0; idx < NBins; ++idx)
   {
-    double const &DataVal = SampleHandler_data[idx];
-    double const &MCPred = SampleHandler_array[idx];
-    std::vector<double> const &Grad = SampleHandler_gradients[idx];
+    const double DataVal = SampleHandler_data[static_cast<size_t>(idx)];
+    const double MCPred = SampleHandler_array[static_cast<size_t>(idx)];
+    //HW GetPoissonLLH clamps the prediction below this bound, so the test statistic is flat there
+    if (MCPred < M3::_LOW_MC_BOUND_) continue;
 
-    // We can then calculate the derivative of our poisson
-    double pre_factor = 1 - (DataVal/MCPred);
+    // -logL = MC - D + D*log(D/MC), so d(-logL)/d(MC) is this pre-factor
+    const double PreFactor = 1. - (DataVal / MCPred);
+    //HW Flat array, so this bin's nGradPars entries sit next to each other
+    const double* _restrict_ Grad = SampleHandler_gradients.data() + static_cast<size_t>(idx) * static_cast<size_t>(nGradPars);
 
-    for(int i =0; i<ParHandler->GetNumParams();i++){
-      gradLogL[i]+=pre_factor*Grad[i];
+    for (int iPar = 0; iPar < nGradPars; ++iPar) {
+      gradOut[iPar] += PreFactor * Grad[iPar];
     }
   }
   return gradLogL;
 }
-
-
 
 // ************************************************
 void SampleHandlerBase::SaveAdditionalInfo(TDirectory* Dir) {

@@ -29,11 +29,10 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
     #endif
   }
-  else if(Algorithm == "HMC" || Algorithm=="HamiltonianMC"){
-      MaCh3Fitter = std::make_unique<HamiltonianMC>(fitMan);
-
+  else if (Algorithm == "HMC" || Algorithm == "HamiltonianMC")
+  {
+    MaCh3Fitter = std::make_unique<HamiltonianMC>(fitMan);
   }
-
   else
   {
     MACH3LOG_ERROR("You want to use algorithm {}, I don't recognize it, sry", Algorithm);

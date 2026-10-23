@@ -125,8 +125,6 @@ class UnbinnedSplineHandler : public SplineBase {
     /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> cpu_paramNo_TF1_arr;
 
-    M3::float_t* cpu_spline_grad;
-
     /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;
 

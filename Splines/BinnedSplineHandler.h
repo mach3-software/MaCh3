@@ -39,6 +39,8 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* RetPointer(const SplineIndex& Variables) const;
 
+    /// @brief get pointer to the derivative of the spline weight based on bin variables
+    /// @details Points at M3::Zero for flat splines, whose weight doesn't vary
     const M3::float_t* RetGradPointer(const SplineIndex& Variables) const;
 
     /// @copydoc SplineBase::PrepareSplineFile

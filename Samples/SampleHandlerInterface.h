@@ -20,6 +20,8 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TString.h"
 _MaCh3_Safe_Include_End_ //}
 
+class ParameterHandlerBase;
+
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 ///
 /// @details It serves as basic interface for fit running, as well as other functionalities like llh scan, sigma var or even posterior predictive distribution.
@@ -63,7 +65,31 @@ class SampleHandlerInterface
   virtual void Reweight()=0;
   /// @brief Return likelihood (-LogL) for all samples
   virtual double GetLikelihood() const = 0;
-  virtual std::vector<double>  GetGradLikelihood() const {};
+
+  /// @brief Return the gradient of the likelihood (-LogL) with respect to every parameter
+  /// @return \f$\partial(-\log\mathcal{L})/\partial x_i\f$ for every parameter \f$i\f$ of the
+  /// parameter handler this sample handler was built with
+  /// @note SetComputeGradients(true) has to have been called before the last Reweight(), otherwise
+  /// there are no per-bin gradients to contract with
+  virtual std::vector<double> GetGradLikelihood() const {
+    MACH3LOG_ERROR("GetGradLikelihood is not implemented for {}", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  /// @brief Toggle book-keeping of \f$\partial(\text{bin content})/\partial x_i\f$ during Reweight()
+  /// @param Enable whether to allocate and fill the per-bin gradient array
+  /// @details Off by default. The gradients need a flat NBins * NParams array and cost extra work in
+  /// the reweight loop, so only gradient based fitters (e.g. HamiltonianMC) switch this on.
+  virtual void SetComputeGradients([[maybe_unused]] const bool Enable) {
+    MACH3LOG_ERROR("SetComputeGradients is not implemented for {}", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  /// @brief Return the parameter handler GetGradLikelihood() is indexed by
+  /// @return nullptr if this sample handler isn't driven by a parameter handler
+  /// @details Gradient based fitters need this to work out where each entry of GetGradLikelihood()
+  /// belongs in their own, fit wide, parameter ordering
+  virtual const ParameterHandlerBase* GetGradParHandler() const { return nullptr; }
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
