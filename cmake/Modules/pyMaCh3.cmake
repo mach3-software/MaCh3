@@ -3,6 +3,12 @@ if(NOT COMMAND setup_pyMaCh3)
 function(setup_pyMaCh3)
 
   include(CMakePackageConfigHelpers)
+
+  if(APPLE)
+    set(MaCh3_RPATH_ORIGIN "@loader_path")
+  else()
+    set(MaCh3_RPATH_ORIGIN "$ORIGIN")
+  endif()
   
   find_package(ROOT)
 
@@ -56,7 +62,7 @@ function(setup_pyMaCh3)
     TARGET
     _pyMaCh3
     PROPERTY
-      INSTALL_RPATH "$ORIGIN/lib"
+      INSTALL_RPATH "${MaCh3_RPATH_ORIGIN}/lib"
   )
 
   ## install our pybind11 object
@@ -104,7 +110,7 @@ function(setup_pyMaCh3)
       TARGET
       ${link_target}
       PROPERTY
-        INSTALL_RPATH "$ORIGIN;$ORIGIN/../"
+        INSTALL_RPATH "${MaCh3_RPATH_ORIGIN};${MaCh3_RPATH_ORIGIN}/../"
     )
     install( TARGETS ${link_target} DESTINATION ${INSTALL_DIR}/lib/experiment )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
