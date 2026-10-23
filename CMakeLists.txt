@@ -173,7 +173,7 @@ if(APPLE)
 else()
   set(MaCh3_RPATH_ORIGIN "$ORIGIN")
   set(MaCh3_SO_EXTENSION ".so")
-  endif()
+endif()
 foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Plotting;Oscillator;OscProbCalcer;CLIModules )
   set_property(
     TARGET
