@@ -66,7 +66,7 @@ find_path(MaCh3_INCLUDE_DIR
 )
 
 find_path(MaCh3_LIB_DIR
-  NAMES libFitters.${MaCh3_SO_EXTENSION}
+  NAMES libFitters.@MaCh3_SO_EXTENSION@
   PATHS ${MaCh3_CMAKE_DIR}/lib/
 )
 
