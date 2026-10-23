@@ -6,8 +6,7 @@ HamiltonianMC::HamiltonianMC(Manager *const FitManager) : MCMCBase(FitManager) {
 // ***************
     AlgorithmName = "HamiltonianMC";
     n_leapfrog = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NLeapFrog"], 10, __FILE__, __LINE__);
-    //HW The mass matrix is the parameter covariance, so DeltaT is in units of prior sigma and a
-    //well conditioned problem wants it of order one, not the tiny values an identity mass needs
+    //HW DeltaT is in units of prior sigma, so order one rather than the tiny identity mass values
     delta_t = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DeltaT"], 0.1, __FILE__, __LINE__);
     ke_init = 0.;
     logL_init = 0.;
@@ -26,8 +25,7 @@ HamiltonianMC::HamiltonianMC(Manager *const FitManager) : MCMCBase(FitManager) {
 // *******************
 void HamiltonianMC::RunMCMC() {
 // *******************
-    // Lay out the flat parameter ordering, switch the samples over to tracking gradients and build
-    // the mass matrix, all before the base class proposes its first step
+    // All of this has to happen before the base class proposes its first step
     SetupGradients();
     SetupMassMatrix();
 
@@ -53,11 +51,9 @@ void HamiltonianMC::SetupGradients() {
                            "the un-rotated parameter space", systematics[s]->GetName());
             throw MaCh3Exception(__FILE__, __LINE__);
         }
-        /// @todo HW: the adapted covariance would make a better mass matrix than the prior one,
-        /// but it changes mid chain and rebuilding the Cholesky every step is too expensive
         if (systematics[s]->GetDoAdaption()) {
-            MACH3LOG_WARN("{} has adaption enabled, HMC takes its mass matrix from the prior "
-                          "covariance and won't pick up the adapted one", systematics[s]->GetName());
+            MACH3LOG_INFO("{} has adaption enabled, HMC will pick up each adapted matrix as its mass "
+                          "matrix", systematics[s]->GetName());
         }
         syst_offset[s] = NPars;
         NPars += systematics[s]->GetNumParams();
@@ -114,6 +110,7 @@ void HamiltonianMC::DoStep() {
 void HamiltonianMC::ProposeStep() {
 // *******************
     out_of_bounds = false;
+    RefreshMassMatrix();
 
     // Start from the last accepted state. A rejected step leaves the proposed values at the end of
     // the trajectory we threw away, so this has to be done explicitly
@@ -124,8 +121,7 @@ void HamiltonianMC::ProposeStep() {
         }
     }
 
-    // Fresh velocity from the mass matrix. We keep the kinetic energy it carries so we can compare
-    // the Hamiltonian at either end of the trajectory
+    // Keep the kinetic energy so we can compare the Hamiltonian at either end of the trajectory
     ThrowVelocity();
     ke_init = KineticEnergy();
 
@@ -135,9 +131,8 @@ void HamiltonianMC::ProposeStep() {
     }
     UpdateGradU();
 
-    // U where the trajectory starts. We've just reweighted for it anyway, and taking it here keeps
-    // the Hamiltonian self consistent instead of leaning on logLCurr, which the base class only
-    // seeds after this very function has run for the first time
+    // Taking U here keeps the Hamiltonian self consistent instead of leaning on logLCurr, which
+    // the base class only seeds after this function has already run once
     logL_init = 0.;
     for (const auto& syst : systematics) {
         logL_init += syst->GetLikelihood();
@@ -147,8 +142,7 @@ void HamiltonianMC::ProposeStep() {
     }
 
     for (int f = 0; f < n_leapfrog; ++f) {
-        // Half kick, drift, half kick. Back to back half kicks across iterations add up to the full
-        // kick of the usual leapfrog, and UpdatePosition leaves the samples reweighted for UpdateGradU
+        // Half kick, drift, half kick. Adjacent half kicks compose into the usual full kick
         UpdateVelocity();
         UpdatePosition();
         // A parameter couldn't be brought back inside its bounds, this trajectory is a write off
@@ -189,7 +183,7 @@ void HamiltonianMC::ProposeStep() {
 // Refresh the gradient of the potential, U = -logL
 void HamiltonianMC::UpdateGradU() {
 // *******************
-    // The prior penalties come first and overwrite, which resets the gradient for this evaluation
+    // Priors come first and overwrite, which resets the gradient for this evaluation
     for (size_t s = 0; s < systematics.size(); ++s) {
         const std::vector<double> SystGrad = systematics[s]->CalcGradient();
         const size_t Offset = static_cast<size_t>(syst_offset[s]);
@@ -198,8 +192,7 @@ void HamiltonianMC::UpdateGradU() {
         }
     }
 
-    // Then the samples add on top. They were reweighted by UpdatePosition, or by ProposeStep for the
-    // first evaluation of a trajectory
+    // Then the samples add on top, already reweighted by UpdatePosition or ProposeStep
     for (size_t i = 0; i < samples.size(); ++i) {
         const std::vector<double> SampGrad = samples[i]->GetGradLikelihood();
         const size_t Offset = static_cast<size_t>(sample_offset[i]);
@@ -210,7 +203,6 @@ void HamiltonianMC::UpdateGradU() {
 }
 
 // *******************
-// Build the block diagonal mass matrix, one block per parameter handler
 void HamiltonianMC::SetupMassMatrix() {
 // *******************
     par_fixed.assign(velocity.size(), 0);
@@ -218,56 +210,79 @@ void HamiltonianMC::SetupMassMatrix() {
 
     int MaxPars = 0;
     for (size_t s = 0; s < systematics.size(); ++s) {
-        MassBlock& Block = mass[s];
-        Block.Offset = syst_offset[s];
-        Block.NPars = systematics[s]->GetNumParams();
-        MaxPars = std::max(MaxPars, Block.NPars);
+        mass[s].Offset = syst_offset[s];
+        mass[s].NPars = systematics[s]->GetNumParams();
+        MaxPars = std::max(MaxPars, mass[s].NPars);
 
-        // M^-1 is the handler's covariance. That makes the prior part of the dynamics a unit
-        // frequency oscillator, since the prior gradient is Sigma^-1 * Delta and M^-1 times it is
-        // just Delta, so the leapfrog no longer has to resolve the smallest prior error in the fit
-        const TMatrixDSym* Cov = systematics[s]->GetCovMatrix();
-        if (Cov == nullptr || Cov->GetNrows() != Block.NPars) {
-            MACH3LOG_ERROR("{} has no usable covariance matrix to build a mass matrix from", systematics[s]->GetName());
-            throw MaCh3Exception(__FILE__, __LINE__);
+        for (int i = 0; i < mass[s].NPars; ++i) {
+            if (systematics[s]->IsParameterFixed(i)) par_fixed[static_cast<size_t>(mass[s].Offset + i)] = 1;
         }
-        TMatrixDSym InvMass(*Cov);
-
-        // A fixed parameter mustn't move, so decouple it from the rest and leave a unit mass on its
-        // diagonal to keep the matrix decomposable. ZeroFixedVelocities does the rest
-        for (int i = 0; i < Block.NPars; ++i) {
-            if (!systematics[s]->IsParameterFixed(i)) continue;
-            par_fixed[static_cast<size_t>(Block.Offset + i)] = 1;
-            for (int j = 0; j < Block.NPars; ++j) {
-                InvMass(i, j) = 0.;
-                InvMass(j, i) = 0.;
-            }
-            InvMass(i, i) = 1.;
-        }
-
-        if (!M3::CanDecomposeMatrix(InvMass)) {
-            MACH3LOG_WARN("Covariance of {} isn't positive definite, nudging the diagonal before "
-                          "decomposing it", systematics[s]->GetName());
-            M3::MakeMatrixPosDef(&InvMass);
-        }
-        const auto Chol = M3::GetCholeskyDecomposedMatrix(InvMass, systematics[s]->GetName());
-
-        //KS: Flat row major copies, ROOT's indexing is far too slow for the per kick matrix multiply
-        const size_t N = static_cast<size_t>(Block.NPars);
-        Block.InvMass.resize(N * N);
-        Block.Chol.resize(N * N);
-        for (int i = 0; i < Block.NPars; ++i) {
-            for (int j = 0; j < Block.NPars; ++j) {
-                const size_t Element = static_cast<size_t>(i) * N + static_cast<size_t>(j);
-                Block.InvMass[Element] = InvMass(i, j);
-                Block.Chol[Element] = Chol[static_cast<size_t>(i)][static_cast<size_t>(j)];
-            }
-        }
-        const double MegaBytes = 2. * static_cast<double>(N * N * sizeof(double)) / (1024. * 1024.);
-        MACH3LOG_INFO("Mass matrix for {} taken from its {}x{} covariance, {:.1f} MB with its Cholesky factor",
-                      systematics[s]->GetName(), Block.NPars, Block.NPars, MegaBytes);
     }
     chol_solve.assign(static_cast<size_t>(MaxPars), 0.);
+
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        BuildMassBlock(s);
+    }
+}
+
+// *******************
+void HamiltonianMC::BuildMassBlock(const size_t s) {
+// *******************
+    MassBlock& Block = mass[s];
+
+    // M^-1 is the throw matrix, which is the covariance until adaption replaces it with a better
+    // estimate of the target. Either way the prior dynamics become a unit frequency oscillator
+    const TMatrixDSym* Throw = systematics[s]->GetThrowMatrix();
+    if (Throw == nullptr || Throw->GetNrows() != Block.NPars) {
+        MACH3LOG_ERROR("{} has no usable throw matrix to build a mass matrix from", systematics[s]->GetName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    TMatrixDSym InvMass(*Throw);
+
+    // A fixed parameter mustn't move, so decouple it and leave a unit mass on its diagonal to keep
+    // the matrix decomposable. ZeroFixedVelocities does the rest
+    for (int i = 0; i < Block.NPars; ++i) {
+        if (!systematics[s]->IsParameterFixed(i)) continue;
+        for (int j = 0; j < Block.NPars; ++j) {
+            InvMass(i, j) = 0.;
+            InvMass(j, i) = 0.;
+        }
+        InvMass(i, i) = 1.;
+    }
+
+    if (!M3::CanDecomposeMatrix(InvMass)) {
+        MACH3LOG_WARN("Throw matrix of {} isn't positive definite, nudging the diagonal", systematics[s]->GetName());
+        M3::MakeMatrixPosDef(&InvMass);
+    }
+    const auto Chol = M3::GetCholeskyDecomposedMatrix(InvMass, systematics[s]->GetName());
+
+    //KS: Flat row major copies, ROOT's indexing is too slow for the per kick matrix multiply
+    const size_t N = static_cast<size_t>(Block.NPars);
+    Block.InvMass.resize(N * N);
+    Block.Chol.resize(N * N);
+    for (int i = 0; i < Block.NPars; ++i) {
+        for (int j = 0; j < Block.NPars; ++j) {
+            const size_t Element = static_cast<size_t>(i) * N + static_cast<size_t>(j);
+            Block.InvMass[Element] = InvMass(i, j);
+            Block.Chol[Element] = Chol[static_cast<size_t>(i)][static_cast<size_t>(j)];
+        }
+    }
+    Block.BuiltAtUpdate = systematics[s]->GetThrowMatrixUpdates();
+
+    MACH3LOG_DEBUG("Mass matrix for {} built from its {}x{} throw matrix", systematics[s]->GetName(),
+                   Block.NPars, Block.NPars);
+}
+
+// *******************
+void HamiltonianMC::RefreshMassMatrix() {
+// *******************
+    // Adaption only swaps the throw matrix every AdaptiveUpdateStep steps, so the O(N^3) rebuild is
+    // amortised over all the steps in between
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        if (mass[s].BuiltAtUpdate == systematics[s]->GetThrowMatrixUpdates()) continue;
+        MACH3LOG_INFO("Throw matrix of {} was re-adapted, rebuilding its mass matrix", systematics[s]->GetName());
+        BuildMassBlock(s);
+    }
 }
 
 // *******************
@@ -289,7 +304,7 @@ void HamiltonianMC::ThrowVelocity() {
         #endif
         for (int i = 0; i < NPars; ++i) {
             double Sum = 0.;
-            //HW L is lower triangular, so row i only touches the first i + 1 throws
+            //HW Lower triangular, so row i only touches the first i + 1 throws
             for (int j = 0; j <= i; ++j) {
                 Sum += L[i * NPars + j] * Throws[j];
             }
@@ -302,8 +317,7 @@ void HamiltonianMC::ThrowVelocity() {
 // *******************
 double HamiltonianMC::KineticEnergy() {
 // *******************
-    //HW KE = 1/2 w^T M w, and M^-1 = L L^T, so forward substituting L u = w gives KE = 1/2 |u|^2
-    //without ever forming M itself
+    //HW M^-1 = L L^T, so forward substituting L u = w gives 1/2 w^T M w as 1/2 |u|^2
     double ke = 0.;
     for (const auto& Block : mass) {
         const int NPars = Block.NPars;
@@ -326,8 +340,7 @@ double HamiltonianMC::KineticEnergy() {
 // *******************
 void HamiltonianMC::UpdateVelocity() {
 // *******************
-    //HW In velocity coordinates the half kick p -> p - (dt/2) grad U becomes
-    //w -> w - (dt/2) M^-1 grad U, so the metric enters here rather than in the drift
+    //HW Half kick, which in velocity coordinates is w -> w - (dt/2) M^-1 grad U
     for (const auto& Block : mass) {
         const int NPars = Block.NPars;
         const double* _restrict_ InvMass = Block.InvMass.data();
@@ -354,8 +367,7 @@ void HamiltonianMC::UpdateVelocity() {
 // *******************
 void HamiltonianMC::ZeroFixedVelocities() {
 // *******************
-    //HW A fixed parameter is decoupled in the mass matrix but its unit diagonal still hands it a
-    //velocity on every kick, so pin it to zero and it can never drift
+    //HW The unit diagonal still hands a fixed parameter a velocity on every kick, so pin it to zero
     for (size_t i = 0; i < velocity.size(); ++i) {
         if (par_fixed[i]) velocity[i] = 0.;
     }
@@ -370,8 +382,8 @@ void HamiltonianMC::UpdatePosition() {
 
         for (int i = 0; i < NPars; ++i) {
             const size_t k = Offset + static_cast<size_t>(i);
-            //HW The one place the mass matrix doesn't appear, which is why we carry the velocity and
-            //not the momentum: the drift stays axis aligned so the reflection is a simple sign flip
+            //HW Carrying the velocity rather than the momentum keeps the drift axis aligned, so the
+            //reflection below stays a simple per parameter sign flip
             double NewVal = systematics[s]->GetParProp(i) + delta_t * velocity[k];
 
             const double LowBound = systematics[s]->GetLowerBound(i);

@@ -398,8 +398,8 @@ void SampleHandlerBase::FillArray() {
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
-  //HW Null unless SetComputeGradients(true) was called. Not part of the reduction below, a per-thread
-  //copy of a NBins * nGradPars array would dwarf the MC prediction itself, so we use atomics instead
+  //HW Null unless SetComputeGradients(true). Kept out of the reduction below, per-thread copies of
+  //a NBins * nGradPars array would dwarf the MC prediction, so FillGradientArray uses atomics
   double* _restrict_ Grad_Array = ComputeGradients ? SampleHandler_gradients.data() : nullptr;
 
   #ifdef MULTITHREAD
@@ -434,7 +434,7 @@ void SampleHandlerBase::FillArray() {
     //DB Fill relevant part of thread array
     if (GlobalBin > M3::UnderOverFlowBin) {
       MC_Array_for_reduction[GlobalBin] += totalweight;
-      //HW Safe to divide by the individual weights in here, totalweight > 0 means none of them is zero
+      //HW totalweight > 0 here, so FillGradientArray can safely divide by the individual weights
       if (Grad_Array != nullptr) FillGradientArray(MCEvent, totalweight, GlobalBin, Grad_Array);
       if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
     }
@@ -506,8 +506,7 @@ void SampleHandlerBase::FillGradientArray(const EventInfo* _restrict_ MCEvent, c
   const size_t TotalWeights = MCEvent->total_weight_pointers.size();
 
   //DB Loop over stored pointers
-  //HW No omp simd here, several weights can land on the same parameter so the scatter into
-  //GradArray isn't vectorisable
+  //HW No omp simd, several weights can land on the same parameter so the scatter isn't vectorisable
   for (size_t iWeight = 0; iWeight < TotalWeights; ++iWeight) {
     const auto& [iPar, DerivPointer] = MCEvent->total_weight_gradients[iWeight];
     //HW Weights we don't track a derivative for (oscillation, unbinned splines) point at M3::Zero
@@ -515,7 +514,7 @@ void SampleHandlerBase::FillGradientArray(const EventInfo* _restrict_ MCEvent, c
 
     const double Weight = *(MCEvent->total_weight_pointers[iWeight]);
     const double Deriv = *DerivPointer;
-    //HW dW/dx_p = W * sum_k (1/w_k) dw_k/dx_p, the caller guarantees W > 0 so no w_k is zero
+    //HW dW/dx_p = W * sum_k (1/w_k) dw_k/dx_p
     const double Contribution = TotalWeight * Deriv / Weight;
 
     #ifdef MULTITHREAD
@@ -594,8 +593,7 @@ void SampleHandlerBase::SetupNormParameters() {
 
     for(auto const & norm_bin: norms_bins[iEvent]) {
       MCEvents[iEvent].total_weight_pointers[offset + counter] = ParHandler->RetPointer(norm_bin);
-      //HW A norm weight is just w = x, so dw/dx is flat unity. The 1/w the chain rule needs is
-      //applied in FillGradientArray, which turns this into the expected W/x
+      //HW A norm weight is just w = x, so dw/dx is unity. FillGradientArray applies the 1/w
       MCEvents[iEvent].total_weight_gradients[offset + counter] = {norm_bin, &M3::Unity};
       counter += 1;
     }
@@ -695,7 +693,7 @@ void SampleHandlerBase::SetComputeGradients(const bool Enable) {
     MACH3LOG_ERROR("Can't track gradients for {} without a parameter handler", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  //HW Called before the binning exists, SetupReweightArrays will come back to us once it does
+  //HW No binning yet, SetupReweightArrays will come back to us once there is
   if (Binning == nullptr) return;
 
   /// @todo HW: UnbinnedSplineHandler doesn't expose spline derivatives, so gradient based fitters
@@ -710,7 +708,7 @@ void SampleHandlerBase::SetComputeGradients(const bool Enable) {
     MACH3LOG_ERROR("Parameter handler {} has no parameters to take gradients with respect to", ParHandler->GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  //HW One flat NBins * nGradPars array, bin major so a bin's parameters stay contiguous
+  //HW Bin major, so one bin's parameters stay contiguous
   SampleHandler_gradients.assign(static_cast<size_t>(Binning->GetNBins()) * static_cast<size_t>(nGradPars), 0.);
   MACH3LOG_INFO("{} is now tracking gradients for {} parameters over {} bins",
                 GetName(), nGradPars, Binning->GetNBins());
@@ -1316,8 +1314,7 @@ void SampleHandlerBase::SetSplinePointers() {
   } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
       MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->RetPointer(iEvent));
-      //HW Unbinned splines don't expose a derivative, so the gradient of this weight is dropped.
-      //SetComputeGradients warns about it, see the @todo there
+      //HW Unbinned splines expose no derivative, so this weight's gradient is dropped
       MCEvents[iEvent].total_weight_gradients.push_back({0, &M3::Zero});
     }
   } else {
@@ -1374,8 +1371,8 @@ std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
     MACH3LOG_ERROR("Asked {} for the likelihood gradient without calling SetComputeGradients(true) first", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  //HW The pre-factor below is the derivative of the Poisson test statistic only, the others don't
-  //share it and the MC stat ones pick up a dependence on w2 we don't track derivatives for
+  //HW The pre-factor below is the Poisson derivative, and the MC stat statistics would also pick up
+  //a w2 dependence we don't track derivatives for
   if (fTestStatistic != kPoisson) {
     MACH3LOG_ERROR("Likelihood gradients are only implemented for the {} test statistic, you asked for {}",
                    TestStatistic_ToString(kPoisson), TestStatistic_ToString(fTestStatistic));

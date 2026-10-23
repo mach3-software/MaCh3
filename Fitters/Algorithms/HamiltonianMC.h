@@ -3,8 +3,8 @@
 #include "Algorithms/MCMCBase.h"
 
 /// @brief Hamiltonian Monte Carlo.
-/// @details The mass matrix is each parameter handler's covariance, so DeltaT is in units of prior
-/// sigma rather than of the raw parameter values.
+/// @details The mass matrix is each parameter handler's throw matrix, picking up the adapted one
+/// when adaption is on, so DeltaT is in units of sigma rather than of the raw parameter values.
 /// @author Henry Wallace
 ///
 /// @ingroup FittingAlgorithms
@@ -40,9 +40,15 @@ protected:
     /// @note Expects the samples to have been reweighted for the current proposed values already
     void UpdateGradU();
 
-    /// @brief Build the mass matrix blocks from each parameter handler's covariance
-    /// @details Called once at the start of the fit, after SetupGradients()
+    /// @brief Build every mass matrix block from its parameter handler's throw matrix
     void SetupMassMatrix();
+
+    /// @brief Rebuild one handler's mass matrix block from its current throw matrix
+    /// @param s Index into #systematics
+    void BuildMassBlock(const size_t s);
+
+    /// @brief Rebuild the blocks of any handler whose throw matrix has been re-adapted
+    void RefreshMassMatrix();
 
     /// @brief Draw a fresh velocity \f$w \sim N(0, M^{-1})\f$
     void ThrowVelocity();
@@ -66,8 +72,10 @@ protected:
       int Offset = 0;
       /// How many parameters this handler has
       int NPars = 0;
-      /// \f$M^{-1}\f$, the handler's covariance with fixed parameters decoupled, row major
+      /// \f$M^{-1}\f$, the handler's throw matrix with fixed parameters decoupled, row major
       std::vector<double> InvMass;
+      /// Value of GetThrowMatrixUpdates() this block was built from
+      int BuiltAtUpdate = -1;
       /// Lower triangular \f$L\f$ with \f$L L^T = M^{-1}\f$, row major
       std::vector<double> Chol;
     };

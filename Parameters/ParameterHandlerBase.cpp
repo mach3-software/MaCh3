@@ -1108,6 +1108,7 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
   }
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
+  ++throwMatrixUpdates;
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
   else {
     // HW: Prevent spam from adaptive handler
