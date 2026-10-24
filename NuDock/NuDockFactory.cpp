@@ -34,10 +34,10 @@ const std::unordered_map<std::string, CommunicationType> CommunicationTypeMap = 
 
 /// @brief Lookup table mapping strings to NuDock VerbosityLevel enum values.
 const std::unordered_map<std::string, VerbosityLevel> VerbosityLevelMap = {
-  {"DEBUG", VerbosityLevel::DEBUG},
-  {"INFO", VerbosityLevel::INFO},
-  {"WARNING", VerbosityLevel::WARNING},
-  {"ERROR", VerbosityLevel::ERROR}
+  {"DEBUG", VerbosityLevel::Debug},
+  {"INFO", VerbosityLevel::Info},
+  {"WARNING", VerbosityLevel::Warning},
+  {"ERROR", VerbosityLevel::Error}
 };
 
 void InitialiseNuDockObj(Manager *man,
