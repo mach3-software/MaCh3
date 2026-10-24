@@ -66,9 +66,8 @@ inline Double_t CalculateErec(iclassName iclass, double LepMom, double costheta)
       iscc1pi = true;
       break;
     default:
-      std::cerr << "[ERR]: Unknown iclass so I don't know how to calculate erec :'( " << std::endl;
-      std::cerr << __FILE__ << ":"<<__LINE__<<std::endl;
-      throw;
+      MACH3LOG_ERROR("Unknown iclass so I don't know how to calculate erec :'( ");
+      throw MaCh3Exception(__FILE__, __LINE__);
       break;
   }
 
@@ -121,9 +120,15 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
   int GetMode([[maybe_unused]] Long64_t jentry) final {return mode;}
   double GetEnu([[maybe_unused]] Long64_t jentry) final {return pnu[0];}
   double GetWeight(Long64_t jentry, size_t iSyst, int iKnot) final;
+  double GetWeight([[maybe_unused]] Long64_t jentry,
+                   [[maybe_unused]] size_t iSyst,
+                   [[maybe_unused]] double Value) final {
+    MACH3LOG_ERROR("Not implemented");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   int GetBinningType(const std::string& binName);
-  std::vector<double> ExtractBinningFromTemplate(std::string template_file_name,
-                                                               std::string  binning_name, bool atm);
+  std::vector<double> ExtractBinningFromTemplate(const std::string& template_file_name,
+                                                 const std::string&  binning_name, bool atm);
   // Input file containing weights, properly formatted
   std::vector< TArrayF* > weightArray;
 

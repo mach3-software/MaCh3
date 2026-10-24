@@ -59,6 +59,7 @@ class BinnedSplineMakerBase {
   virtual int GetMode(Long64_t jentry) = 0;
   virtual double GetEnu(Long64_t jentry) = 0;
   virtual double GetWeight(Long64_t jentry, size_t iSyst, int iKnot) = 0;
+  virtual double GetWeight(Long64_t jentry, size_t iSyst, double Value) = 0;
 
   std::unique_ptr<Manager> Setting;
   std::unique_ptr<MaCh3Modes> Modes;
@@ -77,4 +78,6 @@ class BinnedSplineMakerBase {
 
   // MaCh3 mode index -> spline mode index
   std::map<int, int> fModeToSplineMode;
+
+  bool UseKnotForWeight;
 };

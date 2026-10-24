@@ -7,7 +7,7 @@ BinnedSplineMakerBase::BinnedSplineMakerBase(const std::string& Config) {
   auto& options = Setting->raw()["settings"];
   auto ModeName = Get<std::string>(options["modes"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
-
+  UseKnotForWeight = GetFromManager<bool>(options["UseKnot"], true, __FILE__, __LINE__);
   int nSplineModes = 0;
   for (int mode = 0; mode < Modes->GetNModes(); ++mode) {
     const std::string modeName = Modes->GetMaCh3ModeName(mode);
@@ -294,7 +294,13 @@ void BinnedSplineMakerBase::FillSystematicProperties()
           for (int iKnot = 0; iKnot < systematicProperties[iSyst].knotArray->GetSize(); ++iKnot)
           {
             double Enu = GetEnu(jentry);
-            auto wgt = GetWeight(jentry, iSyst, iKnot);
+            double wgt = 0;
+            if(UseKnotForWeight){
+              wgt = GetWeight(jentry, iSyst, iKnot);
+            } else {
+              wgt = GetWeight(jentry, iSyst, systematicProperties[iSyst].knotArray->At(iKnot));
+            }
+
             if (std::isnan(wgt) || wgt < 0) {
               MACH3LOG_WARN("weight {}, Enu: {}, binning_par1: {}, binning_par2: {}, mode: {}",
                              wgt, Enu, binning_par1, binning_par2, Mode);

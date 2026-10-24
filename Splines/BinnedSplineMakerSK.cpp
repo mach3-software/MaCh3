@@ -320,7 +320,8 @@ int BinnedSplineMakerSK::GetBinningType(const std::string& binName) {
   return 0;
 }
 
-std::vector<double> BinnedSplineMakerSK::ExtractBinningFromTemplate(std::string template_file_name, std::string  binning_name, bool atm) {
+std::vector<double> BinnedSplineMakerSK::ExtractBinningFromTemplate(const std::string& template_file_name,
+                                                                    const std::string&  binning_name, bool atm) {
   // Simple function to get bins from a template file
   TFile* template_file = new TFile(template_file_name.c_str());
   MACH3LOG_INFO("Getting bins from {}", template_file_name);
