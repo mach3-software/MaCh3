@@ -404,7 +404,7 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() const {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
+bool AdaptiveMCMCHandler::ShouldUpdateMatrixAdapt() {
 // ********************************************
   if(total_steps >= start_adaptive_throw &&
     // Check whether the number of steps is divisible by the adaptive update step

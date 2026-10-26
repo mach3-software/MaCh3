@@ -1080,11 +1080,21 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
   }
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
-  if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
-  else {
+  if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) {
+    MakeClosestPosDef(throwMatrix);
+  } else {
     // HW: Prevent spam from adaptive handler
     bool verbose = AdaptiveHandler ? AdaptiveHandler->GetTotalSteps() < 2 : true;
     MakePosDef(throwMatrix, verbose);
+  }
+
+  // Simple sanitizer
+  for (int i = 0; i < _fNumPar; ++i) {
+    const double variance = (*throwMatrix)(i, i);
+    if(!std::isfinite(variance) || variance <= 0.) {
+      MACH3LOG_WARN("Invalid variance for param {} ({}): {}, after posdef this will cause proposal to fail",
+                    i, _fFancyNames[i], variance);
+    }
   }
 
   auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
@@ -1278,7 +1288,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
     SetIndivStepScaleForSkippedAdaptParams();
   }
 
-  if(AdaptiveHandler->UpdateMatrixAdapt()) {
+  if(AdaptiveHandler->ShouldUpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
     //Also Save the adaptive to file
