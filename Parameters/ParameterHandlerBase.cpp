@@ -1045,6 +1045,13 @@ void ParameterHandlerBase::ResetIndivStepScale() {
 }
 
 // ********************************************
+void ParameterHandlerBase::CaptureAdaptiveStepScaleNominal() {
+// ********************************************
+  _fIndivStepScaleInitial = _fIndivStepScale;
+  _fGlobalStepScaleInitial = _fGlobalStepScale;
+}
+
+// ********************************************
 void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 // ********************************************
   if (!param_skip_adapt_flags.size()) {
@@ -1180,9 +1187,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
   }
   AdaptiveHandler = std::make_unique<AdaptiveMCMCHandler>();
 
-  // HH: Backing up _fIndivStepScale and _fGlobalStepScale before adaption
-  _fIndivStepScaleInitial = _fIndivStepScale;
-  _fGlobalStepScaleInitial = _fGlobalStepScale;
+  CaptureAdaptiveStepScaleNominal();
 
   // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
   auto params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {}, __FILE__ , __LINE__);
@@ -1264,6 +1269,8 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
     AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
     SetIndivStepScaleForSkippedAdaptParams();
+    MACH3LOG_INFO("Robbins-Monro update for matrix {}: step scale = {:.6e}", GetName(), _fGlobalStepScale);
+    // MACH3LOG_DEBUG("Robbins-Monro update for matrix {}: step scale = {:.6e}", GetName(), _fGlobalStepScale);
   }
 
   // Call main adaption function
@@ -1271,6 +1278,10 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
 
   // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
+    // Refresh the caputured step scales before the first adaptive throw
+    // This ensure that any parameter which had it steps scale changed after adaptive intialisation (ie umbrella sampled params) are correctly stored
+    CaptureAdaptiveStepScaleNominal();
+    AdaptiveHandler->SetInitialStepScale(_fGlobalStepScaleInitial);
     ResetIndivStepScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale());
     SetIndivStepScaleForSkippedAdaptParams();

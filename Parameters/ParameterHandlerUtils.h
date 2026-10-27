@@ -516,7 +516,7 @@ inline std::vector<std::vector<double>> GetCholeskyDecomposedMatrix(const TMatri
     for (Int_t k = 0; k < j; ++k) {
       sum_diag -= L[j][k] * L[j][k];
     }
-    const double tol = 1e-15;
+    const double tol = 1e-16;
     if (sum_diag <= tol) {
       MACH3LOG_ERROR("Cholesky decomposition failed for {} (non-positive diagonal)", matrixName);
       throw MaCh3Exception(__FILE__, __LINE__);
