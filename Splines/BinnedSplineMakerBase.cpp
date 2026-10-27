@@ -9,6 +9,8 @@ BinnedSplineMakerBase::BinnedSplineMakerBase(const std::string& Config) {
   Modes = std::make_unique<MaCh3Modes>(ModeName);
   UseKnotForWeight = GetFromManager<bool>(options["UseKnot"], true, __FILE__, __LINE__);
   int nSplineModes = 0;
+  KinematicParameters = nullptr;
+  ReversedKinematicParameters = nullptr;
   for (int mode = 0; mode < Modes->GetNModes(); ++mode) {
     const std::string modeName = Modes->GetMaCh3ModeName(mode);
     const std::string suffix =
@@ -127,6 +129,13 @@ void BinnedSplineMakerBase::LoadSystematics() {
 
 void BinnedSplineMakerBase::Initialise()
 {
+  const auto& binning_opts = Setting->raw()["binning_opts"];
+  auto binvar_1_str = binning_opts["binvar1"].as<std::string>();
+  auto binvar_2_str = binning_opts["binvar2"].as<std::string>();
+
+  binTypes_vec.insert(binTypes_vec.end(),
+                      {ReturnKinematicParameterFromString(binvar_1_str),
+                       ReturnKinematicParameterFromString(binvar_2_str)});
   // Currently we can only bin in (at most) etrue, var1, var2
   if(binTypes_vec.size() != 2){
     MACH3LOG_ERROR("Wrong number of binning types, got {}, must provide 2!", binTypes_vec.size());
@@ -268,8 +277,9 @@ void BinnedSplineMakerBase::FillSystematicProperties()
     GetEntry(jentry);
 
     // Okay now we deal with our spline binning
-    double binning_par1 = GetVariableValue(binTypes_vec[0]);
-    double binning_par2 = GetVariableValue(binTypes_vec[1]);
+    double Enu = ReturnKinematicParameter("TrueNeutrinoEnergy", jentry);
+    double binning_par1 = ReturnKinematicParameter(binTypes_vec[0], jentry);
+    double binning_par2 = ReturnKinematicParameter(binTypes_vec[1], jentry);
 
     auto Mode = GetMode(jentry);
     auto interaction_mode = Modes->GetModeFromGenerator(Mode);
@@ -293,7 +303,6 @@ void BinnedSplineMakerBase::FillSystematicProperties()
         {
           for (int iKnot = 0; iKnot < systematicProperties[iSyst].knotArray->GetSize(); ++iKnot)
           {
-            double Enu = GetEnu(jentry);
             double wgt = 0;
             if(UseKnotForWeight){
               wgt = GetWeight(jentry, iSyst, iKnot);
@@ -435,4 +444,30 @@ void BinnedSplineMakerBase::WriteSplines() {
 
   fout->Close();
   MACH3LOG_INFO("Splines written to {}", outputname);
+}
+
+// ************************************************
+int BinnedSplineMakerBase::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
+// ************************************************
+  auto it = KinematicParameters->find(KinematicParameterStr);
+  if (it != KinematicParameters->end()) return it->second;
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameterStr);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return M3::_BAD_INT_;
+}
+
+// ************************************************
+std::string BinnedSplineMakerBase::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
+// ************************************************
+  auto it = ReversedKinematicParameters->find(KinematicParameter);
+  if (it != ReversedKinematicParameters->end()) {
+    return it->second;
+  }
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameter);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return "";
 }

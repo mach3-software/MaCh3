@@ -5,10 +5,8 @@ BinnedSplineMakerSK::BinnedSplineMakerSK(const std::string& Config) : BinnedSpli
   is_atm = GetFromManager<bool>(Setting->raw()["settings"]["is_atm"], false, __FILE__, __LINE__);
   erec_mev = GetFromManager<bool>(Setting->raw()["binning_opts"]["erec_mev"], false, __FILE__, __LINE__);
 
-  const auto& binning_opts = Setting->raw()["binning_opts"];
-  auto binvar_1_str = binning_opts["binvar1"].as<std::string>();
-  auto binvar_2_str = binning_opts["binvar2"].as<std::string>();
-  binTypes_vec.insert(binTypes_vec.end(), {GetBinningType(binvar_1_str), GetBinningType(binvar_2_str)});
+  KinematicParameters = &BinningTypeSK;
+  ReversedKinematicParameters = &ReversedBinningTypeSK;
 
   Initialise();
   //Hacky way to get normalisation weight;
@@ -198,7 +196,7 @@ void BinnedSplineMakerSK::LoadVariables()
   }
 }
 
-double BinnedSplineMakerSK::GetVariableValue(int binTypes) {
+double BinnedSplineMakerSK::ReturnKinematicParameter(int binTypes, [[maybe_unused]] const Long64_t jentry) const {
   double var = 0;
   constexpr double SKNuDir[3] = {0.669764, -0.742179, 0.024223};
 
@@ -279,6 +277,9 @@ double BinnedSplineMakerSK::GetVariableValue(int binTypes) {
     case kGencz:
       var = gencz;
       break;
+    case kTrueNeutrinoEnergy:
+      var = pnu[0];
+      break;
     case kNoBinning:
       var = 0.0; // Dummy bin
       break;
@@ -288,7 +289,6 @@ double BinnedSplineMakerSK::GetVariableValue(int binTypes) {
   };
   return var;
 }
-
 
 // loop over all knots
 double BinnedSplineMakerSK::GetWeight([[maybe_unused]] Long64_t jentry, size_t iSyst, int iKnot)
@@ -303,21 +303,6 @@ double BinnedSplineMakerSK::GetWeight([[maybe_unused]] Long64_t jentry, size_t i
     wgt *= wgtflx * wgtosc * knotWeight;
   }
   return wgt;
-}
-
-
-int BinnedSplineMakerSK::GetBinningType(const std::string& binName) {
-  if(binName == "none")         return kNoBinning;
-  else if(binName == "erec")    return kErec;
-  else if(binName == "theta")   return kTheta;
-  else if(binName == "mom")     return kMom;
-  else if(binName == "genmom")  return kGenmom;
-  else if(binName == "gencz")   return kGencz;
-  else {
-    MACH3LOG_ERROR("Sorry: {} is not a recognised bin type!", binName);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  return 0;
 }
 
 std::vector<double> BinnedSplineMakerSK::ExtractBinningFromTemplate(const std::string& template_file_name,

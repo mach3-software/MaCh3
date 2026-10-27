@@ -113,12 +113,11 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
    }
 
   std::vector<double> GetETrueBinning() final;
-  double GetVariableValue(int binTypes) final;
+  double ReturnKinematicParameter(int binTypes, const Long64_t jentry) const final;
 
   Long64_t GetEntries() final {return fChain_sk->GetEntries();}
   void GetEntry(Long64_t jentry) final {fChain_sk->GetEntry(jentry);}
   int GetMode([[maybe_unused]] Long64_t jentry) final {return mode;}
-  double GetEnu([[maybe_unused]] Long64_t jentry) final {return pnu[0];}
   double GetWeight(Long64_t jentry, size_t iSyst, int iKnot) final;
   double GetWeight([[maybe_unused]] Long64_t jentry,
                    [[maybe_unused]] size_t iSyst,
@@ -126,14 +125,13 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
     MACH3LOG_ERROR("Not implemented");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  int GetBinningType(const std::string& binName);
   std::vector<double> ExtractBinningFromTemplate(const std::string& template_file_name,
                                                  const std::string&  binning_name, bool atm);
-  // Input file containing weights, properly formatted
+  /// Input file containing weights, properly formatted
   std::vector< TArrayF* > weightArray;
 
-  // All of our non-mtuple variables
-  // Pointer to the analyzed TTree or TChain
+  /// All of our non-mtuple variables
+  /// Pointer to the analyzed TTree or TChain
   TChain *fChain_sk;
 
   bool erec_mev;
@@ -171,5 +169,25 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
 
   struct ConstantsStruct constants;
 
-  enum binningType{kNoBinning, kErec, kTheta, kMom, kGenmom, kGencz};
+  enum binningType{kNoBinning, kTrueNeutrinoEnergy, kErec, kTheta, kMom, kGenmom, kGencz};
+
+  const std::unordered_map<std::string, int> BinningTypeSK = {
+    {"none", kNoBinning},
+    {"TrueNeutrinoEnergy", kTrueNeutrinoEnergy},
+    {"erec", kErec},
+    {"theta", kTheta},
+    {"mom", kMom},
+    {"genmom", kGenmom},
+    {"gencz", kGencz},
+  };
+
+  const std::unordered_map<int, std::string> ReversedBinningTypeSK = {
+    {kNoBinning, "none"},
+    {kTrueNeutrinoEnergy, "TrueNeutrinoEnergy"},
+    {kErec, "erec"},
+    {kTheta, "theta"},
+    {kMom, "mom"},
+    {kGenmom, "genmom"},
+    {kGencz, "gencz"},
+  };
 };
