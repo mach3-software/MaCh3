@@ -5,24 +5,20 @@ ROOT_GENERATE_DICTIONARY(MaCh3SplineDict
 
 set(HEADERS
     SplineBase.h
+    BinnedSplineMakerBase.h
     BinnedSplineHandler.h
     UnbinnedSplineHandler.h
     SplineCommon.h
     SplineStructs.h
     gpuSplineUtils.cuh
-
-    BinnedSplineMakerSK.h
-    BinnedSplineMakerBase.h
 )
 
 add_library(Splines SHARED
     SplineBase.cpp
+    BinnedSplineMakerBase.cpp
     BinnedSplineHandler.cpp
     UnbinnedSplineHandler.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuSplineUtils.cu>
-
-    BinnedSplineMakerBase.cpp
-    BinnedSplineMakerSK.cpp
 )
 
 if(MaCh3_GPU_ENABLED)
