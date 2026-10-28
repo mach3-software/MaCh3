@@ -311,7 +311,7 @@ void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* 
   ParamVaried[i] = true;
 
   // Draw onto the TCanvas
-  hpost[i]->Draw();
+  hpost[i]->Draw("hist");
   hpd->Draw("same");
   Asimov->Draw("same");
   leg->Draw("same");
