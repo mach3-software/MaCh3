@@ -117,7 +117,6 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
 
   Long64_t GetEntries() final {return fChain_sk->GetEntries();}
   void GetEntry(Long64_t jentry) final {fChain_sk->GetEntry(jentry);}
-  int GetMode([[maybe_unused]] Long64_t jentry) final {return mode;}
   double GetWeight(Long64_t jentry, size_t iSyst, int iKnot) final;
   double GetWeight([[maybe_unused]] Long64_t jentry,
                    [[maybe_unused]] size_t iSyst,
@@ -169,11 +168,12 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
 
   struct ConstantsStruct constants;
 
-  enum binningType{kNoBinning, kTrueNeutrinoEnergy, kErec, kTheta, kMom, kGenmom, kGencz};
+  enum binningType{kNoBinning, kTrueNeutrinoEnergy, kGeneratorMode, kErec, kTheta, kMom, kGenmom, kGencz};
 
   const std::unordered_map<std::string, int> BinningTypeSK = {
     {"none", kNoBinning},
     {"TrueNeutrinoEnergy", kTrueNeutrinoEnergy},
+    {"GeneratorMode", kGeneratorMode},
     {"erec", kErec},
     {"theta", kTheta},
     {"mom", kMom},
@@ -184,6 +184,7 @@ class BinnedSplineMakerSK : public BinnedSplineMakerBase {
   const std::unordered_map<int, std::string> ReversedBinningTypeSK = {
     {kNoBinning, "none"},
     {kTrueNeutrinoEnergy, "TrueNeutrinoEnergy"},
+    {kGeneratorMode, "GeneratorMode"},
     {kErec, "erec"},
     {kTheta, "theta"},
     {kMom, "mom"},

@@ -280,6 +280,9 @@ double BinnedSplineMakerSK::ReturnKinematicParameter(int binTypes, [[maybe_unuse
     case kTrueNeutrinoEnergy:
       var = pnu[0];
       break;
+    case kGeneratorMode:
+      var = mode;
+      break;
     case kNoBinning:
       var = 0.0; // Dummy bin
       break;
