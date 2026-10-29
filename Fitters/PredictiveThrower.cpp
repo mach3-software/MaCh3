@@ -367,11 +367,10 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
                                  const int iToy) {
 // *************************
   int SampleCounter = 0;
-  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
-  {
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
     auto* SampleHandler = samples[iPDF];
-    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
-    {
+    
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample) {
       ToyDirectory->cd();
 
       auto SampleName = SampleHandler->GetSampleTitle(iSample);
@@ -379,10 +378,13 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
       MC_Hist_Toy[SampleCounter][iToy] = M3::Clone(MCHist, SampleName + "_mc_" + std::to_string(iToy));
       MC_Hist_Toy[SampleCounter][iToy]->Write();
 
+      /*
       const TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
       W2_Hist_Toy[SampleCounter][iToy] = M3::Clone(W2Hist, SampleName + "_w2_" + std::to_string(iToy));
       W2_Hist_Toy[SampleCounter][iToy]->Write();
-
+      */
+      
+      /*
       // now get 1D projection for every dimension
       Toy_1DDirectory->cd();
       for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
@@ -394,7 +396,9 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
         hist->SetName((SampleName + ProjectionSuffix).c_str());
         hist->Write();
       }
-
+      */
+      
+      /*
       Toy_2DDirectory->cd();
       // now get 2D projection for every combination
       for(int iDim1 = 0; iDim1 < SampleHandler->GetNDim(iSample); iDim1++) {
@@ -413,6 +417,8 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
           hist2D->Write();
         }
       }
+      */
+      
       SampleCounter++;
     }
   }
