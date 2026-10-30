@@ -15,7 +15,7 @@ option(MaCh3_DEBUG_ENABLED "Enable special debugging mode, with additional print
 option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
 option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
-option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
+option(MaCh3_GPU_ENABLED  "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
 set(MaCh3_PYTHON_INSTALL_DIR  CACHE STRING "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If not set then will be installed in the build location of MaCh3")
 
@@ -167,12 +167,19 @@ add_subdirectory(Utils)
 add_subdirectory(CLI)
 add_subdirectory(python)
 
-foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+if(APPLE)
+  set(MaCh3_RPATH_ORIGIN "@loader_path")
+  set(MaCh3_SO_EXTENSION ".dylib")
+else()
+  set(MaCh3_RPATH_ORIGIN "$ORIGIN")
+  set(MaCh3_SO_EXTENSION ".so")
+endif()
+foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Plotting;Oscillator;OscProbCalcer;CLIModules )
   set_property(
     TARGET
     ${lib}
     PROPERTY
-      INSTALL_RPATH "$ORIGIN"
+      INSTALL_RPATH "${MaCh3_RPATH_ORIGIN}"
   )
 endforeach()
 

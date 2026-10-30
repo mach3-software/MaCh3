@@ -14,17 +14,17 @@ for lib in [
     
     ctypes.cdll.LoadLibrary(f'{lib}')
 
-pymach3_lib_list = glob.glob('_pyMaCh3*.so')
+pymach3_lib_list = glob.glob(f'{mach3_dir}/_pyMaCh3*.so')
 ## load all the MaCh3 core libraries
 for lib in pymach3_lib_list:
     
-    ctypes.cdll.LoadLibrary(f'{mach3_dir}/{lib}')
+    ctypes.cdll.LoadLibrary(lib)
 
 ## search for any experiment specific libraries
 other_libs = [@LINK_TARGET_LIB_LIST@]
 
 for lib in other_libs:
-    ctypes.cdll.LoadLibrary(f"{lib_dir}/experiment/lib{lib}.so")
+    ctypes.cdll.LoadLibrary(f"{lib_dir}/experiment/lib{lib}@CMAKE_SHARED_LIBRARY_SUFFIX@")
 
 ## set the MaCh3 environment var
 os.environ["MaCh3_ROOT"] = f"{mach3_dir}"
