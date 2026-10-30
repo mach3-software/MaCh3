@@ -244,11 +244,11 @@ void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGr
 // Try loading toys
 bool PredictiveThrower::LoadToys() {
 // *************************
-  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  auto ToyFileName = Get<std::string>(fitMan->raw()["Predictive"]["ToyFile"], __FILE__ , __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TFile* file = TFile::Open(ToyFileName.c_str(), "READ");
 
   gErrorIgnoreLevel = originalErrorWarning;
   TDirectory* ToyDir = nullptr;
@@ -493,10 +493,12 @@ void PredictiveThrower::ProduceToys() {
                      BoundValuePointer, ParamBounds);
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  auto ToyFileName = Get<std::string>(fitMan->raw()["Predictive"]["ToyFile"], __FILE__ , __LINE__);
+  auto ToyFile = M3::Open(ToyFileName, "RECREATE", __FILE__, __LINE__);
 
   MACH3LOG_INFO("Starting {}", __func__);
 
-  outputFile->cd();
+  ToyFile->cd();
   double Penalty = 0, Weight = 1.;
   int Draw = 0;
 
@@ -524,7 +526,7 @@ void PredictiveThrower::ProduceToys() {
       ParamCounter++;
     }
   }
-  TDirectory* ToyDirectory = outputFile->mkdir("Toys");
+  TDirectory* ToyDirectory = ToyFile->mkdir("Toys");
   ToyDirectory->cd();
   int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
@@ -548,11 +550,11 @@ void PredictiveThrower::ProduceToys() {
     }
   }
 
-  TDirectory* Toy_1DDirectory = outputFile->mkdir("Toys_1DHistVar");
-  TDirectory* Toy_2DDirectory = outputFile->mkdir("Toys_2DHistVar");
+  TDirectory* Toy_1DDirectory = ToyFile->mkdir("Toys_1DHistVar");
+  TDirectory* Toy_2DDirectory = ToyFile->mkdir("Toys_2DHistVar");
   auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
   TDirectory* ByModeDirectory = nullptr;
-  if(doByMode) ByModeDirectory = outputFile->mkdir("Toys_ByMode");
+  if(doByMode) ByModeDirectory = ToyFile->mkdir("Toys_ByMode");
   auto ReweightNames = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ReweightNames"],
                                                                 {"Weight"}, __FILE__, __LINE__);
   bool doReweight = false;
@@ -689,9 +691,9 @@ void PredictiveThrower::ProduceToys() {
     ByModeDirectory->Close();
     delete ByModeDirectory;
   }
-
-  outputFile->cd();
   ToyTree->Write(); delete ToyTree;
+  if(ToyFile) delete ToyFile;
+  outputFile->cd();
 
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
@@ -704,21 +706,18 @@ void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& Sampl
   TDirectory * ogdir = gDirectory;
   TDirectory* ToyDir = nullptr;
 
-  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  auto ToyFileName = Get<std::string>(fitMan->raw()["Predictive"]["ToyFile"], __FILE__ , __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TFile* file = TFile::Open(ToyFileName.c_str(), "READ");
   gErrorIgnoreLevel = originalErrorWarning;
 
   if (file == nullptr || file->IsZombie()) {
-    ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+    MACH3LOG_ERROR("Didn't find Toys_1DHistVar in toy file");
+    throw MaCh3Exception(__FILE__,__LINE__);
   } else {
     ToyDir = file->GetDirectory("Toys_1DHistVar");
-    // If toys not amiable in posterior file this means they must be in output file
-    if(ToyDir == nullptr) {
-      ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
-    }
   }
 
   // [sample], [toy], [dim]
@@ -809,21 +808,18 @@ void PredictiveThrower::StudyByMode1DProjections(const std::vector<TDirectory*>&
   TDirectory* ogdir = gDirectory;
   TDirectory* ToyDir = nullptr;
 
-  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  auto ToyFileName = Get<std::string>(fitMan->raw()["Predictive"]["ToyFile"], __FILE__ , __LINE__);
   // Open the ROOT file
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
-  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TFile* file = TFile::Open(ToyFileName.c_str(), "READ");
   gErrorIgnoreLevel = originalErrorWarning;
 
   if (file == nullptr || file->IsZombie()) {
-    ToyDir = outputFile->GetDirectory("Toys_ByMode");
+    MACH3LOG_ERROR("Didn't find Toys_ByMode in toy file");
+    throw MaCh3Exception(__FILE__,__LINE__);
   } else {
     ToyDir = file->GetDirectory("Toys_ByMode");
-    // If toys not amiable in posterior file this means they must be in output file
-    if(ToyDir == nullptr) {
-      ToyDir = outputFile->GetDirectory("Toys_ByMode");
-    }
   }
 
   /// @todo KS: Here we assume each sample has same modes, this is because ProduceSpectra function,
@@ -985,7 +981,7 @@ std::string PredictiveThrower::GetBinName(TH1* hist,
     const double up  = ax->GetBinUpEdge(b);
 
     BinName = fmt::format("Dim0 ({:g}, {:g})", low, up);
-  } else if (Dim == 2) { // True 2D dsitrubitons
+  } else if (Dim == 2) { // True 2D distributions
     if(uniform == true) { //using TH2D
       const int bx = bins[0];
       const int by = bins[1];
@@ -1112,11 +1108,11 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
         }
       } else {
         int nbinsx = hist->GetNbinsX();
-          for (int i = 1; i <= nbinsx; ++i) {
-            double content = Toys[sample][iToy]->GetBinContent(i);
-            Posterior_hist[sample][i-1]->Fill(content, ReweightWeight[iToy]);
-          } // end loop over bins
-        } // end if over dimensions
+        for (int i = 1; i <= nbinsx; ++i) {
+          double content = Toys[sample][iToy]->GetBinContent(i);
+          Posterior_hist[sample][i-1]->Fill(content, ReweightWeight[iToy]);
+        } // end loop over bins
+      } // end if over dimensions
     } // end loop over toys
   } // end loop over samples
 
