@@ -82,7 +82,7 @@ class AdaptiveMCMCHandler
   bool IndivStepScaleAdapt() const;
 
   /// @brief Tell whether matrix should be updated
-  bool UpdateMatrixAdapt();
+  bool ShouldUpdateMatrixAdapt();
 
   /// @brief To be fair not a clue...
   bool AdaptionUpdate() const;
