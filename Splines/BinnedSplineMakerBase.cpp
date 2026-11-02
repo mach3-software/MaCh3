@@ -6,7 +6,7 @@ BinnedSplineMakerBase::BinnedSplineMakerBase(const std::string& Config) {
 // ************************************************
   Setting = std::make_unique<Manager>(Config.c_str());
 
-  auto& options = Setting->raw()["settings"];
+  const auto options = Get<YAML::Node>(Setting->raw()["systematics"], __FILE__, __LINE__);
   auto ModeName = Get<std::string>(options["modes"], __FILE__ , __LINE__);
   M3::AddPath(ModeName);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
@@ -41,7 +41,7 @@ BinnedSplineMakerBase::BinnedSplineMakerBase(const std::string& Config) {
 // ************************************************
 void BinnedSplineMakerBase::LoadSystematics() {
 // ************************************************
-  const auto& systematics = Setting->raw()["systematics"];
+  const auto systematics = Get<YAML::Node>(Setting->raw()["systematics"], __FILE__, __LINE__);
   std::vector<std::string> dial_names;
   std::vector<int> dial_nominal_knots;
   std::vector<std::vector<int>> dial_modes;
@@ -50,20 +50,19 @@ void BinnedSplineMakerBase::LoadSystematics() {
   // Next we deal with our systematics
   MACH3LOG_INFO("Dial Names :");
   for (const auto& table : systematics) {
-    std::string name = table.first.as<std::string>();
+    const std::string name = Get<std::string>(table.first, __FILE__, __LINE__);
 
     // Access the values for this systematic
     const auto& sys = systematics[name];
 
     // Let's user write splines with name that's not the dial name
     if(sys["output_name"]) {
-      dial_output_names.push_back(sys["output_name"].as<std::string>());
+      dial_output_names.push_back(Get<std::string>(sys["output_name"], __FILE__, __LINE__));
     } else{
       dial_output_names.push_back(name);
     }
-
-    int nom_knot = sys["nominal_knot"].as<int>();
-    auto interaction_mode_names = sys["interaction_modes"].as<std::vector<std::string>>();
+    const int nom_knot = Get<int>(sys["nominal_knot"], __FILE__, __LINE__);
+    auto interaction_mode_names = Get<std::vector<std::string>>(sys["interaction_modes"], __FILE__, __LINE__);
 
     dial_names.push_back(name);
 
@@ -120,9 +119,9 @@ void BinnedSplineMakerBase::LoadSystematics() {
 // ************************************************
 void BinnedSplineMakerBase::Initialise() {
 // ************************************************
-  const auto& binning_opts = Setting->raw()["binning_opts"];
-  auto binvar_1_str = binning_opts["binvar1"].as<std::string>();
-  auto binvar_2_str = binning_opts["binvar2"].as<std::string>();
+  const auto& binning_opts = Get<YAML::Node>(Setting->raw()["binning_opts"], __FILE__, __LINE__);
+  const auto binvar_1_str = Get<std::string>(binning_opts["binvar1"], __FILE__, __LINE__);
+  const auto binvar_2_str = Get<std::string>(binning_opts["binvar2"], __FILE__, __LINE__);
 
   BinningTypes.push_back(ReturnKinematicParameterFromString(binvar_1_str));
   BinningTypes.push_back(ReturnKinematicParameterFromString(binvar_2_str));
@@ -213,6 +212,20 @@ void BinnedSplineMakerBase::FillGraphs() {
 // ************************************************
   int sysMode = 0;
 
+  auto throwInvalidBinContent = [&](const std::string& type, const double content,
+                                    const size_t  knot, const size_t  iSyst,
+                                    const size_t  iMode, const int xBin,
+                                    const int yBin, const int zBin) {
+    MACH3LOG_ERROR("Spline has invalid {} bin content!", type);
+    MACH3LOG_ERROR("Systematic: {} ({})", iSyst, systematicProperties[iSyst].outputSystName);
+    MACH3LOG_ERROR("Interaction mode: {}", systematicProperties[iSyst].intModes[iMode]);
+    MACH3LOG_ERROR("Knot index: {}", knot);
+    MACH3LOG_ERROR("Histogram bin (x, y, z): ({}, {}, {})", xBin + 1, yBin + 1, zBin + 1);
+    MACH3LOG_ERROR("Bin content: {}", content);
+
+    throw MaCh3Exception(__FILE__, __LINE__);
+  };
+
   // loop over all systematics:
   for(size_t iSyst = 0; iSyst < systematicProperties.size(); iSyst++)
   {
@@ -235,25 +248,15 @@ void BinnedSplineMakerBase::FillGraphs() {
               const double knotContent = VariationHistogram[sysMode + iMode][iKnot]->GetBinContent(xBin+1,yBin+1,zBin+1);
               graphs[sysMode+iMode][xBin][yBin][zBin]->SetPoint(iter, systematicProperties[iSyst].knotArray->At(iKnot),
                                                                 (nomContent > 0. ? knotContent / nomContent : 1.));
-              // Don't want to fill our splines with junk!
-              if(std::isnan((nomContent)) || nomContent < 0) {
-                MACH3LOG_ERROR("2D: is nan at nom");
+
+              // Check nominal bin content
+              if (std::isnan(nomContent) || nomContent < 0.) {
+                throwInvalidBinContent("nominal", nomContent, nom, iSyst, iMode, xBin, yBin, zBin);
               }
 
-              if(std::isnan(knotContent) || knotContent < 0) {
-                const int spline_mode = systematicProperties[iSyst].intModes[iMode];
-                std::string splineSuffix;
-                for (const auto& [suffix, id] : fSuffixToSplineMode) {
-                  if (id == spline_mode) {
-                    splineSuffix = suffix;
-                    break;
-                  }
-                }
-                MACH3LOG_ERROR("ERROR 2D: is nan at knot a: {}", iKnot);
-                MACH3LOG_ERROR("Systematic is: {} : {}", iSyst, systematicProperties[iSyst].outputSystName);
-                MACH3LOG_ERROR("Are you returning a NaN? {}", std::isnan(knotContent));
-                MACH3LOG_ERROR("Do you have a negative bin content? {}", knotContent);
-                MACH3LOG_ERROR("Currently working on mode: {}", spline_mode);
+              // Check variation bin content
+              if (std::isnan(knotContent) || knotContent < 0.) {
+                throwInvalidBinContent("variation", knotContent, iKnot, iSyst, iMode, xBin, yBin, zBin);
               }
             }
           }
@@ -358,7 +361,7 @@ void BinnedSplineMakerBase::SetupBinning() {
 // ************************************************
   // Okay now we can grab the etrue bins if we provide a template file, else use a default setting.
   std::vector<double> var0Bins = GetETrueBinning();
-  auto binning_opts = Setting->raw()["binning_opts"];
+  const auto& binning_opts = Get<YAML::Node>(Setting->raw()["binning_opts"], __FILE__, __LINE__);
   // Okay next we need to deal with reco energy bins! (var1)
   // This really really ought to be configurable!
   // HW : Should now just work, Var1 bins now set up correctly
@@ -423,7 +426,7 @@ std::string BinnedSplineMakerBase::GetSplineSuffix(const int spline_mode) const 
 // ************************************************
 void BinnedSplineMakerBase::WriteSplines() {
 // ************************************************
-  auto outputname = Setting->raw()["settings"]["outputfile"].as<std::string>();
+  auto outputname = Get<std::string>(Setting->raw()["settings"]["outputfile"], __FILE__, __LINE__);
   M3::AddPath(outputname);
 
   TFile* fout = new TFile(outputname.c_str(), "RECREATE");
