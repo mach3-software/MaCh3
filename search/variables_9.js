@@ -17,8 +17,8 @@ var searchData=
   ['is_5fpriorpredictive_3873',['Is_PriorPredictive',['../classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9',1,'PredictiveThrower']]],
   ['isample_3874',['iSample',['../structSplineIndex.html#a86841d2d184bce792aca2bad8b6acd9b',1,'SplineIndex']]],
   ['isdecomposedpca_3875',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
-  ['isnc_3876',['isNC',['../structEventInfo.html#ae2965d50aedd9de21f0afcdc9912155a',1,'EventInfo']]],
-  ['isnc_3877',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
+  ['isnc_3876',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
+  ['isnc_3877',['isNC',['../structEventInfo.html#ae2965d50aedd9de21f0afcdc9912155a',1,'EventInfo']]],
   ['isyst_3878',['iSyst',['../structSplineIndex.html#af32cbf16a503ceb95236db5d5e32637f',1,'SplineIndex']]],
   ['ivar_3879',['iVar',['../structSplineIndex.html#a53ed6319390fabacb2492a40376ab3cf',1,'SplineIndex']]]
 ];

@@ -130,9 +130,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a08210ff65edde6ae101aa8c924da02f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAdaptiveMCMCHandler.html#a08210ff65edde6ae101aa8c924da02f3">IndivStepScaleAdapt</a> () const</td></tr>
 <tr class="memdesc:a08210ff65edde6ae101aa8c924da02f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell whether we want reset step scale or not.  <a href="classAdaptiveMCMCHandler.html#a08210ff65edde6ae101aa8c924da02f3">More...</a><br /></td></tr>
 <tr class="separator:a08210ff65edde6ae101aa8c924da02f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56b427fada919322904699290abc6aad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAdaptiveMCMCHandler.html#a56b427fada919322904699290abc6aad">UpdateMatrixAdapt</a> ()</td></tr>
-<tr class="memdesc:a56b427fada919322904699290abc6aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell whether matrix should be updated.  <a href="classAdaptiveMCMCHandler.html#a56b427fada919322904699290abc6aad">More...</a><br /></td></tr>
-<tr class="separator:a56b427fada919322904699290abc6aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74738399a6384fbcc33239ba1f323194"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAdaptiveMCMCHandler.html#a74738399a6384fbcc33239ba1f323194">ShouldUpdateMatrixAdapt</a> ()</td></tr>
+<tr class="memdesc:a74738399a6384fbcc33239ba1f323194"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell whether matrix should be updated.  <a href="classAdaptiveMCMCHandler.html#a74738399a6384fbcc33239ba1f323194">More...</a><br /></td></tr>
+<tr class="separator:a74738399a6384fbcc33239ba1f323194"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17144fa4726e95a8c424fc4ec41d4da8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAdaptiveMCMCHandler.html#a17144fa4726e95a8c424fc4ec41d4da8">AdaptionUpdate</a> () const</td></tr>
 <tr class="memdesc:a17144fa4726e95a8c424fc4ec41d4da8"><td class="mdescLeft">&#160;</td><td class="mdescRight">To be fair not a clue...  <a href="classAdaptiveMCMCHandler.html#a17144fa4726e95a8c424fc4ec41d4da8">More...</a><br /></td></tr>
 <tr class="separator:a17144fa4726e95a8c424fc4ec41d4da8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1749,6 +1749,37 @@ Hank Hua</dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a74738399a6384fbcc33239ba1f323194"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74738399a6384fbcc33239ba1f323194">&#9670;&nbsp;</a></span>ShouldUpdateMatrixAdapt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool AdaptiveMCMCHandler::ShouldUpdateMatrixAdapt </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tell whether matrix should be updated. </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00407">407</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                                                  {</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classAdaptiveMCMCHandler.html#a621f8e70851ba8b5f1b0292a81245243">total_steps</a> &gt;= <a class="code" href="classAdaptiveMCMCHandler.html#a215b80de985a93cf52ca9a5ce8ae8064">start_adaptive_throw</a> &amp;&amp;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="comment">// Check whether the number of steps is divisible by the adaptive update step</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="comment">// e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    (<a class="code" href="classAdaptiveMCMCHandler.html#a621f8e70851ba8b5f1b0292a81245243">total_steps</a> - <a class="code" href="classAdaptiveMCMCHandler.html#a215b80de985a93cf52ca9a5ce8ae8064">start_adaptive_throw</a>)%<a class="code" href="classAdaptiveMCMCHandler.html#a7a9eecbe9f66d0fc274b91fbc0587835">adaptive_update_step</a> == 0) {</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  } </div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a15ad51e6c2e6e14ced71c4e31693a56e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a15ad51e6c2e6e14ced71c4e31693a56e">&#9670;&nbsp;</a></span>SkipAdaption()</h2>
 
@@ -1868,37 +1899,6 @@ Hank Hua</dd></dl>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  }</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;}</div>
 <div class="ttc" id="aclassAdaptiveMCMCHandler_html_ac9042a85da07e156be1365af65a9052e"><div class="ttname"><a href="classAdaptiveMCMCHandler.html#ac9042a85da07e156be1365af65a9052e">AdaptiveMCMCHandler::CurrVal</a></div><div class="ttdeci">double CurrVal(const int par_index) const</div><div class="ttdoc">Get Current value of parameter.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00507">AdaptiveMCMCHandler.cpp:507</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a56b427fada919322904699290abc6aad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56b427fada919322904699290abc6aad">&#9670;&nbsp;</a></span>UpdateMatrixAdapt()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool AdaptiveMCMCHandler::UpdateMatrixAdapt </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Tell whether matrix should be updated. </p>
-
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00407">407</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                                            {</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="comment">// ********************************************</span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classAdaptiveMCMCHandler.html#a621f8e70851ba8b5f1b0292a81245243">total_steps</a> &gt;= <a class="code" href="classAdaptiveMCMCHandler.html#a215b80de985a93cf52ca9a5ce8ae8064">start_adaptive_throw</a> &amp;&amp;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="comment">// Check whether the number of steps is divisible by the adaptive update step</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="comment">// e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true</span></div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    (<a class="code" href="classAdaptiveMCMCHandler.html#a621f8e70851ba8b5f1b0292a81245243">total_steps</a> - <a class="code" href="classAdaptiveMCMCHandler.html#a215b80de985a93cf52ca9a5ce8ae8064">start_adaptive_throw</a>)%<a class="code" href="classAdaptiveMCMCHandler.html#a7a9eecbe9f66d0fc274b91fbc0587835">adaptive_update_step</a> == 0) {</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  } </div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
