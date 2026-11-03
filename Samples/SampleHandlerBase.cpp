@@ -2025,16 +2025,18 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   MACH3LOG_INFO("Printing for {}", GetName());
+  std::vector<M3::Utils::ColumnSpec> columns;
 
   if (!DataOnly) {
-    const std::string sep_full(81, '-');
-    MACH3LOG_INFO("{}", sep_full);
-    MACH3LOG_INFO("{:<40}{:<15}{:<15}{:<10}|", "Sample", "Data", "MC", "-LLH");
+    columns = {{"Sample", 10, 50, M3::Utils::Alignment::Left},
+               {"Data",   10, 20, M3::Utils::Alignment::Right},
+               {"MC",     10, 20, M3::Utils::Alignment::Right},
+               {"-LLH",   10, 20, M3::Utils::Alignment::Right}};
   } else {
-    const std::string sep_data(56, '-');
-    MACH3LOG_INFO("{}", sep_data);
-    MACH3LOG_INFO("{:<40}{:<15}|", "Sample", "Data");
+    columns = {{"Sample", 10, 50, M3::Utils::Alignment::Left},
+               {"Data",   10, 20, M3::Utils::Alignment::Right}};
   }
+  M3::Utils::TablePrinter table(columns);
 
   double sumData = 0.0;
   double sumMC = 0.0;
@@ -2051,20 +2053,26 @@ void SampleHandlerBase::PrintRates(const bool DataOnly) {
       sumMC += mcIntegral;
       likelihood = GetSampleLikelihood(iSample);
 
-      MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
+      table.AddRow(name, M3::Utils::Cell(dataIntegral, "{:.2f}"),
+                         M3::Utils::Cell(mcIntegral, "{:.2f}"),
+                         M3::Utils::Cell(likelihood, "{:.2f}"));
     } else {
-      MACH3LOG_INFO("{:<40}{:<15.2f}|", name, dataIntegral);
+      table.AddRow(name, M3::Utils::Cell(dataIntegral, "{:.2f}"));
     }
   }
+  // Add total row
   if (!DataOnly) {
     likelihood = GetLikelihood();
-    MACH3LOG_INFO("{:<40}{:<15.2f}{:<15.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
-    const std::string sep_full(81, '-');
-    MACH3LOG_INFO("{}", sep_full);
+    table.AddRow("Total", M3::Utils::Cell(sumData, "{:.2f}"),
+                          M3::Utils::Cell(sumMC, "{:.2f}"),
+                          M3::Utils::Cell(likelihood, "{:.2f}"));
   } else {
-    MACH3LOG_INFO("{:<40}{:<20.2f}|", "Total", sumData);
-    const std::string sep_data(56, '-');
-    MACH3LOG_INFO("{}", sep_data);
+    table.AddRow("Total", M3::Utils::Cell(sumData, "{:.2f}"));
+  }
+
+  // Print table
+  for (const auto& line : table.Render()) {
+    MACH3LOG_INFO("{}", line);
   }
 }
 
