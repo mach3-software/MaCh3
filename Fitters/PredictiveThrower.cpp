@@ -378,13 +378,10 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
       MC_Hist_Toy[SampleCounter][iToy] = M3::Clone(MCHist, SampleName + "_mc_" + std::to_string(iToy));
       MC_Hist_Toy[SampleCounter][iToy]->Write();
 
-      /*
       const TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
       W2_Hist_Toy[SampleCounter][iToy] = M3::Clone(W2Hist, SampleName + "_w2_" + std::to_string(iToy));
       W2_Hist_Toy[SampleCounter][iToy]->Write();
-      */
       
-      /*
       // now get 1D projection for every dimension
       Toy_1DDirectory->cd();
       for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
@@ -396,7 +393,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
         hist->SetName((SampleName + ProjectionSuffix).c_str());
         hist->Write();
       }
-      */
       
       /*
       Toy_2DDirectory->cd();
@@ -1154,8 +1150,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   auto doByMode = GetFromManager<bool>(fitMan->raw()["Predictive"]["ByMode"], false, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
-  std::vector<TDirectory*> SampleDirectories;
-  SampleDirectories.resize(TotalNumberOfSamples+1);
+  std::cout << "TotalNumberOfSamples:" << TotalNumberOfSamples << std::endl;
+  std::vector<TDirectory*> SampleDirectories(TotalNumberOfSamples+1);
 
   // open directory for every sample
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
