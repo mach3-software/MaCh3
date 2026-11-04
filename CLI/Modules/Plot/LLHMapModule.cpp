@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "CLI/Modules/plot/LLHMapModule.hpp"
+#include "CLI/Modules/Plot/LLHMapModule.hpp"
 #include "Manager/Manager.h"
 
 /// @file LLHMapModule.cpp
