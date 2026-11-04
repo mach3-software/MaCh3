@@ -21,13 +21,13 @@ namespace M3{
     m_parser->add_subparser(*plotParser);
     m_parser->set_default_subcommand(m_default_parser->name());
     m_parser->add_description("Tool for MCMC diagnostic like autocorrelations.");
-    m_default_parser->add_argument("mcmc-output")
-      .help("MCMC chain root file.")
-      .metavar("MCMC_CHAIN")
-      .required();
     m_default_parser->add_argument("config")
       .help("Config file.")
       .metavar("CONFIG")
+      .required();
+    m_default_parser->add_argument("mcmc-output")
+      .help("MCMC chain root file.")
+      .metavar("MCMC_CHAIN")
       .required();
     m_default_parser->add_epilog("Optional subcommands:\n  " + plotParser->name() + "        " + plotParser->description());
     return m_parser.get();
