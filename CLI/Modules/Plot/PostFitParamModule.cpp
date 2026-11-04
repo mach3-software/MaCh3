@@ -9,21 +9,17 @@ namespace M3 {
       m_parser = std::make_unique<MaCh3ArgumentParser>("postfitparam", "1.0", argparse::default_arguments::help);
       m_parser->add_description("new version of the old GetPlotPostFitParam binary.");
       m_parser->add_argument("-o", "--outputfile")
-      .help("Output file.")
-      .metavar("OUTPUTFILE")
-      .required();
+      .help("Output file. If omitted, use the plotting manager's default output name.")
+      .metavar("OUTPUTFILE");
       m_parser->add_argument("-c", "--config")
-      .help("Config file.")
-      .metavar("CONFIG")
-      .required();
+      .help("Config file. If omitted, use the plotting manager's default configuration.")
+      .metavar("CONFIG");
       m_parser->add_argument("-l", "--labels")
-      .help("string of labels for each file in the format Label1;Label2;... to be parsed by parseFileLabels(), number of labels should match exactly the number of files.")
-      .metavar("LABELS")
-      .required();
+      .help("Labels in the format Label1;Label2;...; provide one per input file. If omitted, use the input file names.")
+      .metavar("LABELS");
       m_parser->add_argument("-d", "--drawopts")
-      .help("Draw options for the plots.")
-      .metavar("DRAWOPTS")
-      .required();
+      .help("Extra draw options for the plots. If omitted, use no extra draw options.")
+      .metavar("DRAWOPTS");
       m_parser->add_argument("-s", "--split")
       .help("where possible, will try to split plots made by sample.")
       .flag();
@@ -52,31 +48,36 @@ namespace M3 {
     if (m_parser->get<bool>("grid")) {
       arguments.push_back("-g");
     }
-    arguments.push_back("-d");
-    arguments.push_back(m_parser->get<std::string>("drawopts"));
-    arguments.push_back("-o");
-    arguments.push_back(m_parser->get<std::string>("outputfile"));
-    arguments.push_back("-c");
-    arguments.push_back(m_parser->get<std::string>("config"));
-    arguments.push_back("-l");
-    arguments.push_back(m_parser->get<std::string>("labels"));
+    if (const auto drawOptions = m_parser->present<std::string>("drawopts")) {
+      arguments.push_back("-d");
+      arguments.push_back(*drawOptions);
+    }
+    if (const auto outputFile = m_parser->present<std::string>("outputfile")) {
+      arguments.push_back("-o");
+      arguments.push_back(*outputFile);
+    }
+    if (const auto config = m_parser->present<std::string>("config")) {
+      arguments.push_back("-c");
+      arguments.push_back(*config);
+    }
+    if (const auto labels = m_parser->present<std::string>("labels")) {
+      arguments.push_back("-l");
+      arguments.push_back(*labels);
+    }
     const auto inputFiles = m_parser->get<std::vector<std::string>>("inputfiles");
     arguments.insert(arguments.end(), inputFiles.begin(), inputFiles.end());
     return arguments;
   }
 
   void PostFitParamModule::validateCommandLine() {
-    auto labels = m_parser->get<std::string>("labels");
-    auto inputfiles = m_parser->get<std::vector<std::string>>("inputfiles");
-    
-    std::vector<std::string> splitLabels;
-    std::stringstream ss(labels);
-    std::string label;
-    while (std::getline(ss, label, ':')) {
-        splitLabels.push_back(label);
+    const auto labels = m_parser->present<std::string>("labels");
+    if (!labels) {
+      return;
     }
 
-    if (splitLabels.size() != inputfiles.size()) {
+    const auto inputfiles = m_parser->get<std::vector<std::string>>("inputfiles");
+    const auto labelCount = static_cast<std::size_t>(std::count(labels->begin(), labels->end(), ';') + 1);
+    if (labelCount != inputfiles.size()) {
         MACH3LOG_ERROR("Number of labels does not match number of input files.");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
