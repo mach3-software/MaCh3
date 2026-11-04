@@ -9,6 +9,8 @@ add_library(CLIModules SHARED
     SmearModule.cpp
     ReweightModule.cpp
     CombineModule.cpp
+    UmbrellaModule.cpp
+    UmbrellaPlotModule.cpp
 )
 
 target_link_libraries(CLIModules PRIVATE MaCh3::All)

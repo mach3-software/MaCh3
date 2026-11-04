@@ -12,6 +12,7 @@
 #include "CLI/Modules/ReweightModule.hpp"
 #include "CLI/Modules/CombineModule.hpp"
 #include "CLI/Modules/Plot/PlotModule.hpp"
+#include "CLI/Modules/UmbrellaModule.hpp"
 #include "CLI/MaCh3Program.hpp"
 
 /// @brief Main entry point for the MaCh3 application
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
     M3::ReweightModule reweight;
     M3::CombineModule combine;
     M3::PlotModule plot;
+    M3::UmbrellaModule umbrella;
 
     program.add_core_module(proc);
     program.add_core_module(diag);
@@ -52,6 +54,7 @@ int main(int argc, char *argv[]) {
     program.add_core_module(reweight);
     program.add_core_module(combine);
     program.add_core_module(plot);
+    program.add_core_module(umbrella);
     program.load_dynamic_plugins();
 
     // Pre-scan for --complete before argparse processes the full command line,

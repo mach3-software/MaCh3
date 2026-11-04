@@ -6,7 +6,7 @@ foreach(app
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(UmbreallaSamplingApps ${app})
-    target_link_libraries(${app} MaCh3::All MaCh3Warnings)
+    target_link_libraries(${app} MaCh3::CLIModules MaCh3::All MaCh3Warnings)
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
