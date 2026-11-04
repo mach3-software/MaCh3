@@ -70,6 +70,56 @@ namespace M3 {
                 return it->second->get_usage_full().find(' ') != std::string::npos;
             }
 
+            /// @brief Complete subcommands or long options at any depth without parsing incomplete arguments
+            /// @return Matching names, or an empty list to allow shell file completion
+            std::vector<std::string> get_completions(const std::string& prefix,
+                                                    const std::vector<std::string>& context) const {
+                const MaCh3ArgumentParser* parser = this;
+                bool positional = false;
+                for (std::size_t i = 0; i < context.size(); ++i) {
+                    const auto& word = context[i];
+                    if (word == "--") return {};
+
+                    if (!positional) {
+                        auto sub = parser->m_subparser_map.find(word);
+                        if (sub != parser->m_subparser_map.end()) {
+                            parser = &static_cast<const MaCh3ArgumentParser&>(sub->second->get());
+                            continue;
+                        }
+                        auto fallback = parser->m_subparser_map.find(parser->m_default_subcommand);
+                        if (fallback != parser->m_subparser_map.end())
+                            parser = &static_cast<const MaCh3ArgumentParser&>(fallback->second->get());
+                    }
+
+                    if (!word.empty() && word[0] == '-') {
+                        const auto equals = word.find('=');
+                        if (equals == std::string::npos && parser->option_takes_value(word)) {
+                            if (++i == context.size()) return {};
+                        }
+                    } else {
+                        // Once positional arguments start, later filenames are not subcommands.
+                        positional = true;
+                    }
+                }
+
+                std::vector<std::string> names;
+                if (!prefix.empty() && prefix[0] == '-') {
+                    auto fallback = parser->m_subparser_map.find(parser->m_default_subcommand);
+                    if (fallback != parser->m_subparser_map.end())
+                        parser = &static_cast<const MaCh3ArgumentParser&>(fallback->second->get());
+                    for (const auto& name : parser->get_long_option_names()) {
+                        if (name.rfind(prefix, 0) == 0) names.push_back(name);
+                    }
+                } else if (!positional) {
+                    for (const auto& [name, sub] : parser->m_subparser_map) {
+                        const auto& child = static_cast<const MaCh3ArgumentParser&>(sub->get());
+                        if (!child.m_suppress && name.rfind(prefix, 0) == 0)
+                            names.push_back(name);
+                    }
+                }
+                return names;
+            }
+
             /// @brief Set a subcommand to use when none of the registered subcommands is given
             /// @param name Name of the default subcommand
             void set_default_subcommand(const std::string& name){
