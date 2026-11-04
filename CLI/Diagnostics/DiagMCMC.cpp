@@ -20,8 +20,10 @@ int main(int argc, char const* argv[]){
         }
     }
     // ////////////////////////////////////////////////////////////////////////////
-    
-    parser->parse_args(argc, argv);
+
+    std::vector<std::string> args(argv, argv + argc);
+    parser->insert_default_subcommands(args);  // The DiagMCMCModule parser doesn't automatically insert default subcommand so treats the first argument as a subcommand
+    parser->parse_args(args);
     proc.Run();
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
     MACH3LOG_WARN("                   : you can use 'mach3 diag' as a direct replacement instead.");

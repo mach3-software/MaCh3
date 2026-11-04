@@ -12,7 +12,9 @@ int main(int argc, char const* argv[]){
     argv[0] = "umbrella";
     M3::UmbrellaModule proc;
     M3::MaCh3ArgumentParser* parser = proc.get_parser();
-    parser->parse_args(argc, argv);
+    std::vector<std::string> args(argv, argv + argc);
+    parser->insert_default_subcommands(args);  // The UmbrellaModule parser doesn't automatically insert default subcommand so treats the first argument as a subcommand
+    parser->parse_args(args);
     proc.Run();
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
     MACH3LOG_WARN("                   : you can use 'mach3 umbrella' as a direct replacement instead.");
