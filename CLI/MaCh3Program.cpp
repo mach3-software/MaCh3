@@ -96,33 +96,6 @@ namespace M3{
         MaCh3ArgumentParser::parse_args(args);
     }
 
-    // void MaCh3Program::parse_args(int argc, const char *const argv[]) {
-    //     try{
-    //         MaCh3ArgumentParser::parse_args(argc, argv);
-
-    //     }
-    //     catch (const std::exception& err) {
-    //         if (auto prefix = this->present<std::string>("--complete")) {
-    //             this->completions(*prefix);
-    //             exit(0);
-    //         }
-
-    //         if (this->get<bool>("--install-completions")) {
-    //             this->install_completions();
-    //             exit(0);
-    //         }
-    //         std::cerr << err.what() << std::endl;
-    //         std::cerr << this->get_subcommand_used();
-    //         MACH3LOG_ERROR(err.what());
-    //         throw;
-    //     }
-
-    //     if (!this->get_subcommand_used()){
-    //         std::cerr << this->get_subcommand_used();
-    //         throw NoArgsException();
-    //     }
-    // }
-
     void MaCh3Program::add_core_module(IModule& module){
         MaCh3ArgumentParser* parser = module.get_parser();
         this->add_subparser(*parser);

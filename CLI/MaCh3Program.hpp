@@ -32,7 +32,6 @@ namespace M3{
 
             /// @brief Destructor that unloads all dynamic plugins
             virtual ~MaCh3Program(){
-                //std::cout<<"UNLOADED"<< std::endl;
                 this->unload_dynamic_plugins();
             }
 

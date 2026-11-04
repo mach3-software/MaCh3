@@ -40,16 +40,6 @@ namespace M3{
       MACH3LOG_ERROR("Wrong number of arguments for diag-output provided");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    // // Require at least one file-title pair
-    // if (argc < 3 || (argc - 1) % 2 != 0)
-    // {
-    //   MACH3LOG_ERROR("Wrong number of arguments ({}) provided", argc);
-    //   MACH3LOG_ERROR("Usage: {} file1 title1 [file2 title2 ... fileN titleN]", argv[0]);
-    //   MACH3LOG_ERROR("Example: {} DiagMCMC_Output.root PlotName", argv[0]);
-    //   throw MaCh3Exception(__FILE__, __LINE__);
-    // }
-    // std::vector<TString> filename;
-    // std::vector<TString> title;
 
     std::vector<TString> filenames;
     std::vector<TString> titles;

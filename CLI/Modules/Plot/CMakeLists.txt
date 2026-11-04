@@ -15,14 +15,4 @@ target_include_directories(CLIPlotModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINAR
 
 install(TARGETS CLIPlotModules LIBRARY DESTINATION lib)
 
-# set_target_properties(Plugins PROPERTIES
-#     PUBLIC_HEADER "${HEADERS}"
-#     EXPORT_NAME Plugins)
-
-
-# install(TARGETS Plugins
-#         EXPORT MaCh3-targets
-#         LIBRARY DESTINATION lib/
-#         PUBLIC_HEADER DESTINATION include/Plugins)
-
 add_library(MaCh3::CLIPlotModules ALIAS CLIPlotModules)

@@ -94,19 +94,6 @@ namespace M3{
           FileNames.push_back(mcmc_chain_args[i]);
           TitleNames.push_back(mcmc_chain_args[i + 1]);
       }
-      // MACH3LOG_INFO("Producing two fit comparison");
-      // FileNames.push_back(files[0]);
-      // TitleNames.push_back("ONE"); // todo fix
-
-      // FileNames.push_back(files[1]);
-      // TitleNames.push_back("TWO");
-      // //KS: If there is third file add it
-      // if(files.size() == 3)
-      // {
-      //   FileNames.push_back(files[2]);
-      //   TitleNames.push_back("THREE");
-      // }
-
       this->MultipleProcessMCMC();
     }
     return 0;
