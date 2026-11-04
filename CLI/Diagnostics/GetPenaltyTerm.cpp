@@ -6,7 +6,7 @@ int main(int argc, char const* argv[]){
     MACH3LOG_WARN("                   : you can use 'mach3 penterm' as a direct replacement instead.");
     argv[0] = "penterm";
     M3::GetPenaltyTermModule proc;
-    ArgumentParser* parser = proc.get_parser();
+    M3::MaCh3ArgumentParser* parser = proc.get_parser();
     parser->parse_args(argc, argv);
     proc.Run();
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
