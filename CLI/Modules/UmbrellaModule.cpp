@@ -35,7 +35,7 @@ namespace M3{
   int UmbrellaModule::Run() {
     if (m_parser->is_subcommand_used("plot")) return m_plotModule.Run();
     SetMaCh3LoggerFormat();
-    std::string config_file = m_parser->get<std::string>("config");
+    std::string config_file = m_default_parser->get<std::string>("config");
     try {
         UmbrellaSolver(config_file);
     } catch (const std::exception &e) {
