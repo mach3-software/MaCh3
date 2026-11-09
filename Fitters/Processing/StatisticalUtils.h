@@ -10,7 +10,7 @@
 
 //MaCh3 includes
 #include "Manager/Manager.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/Histograms.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes

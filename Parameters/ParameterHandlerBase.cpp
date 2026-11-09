@@ -1,5 +1,5 @@
 #include "Parameters/ParameterHandlerBase.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/Histograms.h"
 
 #include <regex>
 

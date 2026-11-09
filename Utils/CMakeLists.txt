@@ -1,9 +1,11 @@
 set(HEADERS
     Histograms.h
+    Binning.h
 )
 
 add_library(Utils SHARED
     Histograms.cpp
+    Binning.cpp
 )
 
 set_target_properties(Utils PROPERTIES
@@ -24,4 +26,4 @@ add_library(MaCh3::Utils ALIAS Utils)
 target_link_libraries(MaCh3 INTERFACE Utils)
 
 # Add new folders
-add_subdirectory(Utils)
+add_subdirectory(Plotting)

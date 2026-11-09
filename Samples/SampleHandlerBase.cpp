@@ -1661,9 +1661,9 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
   auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
   bool found_range_specifier = false;
   if(BinningConfig[GetSampleTitle(Sample)] && BinningConfig[GetSampleTitle(Sample)][KinematicParameter]){
-    BinningVect = BuildBinEdgesFromNode(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], found_range_specifier);
+    BinningVect = M3::BuildBinEdgesFromNode(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], found_range_specifier);
   } else {
-    BinningVect = BuildBinEdgesFromNode(BinningConfig[KinematicParameter], found_range_specifier);
+    BinningVect = M3::BuildBinEdgesFromNode(BinningConfig[KinematicParameter], found_range_specifier);
   }
 
   // Ensure binning is increasing

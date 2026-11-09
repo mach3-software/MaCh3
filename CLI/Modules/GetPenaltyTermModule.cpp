@@ -1,7 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/Histograms.h"
 #include "Parameters/ParameterHandlerUtils.h"
 #include "CLI/Modules/GetPenaltyTermModule.hpp"
 

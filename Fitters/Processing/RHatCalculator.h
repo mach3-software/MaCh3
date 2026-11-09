@@ -2,7 +2,7 @@
 
 // MaCh3 includes
 #include "Processing/StatisticalUtils.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/Histograms.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
 /// @brief Class responsible for calculating \f$ \hat{R} \f$ estimator for Markov Chain Monte Carlo (MCMC) convergence.

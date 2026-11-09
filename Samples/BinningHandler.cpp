@@ -39,7 +39,7 @@ std::vector<std::vector<double>> UniformBinEdgeConfigParser(YAML::Node const &bi
   if (bin_edges_node.IsMap()) {
     found_range_specifier = true;
     return std::vector<std::vector<double>>{
-      BinRangeToBinEdges(bin_edges_node),
+      M3::BinRangeToBinEdges(bin_edges_node),
     };
   } else if (bin_edges_node.IsSequence()) {
     if (!bin_edges_node.size()) {
@@ -52,13 +52,13 @@ std::vector<std::vector<double>> UniformBinEdgeConfigParser(YAML::Node const &bi
     auto const &first_el = bin_edges_node[0];
     if (first_el.IsScalar() || first_el.IsMap()) { // 1D binning
       return std::vector<std::vector<double>>{
-        BuildBinEdgesFromNode(bin_edges_node, found_range_specifier),
+        M3::BuildBinEdgesFromNode(bin_edges_node, found_range_specifier),
       };
     }
     // ND binning
     std::vector<std::vector<double>> dims;
     for (auto const &dim_node : bin_edges_node) {
-      dims.push_back(BuildBinEdgesFromNode(dim_node, found_range_specifier));
+      dims.push_back(M3::BuildBinEdgesFromNode(dim_node, found_range_specifier));
     }
     return dims;
   } else {

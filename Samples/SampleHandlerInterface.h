@@ -5,7 +5,7 @@
 
 //MaCh3 includes
 #include "Samples/SampleStructs.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/Histograms.h"
 #include "Manager/Manager.h"
 #include "Manager/MaCh3Modes.h"
 

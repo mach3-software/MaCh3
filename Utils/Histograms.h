@@ -1,14 +1,12 @@
 #pragma once
 
 // MaCh3 includes
-#include "Samples/SampleStructs.h"
-#include "Parameters/ParameterStructs.h"
-#include "Manager/YamlHelper.h"
+#include "Manager/Manager.h"
 #include "Manager/Random.h"
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TObject;
 
-/// @file HistogramUtils.h
+/// @file Histograms.h
 /// @author Will Parker
 /// @author Kamil Skwarczynski
 
@@ -134,15 +132,6 @@ double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
 /// @param name    Name of the output TH1D.
 std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra, const std::string& name);
 
-/// @brief Builds a single dimension's bin edges from YAML::Node
-/// @param bin_edges_node Yaml node containing binning
-/// @param found_range_specifier Whether or not a range specifier (linspace/logspace) was found
-std::vector<double> BuildBinEdgesFromNode(YAML::Node const &bin_edges_node, bool &found_range_specifier);
-
-/// @brief Converts a range (linspace/logspace) to a std::vector<double>
-/// @param bin_range Yaml node containing binning
-std::vector<double> BinRangeToBinEdges(YAML::Node const &bin_range);
-
 namespace M3 {
 /// @brief KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.
 ///
@@ -182,7 +171,4 @@ void CheckBinningMatch(const TH1D* Hist1, const TH1D* Hist2, const std::string& 
 void CheckBinningMatch(const TH2D* Hist1, const TH2D* Hist2, const std::string& File, const int Line);
 /// @brief KS: Helper function check if data and MC binning matches
 void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line);
-/// @brief KS: Convert TH2Poly into yaml config accepted by MaCh3
-YAML::Node PolyToYaml(TH2Poly* Hist, const std::string& YamlName, const std::string& File, const int Line);
-
 } //end M3
