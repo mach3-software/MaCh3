@@ -1,18 +1,18 @@
-set( HEADERS
+set(HEADERS
     PlottingManager.h
     InputManager.h
     StyleManager.h
     PlottingUtils.h
 )
 
-add_library( Plotting SHARED
+add_library(Plotting SHARED
     PlottingManager.cpp
     InputManager.cpp
     StyleManager.cpp
     PlottingUtils.cpp
 )
 
-set_target_properties( Plotting PROPERTIES
+set_target_properties(Plotting PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Plotting
 )
@@ -28,7 +28,7 @@ endif()
 install(TARGETS Plotting
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/Plotting/PlottingUtils
+    PUBLIC_HEADER DESTINATION include/Utils/Plotting
 )
 
 add_library(MaCh3::Plotting ALIAS Plotting)

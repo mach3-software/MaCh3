@@ -21,7 +21,7 @@ set_target_properties(Parameters PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME Parameters)
 
-target_link_libraries(Parameters PUBLIC Manager)
+target_link_libraries(Parameters PUBLIC Manager Utils)
 # KS: ROOT ≤ 6.30 requires explicit linking of MathMore (if built, not sure why through...)
 if(ROOT_VERSION VERSION_LESS 6.30)
     if(TARGET ROOT::MathMore)
