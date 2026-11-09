@@ -6,7 +6,7 @@
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TObject;
 
-/// @file Histograms.h
+/// @file HistogramUtils.h
 /// @author Will Parker
 /// @author Kamil Skwarczynski
 
@@ -98,35 +98,6 @@ CastVector(std::vector<std::unique_ptr<Derived>>&& inputVec) {
   return outputVec;
 }
 
-/// @brief Helper to check if files exist or not
-inline std::string file_exists(std::string filename) {
-  std::ifstream infile(filename.c_str());
-  if (!infile.good()) {
-    MACH3LOG_ERROR("File {} does not exist", filename);
-    MACH3LOG_ERROR("Please try again");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  return filename;
-}
-
-/// @brief DB Get the Cherenkov momentum threshold in MeV
-/// @param PDG PDG code of the particle for which the Cherenkov threshold is requested.
-double returnCherenkovThresholdMomentum(const int PDG);
-
-/// @brief Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
-/// @param PLep Shifted outgoing lepton momentum (MeV/c).
-/// @param PUpd Updated lepton angle or related kinematic quantity used in the recalculation.
-/// @param EnuTrue True neutrino energy (MeV).
-/// @param InitialQ2 Optional initial Q^2 value (used as seed or fallback, default = 0).
-double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
-
-/// @brief Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
-/// @param PLep Shifted outgoing lepton momentum (MeV/c).
-/// @param cosTheta Cosine of the lepton scattering angle.
-/// @param EB Binding energy shift applied to the interaction (MeV).
-/// @param neutrino True if the interaction is neutrino, false if antineutrino.
-double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
-
 /// @brief @brief Build a 1D posterior-predictive summary from a violin spectrum.
 /// @param Spectra Input TH2D violin/density histogram.
 /// @param name    Name of the output TH1D.
@@ -149,18 +120,6 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 
   return Hist;
 }
-
-/// @brief Opens a ROOT file with the given name and mode.
-///
-/// This function wraps ROOT’s `TFile` constructor and checks whether the file was opened
-/// successfully and give some useful debugging information
-///
-/// @param Name The name or path of the file to open.
-/// @param Type The file open mode (e.g., "READ", "RECREATE", "UPDATE").
-/// @param File The name of the file where the exception occurred.
-/// @param Line The line number where the exception occurred.
-/// @return Pointer to the opened ROOT file.
-TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
 
 /// @brief Scale histogram to get divided by bin width
 void ScaleHistogram(TH1* Sample_Hist, const double scale);

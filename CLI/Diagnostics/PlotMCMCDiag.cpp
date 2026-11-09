@@ -1,6 +1,5 @@
 // MaCh3 includes
 #include "Fitters/Processing/MCMCProcessor.h"
-#include "Utils/Histograms.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "THStack.h"

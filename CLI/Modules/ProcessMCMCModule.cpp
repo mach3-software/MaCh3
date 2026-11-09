@@ -6,9 +6,7 @@
 #include "Manager/Manager.h"
 #include "CLI/Modules/ProcessMCMCModule.hpp"
 
-
 namespace M3{
-
   ProcessMCMCModule::~ProcessMCMCModule() = default;
 
   MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){

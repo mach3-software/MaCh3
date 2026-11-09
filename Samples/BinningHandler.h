@@ -4,7 +4,7 @@
 
 #include "Samples/SampleStructs.h"
 #include "Samples/SampleInfo.h"
-#include "Utils/Binning.h"
+#include "Utils/BinningUtils.h"
 #include "Manager/Manager.h"
 
 // ***************************

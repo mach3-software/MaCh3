@@ -6,7 +6,8 @@
 
 // MaCh3 includes
 #include "Processing/StatisticalUtils.h"
-#include "Utils/Histograms.h"
+#include "Utils/HistogramUtils.h"
+#include "Utils/IOUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{

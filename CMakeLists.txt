@@ -174,7 +174,7 @@ else()
   set(MaCh3_RPATH_ORIGIN "$ORIGIN")
   set(MaCh3_SO_EXTENSION ".so")
 endif()
-foreach( lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Plotting;Oscillator;OscProbCalcer;CLIModules )
+foreach(lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Utils;Plotting;Oscillator;OscProbCalcer;CLIModules )
   set_property(
     TARGET
     ${lib}
@@ -185,20 +185,16 @@ endforeach()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-target_link_libraries(MaCh3 INTERFACE CLIApi Fitters FitProcessing Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
-set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
-
-install(TARGETS MaCh3
-    EXPORT MaCh3-targets
-    LIBRARY DESTINATION lib/)
-
-add_library(MaCh3::All ALIAS MaCh3)
-
+target_link_libraries(MaCh3 INTERFACE CLIApi Fitters FitProcessing Samples Parameters Splines Manager Utils Plotting)
 if (MaCh3_NUDOCK_ENABLED)
   add_subdirectory(NuDock)
   target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
 endif()
 
+set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
+install(TARGETS MaCh3
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/)
 add_library(MaCh3::All ALIAS MaCh3)
 
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)

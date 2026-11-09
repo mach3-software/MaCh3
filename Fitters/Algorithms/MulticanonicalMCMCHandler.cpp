@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include "Algorithms/MulticanonicalMCMCHandler.h"
 #include "Parameters/ParameterHandlerBase.h"
-#include "Utils/Histograms.h"
+#include "Utils/IOUtils.h"
 
 /// @file MulticanonicalMCMCHandler.cpp
 ///

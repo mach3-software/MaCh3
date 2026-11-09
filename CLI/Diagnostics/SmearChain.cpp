@@ -1,5 +1,4 @@
 #include "Fitters/Processing/MCMCProcessor.h"
-#include "Utils/Histograms.h"
 #include "Manager/Manager.h"
 
 /// @file SmearChain.cpp

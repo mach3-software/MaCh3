@@ -1,4 +1,4 @@
-#include "Utils/Binning.h"
+#include "Utils/BinningUtils.h"
 namespace M3 {
 // ************************************************
 std::vector<double> BinRangeToBinEdges(YAML::Node const &bin_range) {
