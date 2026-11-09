@@ -1,11 +1,13 @@
 set(HEADERS
-    Histograms.h
-    Binning.h
+    HistogramUtils.h
+    BinningUtils.h
+    PhysicsUtils.h
 )
 
 add_library(Utils SHARED
-    Histograms.cpp
-    Binning.cpp
+    HistogramUtils.cpp
+    BinningUtils.cpp
+    PhysicsUtils.cpp
 )
 
 set_target_properties(Utils PROPERTIES
