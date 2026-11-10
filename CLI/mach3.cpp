@@ -99,11 +99,18 @@ int main(int argc, char *argv[]) {
     }
 
     try{
-        program.Run();
+        return program.Run();
+    }
+    catch(const std::exception& err){
+        MACH3LOG_ERROR(err.what());
+        std::cerr << "An exception occurred during program execution: " << err.what() << std::endl;
+        return 3;
     }
     catch(...){
+        MACH3LOG_ERROR("Unknown exception occurred during program execution.");
+        std::cerr << "An unknown exception occurred during program execution." << std::endl;
         return 3;
     }
 
-    return 0;
+    // return 0;
 }
