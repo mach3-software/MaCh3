@@ -17,12 +17,12 @@ namespace M3{
     }
 
     int PlotModule::Run() {
-        // if (m_parser->is_subcommand_used("llhmap")) return m_llhMapModule.Run();
-        // if (m_parser->is_subcommand_used("llh")) return m_llhModule.Run();
-        // if (m_parser->is_subcommand_used("postfit")) return m_postFitParamModule.Run();
-        // if (m_parser->is_subcommand_used("matrix")) return m_matrixModule.Run();
-        // if (m_parser->is_subcommand_used("sigmavar")) return m_sigmaVariation.Run();
-        // if (m_parser->is_subcommand_used("predictive")) return m_predictiveModule.Run();
+        if (m_parser->is_subcommand_used("llhmap")) return m_llhMapModule.Run();
+        if (m_parser->is_subcommand_used("llh")) return m_llhModule.Run();
+        if (m_parser->is_subcommand_used("postfit")) return m_postFitParamModule.Run();
+        if (m_parser->is_subcommand_used("matrix")) return m_matrixModule.Run();
+        if (m_parser->is_subcommand_used("sigmavar")) return m_sigmaVariation.Run();
+        if (m_parser->is_subcommand_used("predictive")) return m_predictiveModule.Run();
         return 0;
     }
 } // namespace M3
