@@ -156,21 +156,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01934">1934</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;                                                                               {</div>
-<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;<span class="comment">// ****************</span></div>
-<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;  <span class="comment">// Compute the mean log-likelihood and the squared mean</span></div>
-<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160;  mean_llh /= Ntoys;</div>
-<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;  mean_llh_squared /= Ntoys;</div>
-<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160;  sum_exp_llh /= Ntoys;</div>
-<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;  sum_exp_llh = std::log(sum_exp_llh);</div>
-<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160; </div>
-<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160;  <span class="comment">// Log pointwise predictive density based on Eq. 4 in Gelman2014</span></div>
-<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;  lppd += sum_exp_llh;</div>
-<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160; </div>
-<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160;  <span class="comment">// Compute the effective number of parameters for WAIC</span></div>
-<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);</div>
-<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01930">1930</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;                                                                               {</div>
+<div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;<span class="comment">// ****************</span></div>
+<div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;  <span class="comment">// Compute the mean log-likelihood and the squared mean</span></div>
+<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;  mean_llh /= Ntoys;</div>
+<div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;  mean_llh_squared /= Ntoys;</div>
+<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;  sum_exp_llh /= Ntoys;</div>
+<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;  sum_exp_llh = std::log(sum_exp_llh);</div>
+<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160; </div>
+<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;  <span class="comment">// Log pointwise predictive density based on Eq. 4 in Gelman2014</span></div>
+<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160;  lppd += sum_exp_llh;</div>
+<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160; </div>
+<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;  <span class="comment">// Compute the effective number of parameters for WAIC</span></div>
+<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160;  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);</div>
+<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -212,16 +212,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01919">1919</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;                                            {</div>
-<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;<span class="comment">// ****************</span></div>
-<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="comment">// Negate the negative log-likelihood to get the actual log-likelihood</span></div>
-<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;  <span class="keywordtype">double</span> LLH_temp = -neg_LLH_temp;</div>
-<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160; </div>
-<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;  mean_llh += LLH_temp;</div>
-<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;  mean_llh_squared += LLH_temp * LLH_temp;</div>
-<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;  sum_exp_llh += std::exp(LLH_temp);</div>
-<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l01915">1915</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01918"></a><span class="lineno"> 1918</span>&#160;                                            {</div>
+<div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160;<span class="comment">// ****************</span></div>
+<div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;  <span class="comment">// Negate the negative log-likelihood to get the actual log-likelihood</span></div>
+<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;  <span class="keywordtype">double</span> LLH_temp = -neg_LLH_temp;</div>
+<div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160; </div>
+<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;  mean_llh += LLH_temp;</div>
+<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  mean_llh_squared += LLH_temp * LLH_temp;</div>
+<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160;  sum_exp_llh += std::exp(LLH_temp);</div>
+<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
