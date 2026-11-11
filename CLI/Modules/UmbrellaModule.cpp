@@ -15,8 +15,8 @@ namespace M3{
   UmbrellaModule::~UmbrellaModule() = default;
 
   MaCh3ArgumentParser* UmbrellaModule::get_parser(){
-    m_parser = std::make_unique<MaCh3ArgumentParser>("umbrella", "1.0", argparse::default_arguments::help);
-    m_default_parser = std::make_unique<MaCh3ArgumentParser>("umbrella__default__", "1.0", argparse::default_arguments::help);
+    m_parser = std::make_unique<MaCh3ArgumentParser>("umbrellasolver", "1.0", argparse::default_arguments::help);
+    m_default_parser = std::make_unique<MaCh3ArgumentParser>("umbrellasolver__default__", "1.0", argparse::default_arguments::help);
     m_default_parser->set_suppress(true);
     m_parser->add_subparser(*m_default_parser.get());
     auto* plotParser = m_plotModule.get_parser();
