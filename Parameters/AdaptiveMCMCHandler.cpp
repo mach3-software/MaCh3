@@ -576,8 +576,11 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
 
   // double root_scale = std::sqrt(adaption_scale);
 
-  /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
-  double scale_factor = adaption_scale * c_robbins_monro / std::max(200.0, static_cast<double>(batch_step) / n_adapt_pars);
+  /// [200 is arbitrary for early stability but motivated by paper]
+  constexpr double MinRMScale = 200.0;
+  
+  /// Update the scale factor for Robbins-Monro adaption
+  double scale_factor = adaption_scale * c_robbins_monro / std::max(MinRMScale, static_cast<double>(batch_step) / n_adapt_pars);
 
   /// Now we either increase or decrease the scale
   if(prev_step_accepted){
