@@ -3,8 +3,8 @@
 
 int main(int argc, char const* argv[]){
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
-    MACH3LOG_WARN("                   : you can use 'mach3 diag' as a direct replacement instead.");
-    argv[0] = "diag";
+    MACH3LOG_WARN("                   : you can use 'mach3 diagnostics mcmc' as a direct replacement instead.");
+    argv[0] = "mcmc";
     M3::DiagMCMCModule proc;
     M3::MaCh3ArgumentParser* parser = proc.get_parser();
 
@@ -26,6 +26,6 @@ int main(int argc, char const* argv[]){
     parser->parse_args(args);
     proc.Run();
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
-    MACH3LOG_WARN("                   : you can use 'mach3 diag' as a direct replacement instead.");
+    MACH3LOG_WARN("                   : you can use 'mach3 diagnostics mcmc' as a direct replacement instead.");
     return 0;
 }

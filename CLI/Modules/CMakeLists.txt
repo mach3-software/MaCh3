@@ -3,7 +3,8 @@ add_subdirectory(Plot)
 add_library(CLIModules SHARED
     ProcessMCMCModule.cpp
     DiagMCMCModule.cpp
-    DiagMCMCPlotModule.cpp
+    LLHMapModule.cpp
+    DiagModule.cpp
     GetPenaltyTermModule.cpp
     RHatModule.cpp
     SmearModule.cpp

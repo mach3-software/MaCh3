@@ -5,7 +5,7 @@
 /// registers core modules, loads dynamic plugins, and processes command-line arguments.
 
 #include "CLI/Modules/ProcessMCMCModule.hpp"
-#include "CLI/Modules/DiagMCMCModule.hpp"
+#include "CLI/Modules/DiagModule.hpp"
 #include "CLI/Modules/GetPenaltyTermModule.hpp"
 #include "CLI/Modules/RHatModule.hpp"
 #include "CLI/Modules/SmearModule.hpp"
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         .flag();
 
     M3::ProcessMCMCModule proc;
-    M3::DiagMCMCModule diag;
+    M3::DiagModule diag;
     M3::GetPenaltyTermModule penterm;
     M3::RHatModule rhat;
     M3::SmearModule smear;

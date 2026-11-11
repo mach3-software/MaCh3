@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "CLI/Modules/DiagMCMCPlotModule.hpp"
+#include "CLI/Modules/Plot/DiagMCMCPlotModule.hpp"
 #include "Manager/MaCh3Logger.h"
 #include "Manager/MaCh3Exception.h"
 #include "Fitters/Processing/MCMCProcessor.h"
@@ -21,7 +21,7 @@ namespace M3{
   DiagMCMCPlotModule::~DiagMCMCPlotModule() = default;
 
   MaCh3ArgumentParser* DiagMCMCPlotModule::get_parser(){
-    m_parser = std::make_unique<MaCh3ArgumentParser>("plot", "1.0", argparse::default_arguments::help);
+    m_parser = std::make_unique<MaCh3ArgumentParser>("diagmcmc", "1.0", argparse::default_arguments::help);
     m_parser->add_description("Tool for plotting MCMC diagnostic like autocorrelations.");
     m_parser->add_argument("diag-output")
       .help("DiagMCMC root files and titles.")

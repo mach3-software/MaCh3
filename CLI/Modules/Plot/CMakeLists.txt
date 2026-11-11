@@ -1,7 +1,7 @@
 add_library(CLIPlotModules SHARED
-    LLHMapModule.cpp
     LLHModule.cpp
     PostFitParamModule.cpp
+    DiagMCMCPlotModule.cpp
     MatrixModule.cpp
     SigmaVariationModule.cpp
     PredictiveModule.cpp

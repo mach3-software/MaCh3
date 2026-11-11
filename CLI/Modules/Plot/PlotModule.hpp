@@ -3,7 +3,7 @@
 
 #pragma once
 #include "CLI/API/plugin.hpp"
-#include "CLI/Modules/Plot/LLHMapModule.hpp"
+#include "CLI/Modules/Plot/DiagMCMCPlotModule.hpp"
 #include "CLI/Modules/Plot/LLHModule.hpp"
 #include "CLI/Modules/Plot/PostFitParamModule.hpp"
 #include "CLI/Modules/Plot/MatrixModule.hpp"
@@ -32,7 +32,7 @@ namespace M3{
       /// @return Exit code (0 on success)
       int Run() override;
     private:
-      LLHMapModule m_llhMapModule;
+      DiagMCMCPlotModule m_diagMCMCPlotModule;
       LLHModule m_llhModule;
       PostFitParamModule m_postFitParamModule;
       MatrixModule m_matrixModule;
