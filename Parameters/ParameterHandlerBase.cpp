@@ -819,23 +819,29 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
 double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
   double logL = 0.0;
+  int firstRegPar = 293;
+  int binsPerChan = 80;
+
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
-  for(int k = 1; k < _fNumPar; k++){ // Left regularisation
-    if(_fPropVal[k] == 0 || _fPropVal[k-1] == 0 || k % (_fNumPar / 12) == 0) { // Do not regularise across boundaries or if params are 0
-      continue;
-    }
+  
+  for(int k = firstRegPar + 1; k < _fNumPar; k++){ // Left regularisation
+    if (!_fRegParam[k]) continue;
+    if (_fPropVal[k] == 0 || _fPropVal[k-1] == 0) continue;
+    if ((k - firstRegPar) % binsPerChan == 0) continue; // Do not regularise across boundaries
     double ParamDiff = _fPropVal[k] - _fPropVal[k-1];
     logL += RegVal * ParamDiff * ParamDiff / (_fPropVal[k] * _fPropVal[k]); 
   }
-  for(int k = 0; k < _fNumPar - 1; k++){ // Right regularisation
-    if(_fPropVal[k] == 0 || _fPropVal[k+1] == 0 || (k+1) % (_fNumPar / 12) == 0) { // Do not regularise across boundaries or if params are 0
-      continue;
-    }
+
+  for(int k = firstRegPar; k < _fNumPar - 1; k++){ // Right regularisation
+    if (!_fRegParam[k]) continue;
+    if(_fPropVal[k] == 0 || _fPropVal[k+1] == 0) continue;
+    if ((k - firstRegPar + 1) % binsPerChan == 0) continue; // Do not regularise across boundaries
     double ParamDiff = _fPropVal[k] - _fPropVal[k+1];
     logL += RegVal * ParamDiff * ParamDiff / (_fPropVal[k] * _fPropVal[k]); 
   }
+
   for(int i = 0; i < _fNumPar; ++i) {
     if(_fFlatPrior[i]){
       //HW: Flat prior, no need to calculate anything
