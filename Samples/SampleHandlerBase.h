@@ -77,6 +77,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<double> GetGradLikelihood() const override;
   /// @copydoc SampleHandlerInterface::SetComputeGradients
   void SetComputeGradients(const bool Enable) override;
+  /// @copydoc SampleHandlerInterface::SetGradientsPaused
+  void SetGradientsPaused(const bool Paused) override { GradientsPaused = Paused; }
   /// @copydoc SampleHandlerInterface::GetGradParHandler
   const ParameterHandlerBase* GetGradParHandler() const override { return ParHandler; }
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
@@ -239,6 +241,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// @brief DB Function to determine which weights apply to which types of samples
   virtual void AddAdditionalWeightPointers() = 0;
+  /// @brief Promise that every weight AddAdditionalWeightPointers registers is constant for the
+  /// whole fit, and that CalcWeightFunc does nothing
+  /// @details With that promise, events which share a bin and every other weight pointer can be
+  /// summed into one before the event loop, see SetupEventGrouping. Off unless a handler opts in
+  virtual bool AdditionalWeightsAreConstant() const { return false; }
 
   /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
   void SetupKinematicMap();
@@ -352,6 +359,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// TotalWeight > 0, which guarantees no \f$w_k\f$ is zero and so the division is safe.
   void FillGradientArray(const EventInfo* _restrict_ MCEvent, const double TotalWeight,
                          const int GlobalBin, double* _restrict_ GradArray) const _noexcept_;
+  /// @brief As FillGradientArray, into one bin's row, for a caller which is the only writer of it
+  /// @param MCEvent Event whose weight derivatives we want
+  /// @param TotalWeight The event's total weight, as returned by CalcWeightTotal, > 0
+  /// @param GradRow The nGradPars entries of SampleHandler_gradients for the event's bin
+  void FillGradientRow(const EventInfo* _restrict_ MCEvent, const double TotalWeight,
+                       double* _restrict_ GradRow) const _noexcept_;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -427,6 +440,78 @@ class SampleHandlerBase :  public SampleHandlerInterface
   int nGradPars = 0;
   /// HW Whether to fill SampleHandler_gradients during the reweight, see SetComputeGradients
   bool ComputeGradients = false;
+  /// HW Whether reweights currently leave the gradient out, see SetGradientsPaused
+  bool GradientsPaused = false;
+  /// HW Whether SampleHandler_gradients belongs to the last reweight, false after a paused one
+  bool GradientsCurrent = false;
+
+  /// @name Kinematic cache
+  /// HW Which events pass the selection, and which bin each lands in, depend only on the shifted
+  /// kinematics, and those depend only on the functional parameters. While they stay put (every
+  /// leapfrog of a NUTS trajectory, any fit holding them fixed) both answers are the same on every
+  /// reweight, so FillArray works them out once and reuses them, see KinematicCacheMatches
+  /// @warning Assumes a shift depends on nothing but its own functional parameter values and the
+  /// nominal event. A derived PrepFunctionalParameters which feeds the shifts anything else breaks
+  /// that, and has to call InvalidateKinematicCache whenever what it feeds them changes
+  /// @{
+  /// Value of every functional parameter, in registration order, when EventBinCache was filled
+  std::vector<double> KinCacheKey;
+  /// Whether EventBinCache holds a complete pass of FillArray at KinCacheKey
+  bool KinCacheValid = false;
+  /// Global bin of every event at KinCacheKey, kKinCacheNotSelected if the selection rejects it
+  std::vector<int> EventBinCache;
+  /// Events which pass the selection and land inside the binning, grouped by global bin, built
+  /// from EventBinCache the first time it is reused so a reweight which never repeats pays nothing
+  std::vector<int> CachedEvents;
+  /// Where each global bin's events start in CachedEvents, one entry per bin plus one at the end
+  std::vector<int> CachedBinStart;
+  /// Global bins with at least one cached event, most events first, the order threads take them in
+  std::vector<int> CachedBinOrder;
+  /// Whether CachedEvents, CachedBinStart and CachedBinOrder match EventBinCache
+  bool CachedListReady = false;
+  /// Marker in EventBinCache for an event the selection rejects; UnderOverFlowBin means selected
+  /// but outside the binning
+  static constexpr int kKinCacheNotSelected = M3::UnderOverFlowBin - 1;
+  /// @brief Whether the cache was filled at the current functional parameter values
+  /// @details Compares exactly, there is no tolerance. On a mismatch it records the current
+  /// values as the new key and marks the cache as invalid until the next full pass fills it
+  bool KinematicCacheMatches();
+  /// @brief Build CachedEvents, CachedBinStart and CachedBinOrder from EventBinCache
+  void BuildCachedEventList();
+  /// @brief Forget the cache, so the next FillArray does a full pass
+  void InvalidateKinematicCache() { KinCacheValid = false; CachedListReady = false; }
+
+  /// HW Event grouping. Inside one bin, events whose varying weights are the very same pointers
+  /// differ only by their constant weights, so their sum is (sum of constant weights) times one
+  /// product of the shared weights. The cached loop then runs over groups rather than events,
+  /// typically an order of magnitude fewer. Only with AdditionalWeightsAreConstant()
+  /// Where each event's AddAdditionalWeightPointers entries start and end in total_weight_pointers
+  std::vector<std::uint16_t> AdditionalWeightStart;
+  /// See AdditionalWeightStart
+  std::vector<std::uint16_t> AdditionalWeightEnd;
+  /// Whether SetupEventGrouping has run since the weight lists last changed
+  bool GroupingChecked = false;
+  /// Whether the cached loop runs over groups
+  bool GroupingEnabled = false;
+  /// Identifier of each event's list of varying weights, the same for events whose lists match
+  std::vector<int> EventSignature;
+  /// Product of each event's constant weights
+  std::vector<double> EventConstWeight;
+  /// Every event, sorted by signature, so the bins CachedEvents is built into come out sorted too
+  std::vector<int> EventsBySignature;
+  /// One event standing for each group, whose varying weights the group shares
+  std::vector<int> GroupRep;
+  /// Sum over a group of the constant weights, and of their squares for the W2 array
+  std::vector<double> GroupConst;
+  /// See GroupConst
+  std::vector<double> GroupConst2;
+  /// Where each global bin's groups start in GroupRep, one entry per bin plus one at the end
+  std::vector<int> BinGroupStart;
+  /// @brief Work out signatures once, and whether grouping can be used at all
+  void SetupEventGrouping();
+  /// @brief Merge the events of each bin of CachedEvents into groups
+  void BuildEventGroups();
+  /// @}
   /// DB Array to be filled in AddData
   std::vector<double> SampleHandler_data;
   //===============================================================================

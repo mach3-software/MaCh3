@@ -85,6 +85,13 @@ class SampleHandlerInterface
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
+  /// @brief Skip the gradient book-keeping on the next reweights without giving up its arrays
+  /// @param Paused whether reweights should leave the gradient out
+  /// @details For a sampler which interleaves gradient free updates with gradient based ones: the
+  /// gradient free reweights don't need it, and it is the most expensive part of the event loop.
+  /// GetGradLikelihood() refuses to answer after a paused reweight. Does nothing by default
+  virtual void SetGradientsPaused([[maybe_unused]] const bool Paused) {}
+
   /// @brief Return the parameter handler GetGradLikelihood() is indexed by
   /// @return nullptr if this sample handler isn't driven by a parameter handler
   /// @details Gradient based fitters need this to work out where each entry of GetGradLikelihood()

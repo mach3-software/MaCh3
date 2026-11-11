@@ -5,6 +5,8 @@
 
 #include <cstddef>
 #include <algorithm>
+#include <cstdint>
+#include <unordered_map>
 #include <memory>
 #include <numeric>
 
@@ -189,6 +191,8 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
     StoredSelection[iSample].emplace_back(CutObj);
   }
   Selection = StoredSelection;
+  // The cache records which events these cuts select
+  InvalidateKinematicCache();
   /// Add new sample
   SampleDetails[iSample] = std::move(SingleSample);
 }
@@ -221,7 +225,16 @@ void SampleHandlerBase::Initialise() {
   MACH3LOG_INFO("Setting up Functional Pointers..");
   RegisterFunctionalParameters();
   MACH3LOG_INFO("Setting up Additional Weight Pointers..");
+  AdditionalWeightStart.resize(GetNEvents());
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
+    AdditionalWeightStart[iEvent] = static_cast<std::uint16_t>(MCEvents[iEvent].total_weight_pointers.size());
+  }
   AddAdditionalWeightPointers();
+  AdditionalWeightEnd.resize(GetNEvents());
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
+    AdditionalWeightEnd[iEvent] = static_cast<std::uint16_t>(MCEvents[iEvent].total_weight_pointers.size());
+  }
+  GroupingChecked = false;
   MACH3LOG_INFO("Setting up Kinematic Map..");
   SetupKinematicMap();
   clock.Stop();
@@ -400,7 +413,85 @@ void SampleHandlerBase::FillArray() {
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
   //HW Null unless SetComputeGradients(true). Kept out of the reduction below, per-thread copies of
   //a NBins * nGradPars array would dwarf the MC prediction, so FillGradientArray uses atomics
-  double* _restrict_ Grad_Array = ComputeGradients ? SampleHandler_gradients.data() : nullptr;
+  double* _restrict_ Grad_Array = (ComputeGradients && !GradientsPaused) ? SampleHandler_gradients.data() : nullptr;
+  GradientsCurrent = (Grad_Array != nullptr);
+
+  //HW The functional parameters haven't moved since the last full pass, so every event's shifted
+  //kinematics, selection and bin are what that pass found. Skip all three and only redo the weights,
+  //and only for the events which can contribute. Same sums as the full pass, just fewer of them
+  if (KinematicCacheMatches()) {
+    if (!CachedListReady) BuildCachedEventList();
+    const int NBinsUsed = static_cast<int>(CachedBinOrder.size());
+    const int* _restrict_ Events = CachedEvents.data();
+    const int* _restrict_ BinStart = CachedBinStart.data();
+    const int* _restrict_ BinOrder = CachedBinOrder.data();
+    const size_t RowLength = static_cast<size_t>(nGradPars);
+
+    //HW One bin per iteration, so exactly one thread writes each bin of the MC and W2 arrays and
+    //each row of the gradient: no reduction copies and, above all, no atomics on the gradient,
+    //which is what kept the full pass from scaling with threads. Dynamic, since bins differ a lot
+    //in how many events they hold, and the busiest are handed out first
+    #ifdef MULTITHREAD
+    #pragma omp parallel for schedule(dynamic, 1)
+    #endif
+    for (int iOrder = 0; iOrder < NBinsUsed; ++iOrder) {
+      const int GlobalBin = BinOrder[iOrder];
+      double* _restrict_ GradRow = (Grad_Array != nullptr) ? Grad_Array + static_cast<size_t>(GlobalBin) * RowLength : nullptr;
+      double BinSum = 0.;
+      double BinSumW2 = 0.;
+      if (GroupingEnabled) {
+        for (int iGroup = BinGroupStart[GlobalBin]; iGroup < BinGroupStart[GlobalBin + 1]; ++iGroup) {
+          const int iRep = GroupRep[iGroup];
+          const EventInfo* _restrict_ MCEvent = &MCEvents[iRep];
+          const int ConstStart = AdditionalWeightStart[iRep];
+          const int ConstEnd = AdditionalWeightEnd[iRep];
+          const int NWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
+          double Shared = 1.;
+          for (int iWeight = 0; iWeight < ConstStart; ++iWeight) Shared *= *(MCEvent->total_weight_pointers[iWeight]);
+          for (int iWeight = ConstEnd; iWeight < NWeights; ++iWeight) Shared *= *(MCEvent->total_weight_pointers[iWeight]);
+          //HW Every event of a group has constant weights of the same sign, so this skips exactly the
+          //events the per event test below would
+          const double GroupWeight = GroupConst[iGroup] * Shared;
+          if (GroupWeight <= 0.) continue;
+          BinSum += GroupWeight;
+          if (FirstTimeW2) BinSumW2 += GroupConst2[iGroup] * Shared * Shared;
+          if (GradRow != nullptr) {
+            // Constant weights have no derivative, so only the shared ones contribute
+            for (int iWeight = 0; iWeight < NWeights; ++iWeight) {
+              if (iWeight == ConstStart) { iWeight = ConstEnd - 1; continue; }
+              const auto& [iPar, DerivPointer] = MCEvent->total_weight_gradients[iWeight];
+              if (DerivPointer == &M3::Zero) continue;
+              GradRow[iPar] += GroupWeight * (*DerivPointer) / *(MCEvent->total_weight_pointers[iWeight]);
+            }
+          }
+        }
+        MC_Array_for_reduction[GlobalBin] += BinSum;
+        if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += BinSumW2;
+        continue;
+      }
+      for (int iCached = BinStart[GlobalBin]; iCached < BinStart[GlobalBin + 1]; ++iCached) {
+        const int iEvent = Events[iCached];
+        const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
+
+        // Virtual by default does nothing, has to happen before CalcWeightTotal
+        CalcWeightFunc(iEvent);
+
+        const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+        if (totalweight <= 0.){
+          continue;
+        }
+        BinSum += totalweight;
+        if (FirstTimeW2) BinSumW2 += totalweight*totalweight;
+        if (GradRow != nullptr) FillGradientRow(MCEvent, totalweight, GradRow);
+      }
+      MC_Array_for_reduction[GlobalBin] += BinSum;
+      if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += BinSumW2;
+    }
+    return;
+  }
+
+  if (EventBinCache.size() != NumberOfEvents) EventBinCache.resize(NumberOfEvents);
+  int* _restrict_ EventBin = EventBinCache.data();
 
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
@@ -413,8 +504,15 @@ void SampleHandlerBase::FillArray() {
     const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
     //ETA - generic functions to apply shifts to kinematic variable
     if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
+      EventBin[iEvent] = kKinCacheNotSelected;
       continue;
     }
+
+    //DB Find the relevant bin in the PDF for each event
+    //HW Ahead of the weight check, since the bin doesn't depend on the weight and the cache needs
+    //it for events whose weight is zero now but needn't be on the next reweight
+    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
+    EventBin[iEvent] = GlobalBin;
 
     // Virtual by default does nothing, has to happen before CalcWeightTotal
     CalcWeightFunc(iEvent);
@@ -424,9 +522,6 @@ void SampleHandlerBase::FillArray() {
     if (totalweight <= 0.){
       continue;
     }
-
-    //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
 
     //ETA - we can probably remove this final if check on the -1?
     //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -439,8 +534,169 @@ void SampleHandlerBase::FillArray() {
       if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
     }
   }
+  // EventBinCache now holds every event at KinCacheKey, which KinematicCacheMatches set above
+  KinCacheValid = true;
 }
 #pragma GCC diagnostic pop
+
+// ************************************************
+bool SampleHandlerBase::KinematicCacheMatches() {
+// ************************************************
+  size_t NVals = 0;
+  for (const auto& Shift : functional.shifts) NVals += Shift.par_vals.size();
+
+  bool Same = KinCacheValid && (KinCacheKey.size() == NVals);
+  size_t iVal = 0;
+  for (const auto& Shift : functional.shifts) {
+    if (!Same) break;
+    for (const double Val : Shift.par_vals) {
+      //HW Exact on purpose: a parameter a sampler holds fixed comes back bit for bit identical, and
+      //anything else has moved. A NaN never matches, so it always gets a full pass
+      if (KinCacheKey[iVal++] != Val) { Same = false; break; }
+    }
+  }
+  if (Same) return true;
+
+  KinCacheKey.clear();
+  KinCacheKey.reserve(NVals);
+  for (const auto& Shift : functional.shifts) {
+    KinCacheKey.insert(KinCacheKey.end(), Shift.par_vals.begin(), Shift.par_vals.end());
+  }
+  InvalidateKinematicCache();
+  return false;
+}
+
+// ************************************************
+void SampleHandlerBase::SetupEventGrouping() {
+// ************************************************
+  GroupingChecked = true;
+  GroupingEnabled = false;
+  const int NumberOfEvents = static_cast<int>(GetNEvents());
+  if (!AdditionalWeightsAreConstant()) return;
+  if (static_cast<int>(AdditionalWeightStart.size()) != NumberOfEvents || static_cast<int>(AdditionalWeightEnd.size()) != NumberOfEvents) return;
+
+  struct PtrListHash {
+    size_t operator()(const std::vector<const M3::float_t*>& V) const noexcept {
+      size_t h = 1469598103934665603ULL;
+      for (const auto* P : V) { h ^= reinterpret_cast<std::uintptr_t>(P); h *= 1099511628211ULL; }
+      return h;
+    }
+  };
+  std::unordered_map<std::vector<const M3::float_t*>, int, PtrListHash> Signatures;
+  std::vector<int> SignatureFirstEvent;
+  EventSignature.resize(static_cast<size_t>(NumberOfEvents));
+  EventConstWeight.resize(static_cast<size_t>(NumberOfEvents));
+  std::vector<const M3::float_t*> Shared;
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    const auto& Pointers = MCEvents[iEvent].total_weight_pointers;
+    const int ConstStart = AdditionalWeightStart[iEvent];
+    const int ConstEnd = AdditionalWeightEnd[iEvent];
+    Shared.assign(Pointers.begin(), Pointers.begin() + ConstStart);
+    Shared.insert(Shared.end(), Pointers.begin() + ConstEnd, Pointers.end());
+    double Const = 1.;
+    for (int iWeight = ConstStart; iWeight < ConstEnd; ++iWeight) Const *= *(Pointers[iWeight]);
+    EventConstWeight[iEvent] = Const;
+
+    const auto Found = Signatures.emplace(Shared, static_cast<int>(Signatures.size()));
+    EventSignature[iEvent] = Found.first->second;
+    if (Found.second) { SignatureFirstEvent.push_back(iEvent); continue; }
+
+    //HW Same weights should mean the same derivatives, but the group sum leans on it, so check
+    const int iFirst = SignatureFirstEvent[static_cast<size_t>(Found.first->second)];
+    const auto& Derivs = MCEvents[iEvent].total_weight_gradients;
+    const auto& FirstDerivs = MCEvents[iFirst].total_weight_gradients;
+    const bool Aligned = (Derivs.size() == Pointers.size()) && (FirstDerivs.size() == MCEvents[iFirst].total_weight_pointers.size());
+    if (!Aligned) continue;
+    const int FirstStart = AdditionalWeightStart[iFirst];
+    const int FirstEnd = AdditionalWeightEnd[iFirst];
+    std::vector<std::pair<int, const M3::float_t*>> A(Derivs.begin(), Derivs.begin() + ConstStart), B(FirstDerivs.begin(), FirstDerivs.begin() + FirstStart);
+    A.insert(A.end(), Derivs.begin() + ConstEnd, Derivs.end());
+    B.insert(B.end(), FirstDerivs.begin() + FirstEnd, FirstDerivs.end());
+    if (A != B) {
+      MACH3LOG_WARN("{}: events {} and {} share every weight but not every derivative, so they can't "
+                    "be summed together. Event grouping is off", GetName(), iFirst, iEvent);
+      return;
+    }
+  }
+
+  // Counting sort on the signature
+  const int NSignatures = static_cast<int>(Signatures.size());
+  std::vector<int> Start(static_cast<size_t>(NSignatures) + 1, 0);
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) ++Start[static_cast<size_t>(EventSignature[iEvent]) + 1];
+  for (int iSig = 0; iSig < NSignatures; ++iSig) Start[iSig + 1] += Start[iSig];
+  EventsBySignature.resize(static_cast<size_t>(NumberOfEvents));
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) EventsBySignature[static_cast<size_t>(Start[EventSignature[iEvent]]++)] = iEvent;
+
+  GroupingEnabled = true;
+  MACH3LOG_INFO("{}: {} events share {} distinct sets of varying weights, the kinematic cache will sum "
+                "events with the same set and bin before the event loop", GetName(), NumberOfEvents, NSignatures);
+}
+
+// ************************************************
+void SampleHandlerBase::BuildEventGroups() {
+// ************************************************
+  const int NBins = Binning->GetNBins();
+  GroupRep.clear();
+  GroupConst.clear();
+  GroupConst2.clear();
+  BinGroupStart.assign(static_cast<size_t>(NBins) + 1, 0);
+  for (int iBin = 0; iBin < NBins; ++iBin) {
+    BinGroupStart[iBin] = static_cast<int>(GroupRep.size());
+    int iCached = CachedBinStart[iBin];
+    const int End = CachedBinStart[iBin + 1];
+    while (iCached < End) {
+      // One run of a signature, split by the sign of the constant weights
+      const int Sig = EventSignature[CachedEvents[iCached]];
+      int PosRep = -1, NegRep = -1;
+      double PosC = 0., PosC2 = 0., NegC = 0., NegC2 = 0.;
+      for (; iCached < End && EventSignature[CachedEvents[iCached]] == Sig; ++iCached) {
+        const int iEvent = CachedEvents[iCached];
+        const double C = EventConstWeight[iEvent];
+        // A zero constant weight makes every total weight zero, which the event loop skips anyway
+        if (C > 0.) { if (PosRep < 0) PosRep = iEvent; PosC += C; PosC2 += C * C; }
+        else if (C < 0.) { if (NegRep < 0) NegRep = iEvent; NegC += C; NegC2 += C * C; }
+      }
+      if (PosRep >= 0) { GroupRep.push_back(PosRep); GroupConst.push_back(PosC); GroupConst2.push_back(PosC2); }
+      if (NegRep >= 0) { GroupRep.push_back(NegRep); GroupConst.push_back(NegC); GroupConst2.push_back(NegC2); }
+    }
+  }
+  BinGroupStart[NBins] = static_cast<int>(GroupRep.size());
+}
+
+// ************************************************
+void SampleHandlerBase::BuildCachedEventList() {
+// ************************************************
+  //HW Counting sort on the bin: one pass to count, one to place, events keep their order in a bin
+  const int NBins = Binning->GetNBins();
+  const int NumberOfEvents = static_cast<int>(EventBinCache.size());
+  CachedBinStart.assign(static_cast<size_t>(NBins) + 1, 0);
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    // Events outside the binning (UnderOverFlowBin) never fill anything, so they are left out too
+    const int Bin = EventBinCache[iEvent];
+    if (Bin > M3::UnderOverFlowBin) ++CachedBinStart[static_cast<size_t>(Bin) + 1];
+  }
+  for (int iBin = 0; iBin < NBins; ++iBin) CachedBinStart[iBin + 1] += CachedBinStart[iBin];
+
+  CachedEvents.resize(static_cast<size_t>(CachedBinStart[NBins]));
+  std::vector<int> Next(CachedBinStart.begin(), CachedBinStart.end() - 1);
+  if (!GroupingChecked) SetupEventGrouping();
+  //HW Placing events in signature order leaves each bin sorted by signature, so a group is a run
+  for (int iOrder = 0; iOrder < NumberOfEvents; ++iOrder) {
+    const int iEvent = GroupingEnabled ? EventsBySignature[iOrder] : iOrder;
+    const int Bin = EventBinCache[iEvent];
+    if (Bin > M3::UnderOverFlowBin) CachedEvents[static_cast<size_t>(Next[Bin]++)] = iEvent;
+  }
+  if (GroupingEnabled) BuildEventGroups();
+
+  CachedBinOrder.clear();
+  for (int iBin = 0; iBin < NBins; ++iBin) {
+    if (CachedBinStart[iBin + 1] > CachedBinStart[iBin]) CachedBinOrder.push_back(iBin);
+  }
+  std::stable_sort(CachedBinOrder.begin(), CachedBinOrder.end(), [this](const int a, const int b) {
+    return (CachedBinStart[a + 1] - CachedBinStart[a]) > (CachedBinStart[b + 1] - CachedBinStart[b]);
+  });
+  CachedListReady = true;
+}
 
 // **************************************************
 // Helper function to reset the data and MC histograms
@@ -454,7 +710,7 @@ void SampleHandlerBase::ResetHistograms() _noexcept_ {
     std::fill_n(SampleHandler_array_w2.begin(), nBins, 0.0);
   }
   //HW The gradients accumulate the same way the MC prediction does, so they need wiping too
-  if (ComputeGradients) {
+  if (ComputeGradients && !GradientsPaused) {
     std::fill(SampleHandler_gradients.begin(), SampleHandler_gradients.end(), 0.0);
   }
 } // end function
@@ -521,6 +777,19 @@ void SampleHandlerBase::FillGradientArray(const EventInfo* _restrict_ MCEvent, c
     #pragma omp atomic
     #endif
     GradArray[BinOffset + static_cast<size_t>(iPar)] += Contribution;
+  }
+}
+
+// ***************************************************************************
+// Same sum as FillGradientArray, for a caller that owns the row so needs no atomics
+void SampleHandlerBase::FillGradientRow(const EventInfo* _restrict_ MCEvent, const double TotalWeight,
+                                        double* _restrict_ GradRow) const _noexcept_ {
+// ***************************************************************************
+  const size_t TotalWeights = MCEvent->total_weight_pointers.size();
+  for (size_t iWeight = 0; iWeight < TotalWeights; ++iWeight) {
+    const auto& [iPar, DerivPointer] = MCEvent->total_weight_gradients[iWeight];
+    if (DerivPointer == &M3::Zero) continue;
+    GradRow[iPar] += TotalWeight * (*DerivPointer) / *(MCEvent->total_weight_pointers[iWeight]);
   }
 }
 
@@ -683,6 +952,9 @@ void SampleHandlerBase::SetupReweightArrays() {
 void SampleHandlerBase::SetComputeGradients(const bool Enable) {
 // ************************************************
   ComputeGradients = Enable;
+  // Switching gradients on pads the derivative lists, which the grouping check reads
+  GroupingChecked = false;
+  InvalidateKinematicCache();
   if (!Enable) {
     nGradPars = 0;
     SampleHandler_gradients.clear();
@@ -1391,6 +1663,11 @@ std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
 // ************************************************
   if (!ComputeGradients) {
     MACH3LOG_ERROR("Asked {} for the likelihood gradient without calling SetComputeGradients(true) first", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  if (!GradientsCurrent) {
+    MACH3LOG_ERROR("Asked {} for the likelihood gradient, but the last reweight had gradients paused, "
+                   "see SetGradientsPaused", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   //HW The pre-factor below is the Poisson derivative, and the MC stat statistics would also pick up

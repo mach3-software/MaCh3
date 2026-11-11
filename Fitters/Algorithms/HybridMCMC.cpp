@@ -349,8 +349,12 @@ void HybridMCMC::ProposeRandomWalkStep() {
         return;
     }
 
+    //HW The random walk only needs the likelihood. NUTS reweights at its own starting point before
+    //it asks for a gradient, see NoUTurnMC::ProposeStep, so leaving the gradient out here is safe
     for (size_t i = 0; i < samples.size(); ++i) {
+        samples[i]->SetGradientsPaused(true);
         samples[i]->Reweight();
+        samples[i]->SetGradientsPaused(false);
     }
     // Separate loop, so every sample has migrated its events before any likelihood is taken
     for (size_t i = 0; i < samples.size(); ++i) {
@@ -452,7 +456,9 @@ void HybridMCMC::TuneRandomWalkScale() {
     MACH3LOG_INFO("Random walk batch: acceptance {:.4f}, out of bounds {:.4f}, mean dlogL over the "
                   "{} evaluated {:+.4g}", Rate, OobFrac, NEval, MeanDLogL);
 
-    const bool Tuning = rw_tune && step < warmup_steps;
+    // A fit started from a previous file carries on that file's step count, so the warmup
+    // window is measured from where this run started, as NoUTurnMC does for the step size
+    const bool Tuning = rw_tune && step < stepStart + warmup_steps;
 
     if (Tuning) {
         ++rw_tune_updates;
