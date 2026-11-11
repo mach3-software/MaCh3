@@ -450,6 +450,12 @@ class MCMCProcessor {
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
     int nEntries;
+    /// Entries cached for the MCMC diagnostics, i.e. nEntries with the burn-in taken off
+    /// @details PrepareDiagMCMC() drops every entry below StepCut before it caches anything, so
+    /// the diagnostics index their arrays from zero over the post burn-in chain only. Use this,
+    /// not nEntries, anywhere that walks ParStep, AccProbValues, StepNumber, SampleValues or
+    /// SystValues, or the tail of those arrays will be read uninitialised
+    int nDiagEntries;
     /// KS: For merged chains number of entries will be different from nSteps
     int nSteps;
     /// Number of sample PDF objects

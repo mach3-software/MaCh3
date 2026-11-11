@@ -52,7 +52,14 @@ namespace M3{
     Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20, __FILE__, __LINE__));
     Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000, __FILE__, __LINE__));
     Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true, __FILE__, __LINE__));
+    //KS: Steps below this are dropped before anything is cached, so the autocorrelation, the ESS
+    //and the rest are measured over the converged part of the chain rather than over the burn-in
+    //as well. It is a step number, not an entry index
+    const int BurnInSteps = GetFromManager<int>(Settings["DiagMCMC"]["BurnInSteps"], 0, __FILE__, __LINE__);
     Processor->Initialise();
+    if(BurnInSteps > 0) {
+      Processor->SetStepCut(BurnInSteps);
+    }
     if(Settings["MaxEntries"]) {
         Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }

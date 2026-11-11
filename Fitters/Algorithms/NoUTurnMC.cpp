@@ -157,12 +157,18 @@ void NoUTurnMC::ValidateCompatibility() const {
                        "target distribution");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    for (const auto& syst : systematics) {
-        auto* Adaptive = syst->GetAdaptiveHandler();
-        if (Adaptive != nullptr && Adaptive->GetUseRobbinsMonro()) {
-            MACH3LOG_WARN("{} has Robbins-Monro enabled, which tunes the random walk step scale that "
-                          "NUTS never reads. Only its adapted matrix matters here", syst->GetName());
-        }
+    // for (const auto& syst : systematics) {
+    //     auto* Adaptive = syst->GetAdaptiveHandler();
+    //     if (Adaptive != nullptr && Adaptive->GetUseRobbinsMonro()) {
+    //         MACH3LOG_WARN("{} has Robbins-Monro enabled, which tunes the random walk step scale that "
+    //                       "NUTS never reads. Only its adapted matrix matters here", syst->GetName());
+    //     }
+    // }
+
+    if (adapt_metric) {
+        MACH3LOG_INFO("NUTS will re-metric itself whenever adaption swaps a throw matrix");
+    } else {
+        MACH3LOG_INFO("NUTS metric is frozen at the starting throw matrix, AdaptMetric is false");
     }
 }
 
@@ -185,10 +191,11 @@ void NoUTurnMC::ProposeStep() {
     out_of_bounds = false;
 
     // Noticing a rebuilt mass matrix matters: the step size that suited the old metric won't suit
-    // the new one, so the dual averaging has to start again
-    const int VersionBefore = ThrowMatrixVersionSum();
+    // the new one, so the dual averaging has to start again. The test has to be made before the
+    // refresh, and against what each block was built from: adaption bumps the throw matrix version
+    // from PostStepProcess, so sampling it either side of RefreshMassMatrix() never sees a change
+    metric_changed = adapt_metric && MassMatrixIsStale();
     RefreshMassMatrix();
-    metric_changed = (ThrowMatrixVersionSum() != VersionBefore);
 
     RestoreCurrentPosition();
     ReweightSamples();
@@ -401,13 +408,12 @@ double NoUTurnMC::AcceptanceProbability() {
 }
 
 // *******************
-int NoUTurnMC::ThrowMatrixVersionSum() const {
+bool NoUTurnMC::MassMatrixIsStale() const {
 // *******************
-    int Sum = 0;
-    for (const auto& syst : systematics) {
-        Sum += syst->GetThrowMatrixUpdates();
+    for (size_t s = 0; s < systematics.size(); ++s) {
+        if (mass[s].BuiltAtUpdate != systematics[s]->GetThrowMatrixUpdates()) return true;
     }
-    return Sum;
+    return false;
 }
 
 // *******************

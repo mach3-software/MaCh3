@@ -81,7 +81,8 @@ protected:
     void ValidateCompatibility() const;
 
     /// @brief Add the per-step sampler diagnostics to the output tree
-    void RegisterDiagnosticBranches();
+    /// @details Virtual so a subclass which adds a kernel can add its own branches alongside
+    virtual void RegisterDiagnosticBranches();
 
     /// @brief Extend the trajectory by \f$2^{Depth}\f$ leapfrog steps, writing into #tree_level
     /// @param Depth Subtree depth, 0 being a single leapfrog step
@@ -130,8 +131,9 @@ protected:
     /// @brief Feed the last trajectory's acceptance to the dual averaging, or freeze it
     void UpdateStepSize();
 
-    /// @brief Summed throw matrix versions, to notice when a mass matrix block was rebuilt
-    int ThrowMatrixVersionSum() const;
+    /// @brief Has any handler re-adapted its throw matrix since its mass block was built?
+    /// @note Must be asked before RefreshMassMatrix(), which is what clears the staleness
+    bool MassMatrixIsStale() const;
 
     /// Tunes #delta_t during warmup
     DualAveragingStepSize dual_averaging;

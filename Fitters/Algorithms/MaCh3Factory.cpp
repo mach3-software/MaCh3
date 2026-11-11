@@ -37,6 +37,10 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
   {
     MaCh3Fitter = std::make_unique<NoUTurnMC>(fitMan);
   }
+  else if (Algorithm == "Hybrid" || Algorithm == "HybridMCMC")
+  {
+    MaCh3Fitter = std::make_unique<HybridMCMC>(fitMan);
+  }
   else
   {
     MACH3LOG_ERROR("You want to use algorithm {}, I don't recognize it, sry", Algorithm);

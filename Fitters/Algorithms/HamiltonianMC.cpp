@@ -8,8 +8,27 @@ HamiltonianMC::HamiltonianMC(Manager *const FitManager) : MCMCBase(FitManager) {
     n_leapfrog = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NLeapFrog"], 10, __FILE__, __LINE__);
     //HW DeltaT is in units of prior sigma, so order one rather than the tiny identity mass values
     delta_t = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DeltaT"], 0.1, __FILE__, __LINE__);
+    //HW Adaption's covariance is a good random walk proposal and a poor metric, so don't take it
+    //unless asked. See the adapt_metric docs
+    adapt_metric = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["AdaptMetric"], false, __FILE__, __LINE__);
+    //HW Damping the correlations by however much adaption hasn't resolved them is what makes an
+    //adapted matrix usable as a metric, see the metric_shrinkage docs
+    metric_shrinkage = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MetricShrinkage"], 0., __FILE__, __LINE__);
     ke_init = 0.;
     logL_init = 0.;
+
+    if (metric_shrinkage < 0. || metric_shrinkage > 1.) {
+        MACH3LOG_ERROR("MetricShrinkage has to be in [0, 1], you asked for {}", metric_shrinkage);
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if (metric_shrinkage > 0.) {
+        MACH3LOG_INFO("Metric shrunk {:.0f}% of the way towards its diagonal", 100. * metric_shrinkage);
+        if (!adapt_metric) {
+            MACH3LOG_WARN("MetricShrinkage only does something once the metric has correlations "
+                          "worth damping. With AdaptMetric false it just rescales the starting "
+                          "throw matrix, which is usually already diagonal");
+        }
+    }
 
     if (n_leapfrog < 1) {
         MACH3LOG_ERROR("NLeapFrog has to be at least 1, you asked for {}", n_leapfrog);
@@ -52,8 +71,17 @@ void HamiltonianMC::SetupGradients() {
             throw MaCh3Exception(__FILE__, __LINE__);
         }
         if (systematics[s]->GetDoAdaption()) {
-            MACH3LOG_INFO("{} has adaption enabled, HMC will pick up each adapted matrix as its mass "
-                          "matrix", systematics[s]->GetName());
+            if (adapt_metric) {
+                MACH3LOG_INFO("{} has adaption enabled, HMC will pick up each adapted matrix as its "
+                              "mass matrix", systematics[s]->GetName());
+                MACH3LOG_WARN("An adapted covariance is usually too ill conditioned to integrate "
+                              "against. If the chain stops exploring once the adaption starts "
+                              "throwing, set AdaptMetric to false");
+            } else {
+                MACH3LOG_INFO("{} has adaption enabled, but AdaptMetric is false, so the mass matrix "
+                              "stays at its starting throw matrix. The adaption still accumulates "
+                              "and saves its covariance", systematics[s]->GetName());
+            }
         }
         syst_offset[s] = NPars;
         NPars += systematics[s]->GetNumParams();
@@ -164,11 +192,23 @@ void HamiltonianMC::UpdateGradU() {
             gradient[Offset + p] += SampGrad[p];
         }
     }
+
+    //HW A frozen parameter has no business contributing a force. Its row of the metric is already
+    //decoupled so this changes no dynamics, but it keeps the gradient honest for anything which
+    //reads it, and it means a parameter whose likelihood derivative is dropped can't be pushed
+    //around by its prior alone
+    for (size_t i = 0; i < gradient.size() && i < par_fixed.size(); ++i) {
+        if (par_fixed[i]) gradient[i] = 0.;
+    }
 }
 
 // *******************
 void HamiltonianMC::SetupMassMatrix() {
 // *******************
+    //HW Gives a subclass the chance to say which parameters it is sampling with another kernel,
+    //before any of that feeds into par_fixed and the metric below
+    SetupExternalBlock();
+
     par_fixed.assign(velocity.size(), 0);
     mass.resize(systematics.size());
 
@@ -179,7 +219,11 @@ void HamiltonianMC::SetupMassMatrix() {
         MaxPars = std::max(MaxPars, mass[s].NPars);
 
         for (int i = 0; i < mass[s].NPars; ++i) {
-            if (systematics[s]->IsParameterFixed(i)) par_fixed[static_cast<size_t>(mass[s].Offset + i)] = 1;
+            const size_t Flat = static_cast<size_t>(mass[s].Offset + i);
+            //HW A parameter another kernel owns is frozen for us in exactly the same way a fixed
+            //one is, so the two go through the same path from here on
+            const bool External = !par_external.empty() && par_external[Flat] != 0;
+            if (systematics[s]->IsParameterFixed(i) || External) par_fixed[Flat] = 1;
         }
     }
     chol_solve.assign(static_cast<size_t>(MaxPars), 0.);
@@ -203,10 +247,23 @@ void HamiltonianMC::BuildMassBlock(const size_t s) {
     }
     TMatrixDSym InvMass(*Throw);
 
-    // A fixed parameter mustn't move, so decouple it and leave a unit mass on its diagonal to keep
-    // the matrix decomposable. ZeroFixedVelocities does the rest
+    // Keep the variances, which adaption estimates well, and damp the correlations by however much
+    // it hasn't resolved them. See the metric_shrinkage docs
+    if (metric_shrinkage > 0.) {
+        const double Keep = 1. - metric_shrinkage;
+        for (int i = 0; i < Block.NPars; ++i) {
+            for (int j = 0; j < i; ++j) {
+                InvMass(i, j) *= Keep;
+                InvMass(j, i) *= Keep;
+            }
+        }
+    }
+
+    // A frozen parameter mustn't move, so decouple it and leave a unit mass on its diagonal to keep
+    // the matrix decomposable. ZeroFixedVelocities does the rest. par_fixed covers both the
+    // handler's fixed parameters and any block another kernel owns, see par_external
     for (int i = 0; i < Block.NPars; ++i) {
-        if (!systematics[s]->IsParameterFixed(i)) continue;
+        if (!par_fixed[static_cast<size_t>(Block.Offset + i)]) continue;
         for (int j = 0; j < Block.NPars; ++j) {
             InvMass(i, j) = 0.;
             InvMass(j, i) = 0.;
@@ -214,32 +271,64 @@ void HamiltonianMC::BuildMassBlock(const size_t s) {
         InvMass(i, i) = 1.;
     }
 
-    if (!M3::CanDecomposeMatrix(InvMass)) {
-        MACH3LOG_WARN("Throw matrix of {} isn't positive definite, nudging the diagonal", systematics[s]->GetName());
-        M3::MakeMatrixPosDef(&InvMass);
-    }
-    const auto Chol = M3::GetCholeskyDecomposedMatrix(InvMass, systematics[s]->GetName());
-
     //KS: Flat row major copies, ROOT's indexing is too slow for the per kick matrix multiply
     const size_t N = static_cast<size_t>(Block.NPars);
-    Block.InvMass.resize(N * N);
-    Block.Chol.resize(N * N);
-    for (int i = 0; i < Block.NPars; ++i) {
-        for (int j = 0; j < Block.NPars; ++j) {
-            const size_t Element = static_cast<size_t>(i) * N + static_cast<size_t>(j);
-            Block.InvMass[Element] = InvMass(i, j);
-            Block.Chol[Element] = Chol[static_cast<size_t>(i)][static_cast<size_t>(j)];
+    //HW Fully shrunk means there is nothing off the diagonal left, so the solves collapse to O(N)
+    Block.IsDiagonal = (metric_shrinkage >= 1.);
+    Block.InvMass.assign(N * N, 0.);
+    Block.Chol.assign(N * N, 0.);
+
+    if (Block.IsDiagonal) {
+        //HW L is the square roots of the variances, so there is nothing to decompose and none of
+        //the O(N^3) the general path spends on it
+        int NFallback = 0;
+        for (int i = 0; i < Block.NPars; ++i) {
+            double Var = InvMass(i, i);
+            if (!std::isfinite(Var) || Var <= 0.) {
+                //HW A direction adaption never saw move has no variance to scale by. Fall back to
+                //the prior width, which is what the metric would have been without adaption, rather
+                //than freezing the parameter out of the velocity draw
+                const double PriorError = systematics[s]->GetDiagonalError(i);
+                Var = (std::isfinite(PriorError) && PriorError > 0.) ? PriorError * PriorError : 1.;
+                ++NFallback;
+            }
+            const size_t Diag = static_cast<size_t>(i) * N + static_cast<size_t>(i);
+            Block.InvMass[Diag] = Var;
+            Block.Chol[Diag] = std::sqrt(Var);
+        }
+        if (NFallback > 0) {
+            MACH3LOG_WARN("{} had {} parameters with no usable variance for the diagonal metric, "
+                          "they keep their prior width", systematics[s]->GetName(), NFallback);
+        }
+    } else {
+        if (!M3::CanDecomposeMatrix(InvMass)) {
+            MACH3LOG_WARN("Throw matrix of {} isn't positive definite, nudging the diagonal", systematics[s]->GetName());
+            M3::MakeMatrixPosDef(&InvMass);
+        }
+        const auto Chol = M3::GetCholeskyDecomposedMatrix(InvMass, systematics[s]->GetName());
+
+        for (int i = 0; i < Block.NPars; ++i) {
+            for (int j = 0; j < Block.NPars; ++j) {
+                const size_t Element = static_cast<size_t>(i) * N + static_cast<size_t>(j);
+                Block.InvMass[Element] = InvMass(i, j);
+                Block.Chol[Element] = Chol[static_cast<size_t>(i)][static_cast<size_t>(j)];
+            }
         }
     }
     Block.BuiltAtUpdate = systematics[s]->GetThrowMatrixUpdates();
 
-    MACH3LOG_DEBUG("Mass matrix for {} built from its {}x{} throw matrix", systematics[s]->GetName(),
+    MACH3LOG_DEBUG("{} mass matrix for {} built from its {}x{} throw matrix",
+                   Block.IsDiagonal ? "Diagonal" : "Dense", systematics[s]->GetName(),
                    Block.NPars, Block.NPars);
 }
 
 // *******************
 void HamiltonianMC::RefreshMassMatrix() {
 // *******************
+    // Leave the metric exactly as SetupMassMatrix() built it, whatever adaption does to the throw
+    // matrix underneath us
+    if (!adapt_metric) return;
+
     // Adaption only swaps the throw matrix every AdaptiveUpdateStep steps, so the O(N^3) rebuild is
     // amortised over all the steps in between
     for (size_t s = 0; s < systematics.size(); ++s) {
@@ -262,6 +351,17 @@ void HamiltonianMC::ThrowVelocity() {
         const double* _restrict_ L = Block.Chol.data();
         const double* _restrict_ Throws = rand_throw.data() + Block.Offset;
         double* _restrict_ Vel = velocity.data() + Block.Offset;
+
+        if (Block.IsDiagonal) {
+            //HW L is diagonal, so each throw is simply scaled by its own standard deviation
+            #ifdef MULTITHREAD
+            #pragma omp parallel for
+            #endif
+            for (int i = 0; i < NPars; ++i) {
+                Vel[i] = L[i * NPars + i] * Throws[i];
+            }
+            continue;
+        }
 
         #ifdef MULTITHREAD
         #pragma omp parallel for
@@ -289,6 +389,15 @@ double HamiltonianMC::KineticEnergy() {
         const double* _restrict_ Vel = velocity.data() + Block.Offset;
         double* _restrict_ u = chol_solve.data();
 
+        if (Block.IsDiagonal) {
+            //HW No substitution to do, u[i] is just w[i] over its standard deviation
+            for (int i = 0; i < NPars; ++i) {
+                const double ui = Vel[i] / L[i * NPars + i];
+                ke += 0.5 * ui * ui;
+            }
+            continue;
+        }
+
         for (int i = 0; i < NPars; ++i) {
             double Sum = Vel[i];
             for (int j = 0; j < i; ++j) {
@@ -314,6 +423,17 @@ double HamiltonianMC::KineticEnergyAndMomentum(std::vector<double>& Momentum) {
         const double* _restrict_ Vel = velocity.data() + Block.Offset;
         double* _restrict_ u = chol_solve.data();
         double* _restrict_ Mom = Momentum.data() + Block.Offset;
+
+        if (Block.IsDiagonal) {
+            //HW M is the reciprocal of M^-1 element by element, so p = w / variance directly
+            for (int i = 0; i < NPars; ++i) {
+                const double Sd = L[i * NPars + i];
+                const double ui = Vel[i] / Sd;
+                ke += 0.5 * ui * ui;
+                Mom[i] = ui / Sd;
+            }
+            continue;
+        }
 
         for (int i = 0; i < NPars; ++i) {
             double Sum = Vel[i];
@@ -416,6 +536,17 @@ void HamiltonianMC::UpdateVelocity(const double Step) {
         const double* _restrict_ InvMass = Block.InvMass.data();
         const double* _restrict_ Grad = gradient.data() + Block.Offset;
         double* _restrict_ Vel = velocity.data() + Block.Offset;
+
+        if (Block.IsDiagonal) {
+            //HW The hot one: O(N) rather than O(N^2), twice per leapfrog step
+            #ifdef MULTITHREAD
+            #pragma omp parallel for simd
+            #endif
+            for (int i = 0; i < NPars; ++i) {
+                Vel[i] -= 0.5 * Step * InvMass[i * NPars + i] * Grad[i];
+            }
+            continue;
+        }
 
         #ifdef MULTITHREAD
         #pragma omp parallel for

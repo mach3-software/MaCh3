@@ -277,6 +277,28 @@ class ParameterHandlerBase {
   void Randomize() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
   void CorrelateSteps() _noexcept_;
+
+  /// @brief Restrict ProposeStep() to a subset of this handler's parameters
+  /// @param Mask One entry per parameter, non-zero for the ones this handler may propose for
+  /// @details For a sampler which updates the parameter vector one block at a time. The
+  /// parameters the mask excludes are written back to their current value rather than simply
+  /// left alone, so the block another kernel owns ends up exactly where that kernel's last
+  /// accepted step left it, even when a rejected proposal of its own is still sitting in the
+  /// proposed values.
+  ///
+  /// Randomize() is deliberately left alone, so every parameter still draws its standard
+  /// normal and the excluded directions keep contributing to the correlated throw. That makes
+  /// the proposal for the masked in block a Gaussian with the block's own marginal covariance
+  /// \f$\Sigma_{BB}\f$, which is symmetric and so needs no Hastings correction. Zeroing the
+  /// excluded throws instead would give a covariance that depends on the parameter ordering
+  void SetProposalMask(const std::vector<char>& Mask);
+  /// @brief Go back to proposing for every parameter
+  void ClearProposalMask() { ProposalMask.clear(); }
+  /// @brief Whether ProposeStep() is currently allowed to move a parameter
+  /// @param i Parameter index
+  bool IsParameterProposable(const int i) const {
+    return ProposalMask.empty() || ProposalMask[static_cast<size_t>(i)] != 0;
+  }
   /// @brief Method to update adaptive MCMC
   /// @cite haario2001adaptive
   void UpdateAdaptiveCovariance();
@@ -448,6 +470,9 @@ class ParameterHandlerBase {
   std::vector<double> _fCurrVal;
   /// Proposed value of the parameter
   std::vector<M3::float_t> _fPropVal;
+  /// Which parameters ProposeStep() may move, empty when every parameter is proposable
+  /// @details See SetProposalMask()
+  std::vector<char> ProposalMask;
   /// Prior error on the parameter
   std::vector<double> _fError;
   /// Lowest physical bound, parameter will not be able to go beyond it

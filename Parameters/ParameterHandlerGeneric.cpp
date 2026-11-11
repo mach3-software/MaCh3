@@ -199,7 +199,22 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
+    //HW StepScale is written either as a plain number or as a map keyed by the algorithm it
+    //applies to, which is the form the DUNE TDR covariances use. Take both, so a config doesn't
+    //have to be flattened by hand to be readable here
+    const auto StepScaleNode = param["Systematic"]["StepScale"];
+    if (StepScaleNode.IsMap()) {
+      if (!StepScaleNode["MCMC"]) {
+        MACH3LOG_ERROR("StepScale for param {}({}) is a map, but has no MCMC key. Found:", _fFancyNames[i], i);
+        for (auto const& Entry : StepScaleNode) {
+          MACH3LOG_ERROR("  {}", Entry.first.as<std::string>());
+        }
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+      _fIndivStepScale[i] = Get<double>(StepScaleNode["MCMC"], __FILE__ , __LINE__);
+    } else {
+      _fIndivStepScale[i] = Get<double>(StepScaleNode, __FILE__ , __LINE__);
+    }
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);

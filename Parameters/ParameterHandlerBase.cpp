@@ -582,6 +582,22 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
 }
 
 // ************************************************
+void ParameterHandlerBase::SetProposalMask(const std::vector<char>& Mask) {
+// ************************************************
+  if (Mask.size() != static_cast<size_t>(_fNumPar)) {
+    MACH3LOG_ERROR("Proposal mask for {} has {} entries but the handler has {} parameters",
+                   GetName(), Mask.size(), _fNumPar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  if (pca) {
+    MACH3LOG_ERROR("{} is PCA'd, so a proposal mask on the un-rotated parameters is meaningless: "
+                   "one principal component mixes masked in and masked out parameters", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  ProposalMask = Mask;
+}
+
+// ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
 void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // ************************************************
@@ -594,6 +610,16 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
     #pragma omp parallel for
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
+      //HW Another kernel owns this parameter on this step, so put the proposal back onto the last
+      //accepted value instead of leaving whatever happens to be there. Without this a rejected
+      //step of the other kernel would leak into the likelihood this kernel accepts against
+      if (!IsParameterProposable(i)) {
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wuseless-cast"
+        _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i]);
+        #pragma GCC diagnostic pop
+        continue;
+      }
       if (!IsParameterFixed(i) > 0.) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -1107,16 +1133,55 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
-  ++throwMatrixUpdates;
-  if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
+  //HW Build the replacement off to the side rather than straight into throwMatrix. The
+  //decomposition below can fail, and if it does we want the matrix we are already throwing from to
+  //still be there to fall back on
+  auto* Candidate = static_cast<TMatrixDSym*>(cov->Clone());
+  if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(Candidate);
   else {
     // HW: Prevent spam from adaptive handler
     bool verbose = AdaptiveHandler ? AdaptiveHandler->GetTotalSteps() < 2 : true;
-    MakePosDef(throwMatrix, verbose);
+    MakePosDef(Candidate, verbose);
   }
 
-  auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
+  //HW MakeMatrixPosDef nudges the diagonal until CanDecomposeMatrix is happy, and that asks ROOT's
+  //TDecompChol. The decomposition actually used here is GetCholeskyDecomposedMatrix, a hand rolled
+  //loop which rejects on sum_diag <= 1e-15. The two tolerances are not the same, so a matrix can
+  //pass the first and fail the second. That used to happen after throwMatrix had already been
+  //replaced, which left nothing to retreat to and no option but to throw: a chain would die at
+  //whichever adaption update first produced a rank deficient covariance, hours in. Ask the
+  //question with the routine that is going to consume the answer, and commit only if it works
+  std::vector<std::vector<double>> throwMatrix_CholDecomp;
+  bool Decomposed = false;
+  try {
+    throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*Candidate, matrixName);
+    Decomposed = true;
+  } catch (const MaCh3Exception&) {
+    Decomposed = false;
+  }
+
+  if(!Decomposed) {
+    //HW Nothing to fall back on if this is the first one, so it stays fatal
+    if(throwMatrix == nullptr) {
+      MACH3LOG_ERROR("The first throw matrix for {} cannot be Cholesky decomposed, even after being "
+                     "made positive definite, and there is no earlier one to keep", matrixName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    MACH3LOG_WARN("Proposed throw matrix for {} cannot be Cholesky decomposed, even after being made "
+                  "positive definite. Keeping the one already in use and skipping this update",
+                  matrixName);
+    MACH3LOG_WARN("  this is usually an adapted covariance with fewer effective samples than it has "
+                  "parameters, so it is singular in the directions the chain has not explored. It "
+                  "will fix itself as the chain accumulates, but if every update is refused then "
+                  "the adaption window is too short for {} parameters", _fNumPar);
+    //HW Deliberately not deleting the candidate here. SetThrowMatrix has always leaked the matrix
+    //it replaces and other things may hold the pointer, so freeing is a separate question from
+    //this fix. One small leak per refused update is the safe side of that trade
+    return;
+  }
+
+  throwMatrix = Candidate;
+  ++throwMatrixUpdates;
 
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD

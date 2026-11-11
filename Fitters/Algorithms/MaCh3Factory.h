@@ -8,6 +8,7 @@
 #include "Algorithms/LikelihoodFit.h"
 #include "Algorithms/HamiltonianMC.h"
 #include "Algorithms/NoUTurnMC.h"
+#include "Algorithms/HybridMCMC.h"
 #ifdef MaCh3_MINUIT2
 #include "Algorithms/MinuitFit.h"
 #endif

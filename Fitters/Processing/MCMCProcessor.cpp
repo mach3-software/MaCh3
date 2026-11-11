@@ -63,6 +63,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   nDraw = 0;
   nEntries = 0;
+  nDiagEntries = 0;
   UpperCut = M3::_BAD_INT_;
   nSteps = 0;
   nBatches = 0;
@@ -3414,21 +3415,54 @@ void MCMCProcessor::PrepareDiagMCMC() {
     MACH3LOG_ERROR("please use SetnBatches to set other value fore example 20");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-    
+
+  //KS: Everything below caches the chain for the diagnostics, so the burn-in has to come off here
+  //rather than in each of them. BurnInCut is a step number, the same as it is everywhere else in
+  //this class, so find the first entry past it instead of assuming entry index and step number
+  //line up: a chain continued with StartFromPreviousFit does not start at step zero
+  int DiagFirstEntry = nEntries;
+  {
+    Chain->SetBranchStatus("*", false);
+    Chain->SetBranchStatus("step", true);
+    unsigned int StepScan = 0;
+    Chain->SetBranchAddress("step", &StepScan);
+    for (int i = 0; i < nEntries; ++i) {
+      Chain->GetEntry(i);
+      if (StepScan >= BurnInCut) { DiagFirstEntry = i; break; }
+    }
+    Chain->ResetBranchAddresses();
+    Chain->SetBranchStatus("*", true);
+  }
+  nDiagEntries = nEntries - DiagFirstEntry;
+
+  if (nDiagEntries < 2) {
+    MACH3LOG_ERROR("StepCut ({}) leaves {} of {} entries for the diagnostics, which is not enough",
+                   BurnInCut, nDiagEntries, nEntries);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  if (DiagFirstEntry > 0) {
+    MACH3LOG_INFO("Cutting the first {} entries (up to step {}) from the diagnostics, {} left",
+                  DiagFirstEntry, BurnInCut, nDiagEntries);
+  } else {
+    MACH3LOG_WARN("No burn-in is being cut from the diagnostics. The autocorrelation and the ESS "
+                  "are measured over the warmup as well, which makes both look worse than the "
+                  "chain really is. Set it with SetStepCut");
+  }
+
   // Initialise ParStep
   ParStep = new M3::float_t*[nDraw]();
   for (int j = 0; j < nDraw; ++j) {
-    ParStep[j] = new M3::float_t[nEntries]();
-    for (int i = 0; i < nEntries; ++i) {
+    ParStep[j] = new M3::float_t[nDiagEntries]();
+    for (int i = 0; i < nDiagEntries; ++i) {
       ParStep[j][i] = -999.99;
     }
   }
 
-  SampleValues = new double*[nEntries]();
-  SystValues = new double*[nEntries]();
-  AccProbValues = new double[nEntries]();
-  StepNumber = new unsigned int[nEntries]();
-  for (int i = 0; i < nEntries; ++i) {
+  SampleValues = new double*[nDiagEntries]();
+  SystValues = new double*[nDiagEntries]();
+  AccProbValues = new double[nDiagEntries]();
+  StepNumber = new unsigned int[nDiagEntries]();
+  for (int i = 0; i < nDiagEntries; ++i) {
     SampleValues[i] = new double[SampleName_v.size()]();
     SystValues[i] = new double[SystName_v.size()]();
 
@@ -3450,11 +3484,12 @@ void MCMCProcessor::PrepareDiagMCMC() {
   Chain->SetBranchStatus("*", false);
 
   // 10 entries output
-  const int countwidth = nEntries/10;
+  //KS: At least one, a hard burn-in cut can leave fewer than ten entries and i % 0 is a crash
+  const int countwidth = std::max(1, nDiagEntries/10);
 
   // Can also do the batched means here to minimize excessive loops
   // The length of each batch
-  const int BatchLength = nEntries/nBatches+1;
+  const int BatchLength = nDiagEntries/nBatches+1;
   BatchedAverages = new double*[nBatches]();
   AccProbBatchedAverages = new double[nBatches]();
   for (int i = 0; i < nBatches; ++i) {
@@ -3493,12 +3528,13 @@ void MCMCProcessor::PrepareDiagMCMC() {
 
   // Loop over the entries
   //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
-  for (int i = 0; i < nEntries; ++i) {
-    // Fill up the arrays
-    Chain->GetEntry(i);
+  for (int i = 0; i < nDiagEntries; ++i) {
+    // Fill up the arrays. Entry i of the cache is entry i + DiagFirstEntry of the chain, so
+    // everything downstream can index from zero and never think about the burn-in again
+    Chain->GetEntry(i + DiagFirstEntry);
 
     if (i % countwidth == 0)
-      M3::Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::PrintProgressBar(i, nDiagEntries);
 
     // Set the branch addresses for params
     for (int j = 0; j < nDraw; ++j) {
@@ -3535,9 +3571,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
     AccProbBatchedAverages[BatchNumber] += AccProbValues[i];
   }
   clock.Stop();
-  MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nEntries);
+  MACH3LOG_INFO("Took {:.2f}s to finish caching statistic for Diag MCMC with {} steps", clock.RealTime(), nDiagEntries);
 
-  if(AllUnique(StepNumber, nEntries) == false){
+  if(AllUnique(StepNumber, nDiagEntries) == false){
     MACH3LOG_ERROR("Found steps with duplicate StepNumber, this indicate merged chain has been passed to DiagMCMC");
     MACH3LOG_ERROR("Code hasn't been optimised to work with merged chains, results may be unintended");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -3576,7 +3612,7 @@ void MCMCProcessor::ParamTraces() {
     
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Trace", Title.Data(), BranchNames[j].Data());
-    TraceParamPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceParamPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nDiagEntries, 0, nDiagEntries);
     TraceParamPlots[j]->SetDirectory(nullptr);
     TraceParamPlots[j]->GetXaxis()->SetTitle("Step");
     TraceParamPlots[j]->GetYaxis()->SetTitle("Parameter Variation");
@@ -3584,7 +3620,7 @@ void MCMCProcessor::ParamTraces() {
 
   for (size_t j = 0; j < SampleName_v.size(); ++j) {
     std::string HistName = SampleName_v[j].Data();
-    TraceSamplePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSamplePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nDiagEntries, 0, nDiagEntries);
     TraceSamplePlots[j]->SetDirectory(nullptr);
     TraceSamplePlots[j]->GetXaxis()->SetTitle("Step");
     TraceSamplePlots[j]->GetYaxis()->SetTitle("Sample -logL");
@@ -3592,7 +3628,7 @@ void MCMCProcessor::ParamTraces() {
 
   for (size_t j = 0; j < SystName_v.size(); ++j) {
     std::string HistName = SystName_v[j].Data();
-    TraceSystsPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSystsPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nDiagEntries, 0, nDiagEntries);
     TraceSystsPlots[j]->SetDirectory(nullptr);
     TraceSystsPlots[j]->GetXaxis()->SetTitle("Step");
     TraceSystsPlots[j]->GetYaxis()->SetTitle("Systematic -logL");
@@ -3604,7 +3640,7 @@ void MCMCProcessor::ParamTraces() {
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (int i = 0; i < nEntries; ++i) {
+  for (int i = 0; i < nDiagEntries; ++i) {
     // Set bin content for the ith bin to the parameter values
     for (int j = 0; j < nDraw; ++j) {
       TraceParamPlots[j]->SetBinContent(i, ParStep[j][i]);
@@ -3622,7 +3658,7 @@ void MCMCProcessor::ParamTraces() {
   TraceDir->cd();
   for (int j = 0; j < nDraw; ++j) {
     // Fit a linear function to the traces
-    auto Fitter = std::make_unique<TF1>("Fitter", "[0]", nEntries/2, nEntries);
+    auto Fitter = std::make_unique<TF1>("Fitter", "[0]", nDiagEntries/2, nDiagEntries);
     Fitter->SetLineColor(kRed);
     TraceParamPlots[j]->Fit("Fitter","Rq");
     TraceParamPlots[j]->Write();
@@ -3658,7 +3694,7 @@ std::vector <double> MCMCProcessor::GetParameterSums() {
   #pragma omp parallel for
   #endif
   for (int j = 0; j < nDraw; ++j) {
-    for (int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nDiagEntries; ++i) {
       ParamSums[j] += ParStep[j][i];
     }
   }
@@ -3667,7 +3703,7 @@ std::vector <double> MCMCProcessor::GetParameterSums() {
   #pragma omp parallel for
   #endif
   for (int i = 0; i < nDraw; ++i) {
-    ParamSums[i] /= double(nEntries);
+    ParamSums[i] /= double(nDiagEntries);
   }
   return ParamSums;
 }
@@ -3691,24 +3727,24 @@ void MCMCProcessor::AutoCorrelation_FFT() {
   std::vector<std::vector<double>> LagL(nDraw);
 
   // Arrays needed to perform FFT using ROOT
-  std::vector<double> ACFFT(nEntries, 0.0);  // Main autocorrelation array
-  std::vector<double> ParVals(nEntries, 0.0);  // Param values for full chain
-  std::vector<double> ParValsFFTR(nEntries, 0.0);  // FFT Real part
-  std::vector<double> ParValsFFTI(nEntries, 0.0);  // FFT Imaginary part
-  std::vector<double> ParValsFFTSquare(nEntries, 0.0);  // FFT Absolute square
-  std::vector<double> ParValsComplex(nEntries, 0.0);  // Input Imaginary values (0)
+  std::vector<double> ACFFT(nDiagEntries, 0.0);  // Main autocorrelation array
+  std::vector<double> ParVals(nDiagEntries, 0.0);  // Param values for full chain
+  std::vector<double> ParValsFFTR(nDiagEntries, 0.0);  // FFT Real part
+  std::vector<double> ParValsFFTI(nDiagEntries, 0.0);  // FFT Imaginary part
+  std::vector<double> ParValsFFTSquare(nDiagEntries, 0.0);  // FFT Absolute square
+  std::vector<double> ParValsComplex(nDiagEntries, 0.0);  // Input Imaginary values (0)
 
   auto ParamSums = GetParameterSums();
   // Create forward and reverse FFT objects. I don't love using ROOT here,
   // but it works so I can't complain
-  TVirtualFFT* fftf = TVirtualFFT::FFT(1, &nEntries, "C2CFORWARD");
-  TVirtualFFT* fftb = TVirtualFFT::FFT(1, &nEntries, "C2CBACKWARD");
+  TVirtualFFT* fftf = TVirtualFFT::FFT(1, &nDiagEntries, "C2CFORWARD");
+  TVirtualFFT* fftb = TVirtualFFT::FFT(1, &nDiagEntries, "C2CBACKWARD");
 
   // Loop over all pars and calculate the full autocorrelation function using FFT
   for (int j = 0; j < nDraw; ++j) {
     // Initialize
     LagL[j].resize(nLags);
-    for (int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nDiagEntries; ++i) {
       ParVals[i] = ParStep[j][i]-ParamSums[j]; // Subtract the mean to make it numerically tractable
       ParValsComplex[i] = 0.; // Reset dummy array
     }
@@ -3719,7 +3755,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     fftf->GetPointsComplex(ParValsFFTR.data(), ParValsFFTI.data());
 
     // Square the results to get the power spectrum
-    for (int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nDiagEntries; ++i) {
       ParValsFFTSquare[i] = ParValsFFTR[i]*ParValsFFTR[i] + ParValsFFTI[i]*ParValsFFTI[i];
     }
 
@@ -3730,7 +3766,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
 
     // Divide by norm to get autocorrelation
     double normAC = ACFFT[0];
-    for (int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nDiagEntries; ++i) {
       ACFFT[i] /= normAC;
     }
 
@@ -3823,11 +3859,11 @@ void MCMCProcessor::AutoCorrelation() {
   for (int j = 0; j < nDraw; ++j) {
     for (int k = 0; k < nLags; ++k) {
       // Loop over the number of entries
-      for (int i = 0; i < nEntries; ++i) {
+      for (int i = 0; i < nDiagEntries; ++i) {
         const double Diff = ParStep[j][i]-ParamSums[j];
 
         // Only sum the numerator up to i = N-k
-        if (i < nEntries-k) {
+        if (i < nDiagEntries-k) {
           const double LagTerm = ParStep[j][i+k]-ParamSums[j];
           const double Product = Diff*LagTerm;
           NumeratorSum[j][k] += Product;
@@ -3909,7 +3945,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<doubl
                                         float*& NumeratorSum_cpu, float*& ParamSums_cpu, float*& DenomSum_cpu) {
 // **************************
   //KS: Create temporary arrays that will communicate with GPU code
-  ParStep_cpu = new float[nDraw*nEntries];
+  ParStep_cpu = new float[nDraw*nDiagEntries];
   NumeratorSum_cpu = new float[nDraw*nLags];
   DenomSum_cpu = new float[nDraw*nLags];
   ParamSums_cpu = new float[nDraw];
@@ -3947,9 +3983,9 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<doubl
     #endif
     for (int j = 0; j < nDraw; ++j)
     {
-      for (int i = 0; i < nEntries; ++i)
+      for (int i = 0; i < nDiagEntries; ++i)
       {
-        const int temp = j*nEntries+i;
+        const int temp = j*nDiagEntries+i;
         ParStep_cpu[temp] = ParStep[j][i];
       }
     }
@@ -3959,7 +3995,7 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<doubl
   #endif
 
   //KS: First allocate memory on GPU
-  GPUProcessor->InitGPU_AutoCorr(nEntries,
+  GPUProcessor->InitGPU_AutoCorr(nDiagEntries,
                                  nDraw,
                                  nLags);
 
@@ -4028,7 +4064,7 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    (*EffectiveSampleSize)(j) = double(nEntries)/TempDenominator[j];
+    (*EffectiveSampleSize)(j) = double(nDiagEntries)/TempDenominator[j];
     // 100 because we convert to percentage
     (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
 
@@ -4037,7 +4073,7 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
       EffectiveSampleSizeHist[i]->SetBinContent(j+1, 0);
       EffectiveSampleSizeHist[i]->SetBinError(j+1, 0);
 
-      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / double(nEntries);
+      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / double(nDiagEntries);
       if(Thresholds[i] >= TempEntry && TempEntry > Thresholds[i+1])
       {
         if( std::isnan((*EffectiveSampleSize)(j)) ) continue;
@@ -4098,8 +4134,8 @@ void MCMCProcessor::BatchedMeans() {
   for (int j = 0; j < nDraw; ++j) {
     for (int i = 0; i < nBatches; ++i) {
       BatchedParamPlots[j]->SetBinContent(i+1, BatchedAverages[i][j]);
-      const int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
-      const int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+      const int BatchRangeLow = double(i)*double(nDiagEntries)/double(nBatches);
+      const int BatchRangeHigh = double(i+1)*double(nDiagEntries)/double(nBatches);
       std::stringstream ss;
       ss << BatchRangeLow << " - " << BatchRangeHigh;
       BatchedParamPlots[j]->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
@@ -4151,7 +4187,7 @@ void MCMCProcessor::BatchedAnalysis() {
   std::vector<double> C_Rho_Denominator(nDraw);
   std::vector<double> C_Nominator(nDraw);
   std::vector<double> C_Denominator(nDraw);
-  const int BatchLength = nEntries/nBatches+1;
+  const int BatchLength = nDiagEntries/nBatches+1;
 //KS: Start parallel region
 #ifdef MULTITHREAD
 #pragma omp parallel
@@ -4262,7 +4298,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   MACH3LOG_INFO("Making Power Spectrum plots...");
 
   // This is only to reduce number of computations...
-  const int N_Coeffs = std::min(10000, nEntries);
+  const int N_Coeffs = std::min(10000, nDiagEntries);
   const int start = -(N_Coeffs/2-1);
   const int end = N_Coeffs/2-1;
   const int v_size = end - start;
@@ -4274,7 +4310,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
   std::vector<std::vector<float>> P_j(nPrams, std::vector<float>(v_size, 0.0));
 
-  int _N = nEntries;
+  int _N = nDiagEntries;
   if (_N % 2 != 0) _N -= 1; // N must be even
 
   //This is being used a lot so calculate it once to increase performance
@@ -4407,7 +4443,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   #endif
   for (int j = 0; j < nDraw; ++j)
   {
-    for(int i = 0; i < nEntries; ++i)
+    for(int i = 0; i < nDiagEntries; ++i)
     {
       if(StepNumber[i] > Threshold)
       {
@@ -4424,7 +4460,7 @@ void MCMCProcessor::GewekeDiagnostic() {
   #endif
   for (int j = 0; j < nDraw; ++j)
   {
-    for(int i = 0; i < nEntries; ++i)
+    for(int i = 0; i < nDiagEntries; ++i)
     {
       if(StepNumber[i] > Threshold)
       {
@@ -4448,7 +4484,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     //KS: First mean
     for (int j = 0; j < nDraw; ++j)
     {
-      for(int i = 0; i < nEntries; ++i)
+      for(int i = 0; i < nDiagEntries; ++i)
       {
         if(StepNumber[i] < ThresholsCheck)
         {
@@ -4461,7 +4497,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     //Now spectral variance
     for (int j = 0; j < nDraw; ++j)
     {
-      for(int i = 0; i < nEntries; ++i)
+      for(int i = 0; i < nDiagEntries; ++i)
       {
         if(StepNumber[i] < ThresholsCheck)
         {
@@ -4507,7 +4543,7 @@ void MCMCProcessor::AcceptanceProbabilities() {
   MACH3LOG_INFO("Making AccProb plots...");
 
   // Set the titles and limits for TH1Ds
-  auto AcceptanceProbPlot = std::make_unique<TH1D>("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
+  auto AcceptanceProbPlot = std::make_unique<TH1D>("AcceptanceProbability", "Acceptance Probability", nDiagEntries, 0, nDiagEntries);
   AcceptanceProbPlot->SetDirectory(nullptr);
   AcceptanceProbPlot->GetXaxis()->SetTitle("Step");
   AcceptanceProbPlot->GetYaxis()->SetTitle("Acceptance Probability");
@@ -4518,8 +4554,8 @@ void MCMCProcessor::AcceptanceProbabilities() {
   
   for (int i = 0; i < nBatches; ++i) {
     BatchedAcceptanceProblot->SetBinContent(i+1, AccProbBatchedAverages[i]);
-    const int BatchRangeLow = double(i)*double(nEntries)/double(nBatches);
-    const int BatchRangeHigh = double(i+1)*double(nEntries)/double(nBatches);
+    const int BatchRangeLow = double(i)*double(nDiagEntries)/double(nBatches);
+    const int BatchRangeHigh = double(i+1)*double(nDiagEntries)/double(nBatches);
     std::stringstream ss;
     ss << BatchRangeLow << " - " << BatchRangeHigh;
     BatchedAcceptanceProblot->GetXaxis()->SetBinLabel(i+1, ss.str().c_str());
@@ -4528,7 +4564,7 @@ void MCMCProcessor::AcceptanceProbabilities() {
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (int i = 0; i < nEntries; ++i) {
+  for (int i = 0; i < nDiagEntries; ++i) {
     // Set bin content for the i-th bin to the parameter values
     AcceptanceProbPlot->SetBinContent(i, AccProbValues[i]);
   }

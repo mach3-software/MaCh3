@@ -11,6 +11,7 @@ set(HEADERS
     MulticanonicalMCMCHandler.h
     HamiltonianMC.h
     NoUTurnMC.h
+    HybridMCMC.h
     DualAveraging.h
 )
 
@@ -27,6 +28,7 @@ add_library(Fitters SHARED
     MaCh3Factory.cpp
     HamiltonianMC.cpp
     NoUTurnMC.cpp
+    HybridMCMC.cpp
 )
 
 set_target_properties(Fitters PROPERTIES
