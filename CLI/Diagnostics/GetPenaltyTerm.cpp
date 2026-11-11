@@ -3,8 +3,8 @@
 
 int main(int argc, char const* argv[]){
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
-    MACH3LOG_WARN("                   : you can use 'mach3 penterm' as a direct replacement instead.");
-    argv[0] = "penterm";
+    MACH3LOG_WARN("                   : you can use 'mach3 penaltyterm' as a direct replacement instead.");
+    argv[0] = "penaltyterm";
     M3::GetPenaltyTermModule proc;
     M3::MaCh3ArgumentParser* parser = proc.get_parser();
 
@@ -24,6 +24,6 @@ int main(int argc, char const* argv[]){
     parser->parse_args(argc, argv);
     proc.Run();
     MACH3LOG_WARN("Deprecation Warning: Use of the standalone executable will be deprecated in future releases.");
-    MACH3LOG_WARN("                   : you can use 'mach3 penterm' as a direct replacement instead.");
+    MACH3LOG_WARN("                   : you can use 'mach3 penaltyterm' as a direct replacement instead.");
     return 0;
 }
