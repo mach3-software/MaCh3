@@ -168,6 +168,8 @@ class AdaptiveMCMCHandler
     return ((*_fFixedPars)[ipar] < 0);
   }
 
+  /// @brief Get number of updated params (skip non-adapt and fixed params)
+  int GetNumberUpdatedParameters() const;
   /// @brief Get Current value of parameter
   double CurrVal(const int par_index) const;
 
