@@ -40,5 +40,4 @@ install(TARGETS CLIApi
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/CLI/API)
 
-#install(FILES ${HEADERS} DESTINATION include/api)
 add_library(MaCh3::CLIApi ALIAS CLIApi)

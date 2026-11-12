@@ -86,93 +86,20 @@ namespace M3{
     }
 
     void MaCh3Program::completions(const std::string& prefix, const std::vector<std::string>& context) const {
-        // Find the active subcommand from previously typed context words
-        std::string active_subcommand;
-        for (const auto& word : context) {
-            for (const auto& sub : m_subcommands) {
-                if (word == sub) {
-                    active_subcommand = sub;
-                    break;
-                }
-            }
-            if (!active_subcommand.empty()) break;
-        }
-
-        if (active_subcommand.empty()) {
-            // No subcommand typed yet — complete top-level subcommand names
-            for (const auto& cmd : m_subcommands) {
-                if (cmd.rfind(prefix, 0) == 0)
-                    std::cout << cmd << "\n";
-            }
-            return;
-        }
-
-        // Find the parser for the active subcommand
-        const MaCh3ArgumentParser* sub_parser = nullptr;
-        for (const auto& [parser, mod] : m_module_map) {
-            if (parser->name() == active_subcommand) { sub_parser = parser; break; }
-        }
-        if (!sub_parser) {
-            for (const auto& [parser, plug] : m_dynamic_plugin_map) {
-                if (parser->name() == active_subcommand) { sub_parser = parser; break; }
-            }
-        }
-        if (!sub_parser) return; // unknown subcommand — fall back to files
-
-        // If the last context word is an option that expects a value argument,
-        // output nothing so the shell falls back to file completion.
-        if (!context.empty()) {
-            const std::string& prev = context.back();
-            if (prev.size() >= 2 && prev[0] == '-') {
-                if (sub_parser->option_takes_value(prev)) {
-                    return; // option takes a value — let the shell complete files
-                }
-            }
-        }
-
-        // Complete long option names when the prefix starts with '-'
-        if (!prefix.empty() && prefix[0] == '-') {
-            for (const auto& name : sub_parser->get_long_option_names()) {
-                if (name.rfind(prefix, 0) == 0)
-                    std::cout << name << "\n";
-            }
-            return;
-        }
-        // Non-option prefix (or empty) — output nothing, shell falls back to files
+        for (const auto& name : get_completions(prefix, context))
+            std::cout << name << "\n";
     }
 
-    // void MaCh3Program::parse_args(int argc, const char *const argv[]) {
-    //     try{
-    //         MaCh3ArgumentParser::parse_args(argc, argv);
-
-    //     }
-    //     catch (const std::exception& err) {
-    //         if (auto prefix = this->present<std::string>("--complete")) {
-    //             this->completions(*prefix);
-    //             exit(0);
-    //         }
-
-    //         if (this->get<bool>("--install-completions")) {
-    //             this->install_completions();
-    //             exit(0);
-    //         }
-    //         std::cerr << err.what() << std::endl;
-    //         std::cerr << this->get_subcommand_used();
-    //         MACH3LOG_ERROR(err.what());
-    //         throw;
-    //     }
-
-    //     if (!this->get_subcommand_used()){
-    //         std::cerr << this->get_subcommand_used();
-    //         throw NoArgsException();
-    //     }
-    // }
+    void MaCh3Program::parse_args(int argc, const char *const argv[]) {
+        std::vector<std::string> args(argv, argv + argc);
+        this->insert_default_subcommands(args);
+        MaCh3ArgumentParser::parse_args(args);
+    }
 
     void MaCh3Program::add_core_module(IModule& module){
         MaCh3ArgumentParser* parser = module.get_parser();
         this->add_subparser(*parser);
         m_module_map[parser] = &module;
-        m_subcommands.push_back(parser->name());
     }
 
     /// @brief Load dynamic plugins from paths specified in MACH3_PLUGINS environment variable
@@ -202,7 +129,6 @@ namespace M3{
 
                     this->add_subparser(*parser);
                     m_dynamic_plugin_map[parser] = std::move(dlplugin);
-                    m_subcommands.push_back(parser->name());
                 }
                 catch (const std::exception& e) {
                     std::cerr << "Failed to load plugin from " << sofile << ": " << e.what() << "\n";
@@ -229,19 +155,14 @@ namespace M3{
     ///
     /// @return Exit code from the executed module (0 on success)
     int MaCh3Program::Run(){
-        const MaCh3ArgumentParser& sub_parser = this->get_subcommand_used();
-        
-        if (sub_parser){
-            auto plugin_itr = m_module_map.find(&sub_parser);
-            if (plugin_itr != m_module_map.end()){
-                return plugin_itr->second->Run();
-            }
-            auto dplugin_itr = m_dynamic_plugin_map.find(&sub_parser);
-            if (dplugin_itr != m_dynamic_plugin_map.end()){
-                return dplugin_itr->second->Run();
-            }
+        // Dispatch to the top-level module; modules handle their own nested subcommands
+        for (const auto& [parser, module] : m_module_map) {
+            if (this->is_subcommand_used(*parser)) return module->Run();
         }
-        return 0;        
+        for (const auto& [parser, dplugin] : m_dynamic_plugin_map) {
+            if (this->is_subcommand_used(*parser)) return dplugin->Run();
+        }
+        return 0;
     }
 
 
