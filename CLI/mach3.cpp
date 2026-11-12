@@ -23,7 +23,8 @@
 /// @param argc Number of command-line arguments
 /// @param argv Array of command-line argument strings
 /// @return Exit code (0 on success, non-zero on error)
-int main(int argc, char *argv[]) {
+// Fix startup errors: the outer boundary also covers construction, registration and discovery.
+int main(int argc, char *argv[]) try {
     M3::MaCh3Program program("mach3");
 
     // Hidden completion option — accepts prefix + preceding words as context
@@ -78,7 +79,8 @@ int main(int argc, char *argv[]) {
 
         std::cerr << err.what() << std::endl;
         std::cerr << program.get_subcommand_used();
-        MACH3LOG_ERROR(err.what());
+        // Fix error diagnostics: exception text is data, not a logger format string.
+        MACH3LOG_ERROR("{}", err.what());
         return 1;
     }
     catch(...){
@@ -86,23 +88,24 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // no subcommand args
-    if (!program.get_subcommand_used()){
-        std::cerr << program.get_subcommand_used();
+    // Fix handling of no-argument commands: allow leaf defaults; bare groups still need a child.
+    const auto& selected_parser = program.get_subcommand_used();
+    if (!selected_parser && !selected_parser.subparsers().empty()){
+        std::cerr << selected_parser;
         return 2;
     }
 
 
     if (program.get<bool>("--install-completions")) {
-        program.install_completions();
-        return 0;
+        // Fix handling of completion installation: do not turn an installer failure into process success.
+        return program.install_completions();
     }
 
     try{
         return program.Run();
     }
     catch(const std::exception& err){
-        MACH3LOG_ERROR(err.what());
+        MACH3LOG_ERROR("{}", err.what());
         std::cerr << "An exception occurred during program execution: " << err.what() << std::endl;
         return 3;
     }
@@ -112,5 +115,14 @@ int main(int argc, char *argv[]) {
         return 3;
     }
 
-    // return 0;
+}
+catch (const std::exception& err) {
+    MACH3LOG_ERROR("CLI initialisation failed: {}", err.what());
+    std::cerr << "CLI initialisation failed: " << err.what() << "\n";
+    return 1;
+}
+catch (...) {
+    MACH3LOG_ERROR("Unknown exception during CLI initialisation.");
+    std::cerr << "Unknown exception during CLI initialisation.\n";
+    return 1;
 }
