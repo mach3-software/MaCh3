@@ -21,4 +21,5 @@ foreach(app
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)
 
+target_link_libraries(PlotMCMCDiag MaCh3::CLIPlotModules)
 add_subdirectory(UmbrellaSampling)

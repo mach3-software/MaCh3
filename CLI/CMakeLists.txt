@@ -9,7 +9,7 @@ add_executable(mach3
     MaCh3Program.cpp
 )
 
-target_link_libraries(mach3 PRIVATE MaCh3::CLIModules MaCh3::All)
+target_link_libraries(mach3 PRIVATE MaCh3::CLIPlotModules MaCh3::CLIModules MaCh3::All)
 target_link_libraries(mach3 PRIVATE MaCh3Warnings)
 
 # libdl is only available as a separate library on Unix/Linux systems.

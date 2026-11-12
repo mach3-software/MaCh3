@@ -25,10 +25,13 @@ namespace M3{
     class MaCh3Program: public MaCh3ArgumentParser{
         public:
             using MaCh3ArgumentParser::MaCh3ArgumentParser;
+            using MaCh3ArgumentParser::parse_args;
+
+            /// @brief Parse args after inserting any default subcommands
+            void parse_args(int argc, const char *const argv[]);
 
             /// @brief Destructor that unloads all dynamic plugins
             virtual ~MaCh3Program(){
-                //std::cout<<"UNLOADED"<< std::endl;
                 this->unload_dynamic_plugins();
             }
 
@@ -42,7 +45,7 @@ namespace M3{
             /// @brief Install shell completion scripts for bash and zsh
             void install_completions() const;
 
-            /// @brief Generate completion suggestions given the current prefix and preceding words
+            /// @brief Generate subcommand or long-option suggestions at the active parser depth
             /// @param prefix   The partially-typed word being completed
             /// @param context  Words already typed after the program name but before prefix
             void completions(const std::string& prefix, const std::vector<std::string>& context) const;
@@ -71,7 +74,6 @@ namespace M3{
             std::vector<std::string> expand_plugin_path(const std::string& path) const;
 
         private:
-            std::vector<std::string> m_subcommands;                                     ///< List of registered subcommand names
             std::map<const MaCh3ArgumentParser*, IModule*> m_module_map;                ///< Map of parsers to core modules (non-owning)
             std::map<const MaCh3ArgumentParser*, std::unique_ptr<DynamicPlugin>> m_dynamic_plugin_map;  ///< Map of parsers to dynamic plugins (owning)
 
