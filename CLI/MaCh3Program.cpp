@@ -94,7 +94,7 @@ namespace M3{
 
         std::string shell = detect_shell();
         if (shell.empty()) {
-            std::cerr << "Could not detect your shell. Supported: bash, zsh\n";
+            std::cerr << "Could not detect your shell (check it's exported). Supported: bash, zsh\n";
             return 1;
         }
 
