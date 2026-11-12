@@ -538,6 +538,20 @@ void AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength() {
 }
 
 // ********************************************
+int AdaptiveMCMCHandler::GetNumberUpdatedParameters() const {
+// ********************************************
+  int n_updating = 0;
+  for (int i = 0; i < static_cast<int>(_fFixedPars->size()); i++)
+  {
+    if (!IsFixed(i) && !(*_param_skip_adapt_flags)[i])
+    {
+      n_updating++;
+    }
+  }
+  return n_updating;
+}
+
+// ********************************************
 void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
 // ********************************************
   /* 
@@ -553,17 +567,20 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
   int batch_step;
   if (n_rm_restarts > total_rm_restarts) {
     batch_step = total_steps;
-  }
-  else{
+  } else{
     batch_step = total_steps % acceptance_rate_batch_size;
   }
-
-  int non_fixed_pars = GetNumParams()-GetNFixed();
+  // We need number of params which are actually being updated.
+  // This means we skip non adapt and fixed params
+  int n_adapt_pars = GetNumberUpdatedParameters();
 
   // double root_scale = std::sqrt(adaption_scale);
 
-  /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
-  double scale_factor = adaption_scale * c_robbins_monro / std::max(200.0, static_cast<double>(batch_step) / non_fixed_pars);
+  /// [200 is arbitrary for early stability but motivated by paper]
+  constexpr double MinRMScale = 200.0;
+  
+  /// Update the scale factor for Robbins-Monro adaption
+  double scale_factor = adaption_scale * c_robbins_monro / std::max(MinRMScale, static_cast<double>(batch_step) / n_adapt_pars);
 
   /// Now we either increase or decrease the scale
   if(prev_step_accepted){

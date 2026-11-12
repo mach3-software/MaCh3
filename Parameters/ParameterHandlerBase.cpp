@@ -1162,7 +1162,7 @@ void ParameterHandlerBase::SanitizeAdaption() const {
   // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
   // We don't want to change one parameter while keeping the other fixed as this would
   // lead to weird penalty terms in the prior after adapting
-  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
+  constexpr double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
   for (int i = 0; i < _fNumPar; ++i) {
     for (int j = 0; j <= i; ++j) {
       // The symmetry should have been checked during the Init phase
