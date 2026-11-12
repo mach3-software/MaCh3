@@ -61,7 +61,7 @@ get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 
 find_path(MaCh3_INCLUDE_DIR
-  NAMES Algorithms/FitterBase.h
+  NAMES Fitters/Algorithms/FitterBase.h
   PATHS ${MaCh3_CMAKE_DIR}/include/
 )
 

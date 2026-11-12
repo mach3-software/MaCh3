@@ -1,8 +1,8 @@
 #include <ostream>
 #include <stdexcept>
-#include "Algorithms/MulticanonicalMCMCHandler.h"
+#include "Fitters/Algorithms/MulticanonicalMCMCHandler.h"
 #include "Parameters/ParameterHandlerBase.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/IOUtils.h"
 
 /// @file MulticanonicalMCMCHandler.cpp
 ///

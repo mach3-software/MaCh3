@@ -53,67 +53,64 @@ _MaCh3_Safe_Include_End_ //}
 
 namespace M3{
 
-  /// @class GetPostFitParamModule
-  /// @brief Module for generating post-fit parameter plots
-  ///
-  /// This module provides diagnostics such as convergence tests, autocorrelation
-  /// analysis, and batch means calculations to assess the quality of MCMC samples.
-  class PostFitParamModule: public IModuleBase{
+/// @class GetPostFitParamModule
+/// @brief Module for generating post-fit parameter plots
+///
+/// This module provides diagnostics such as convergence tests, autocorrelation
+/// analysis, and batch means calculations to assess the quality of MCMC samples.
+class PostFitParamModule: public IModuleBase{
+ public:
+  /// @brief Destructor
+  virtual ~PostFitParamModule();
 
-    public:
-      /// @brief Destructor
-      virtual ~PostFitParamModule();
+  /// @brief Get the argument parser for this module
+  /// @return Pointer to the configured MaCh3ArgumentParser
+  MaCh3ArgumentParser* get_parser() override;
 
-      /// @brief Get the argument parser for this module
-      /// @return Pointer to the configured MaCh3ArgumentParser
-      MaCh3ArgumentParser* get_parser() override;
+  /// @brief Execute the MCMC diagnostics
+  /// @return Exit code (0 on success)
+  int Run() override;
+ private:
+  std::vector<std::string> rebuildCommandLine();
+  void validateCommandLine();
 
-      /// @brief Execute the MCMC diagnostics
-      /// @return Exit code (0 on success)
-      int Run() override;
-    private:
+  void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
+                          const std::string& type, const int fileId, const bool setLabels = true);
 
-        std::vector<std::string> rebuildCommandLine();
-        void validateCommandLine();
+  void InitializePads(const TCanvas* canvas, TPad*& pad3, TPad*& pad4);
 
-        void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
-                                const std::string& type, const int fileId, const bool setLabels = true);
+  void CopyViolinToBlock(TH2D* FullViolin, TH2D* ReducedViolin, const std::vector<std::string>& ParamNames);
 
-        void InitializePads(const TCanvas* canvas, TPad*& pad3, TPad*& pad4);
+  template <typename HistType>
+  void PrettifyTitles(HistType* hist);
 
-        void CopyViolinToBlock(TH2D* FullViolin, TH2D* ReducedViolin, const std::vector<std::string>& ParamNames);
+  bool ReadSettings(const std::shared_ptr<TFile>& File1);
+  std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes);
+  bool IsInvalidHist(const TH1D* hist, double invalid = M3::_BAD_DOUBLE_);
+  void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec,
+                  TPad *mainPad, TPad *ratioPad, const std::string& OutName);
+  void MakeParameterPlots(TCanvas* canv);
+  void MakeFluxPlots(TCanvas* canv);
+  /// @warning This is legacy functions and will become deprecated
+  void MakeNDDetPlots();
+  void MakeRidgePlots();
+  void GetPostfitParamPlots();
+  std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {});
+  /// @brief KS: Make fancy violin plots
+  void GetViolinPlots();
 
-        template <typename HistType>
-        void PrettifyTitles(HistType* hist);
+  /// @brief KS: Make comparison of 2D Posteriors
+  void Get2DComparison(const std::string& FileName1, const std::string& FileName2);
 
-        bool ReadSettings(const std::shared_ptr<TFile>& File1);
-        std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes);
-        bool IsInvalidHist(const TH1D* hist, double invalid = M3::_BAD_DOUBLE_);
-        void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec,
-                       TPad *mainPad, TPad *ratioPad, const std::string& OutName);
-        void MakeParameterPlots(TCanvas* canv);
-        void MakeFluxPlots(TCanvas* canv);
-        /// @warning This is legacy functions and will become deprecated
-        void MakeNDDetPlots();
-        void MakeRidgePlots();
-        void GetPostfitParamPlots();
-        std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {});
-        /// @brief KS: Make fancy violin plots
-        void GetViolinPlots();
+  Plotting::PlottingManager *PlotMan = nullptr;
 
-        /// @brief KS: Make comparison of 2D Posteriors
-        void Get2DComparison(const std::string& FileName1, const std::string& FileName2);
+  int NDParameters;
+  int NDParametersStartingPos;
 
-        Plotting::PlottingManager *PlotMan = nullptr;
+  std::vector<int> NDSamplesBins;
+  std::vector<std::string> NDSamplesNames;
 
-        int NDParameters;
-        int NDParametersStartingPos;
-
-        std::vector<int> NDSamplesBins;
-        std::vector<std::string> NDSamplesNames;
-
-        std::string SaveName;
-        std::string plotType;
-
-  };
+  std::string SaveName;
+  std::string plotType;
+};
 }

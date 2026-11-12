@@ -1,4 +1,4 @@
-#include "Algorithms/MinuitFit.h"
+#include "Fitters/Algorithms/MinuitFit.h"
 
 // *******************
 // Run the Minuit Fit with all the systematic objects added

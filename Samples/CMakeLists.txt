@@ -5,7 +5,6 @@ set(HEADERS
     SampleHandlerBase.txx
     SampleHandlerFunctional.h
     SampleStructs.h
-    HistogramUtils.h
     SampleInfo.h
     EventInfo.h
     OscillationHandler.h
@@ -15,7 +14,6 @@ add_library(Samples SHARED
     BinningHandler.cpp
     SampleHandlerInterface.cpp
     SampleHandlerBase.cpp
-    HistogramUtils.cpp
     OscillationHandler.cpp
 )
 
