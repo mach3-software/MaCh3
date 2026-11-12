@@ -1,4 +1,4 @@
-#include "Algorithms/MCMCBase.h"
+#include "Fitters/Algorithms/MCMCBase.h"
 
 // *************************
 // Initialise the Manager and make it an object of mcmc class

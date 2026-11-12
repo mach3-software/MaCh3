@@ -1,6 +1,6 @@
 #include <ostream>
 #include <stdexcept>
-#include "Algorithms/MulticanonicalMCMCHandler.h"
+#include "Fitters/Algorithms/MulticanonicalMCMCHandler.h"
 #include "Parameters/ParameterHandlerBase.h"
 #include "Utils/IOUtils.h"
 

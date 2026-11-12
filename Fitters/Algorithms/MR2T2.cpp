@@ -1,4 +1,4 @@
-#include "Algorithms/MR2T2.h"
+#include "Fitters/Algorithms/MR2T2.h"
 
 // ***************
 MR2T2::MR2T2(Manager *man) : MCMCBase(man) {

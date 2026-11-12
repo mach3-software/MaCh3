@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "Processing/StatisticalUtils.h"
+#include "Fitters/Processing/StatisticalUtils.h"
 #include "Utils/HistogramUtils.h"
 #include "Utils/IOUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"

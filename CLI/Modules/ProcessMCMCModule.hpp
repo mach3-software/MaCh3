@@ -3,9 +3,7 @@
 
 //MaCh3 includes
 #pragma once
-// yaml Includes
-#include "yaml-cpp/yaml.h"
-#include "Processing/MCMCProcessor.h"
+#include "Fitters/Processing/MCMCProcessor.h"
 #include "CLI/API/plugin.hpp"
 
 namespace M3{

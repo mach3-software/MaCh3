@@ -1,4 +1,4 @@
-#include "OscProcessor.h"
+#include "Fitters/Processing/OscProcessor.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
