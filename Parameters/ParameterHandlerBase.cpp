@@ -766,6 +766,9 @@ void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
 // ********************************************
 void ParameterHandlerBase::BuildSparsePrior() const {
 // ********************************************
+  //HW One row per parameter with a prior. Walk the columns in ascending order, as the dense loops do,
+  //keeping the non-flat, non-zero entries. CalcLikelihood sums only j <= i (the lower triangle), which is
+  //the first PriorLowerCount entries of each row, while CalcGradient needs the whole row
   const int N = _fNumPar;
   PriorRowOf.assign(static_cast<size_t>(N), -1);
   PriorRowStart.assign(1, 0);

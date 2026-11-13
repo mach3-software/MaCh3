@@ -285,14 +285,14 @@ BinnedSplineHandler::ArrayView BinnedSplineHandler::GetArrayView() const {
     MACH3LOG_ERROR("{}: the spline coefficients are on the GPU only, so they can't be viewed", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  V.XCoeff = xcoeff_arr;
-  V.NX = static_cast<std::size_t>(_max_knots) * static_cast<std::size_t>(nParams);
-  V.ManyCoeff = manycoeff_arr;
-  V.NMany = static_cast<std::size_t>(CoeffIndex) * _nCoeff_;
-  V.NKnots = &nKnots_arr;
-  V.ParamNo = &paramNo_arr;
+  V.KnotX = xcoeff_arr;
+  V.NKnotX = static_cast<std::size_t>(_max_knots) * static_cast<std::size_t>(nParams);
+  V.SegmentCoeffs = manycoeff_arr;
+  V.NSegmentCoeffs = static_cast<std::size_t>(CoeffIndex) * _nCoeff_;
+  V.SplineCoeffStart = &nKnots_arr;
+  V.SplineParam = &paramNo_arr;
   const M3::float_t* ParBase = ParHandler->RetPointer(0);
-  V.GlobalPar.resize(static_cast<std::size_t>(nParams));
+  V.SplineParamIndex.resize(static_cast<std::size_t>(nParams));
   for (int i = 0; i < nParams; ++i) {
     const M3::float_t* P = SplineInfoArray[static_cast<std::size_t>(i)].splineParsPointer;
     const long Offset = static_cast<long>(P - ParBase);
@@ -300,7 +300,7 @@ BinnedSplineHandler::ArrayView BinnedSplineHandler::GetArrayView() const {
       MACH3LOG_ERROR("{}: spline parameter {} doesn't point into the parameter handler", GetName(), i);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    V.GlobalPar[static_cast<std::size_t>(i)] = static_cast<int>(Offset);
+    V.SplineParamIndex[static_cast<std::size_t>(i)] = static_cast<int>(Offset);
   }
   V.NSplines = NSplines_valid;
   V.NParams = nParams;

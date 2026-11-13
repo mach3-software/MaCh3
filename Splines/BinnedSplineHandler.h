@@ -47,15 +47,15 @@ class BinnedSplineHandler : public SplineBase {
     /// splines itself (see Samples/DeviceReweight.h). Only valid while the CPU arrays exist,
     /// i.e. when the float GPU spline path is off
     struct ArrayView {
-      const M3::float_t* XCoeff = nullptr;     ///< _max_knots * nParams knot positions
-      std::size_t NX = 0;
-      const M3::float_t* ManyCoeff = nullptr;  ///< y, b, c, d per segment
-      std::size_t NMany = 0;
-      const std::vector<unsigned int>* NKnots = nullptr;
-      const std::vector<short int>* ParamNo = nullptr;
+      const M3::float_t* KnotX = nullptr;          ///< knot positions, _max_knots per spline parameter
+      std::size_t NKnotX = 0;
+      const M3::float_t* SegmentCoeffs = nullptr;  ///< y, b, c, d of every segment
+      std::size_t NSegmentCoeffs = 0;
+      const std::vector<unsigned int>* SplineCoeffStart = nullptr;  ///< where each spline's segments start
+      const std::vector<short int>* SplineParam = nullptr;  ///< spline parameter of each spline
       /// Global parameter index of each spline parameter, worked out from the pointer the CPU
       /// evaluation reads (UniqueSystIndices is gone by the time anything asks, see CleanUpMemory)
-      std::vector<int> GlobalPar;
+      std::vector<int> SplineParamIndex;
       unsigned int NSplines = 0;
       short int NParams = 0;
       short int MaxKnots = 0;

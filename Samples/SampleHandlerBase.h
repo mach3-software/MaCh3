@@ -602,12 +602,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// See DeviceSignatureVersion
   unsigned int DeviceDataVersion = 0;
   /// Weights the host gathers into the pool each reweight (oscillation and anything else)
-  std::vector<const M3::float_t*> DeviceOtherPtrs;
-  /// Staging for DeviceOtherPtrs' values, the parameter values and the gradient
-  std::vector<double> DeviceOtherVals;
-  /// See DeviceOtherVals
+  std::vector<const M3::float_t*> DeviceGatheredPtrs;
+  /// Staging for DeviceGatheredPtrs' values, the parameter values and the gradient
+  std::vector<double> DeviceGatheredVals;
+  /// See DeviceGatheredVals
   std::vector<double> DeviceParVals;
-  /// See DeviceOtherVals
+  /// See DeviceGatheredVals
   std::vector<double> DeviceGrad;
   /// @brief Build the device copy from the signatures, see DeviceReweight
   void SetupDevice();
@@ -631,6 +631,19 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Turn every shift into per event coefficients, check them, and upload. Leaves
   /// DeviceSweepUsable false (full passes stay on the CPU) if anything doesn't fit, see DeviceSweepStatic
   void SetupDeviceSweep();
+  /// Most variables (binning variable plus shifted cuts) an event can have on the device, see DeviceReweight.cu
+  static constexpr int kDeviceMaxVariables = 8;
+  /// @brief Fill the per sample parts of Sweep (shifted cuts, bin edges) and, per sample, the indices
+  /// into StoredSelection of the cuts on shifted variables
+  void DescribeSweepSamples(DeviceSweepStatic& Sweep, std::vector<std::vector<int>>& ShiftedCuts);
+  /// @brief Host pointers to an event's device variables: the binning variable, then its shifted cuts' variables
+  void GetSweepVariables(const int iEvent, const std::vector<std::vector<int>>& ShiftedCuts, const int NVariables,
+                         std::vector<double*>& Variables) const;
+  /// @brief Find each live event's nominal variables and the coefficient of every shift on them
+  void ProbeShiftCoefficients(DeviceSweepStatic& Sweep, const std::vector<std::vector<int>>& ShiftedCuts);
+  /// @brief Compare the coefficients' prediction with ApplyShifts at random shift values. Returns the
+  /// worst relative mismatch and counts the values compared in NChecked
+  double CheckShiftLinearity(const DeviceSweepStatic& Sweep, const std::vector<std::vector<int>>& ShiftedCuts, long& NChecked);
   /// @brief A full pass on the device, if it is usable. Returns whether it ran
   bool DeviceFullPass(const bool Grads);
   /// @brief Copy the live events' bins of the last device full pass into EventBinCache
