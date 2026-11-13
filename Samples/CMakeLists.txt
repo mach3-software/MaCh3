@@ -9,6 +9,7 @@ set(HEADERS
     SampleInfo.h
     EventInfo.h
     OscillationHandler.h
+    DeviceReweight.h
 )
 
 add_library(Samples SHARED
@@ -17,7 +18,12 @@ add_library(Samples SHARED
     SampleHandlerBase.cpp
     HistogramUtils.cpp
     OscillationHandler.cpp
+    $<$<BOOL:${MaCh3_GPU_ENABLED}>:DeviceReweight.cu>
 )
+
+if(MaCh3_GPU_ENABLED)
+    set_property(TARGET Samples PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
+endif()
 
 target_link_libraries(Samples PUBLIC Splines NuOscillator)
 target_link_libraries(Samples PRIVATE MaCh3Warnings)

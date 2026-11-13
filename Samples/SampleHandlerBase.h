@@ -5,6 +5,7 @@
 #include "Samples/EventInfo.h"
 
 #include "Splines/BinnedSplineHandler.h"
+#include "Samples/DeviceReweight.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
@@ -84,6 +85,29 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int iSample) const override;
   //===============================================================================
+
+  /// @brief Route every reweight through the plain reference loop instead of the optimised paths
+  /// @details The reference loop is the event loop as it was before any of the reweight
+  /// optimisations: every event is shifted, selected, binned and weighted on every reweight, the
+  /// oscillator and splines are always evaluated, and the gradient is filled with atomics. It
+  /// reads none of the caches and leaves them as they were, so the optimised paths carry on
+  /// where they left off once it is switched off again. Much slower, for validation only
+  void SetReferencePath(const bool Enable) { ReferencePath = Enable; }
+  /// @brief Check the optimised reweight against the reference loop, see SetReferencePath
+  /// @details Moves the parameters through NPoints points, cycling between moving only the
+  /// functional (shift) parameters, only the others, and both, which is how the optimised code
+  /// goes through each of its paths: a full pass with event weights reused, a cached pass over
+  /// grouped events, and a full pass with everything recomputed. Flat-prior parameters are
+  /// thrown uniformly in their bounds, the rest by Gaussian about the prefit value with
+  /// Width times their prior error, clipped to their bounds. At every point it reweights through
+  /// the optimised path and then the reference one and compares the MC prediction and the W2
+  /// array bin by bin, relative to each bin, the gradient array relative to its largest entry,
+  /// if gradients are on, and the likelihood. The parameters are put back and the handler
+  /// reweighted at them before returning
+  /// @return The largest discrepancy found, in the relative terms above. Anything above
+  /// Tolerance is also logged as an error with the point, bin and values
+  double CheckAgainstReference(const int NPoints = 9, const double Tolerance = 1e-9,
+                               const double Width = 1., const unsigned int Seed = 2026);
 
   /// @brief Get index of sample based on name
   /// @param SampleTitle The title of the sample to search for.
@@ -246,6 +270,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @details With that promise, events which share a bin and every other weight pointer can be
   /// summed into one before the event loop, see SetupEventGrouping. Off unless a handler opts in
   virtual bool AdditionalWeightsAreConstant() const { return false; }
+  /// @brief Whether any functional shift (or ResetShifts / FinaliseShifts) can change this
+  /// kinematic variable
+  /// @details A selection cut on a variable no shift touches gives the same answer whatever the
+  /// shifts do, so events failing one can never be selected and the full pass skips them outright,
+  /// shifts included. Every variable counts as shifted unless a handler says otherwise
+  virtual bool IsKinematicParameterShifted([[maybe_unused]] const int KinematicVariable) const { return true; }
 
   /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
   void SetupKinematicMap();
@@ -442,6 +472,10 @@ class SampleHandlerBase :  public SampleHandlerInterface
   bool ComputeGradients = false;
   /// HW Whether reweights currently leave the gradient out, see SetGradientsPaused
   bool GradientsPaused = false;
+  /// HW Whether reweights go through the plain reference loop, see SetReferencePath
+  bool ReferencePath = false;
+  /// @brief The reference loop FillArray runs instead of the optimised paths with ReferencePath set
+  void FillArrayReference();
   /// HW Whether SampleHandler_gradients belongs to the last reweight, false after a paused one
   bool GradientsCurrent = false;
 
@@ -501,6 +535,18 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<int> EventsBySignature;
   /// One event standing for each group, whose varying weights the group shares
   std::vector<int> GroupRep;
+  /// Signature of each group, indexing the flat lists below
+  std::vector<int> GroupSig;
+  /// Per signature, its shared weight pointers, flat: SigWeightStart[s] to SigWeightStart[s+1]-1
+  std::vector<const M3::float_t*> SigWeightPtr;
+  /// See SigWeightPtr
+  std::vector<int> SigWeightStart;
+  /// Per signature, its weights with a derivative: parameter, derivative and weight pointers, flat
+  struct SigDeriv { int Par; const M3::float_t* Deriv; const M3::float_t* Weight; };
+  /// See SigDeriv
+  std::vector<SigDeriv> SigDerivs;
+  /// See SigWeightStart
+  std::vector<int> SigDerivStart;
   /// Sum over a group of the constant weights, and of their squares for the W2 array
   std::vector<double> GroupConst;
   /// See GroupConst
@@ -509,6 +555,189 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::vector<int> BinGroupStart;
   /// @brief Work out signatures once, and whether grouping can be used at all
   void SetupEventGrouping();
+  /// @name Bookkeeping the device reweight relies on, kept in every build so the class is the same
+  /// @{
+  /// Bumped whenever SetupEventGrouping rebuilds the signatures, and BuildEventGroups the groups,
+  /// so a device copy knows when it is stale
+  unsigned int SignatureVersion = 0;
+  /// See SignatureVersion
+  unsigned int GroupsVersion = 0;
+  /// Bumped by AddData, see SignatureVersion
+  unsigned int DataVersion = 0;
+  /// Whether the last reweight's gradient came from the device, see DeviceFill
+  bool GradFromDevice = false;
+  /// Whether ResetHistograms left the per bin gradient array for the CPU pass to wipe
+  bool GradNeedsZero = false;
+  /// @brief Whether ResetHistograms should leave the gradient array alone, see GradNeedsZero
+  bool GradResetDeferred() const {
+    #ifdef MaCh3_CUDA
+    return DeviceUsable;
+    #else
+    return false;
+    #endif
+  }
+  /// @brief Wipe the per bin gradient array if ResetHistograms left it, before a CPU pass fills it
+  void ZeroGradientsIfDeferred() {
+    if (!GradNeedsZero) return;
+    std::fill(SampleHandler_gradients.begin(), SampleHandler_gradients.end(), 0.0);
+    GradNeedsZero = false;
+  }
+  /// @}
+
+  #ifdef MaCh3_CUDA
+  /// @name GPU device reweight, see Samples/DeviceReweight.h
+  /// Prototype: only in a CUDA build, and only with MACH3_DEVICE_REWEIGHT=1 in the environment
+  /// (M3::DeviceReweightRequested). Each part falls back to the CPU path when it doesn't fit a handler
+  /// @{
+  /// The device copy, built on the first cached reweight once grouping is set up
+  std::unique_ptr<DeviceReweight> Device;
+  /// Whether SetupDevice has run for the current signatures, and whether it succeeded
+  bool DeviceChecked = false;
+  /// See DeviceChecked
+  bool DeviceUsable = false;
+  /// SignatureVersion and GroupsVersion the device copy was built from
+  unsigned int DeviceSignatureVersion = 0;
+  /// See DeviceSignatureVersion
+  unsigned int DeviceGroupsVersion = 0;
+  /// See DeviceSignatureVersion
+  unsigned int DeviceDataVersion = 0;
+  /// Weights the host gathers into the pool each reweight (oscillation and anything else)
+  std::vector<const M3::float_t*> DeviceOtherPtrs;
+  /// Staging for DeviceOtherPtrs' values, the parameter values and the gradient
+  std::vector<double> DeviceOtherVals;
+  /// See DeviceOtherVals
+  std::vector<double> DeviceParVals;
+  /// See DeviceOtherVals
+  std::vector<double> DeviceGrad;
+  /// @brief Build the device copy from the signatures, see DeviceReweight
+  void SetupDevice();
+  /// @brief Bring the device copy up to date (grouping, setup, data). Returns whether it can be used
+  bool DevicePrepare();
+  /// @brief Copy the parameter values, gathered weights and shift values into the staging vectors, and
+  /// find the spline segments. Returns the segments, nullptr without splines
+  const short int* StageDeviceInputs();
+  /// @brief The cached reweight on the device, if it is usable. Returns whether it ran
+  bool DeviceFill(const bool Grads);
+  /// Whether full passes (the random walk sweeps) run on the device too, see SetupDeviceSweep
+  bool DeviceSweepUsable = false;
+  /// Whether EventBinCache's live entries are on the device, from the last device full pass, see PullEventBins
+  bool EventBinsOnDevice = false;
+  /// Whether the device has built its groups from the last device full pass, see DeviceFill
+  bool DeviceGroupsFromFull = false;
+  /// Live event indices of the device full pass, to put its bins back into EventBinCache
+  std::vector<int> DeviceLiveEvents;
+  /// Shift parameter values, staged for the device
+  std::vector<double> DeviceShiftVals;
+  /// @brief Turn every shift into per event coefficients, check them, and upload. Leaves
+  /// DeviceSweepUsable false (full passes stay on the CPU) if anything doesn't fit, see DeviceSweepStatic
+  void SetupDeviceSweep();
+  /// @brief A full pass on the device, if it is usable. Returns whether it ran
+  bool DeviceFullPass(const bool Grads);
+  /// @brief Copy the live events' bins of the last device full pass into EventBinCache
+  void PullEventBins();
+  /// @}
+  #endif
+
+  /// HW Faster full pass, for the reweights where the shifts have moved (random walk sweeps).
+  /// Whether ApplyShifts can use functional.apply_all, see UpdateFastShifts
+  bool FastShifts = false;
+  /// @brief Decide FastShifts: every registered shift has a plain function on one event vector
+  void UpdateFastShifts();
+  /// Per event, pointers to the variables of its sample's selection cuts, in cut order, so the
+  /// full pass reads them directly rather than through ReturnKinematicParameter
+  std::vector<const double*> SelectionPtr;
+  /// Where each event's entries start in SelectionPtr, one per event plus one at the end
+  std::vector<int> SelectionPtrStart;
+  /// Whether SetupSelectionPointers has run since the cuts last changed, and whether it succeeded
+  bool SelectionPtrChecked = false;
+  /// See SelectionPtrChecked
+  bool SelectionPtrReady = false;
+  /// Events which fail a cut on a variable no shift touches, so can never be selected. Built with
+  /// SelectionPtr, empty when nothing can be ruled out
+  std::vector<char> NeverSelected;
+  /// The other events, which the full pass loops over when NeverSelected is in use
+  std::vector<int> LiveEvents;
+  /// EventBinCache's storage when the never selected events were last marked in it
+  const int* DeadBinsWritten = nullptr;
+  /// @brief Ask the experiment once per event and cut for a pointer to the cut variable, and check
+  /// each one reads the same value ReturnKinematicParameter returns
+  void SetupSelectionPointers();
+  /// @brief IsEventSelected through SelectionPtr, for the stored cuts
+  bool IsEventSelectedFast(const int iSample, const int iEvent) const _noexcept_ {
+    const auto& Cuts = StoredSelection[iSample];
+    const double* const* Ptr = SelectionPtr.data() + SelectionPtrStart[iEvent];
+    const int NCuts = static_cast<int>(Cuts.size());
+    for (int iCut = 0; iCut < NCuts; ++iCut) {
+      const double Val = *Ptr[iCut];
+      if ((Val < Cuts[iCut].LowerBound) || (Val >= Cuts[iCut].UpperBound)) return false;
+    }
+    return true;
+  }
+  /// Weight of every event, kept across reweights in which no weight bearing parameter moved, so
+  /// the random walk sweeps, which only move shifts, reuse them. Only with AdditionalWeightsAreConstant()
+  std::vector<M3::float_t> EventWeightCache;
+  /// WeightCacheVersion at which each EventWeightCache entry was filled
+  std::vector<unsigned int> EventWeightStamp;
+  /// Bumped whenever a weight bearing parameter moves, invalidating every entry at once
+  unsigned int WeightCacheVersion = 1;
+  /// Values of the weight bearing parameters, every non functional one, at WeightCacheVersion
+  std::vector<double> WeightCacheKey;
+  /// Indices of the weight bearing parameters in ParHandler
+  std::vector<int> WeightCachePars;
+  /// Whether the full pass reads and fills EventWeightCache
+  bool WeightCacheEnabled = false;
+  /// WeightCacheVersion at which the oscillator and splines were last evaluated, 0 for never
+  unsigned int WeightsEvaluatedVersion = 0;
+  /// @brief Compare the weight bearing parameters with WeightCacheKey, bump the version if any moved
+  void UpdateWeightCache();
+
+  /// HW Bin lookup for the full pass without the per-event vectors FindGlobalBin goes through.
+  /// Only when every sample has uniform 1D binning; the algorithm is FindBin's, unchanged
+  struct FastAxis {
+    /// Bin edges, NBins + 1 of them
+    const double* Edges = nullptr;
+    /// FindBin's neighbour lookup, one per bin
+    const BinShiftLookup* Lookup = nullptr;
+    /// Number of bins
+    int NBins = 0;
+    /// Stride and global offset, as FindGlobalBin applies them
+    int Stride = 1;
+    /// See Stride
+    int Offset = 0;
+  };
+  /// One per sample
+  std::vector<FastAxis> FastAxes;
+  /// HW Every event's NominalSample, in a plain array so the full pass needn't touch MCEvents
+  /// for events whose weight is cached
+  std::vector<int> EventSampleIdx;
+  /// Per event, the binning variable FindGlobalBin would read
+  std::vector<const double*> FastBinVar;
+  /// Per event, its nominal bin
+  std::vector<int> FastNomBin;
+  /// Whether SetupFastBinning has run, and whether it can be used
+  bool FastBinChecked = false;
+  /// See FastBinChecked
+  bool FastBinReady = false;
+  /// @brief Build the flat lookup and check it against FindGlobalBin for every event
+  void SetupFastBinning();
+  /// @brief FindGlobalBin through the flat lookup
+  int FindGlobalBinFast(const int iSample, const int iEvent) const _noexcept_ {
+    const FastAxis& Axis = FastAxes[iSample];
+    const double Var = *FastBinVar[iEvent];
+    if (Var < Axis.Edges[0] || Var >= Axis.Edges[Axis.NBins]) return M3::UnderOverFlowBin;
+    const int NomBin = FastNomBin[iEvent];
+    int Bin;
+    if (NomBin > M3::UnderOverFlowBin && Var < Axis.Lookup[NomBin].upper_binedge && Var >= Axis.Lookup[NomBin].lower_binedge) {
+      Bin = NomBin;
+    } else if (NomBin > M3::UnderOverFlowBin && Var < Axis.Lookup[NomBin].lower_binedge && Var >= Axis.Lookup[NomBin].lower_lower_binedge) {
+      Bin = NomBin - 1;
+    } else if (NomBin > M3::UnderOverFlowBin && Var < Axis.Lookup[NomBin].upper_upper_binedge && Var >= Axis.Lookup[NomBin].upper_binedge) {
+      Bin = NomBin + 1;
+    } else {
+      Bin = static_cast<int>(std::upper_bound(Axis.Edges, Axis.Edges + Axis.NBins + 1, Var) - Axis.Edges) - 1;
+    }
+    return Bin * Axis.Stride + Axis.Offset;
+  }
   /// @brief Merge the events of each bin of CachedEvents into groups
   void BuildEventGroups();
   /// @}

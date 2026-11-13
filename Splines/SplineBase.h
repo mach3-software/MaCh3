@@ -42,6 +42,10 @@ class SplineBase {
 
     /// @brief Get number of spline parameters
     short int GetNParams() const {return nParams;};
+    /// @brief Whether anything needs d(weight)/d(parameter) from Evaluate
+    /// @details HW Only changes what the GPU spline path computes and copies back: gradient free
+    /// fitters (MR2T2) shouldn't pay for derivatives they never read. Set by SampleHandlerBase::SetComputeGradients
+    void SetComputeDerivatives(const bool Enable) { ComputeDerivatives = Enable; }
 
     /// @brief KS: Prepare spline file that can be used for fast loading
     virtual void PrepareSplineFile(std::string FileName) = 0;
@@ -115,6 +119,8 @@ class SplineBase {
     short int _max_knots;
     /// Number of valid splines
     unsigned int NSplines_valid;
+    /// See SetComputeDerivatives
+    bool ComputeDerivatives = false;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonolithGPU* gpu_monolith;

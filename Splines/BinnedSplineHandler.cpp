@@ -278,6 +278,39 @@ void BinnedSplineHandler::TransferToMonolith() {
 }
 
 // *****************************************
+BinnedSplineHandler::ArrayView BinnedSplineHandler::GetArrayView() const {
+// *****************************************
+  ArrayView V;
+  if (useGPU || xcoeff_arr == nullptr || manycoeff_arr == nullptr) {
+    MACH3LOG_ERROR("{}: the spline coefficients are on the GPU only, so they can't be viewed", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  V.XCoeff = xcoeff_arr;
+  V.NX = static_cast<std::size_t>(_max_knots) * static_cast<std::size_t>(nParams);
+  V.ManyCoeff = manycoeff_arr;
+  V.NMany = static_cast<std::size_t>(CoeffIndex) * _nCoeff_;
+  V.NKnots = &nKnots_arr;
+  V.ParamNo = &paramNo_arr;
+  const M3::float_t* ParBase = ParHandler->RetPointer(0);
+  V.GlobalPar.resize(static_cast<std::size_t>(nParams));
+  for (int i = 0; i < nParams; ++i) {
+    const M3::float_t* P = SplineInfoArray[static_cast<std::size_t>(i)].splineParsPointer;
+    const long Offset = static_cast<long>(P - ParBase);
+    if (P == nullptr || Offset < 0 || Offset >= ParHandler->GetNumParams()) {
+      MACH3LOG_ERROR("{}: spline parameter {} doesn't point into the parameter handler", GetName(), i);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    V.GlobalPar[static_cast<std::size_t>(i)] = static_cast<int>(Offset);
+  }
+  V.NSplines = NSplines_valid;
+  V.NParams = nParams;
+  V.MaxKnots = _max_knots;
+  V.Weights = cpu_spline_weights.data();
+  V.Grads = cpu_spline_grad.data();
+  return V;
+}
+
+// *****************************************
 void BinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
@@ -289,6 +322,7 @@ void BinnedSplineHandler::Evaluate() {
     // The main call to the GPU
     gpu_monolith->RunGPU_SplineMonolith_Binned(
       cpu_spline_weights.data(),
+      ComputeDerivatives ? cpu_spline_grad.data() : nullptr,
       ParamValues,
       SplineSegments);
   } else

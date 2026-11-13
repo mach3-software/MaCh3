@@ -3,8 +3,11 @@
 #include "Manager/MaCh3Logger.h"
 #include "Splines/UnbinnedSplineHandler.h"
 
+#include "TRandom3.h"
+
 #include <cstddef>
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <unordered_map>
 #include <memory>
@@ -193,6 +196,7 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
   Selection = StoredSelection;
   // The cache records which events these cuts select
   InvalidateKinematicCache();
+  SelectionPtrChecked = false;
   /// Add new sample
   SampleDetails[iSample] = std::move(SingleSample);
 }
@@ -362,17 +366,37 @@ void SampleHandlerBase::Reweight() {
   //KS: Reset the histograms before reweight
   ResetHistograms();
 
-  //You only need to do these things if Oscillator has been initialised
-  //if not then you're not considering oscillations
-  if (Oscillator) Oscillator->Evaluate();
-
-  // Calculate weight coming from all splines if we initialised handler
-  if(SplineHandler) SplineHandler->Evaluate();
-
   //update the list of parameter values passed to shift functionals
   functional.update_vals();
   // Update the functional parameter values to the latest proposed values
   PrepFunctionalParameters();
+
+  //HW The device reweight evaluates the splines itself, so when it is going to take this pass (the
+  //shifts haven't moved) the CPU needn't
+  bool OnDevice = false;
+  #ifdef MaCh3_CUDA
+  //HW Only while the device copy matches the grouping: SetComputeGradients and the like mark the
+  //grouping stale, and the device is rebuilt from it in the pass itself
+  OnDevice = DeviceUsable && !ReferencePath && GroupingChecked && (DeviceSignatureVersion == SignatureVersion) &&
+             (DeviceSweepUsable || KinematicCacheMatches());
+  #endif
+
+  //HW Oscillation and spline weights depend only on non functional parameters. If none of those
+  //moved since they were last evaluated (every random walk sweep), they are already right.
+  //The reference loop always evaluates them and leaves the cache's bookkeeping alone
+  if (!ReferencePath) UpdateWeightCache();
+  const bool WeightsCurrent = !ReferencePath && WeightCacheEnabled && (WeightsEvaluatedVersion == WeightCacheVersion);
+
+  //You only need to do these things if Oscillator has been initialised
+  //if not then you're not considering oscillations
+  if (Oscillator && !WeightsCurrent) Oscillator->Evaluate();
+
+  // Calculate weight coming from all splines if we initialised handler
+  if(SplineHandler && !WeightsCurrent && !OnDevice) SplineHandler->Evaluate();
+  //HW After the reference loop the oscillator and splines may hold weights for parameters the cache
+  //has no record of, and after a device pass the CPU spline weights weren't evaluated at all. Either
+  //way the next CPU pass has to evaluate them again
+  WeightsEvaluatedVersion = (WeightCacheEnabled && !ReferencePath && !OnDevice) ? WeightCacheVersion : 0;
 
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
@@ -391,6 +415,10 @@ void SampleHandlerBase::FillArray() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
+  if (ReferencePath) {
+    FillArrayReference();
+    return;
+  }
 
   // NOTE comment below is left for historical reasons
   //DB - Brain dump of speedup ideas
@@ -419,8 +447,13 @@ void SampleHandlerBase::FillArray() {
   //HW The functional parameters haven't moved since the last full pass, so every event's shifted
   //kinematics, selection and bin are what that pass found. Skip all three and only redo the weights,
   //and only for the events which can contribute. Same sums as the full pass, just fewer of them
+  GradFromDevice = false;
   if (KinematicCacheMatches()) {
+    #ifdef MaCh3_CUDA
+    if (DeviceFill(Grad_Array != nullptr)) return;
+    #endif
     if (!CachedListReady) BuildCachedEventList();
+    ZeroGradientsIfDeferred();
     const int NBinsUsed = static_cast<int>(CachedBinOrder.size());
     const int* _restrict_ Events = CachedEvents.data();
     const int* _restrict_ BinStart = CachedBinStart.data();
@@ -440,15 +473,12 @@ void SampleHandlerBase::FillArray() {
       double BinSum = 0.;
       double BinSumW2 = 0.;
       if (GroupingEnabled) {
+        const M3::float_t* const* _restrict_ WPtr = SigWeightPtr.data();
+        const SigDeriv* _restrict_ DList = SigDerivs.data();
         for (int iGroup = BinGroupStart[GlobalBin]; iGroup < BinGroupStart[GlobalBin + 1]; ++iGroup) {
-          const int iRep = GroupRep[iGroup];
-          const EventInfo* _restrict_ MCEvent = &MCEvents[iRep];
-          const int ConstStart = AdditionalWeightStart[iRep];
-          const int ConstEnd = AdditionalWeightEnd[iRep];
-          const int NWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
+          const int Sig = GroupSig[iGroup];
           double Shared = 1.;
-          for (int iWeight = 0; iWeight < ConstStart; ++iWeight) Shared *= *(MCEvent->total_weight_pointers[iWeight]);
-          for (int iWeight = ConstEnd; iWeight < NWeights; ++iWeight) Shared *= *(MCEvent->total_weight_pointers[iWeight]);
+          for (int k = SigWeightStart[Sig]; k < SigWeightStart[Sig + 1]; ++k) Shared *= *WPtr[k];
           //HW Every event of a group has constant weights of the same sign, so this skips exactly the
           //events the per event test below would
           const double GroupWeight = GroupConst[iGroup] * Shared;
@@ -457,11 +487,8 @@ void SampleHandlerBase::FillArray() {
           if (FirstTimeW2) BinSumW2 += GroupConst2[iGroup] * Shared * Shared;
           if (GradRow != nullptr) {
             // Constant weights have no derivative, so only the shared ones contribute
-            for (int iWeight = 0; iWeight < NWeights; ++iWeight) {
-              if (iWeight == ConstStart) { iWeight = ConstEnd - 1; continue; }
-              const auto& [iPar, DerivPointer] = MCEvent->total_weight_gradients[iWeight];
-              if (DerivPointer == &M3::Zero) continue;
-              GradRow[iPar] += GroupWeight * (*DerivPointer) / *(MCEvent->total_weight_pointers[iWeight]);
+            for (int k = SigDerivStart[Sig]; k < SigDerivStart[Sig + 1]; ++k) {
+              GradRow[DList[k].Par] += GroupWeight * (*DList[k].Deriv) / *DList[k].Weight;
             }
           }
         }
@@ -490,20 +517,59 @@ void SampleHandlerBase::FillArray() {
     return;
   }
 
+  #ifdef MaCh3_CUDA
+  if (DeviceFullPass(Grad_Array != nullptr)) {
+    // EventBinCache now holds every event at KinCacheKey, though the live ones are still on the device
+    KinCacheValid = true;
+    return;
+  }
+  EventBinsOnDevice = false;
+  #endif
+  ZeroGradientsIfDeferred();
   if (EventBinCache.size() != NumberOfEvents) EventBinCache.resize(NumberOfEvents);
   int* _restrict_ EventBin = EventBinCache.data();
+
+  UpdateFastShifts();
+  if (!SelectionPtrChecked) SetupSelectionPointers();
+  UpdateWeightCache();
+  const bool FastSelection = SelectionPtrReady;
+  if (!FastBinChecked) SetupFastBinning();
+  const bool FastBins = FastBinReady;
+  if (EventSampleIdx.size() != NumberOfEvents) {
+    EventSampleIdx.resize(NumberOfEvents);
+    for (unsigned int i = 0; i < NumberOfEvents; ++i) EventSampleIdx[i] = MCEvents[i].NominalSample;
+  }
+  const int* _restrict_ EventSample = EventSampleIdx.data();
+  const bool UseWeightCache = WeightCacheEnabled;
+  M3::float_t* _restrict_ WeightCache = UseWeightCache ? EventWeightCache.data() : nullptr;
+  unsigned int* _restrict_ WeightStamp = UseWeightCache ? EventWeightStamp.data() : nullptr;
+  const unsigned int Version = WeightCacheVersion;
+
+  //HW Events failing a cut no shift can change are never selected, so they needn't be visited at
+  //all, beyond recording that once. Only with the pointer based cuts, which built the list
+  const bool SkipDead = FastSelection && !LiveEvents.empty();
+  if (SkipDead && DeadBinsWritten != EventBin) {
+    for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) if (NeverSelected[iEvent]) EventBin[iEvent] = kKinCacheNotSelected;
+    DeadBinsWritten = EventBin;
+  }
+  const unsigned int NLoop = SkipDead ? static_cast<unsigned int>(LiveEvents.size()) : NumberOfEvents;
+  const int* _restrict_ Live = SkipDead ? LiveEvents.data() : nullptr;
 
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
   #endif
-  for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+  for (unsigned int iLoop = 0; iLoop < NLoop; ++iLoop) {
+    const unsigned int iEvent = SkipDead ? static_cast<unsigned int>(Live[iLoop]) : iLoop;
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
     ApplyShifts(iEvent);
 
     const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
+    const int Sample = EventSample[iEvent];
     //ETA - generic functions to apply shifts to kinematic variable
-    if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
+    const bool Selected = FastSelection ? IsEventSelectedFast(Sample, static_cast<int>(iEvent))
+                                        : IsEventSelected(Sample, iEvent);
+    if(!Selected){
       EventBin[iEvent] = kKinCacheNotSelected;
       continue;
     }
@@ -511,13 +577,22 @@ void SampleHandlerBase::FillArray() {
     //DB Find the relevant bin in the PDF for each event
     //HW Ahead of the weight check, since the bin doesn't depend on the weight and the cache needs
     //it for events whose weight is zero now but needn't be on the next reweight
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
+    const int GlobalBin = FastBins ? FindGlobalBinFast(Sample, static_cast<int>(iEvent))
+                                   : Binning->FindGlobalBin(Sample, MCEvent->KinVar, MCEvent->NomBin);
     EventBin[iEvent] = GlobalBin;
 
-    // Virtual by default does nothing, has to happen before CalcWeightTotal
-    CalcWeightFunc(iEvent);
-
-    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    M3::float_t totalweight;
+    if (UseWeightCache && WeightStamp[iEvent] == Version) {
+      totalweight = WeightCache[iEvent];
+    } else {
+      // Virtual by default does nothing, has to happen before CalcWeightTotal
+      CalcWeightFunc(iEvent);
+      totalweight = CalcWeightTotal(MCEvent);
+      if (UseWeightCache) {
+        WeightCache[iEvent] = totalweight;
+        WeightStamp[iEvent] = Version;
+      }
+    }
     //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
       continue;
@@ -538,6 +613,479 @@ void SampleHandlerBase::FillArray() {
   KinCacheValid = true;
 }
 #pragma GCC diagnostic pop
+
+// ************************************************
+void SampleHandlerBase::FillArrayReference() {
+// ************************************************
+  //HW The event loop as it stood before the optimisations, kept as the reference they are checked
+  //against: no caches, no grouping, no skipped events, generic shifts, cuts and bin lookup
+  [[maybe_unused]] const auto TotalBins = Binning->GetNBins();
+  const unsigned int NumberOfEvents = GetNEvents();
+  double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
+  double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
+  double* _restrict_ Grad_Array = (ComputeGradients && !GradientsPaused) ? SampleHandler_gradients.data() : nullptr;
+  GradientsCurrent = (Grad_Array != nullptr);
+  GradFromDevice = false;
+  ZeroGradientsIfDeferred();
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
+  #endif
+  for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    ApplyShifts(iEvent);
+    const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
+    if (!IsEventSelected(MCEvent->NominalSample, iEvent)) continue;
+
+    CalcWeightFunc(iEvent);
+    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    if (totalweight <= 0.) continue;
+
+    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
+    if (GlobalBin > M3::UnderOverFlowBin) {
+      MC_Array_for_reduction[GlobalBin] += totalweight;
+      if (Grad_Array != nullptr) FillGradientArray(MCEvent, totalweight, GlobalBin, Grad_Array);
+      if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
+    }
+  }
+}
+
+#ifdef MaCh3_CUDA
+// ************************************************
+void SampleHandlerBase::SetupDevice() {
+// ************************************************
+  DeviceChecked = true;
+  DeviceUsable = false;
+  Device.reset();
+  if (!M3::DeviceReweightRequested()) return;
+  if (!GroupingEnabled) {
+    MACH3LOG_WARN("{}: MACH3_DEVICE_REWEIGHT is set, but the device reweight needs event grouping "
+                  "(AdditionalWeightsAreConstant), so this handler stays on the CPU", GetName());
+    return;
+  }
+  auto* Binned = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get());
+  if (SplineHandler && Binned == nullptr) {
+    MACH3LOG_WARN("{}: the device reweight only knows binned splines, so this handler stays on the CPU", GetName());
+    return;
+  }
+
+  DeviceReweightStatic St;
+  St.NBins = Binning->GetNBins();
+  St.Data = SampleHandler_data;
+  St.NPars = ParHandler->GetNumParams();
+  St.LowMCBound = M3::_LOW_MC_BOUND_;
+  BinnedSplineHandler::ArrayView View;
+  if (Binned != nullptr) {
+    View = Binned->GetArrayView();
+    St.NSplines = static_cast<int>(View.NSplines);
+    St.NSplineParams = View.NParams;
+    St.MaxKnots = View.MaxKnots;
+    St.XCoeff.assign(View.XCoeff, View.XCoeff + View.NX);
+    St.ManyCoeff.assign(View.ManyCoeff, View.ManyCoeff + View.NMany);
+    St.NKnots = *View.NKnots;
+    St.ParamNo = *View.ParamNo;
+    St.SplineGlobalPar = View.GlobalPar;
+  }
+
+  //HW Where in the pool each pointer's value lives. The constants go last, after the gathered values,
+  //whose number is only known at the end, so they get placeholder codes until then
+  constexpr int kUnity = -1, kZero = -2;
+  const M3::float_t* ParBase = ParHandler->RetPointer(0);
+  std::unordered_map<const M3::float_t*, int> OtherIndex;
+  DeviceOtherPtrs.clear();
+  auto Index = [&](const M3::float_t* P) -> int {
+    if (P >= ParBase && P < ParBase + St.NPars) return static_cast<int>(P - ParBase);
+    if (St.NSplines > 0) {
+      if (P >= View.Weights && P < View.Weights + St.NSplines) return St.NPars + static_cast<int>(P - View.Weights);
+      if (P >= View.Grads && P < View.Grads + St.NSplines) return St.NPars + St.NSplines + static_cast<int>(P - View.Grads);
+    }
+    if (P == &M3::Unity) return kUnity;
+    if (P == &M3::Zero) return kZero;
+    auto It = OtherIndex.find(P);
+    if (It != OtherIndex.end()) return It->second;
+    const int k = St.NPars + 2 * St.NSplines + static_cast<int>(DeviceOtherPtrs.size());
+    OtherIndex.emplace(P, k);
+    DeviceOtherPtrs.push_back(P);
+    return k;
+  };
+  St.SigWStart = SigWeightStart;
+  St.SigDStart = SigDerivStart;
+  St.SigWIdx.reserve(SigWeightPtr.size());
+  for (const M3::float_t* P : SigWeightPtr) St.SigWIdx.push_back(Index(P));
+  for (const auto& D : SigDerivs) {
+    St.SigDPar.push_back(D.Par);
+    St.SigDDeriv.push_back(Index(D.Deriv));
+    St.SigDWeight.push_back(Index(D.Weight));
+  }
+  St.NOther = static_cast<int>(DeviceOtherPtrs.size());
+  const int NPool = St.NPars + 2 * St.NSplines + St.NOther + 2;
+  for (auto* V : {&St.SigWIdx, &St.SigDDeriv, &St.SigDWeight}) {
+    for (int& k : *V) {
+      if (k == kUnity) k = NPool - 2;
+      else if (k == kZero) k = NPool - 1;
+    }
+  }
+
+  try {
+    Device = std::make_unique<DeviceReweight>(St);
+  } catch (const std::exception& E) {
+    MACH3LOG_ERROR("{}: couldn't set up the device reweight, so this handler stays on the CPU: {}", GetName(), E.what());
+    Device.reset();
+    return;
+  }
+  DeviceOtherVals.assign(DeviceOtherPtrs.size(), 0.);
+  DeviceParVals.assign(static_cast<size_t>(St.NPars), 0.);
+  DeviceGrad.assign(static_cast<size_t>(St.NPars), 0.);
+  DeviceSignatureVersion = SignatureVersion;
+  DeviceGroupsVersion = 0;
+  DeviceDataVersion = DataVersion;
+  DeviceUsable = true;
+  SetupDeviceSweep();
+  MACH3LOG_INFO("{}: device reweight on, {} parameters, {} splines, {} gathered weights, {} signatures, {:.1f} MB on the device",
+                GetName(), St.NPars, St.NSplines, St.NOther, SigWeightStart.size() - 1, static_cast<double>(Device->DeviceBytes()) / 1048576.);
+}
+
+// ************************************************
+bool SampleHandlerBase::DevicePrepare() {
+// ************************************************
+  if (ReferencePath) return false;
+  //HW Rebuild the grouping first if something (SetComputeGradients) marked it stale, so the device
+  //copy is rebuilt from the current signatures rather than kept from old ones
+  if (!GroupingChecked) SetupEventGrouping();
+  if (!GroupingEnabled) return false;
+  if (!DeviceChecked || DeviceSignatureVersion != SignatureVersion) SetupDevice();
+  if (!DeviceUsable) return false;
+  if (DeviceDataVersion != DataVersion) { Device->SetData(SampleHandler_data); DeviceDataVersion = DataVersion; }
+  return true;
+}
+
+// ************************************************
+const short int* SampleHandlerBase::StageDeviceInputs() {
+// ************************************************
+  const auto& Prop = ParHandler->GetParPropVec();
+  for (size_t i = 0; i < DeviceParVals.size(); ++i) DeviceParVals[i] = static_cast<double>(Prop[i]);
+  for (size_t i = 0; i < DeviceOtherPtrs.size(); ++i) DeviceOtherVals[i] = static_cast<double>(*DeviceOtherPtrs[i]);
+  for (size_t k = 0; k < DeviceShiftVals.size(); ++k) DeviceShiftVals[k] = functional.shifts[k].par_vals[0];
+  if (auto* Binned = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) return Binned->FindSegments();
+  return nullptr;
+}
+
+// ************************************************
+bool SampleHandlerBase::DeviceFill(const bool Grads) {
+// ************************************************
+  if (!DevicePrepare()) return false;
+  //HW If the last full pass ran on the device its event bins are still there, and the device builds the
+  //groups itself. Otherwise the kinematic cache came from a CPU pass, and the host's groups go up
+  if (EventBinsOnDevice && DeviceSweepUsable) {
+    if (!DeviceGroupsFromFull) {
+      Device->BuildGroupsFromFullPass();
+      DeviceGroupsFromFull = true;
+      DeviceGroupsVersion = 0;
+    }
+  } else {
+    if (!CachedListReady) BuildCachedEventList();
+    if (DeviceGroupsVersion != GroupsVersion) {
+      DeviceReweightGroups G;
+      G.Sig = GroupSig;
+      G.Const = GroupConst;
+      G.Const2 = GroupConst2;
+      G.BinStart = BinGroupStart;
+      Device->SetGroups(G, SampleHandler_data);
+      DeviceGroupsVersion = GroupsVersion;
+    }
+  }
+  const short int* Segments = StageDeviceInputs();
+  Device->Run(DeviceParVals.data(), Segments, DeviceOtherVals.data(), FirstTimeW2, Grads,
+              SampleHandler_array.data(), SampleHandler_array_w2.data(), DeviceGrad.data());
+  GradFromDevice = Grads;
+  return true;
+}
+
+// ************************************************
+void SampleHandlerBase::SetupDeviceSweep() {
+// ************************************************
+  DeviceSweepUsable = false;
+  EventBinsOnDevice = false;
+  if (!SelectionPtrChecked) SetupSelectionPointers();
+  if (!FastBinChecked) SetupFastBinning();
+  if (!SelectionPtrReady || !FastBinReady) {
+    MACH3LOG_INFO("{}: full passes stay on the CPU, the device needs pointer based cuts and uniform 1D binning", GetName());
+    return;
+  }
+  const int NShifts = static_cast<int>(functional.shifts.size());
+  for (const auto& Shift : functional.shifts) {
+    if (Shift.par_vals.size() != 1) {
+      MACH3LOG_INFO("{}: full passes stay on the CPU, a shift takes more than one parameter", GetName());
+      return;
+    }
+  }
+  const int NumberOfEvents = static_cast<int>(GetNEvents());
+  const int NSamples = GetNSamples();
+
+  DeviceSweepStatic W;
+  W.NShifts = NShifts;
+  W.UnderOverFlowBin = M3::UnderOverFlowBin;
+  W.NotSelected = kKinCacheNotSelected;
+  // Per sample: which cuts can move (the others were settled for good by NeverSelected), and the binning
+  std::vector<std::vector<int>> ShiftedCuts(static_cast<size_t>(NSamples));
+  W.CutStart.push_back(0);
+  W.EdgeStart.push_back(0);
+  for (int iSample = 0; iSample < NSamples; ++iSample) {
+    const auto& Cuts = StoredSelection[static_cast<size_t>(iSample)];
+    for (size_t iCut = 0; iCut < Cuts.size(); ++iCut) {
+      if (!IsKinematicParameterShifted(Cuts[iCut].ParamToCutOnIt)) continue;
+      ShiftedCuts[static_cast<size_t>(iSample)].push_back(static_cast<int>(iCut));
+      W.CutSlot.push_back(static_cast<int>(ShiftedCuts[static_cast<size_t>(iSample)].size()));
+      W.CutLo.push_back(Cuts[iCut].LowerBound);
+      W.CutHi.push_back(Cuts[iCut].UpperBound);
+    }
+    W.CutStart.push_back(static_cast<int>(W.CutSlot.size()));
+    W.NSlots = std::max(W.NSlots, 1 + static_cast<int>(ShiftedCuts[static_cast<size_t>(iSample)].size()));
+    const FastAxis& Axis = FastAxes[static_cast<size_t>(iSample)];
+    W.Edges.insert(W.Edges.end(), Axis.Edges, Axis.Edges + Axis.NBins + 1);
+    W.EdgeStart.push_back(static_cast<int>(W.Edges.size()));
+    W.Stride.push_back(Axis.Stride);
+    W.Offset.push_back(Axis.Offset);
+  }
+  if (W.NSlots > 8) {
+    MACH3LOG_INFO("{}: full passes stay on the CPU, more than 7 shifted cuts per sample", GetName());
+    return;
+  }
+
+  DeviceLiveEvents.clear();
+  if (LiveEvents.empty()) { DeviceLiveEvents.resize(static_cast<size_t>(NumberOfEvents)); for (int i = 0; i < NumberOfEvents; ++i) DeviceLiveEvents[static_cast<size_t>(i)] = i; }
+  else DeviceLiveEvents = LiveEvents;
+  W.NLive = static_cast<int>(DeviceLiveEvents.size());
+  const int NS = W.NSlots;
+
+  // The variable each slot of an event reads
+  auto Slots = [&](const int iEvent, std::vector<double*>& P) {
+    const int iSample = MCEvents[iEvent].NominalSample;
+    P.assign(static_cast<size_t>(NS), nullptr);
+    P[0] = const_cast<double*>(FastBinVar[static_cast<size_t>(iEvent)]);
+    const auto& SC = ShiftedCuts[static_cast<size_t>(iSample)];
+    for (size_t j = 0; j < SC.size(); ++j) {
+      P[1 + j] = const_cast<double*>(SelectionPtr[static_cast<size_t>(SelectionPtrStart[iEvent]) + static_cast<size_t>(SC[j])]);
+    }
+  };
+
+  //HW Probe: with an event's variables zeroed, one shift applied at 1 leaves exactly its coefficient
+  const std::vector<double> One{1.};
+  W.CoefStart.assign(static_cast<size_t>(W.NLive) * static_cast<size_t>(NS) + 1, 0);
+  W.Nominal.assign(static_cast<size_t>(W.NLive) * static_cast<size_t>(NS), 0.);
+  W.Sample.resize(static_cast<size_t>(W.NLive));
+  W.Sig.resize(static_cast<size_t>(W.NLive));
+  W.ConstW.resize(static_cast<size_t>(W.NLive));
+  std::vector<double*> P;
+  std::vector<std::vector<std::pair<int, double>>> PerSlot(static_cast<size_t>(NS));
+  for (int i = 0; i < W.NLive; ++i) {
+    const int iEvent = DeviceLiveEvents[static_cast<size_t>(i)];
+    W.Sample[static_cast<size_t>(i)] = MCEvents[iEvent].NominalSample;
+    W.Sig[static_cast<size_t>(i)] = EventSignature[static_cast<size_t>(iEvent)];
+    W.ConstW[static_cast<size_t>(i)] = EventConstWeight[static_cast<size_t>(iEvent)];
+    Slots(iEvent, P);
+    const auto& Shifts = functional.event_shifts.empty() ? std::vector<int>() : functional.event_shifts[static_cast<size_t>(iEvent)];
+    if (!Shifts.empty()) ResetShifts(iEvent);
+    for (int j = 0; j < NS; ++j) {
+      W.Nominal[static_cast<size_t>(i) * static_cast<size_t>(NS) + static_cast<size_t>(j)] = (P[static_cast<size_t>(j)] != nullptr) ? *P[static_cast<size_t>(j)] : 0.;
+      PerSlot[static_cast<size_t>(j)].clear();
+    }
+    for (const int k : Shifts) {
+      ResetShifts(iEvent);
+      for (int j = 0; j < NS; ++j) if (P[static_cast<size_t>(j)] != nullptr) *P[static_cast<size_t>(j)] = 0.;
+      functional.shifts[static_cast<size_t>(k)].apply(One, iEvent);
+      for (int j = 0; j < NS; ++j) {
+        if (P[static_cast<size_t>(j)] == nullptr) continue;
+        const double C = *P[static_cast<size_t>(j)];
+        if (C != 0.) PerSlot[static_cast<size_t>(j)].push_back({k, C});
+      }
+    }
+    if (!Shifts.empty()) ResetShifts(iEvent);
+    // Put back what was there, whether or not ResetShifts covers every variable that was zeroed
+    for (int j = 0; j < NS; ++j) {
+      if (P[static_cast<size_t>(j)] != nullptr) *P[static_cast<size_t>(j)] = W.Nominal[static_cast<size_t>(i) * static_cast<size_t>(NS) + static_cast<size_t>(j)];
+    }
+    for (int j = 0; j < NS; ++j) {
+      for (const auto& [k, C] : PerSlot[static_cast<size_t>(j)]) { W.CoefShift.push_back(k); W.Coef.push_back(C); }
+      W.CoefStart[static_cast<size_t>(i) * static_cast<size_t>(NS) + static_cast<size_t>(j) + 1] = static_cast<int>(W.Coef.size());
+    }
+  }
+
+  //HW Check: at random shift values the CPU's own ApplyShifts has to give what the coefficients say,
+  //for every live event and variable. Anything nonlinear, not additive or touched by FinaliseShifts fails
+  std::vector<double> Saved(static_cast<size_t>(NShifts));
+  for (int k = 0; k < NShifts; ++k) Saved[static_cast<size_t>(k)] = functional.shifts[static_cast<size_t>(k)].par_vals[0];
+  const bool WasReference = ReferencePath;
+  ReferencePath = true;  // ApplyShifts then reads par_vals rather than the fast table
+  TRandom3 Rng(77);
+  double Worst = 0.;
+  long NChecked = 0;
+  for (int Trial = 0; Trial < 3; ++Trial) {
+    std::vector<double> Vals(static_cast<size_t>(NShifts));
+    for (int k = 0; k < NShifts; ++k) { Vals[static_cast<size_t>(k)] = 0.1 * Rng.Gaus(); functional.shifts[static_cast<size_t>(k)].par_vals[0] = Vals[static_cast<size_t>(k)]; }
+    for (int i = 0; i < W.NLive; ++i) {
+      const int iEvent = DeviceLiveEvents[static_cast<size_t>(i)];
+      ApplyShifts(iEvent);
+      Slots(iEvent, P);
+      for (int j = 0; j < NS; ++j) {
+        if (P[static_cast<size_t>(j)] == nullptr) continue;
+        const size_t Cell = static_cast<size_t>(i) * static_cast<size_t>(NS) + static_cast<size_t>(j);
+        double x = W.Nominal[Cell];
+        for (int c = W.CoefStart[Cell]; c < W.CoefStart[Cell + 1]; ++c) x = x + Vals[static_cast<size_t>(W.CoefShift[static_cast<size_t>(c)])] * W.Coef[static_cast<size_t>(c)];
+        const double Actual = *P[static_cast<size_t>(j)];
+        Worst = std::max(Worst, std::fabs(x - Actual) / std::max(1., std::fabs(Actual)));
+        ++NChecked;
+      }
+    }
+  }
+  for (int k = 0; k < NShifts; ++k) functional.shifts[static_cast<size_t>(k)].par_vals[0] = Saved[static_cast<size_t>(k)];
+  for (const int iEvent : DeviceLiveEvents) if (!functional.event_shifts.empty() && !functional.event_shifts[static_cast<size_t>(iEvent)].empty()) ResetShifts(iEvent);
+  ReferencePath = WasReference;
+  InvalidateKinematicCache();
+  if (!(Worst < 1e-12)) {
+    MACH3LOG_WARN("{}: full passes stay on the CPU, the shifts aren't additive and linear (worst mismatch {:.3g})", GetName(), Worst);
+    return;
+  }
+
+  try {
+    Device->SetSweep(W);
+  } catch (const std::exception& E) {
+    MACH3LOG_ERROR("{}: couldn't set up device full passes, they stay on the CPU: {}", GetName(), E.what());
+    return;
+  }
+  DeviceShiftVals.assign(static_cast<size_t>(NShifts), 0.);
+  DeviceSweepUsable = true;
+  MACH3LOG_INFO("{}: full passes on the device too, {} live events, {} shifted variables per event, {} coefficients, "
+                "linearity checked to {:.2g} over {} values, {:.1f} MB on the device in all", GetName(), W.NLive, NS,
+                W.Coef.size(), Worst, NChecked, static_cast<double>(Device->DeviceBytes()) / 1048576.);
+}
+
+// ************************************************
+bool SampleHandlerBase::DeviceFullPass(const bool Grads) {
+// ************************************************
+  if (!DevicePrepare() || !DeviceSweepUsable) return false;
+  const short int* Segments = StageDeviceInputs();
+  Device->RunFull(DeviceParVals.data(), Segments, DeviceOtherVals.data(), DeviceShiftVals.data(), FirstTimeW2, Grads,
+                  SampleHandler_array.data(), SampleHandler_array_w2.data(), DeviceGrad.data());
+  GradFromDevice = Grads;
+  EventBinsOnDevice = true;
+  DeviceGroupsFromFull = false;
+  return true;
+}
+
+// ************************************************
+void SampleHandlerBase::PullEventBins() {
+// ************************************************
+  const unsigned int NumberOfEvents = GetNEvents();
+  if (EventBinCache.size() != NumberOfEvents) EventBinCache.resize(NumberOfEvents);
+  // Everything not live failed a cut no shift can change
+  if (DeviceLiveEvents.size() != NumberOfEvents) std::fill(EventBinCache.begin(), EventBinCache.end(), kKinCacheNotSelected);
+  std::vector<int> Bins(DeviceLiveEvents.size());
+  Device->GetEventBins(Bins.data());
+  for (size_t i = 0; i < Bins.size(); ++i) EventBinCache[static_cast<size_t>(DeviceLiveEvents[i])] = Bins[i];
+  // The CPU full pass skips marking the dead events again while this pointer matches, so make it look again
+  DeadBinsWritten = nullptr;
+  EventBinsOnDevice = false;
+}
+#endif
+
+// ************************************************
+double SampleHandlerBase::CheckAgainstReference(const int NPoints, const double Tolerance,
+                                                const double Width, const unsigned int Seed) {
+// ************************************************
+  const int NPar = ParHandler->GetNumParams();
+  std::vector<double> Saved(static_cast<size_t>(NPar));
+  for (int i = 0; i < NPar; ++i) Saved[static_cast<size_t>(i)] = ParHandler->GetParProp(i);
+  const bool WasReference = ReferencePath;
+  ReferencePath = false;
+
+  TRandom3 Rng(Seed);
+  // 0: only the shifts move, 1: only the rest, 2: both
+  auto Throw = [&](const int What) {
+    for (int i = 0; i < NPar; ++i) {
+      if (ParHandler->IsParameterFixed(i)) continue;
+      const bool Shift = (ParHandler->GetParamType(i) == SystType::kFunc);
+      if ((What == 0 && !Shift) || (What == 1 && Shift)) continue;
+      const double Lo = ParHandler->GetLowerBound(i), Hi = ParHandler->GetUpperBound(i);
+      double Val;
+      if (ParHandler->GetFlatPrior(i)) Val = Rng.Uniform(std::max(Lo, -10.), std::min(Hi, 10.));
+      else Val = ParHandler->GetParPreFit(i) + Width * ParHandler->GetDiagonalError(i) * Rng.Gaus();
+      ParHandler->SetParProp(i, std::min(Hi, std::max(Lo, Val)));
+    }
+  };
+  const char* Moves[] = {"shifts only", "non-shifts only", "everything"};
+
+  const bool Grads = ComputeGradients && !GradientsPaused;
+  const bool W2 = FirstTimeW2;
+  double Worst = 0.;
+  for (int iPoint = 0; iPoint < NPoints; ++iPoint) {
+    // Start with a move of everything, so the first optimised reweight is a full pass from scratch
+    const int What = (iPoint + 2) % 3;
+    Throw(What);
+
+    Reweight();
+    const std::vector<double> MC = SampleHandler_array, MCW2 = SampleHandler_array_w2, Grad = SampleHandler_gradients;
+    const double LLH = GetLikelihood();
+    //HW A device reweight sums d(-lnL)/d(parameter) directly and never fills the per bin array, so
+    //compare what the sampler actually uses
+    const bool OptFromDevice = GradFromDevice;
+    const bool CompareLLHGrad = Grads && fTestStatistic == kPoisson;
+    const std::vector<double> LLHGrad = CompareLLHGrad ? GetGradLikelihood() : std::vector<double>();
+    ReferencePath = true;
+    Reweight();
+    ReferencePath = false;
+
+    double PointWorst = 0.;
+    auto Note = [&](const double Diff, const char* What2, const int Index, const double Opt, const double Ref) {
+      PointWorst = std::max(PointWorst, Diff);
+      if (Diff > Tolerance) {
+        MACH3LOG_ERROR("{}: point {} ({}), {} {}: optimised {:.17g}, reference {:.17g}, relative difference {:.3g}",
+                       GetName(), iPoint, Moves[What], What2, Index, Opt, Ref, Diff);
+      }
+    };
+    for (size_t b = 0; b < MC.size(); ++b) {
+      const double Ref = SampleHandler_array[b];
+      Note(std::fabs(MC[b] - Ref) / std::max(std::fabs(Ref), 1e-300), "bin", static_cast<int>(b), MC[b], Ref);
+      if (W2) {
+        const double Ref2 = SampleHandler_array_w2[b];
+        Note(std::fabs(MCW2[b] - Ref2) / std::max(std::fabs(Ref2), 1e-300), "W2 bin", static_cast<int>(b), MCW2[b], Ref2);
+      }
+    }
+    if (CompareLLHGrad) {
+      const std::vector<double> RefGrad = GetGradLikelihood();
+      double Scale = 0.;
+      for (const double G : RefGrad) Scale = std::max(Scale, std::fabs(G));
+      for (size_t k = 0; k < RefGrad.size(); ++k) {
+        Note(std::fabs(LLHGrad[k] - RefGrad[k]) / std::max(Scale, 1e-300), "-lnL gradient entry",
+             static_cast<int>(k), LLHGrad[k], RefGrad[k]);
+      }
+    }
+    if (Grads && !OptFromDevice) {
+      double Scale = 0.;
+      for (const double G : SampleHandler_gradients) Scale = std::max(Scale, std::fabs(G));
+      for (size_t k = 0; k < Grad.size(); ++k) {
+        Note(std::fabs(Grad[k] - SampleHandler_gradients[k]) / std::max(Scale, 1e-300), "gradient entry",
+             static_cast<int>(k), Grad[k], SampleHandler_gradients[k]);
+      }
+    }
+    const double RefLLH = GetLikelihood();
+    Note(std::fabs(LLH - RefLLH) / std::max(std::fabs(RefLLH), 1.), "-lnL", 0, LLH, RefLLH);
+    MACH3LOG_INFO("{}: point {} moving {}, -lnL {:.10f}, largest relative difference from the reference loop {:.3g}",
+                  GetName(), iPoint, Moves[What], RefLLH, PointWorst);
+    Worst = std::max(Worst, PointWorst);
+  }
+
+  for (int i = 0; i < NPar; ++i) ParHandler->SetParProp(i, Saved[static_cast<size_t>(i)]);
+  ReferencePath = WasReference;
+  Reweight();
+  if (Worst > Tolerance) {
+    MACH3LOG_ERROR("{}: the optimised reweight differs from the reference loop by up to {:.3g}, tolerance {:.3g}",
+                   GetName(), Worst, Tolerance);
+  } else {
+    MACH3LOG_INFO("{}: the optimised reweight agrees with the reference loop to {:.3g} over {} points",
+                  GetName(), Worst, NPoints);
+  }
+  return Worst;
+}
 
 // ************************************************
 bool SampleHandlerBase::KinematicCacheMatches() {
@@ -564,6 +1112,155 @@ bool SampleHandlerBase::KinematicCacheMatches() {
   }
   InvalidateKinematicCache();
   return false;
+}
+
+// ************************************************
+void SampleHandlerBase::UpdateFastShifts() {
+// ************************************************
+  FastShifts = (functional.apply_all != nullptr) && functional.apply_all_possible && !functional.shifts.empty();
+  for (const auto& Shift : functional.shifts) {
+    if (Shift.raw == nullptr) { FastShifts = false; break; }
+  }
+  if (!FastShifts) return;
+
+  // The event lists only change at registration, so they are flattened once
+  const size_t NEvents = functional.event_shifts.size();
+  if (functional.flat_start.size() != NEvents + 1) {
+    functional.flat_start.assign(NEvents + 1, 0);
+    functional.flat_index.clear();
+    for (size_t iEvent = 0; iEvent < NEvents; ++iEvent) {
+      functional.flat_index.insert(functional.flat_index.end(), functional.event_shifts[iEvent].begin(), functional.event_shifts[iEvent].end());
+      functional.flat_start[iEvent + 1] = static_cast<int>(functional.flat_index.size());
+    }
+  }
+  // The values change every reweight; update_vals has already run
+  functional.raw_table.resize(functional.shifts.size());
+  for (size_t iShift = 0; iShift < functional.shifts.size(); ++iShift) {
+    functional.raw_table[iShift].raw = functional.shifts[iShift].raw;
+    functional.raw_table[iShift].value = functional.shifts[iShift].par_vals[0];
+  }
+}
+
+// ************************************************
+void SampleHandlerBase::SetupSelectionPointers() {
+// ************************************************
+  SelectionPtrChecked = true;
+  SelectionPtrReady = false;
+  const int NumberOfEvents = static_cast<int>(GetNEvents());
+  SelectionPtrStart.assign(static_cast<size_t>(NumberOfEvents) + 1, 0);
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    SelectionPtrStart[iEvent + 1] = SelectionPtrStart[iEvent] + static_cast<int>(StoredSelection[MCEvents[iEvent].NominalSample].size());
+  }
+  SelectionPtr.assign(static_cast<size_t>(SelectionPtrStart[NumberOfEvents]), nullptr);
+  try {
+    for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+      const auto& Cuts = StoredSelection[MCEvents[iEvent].NominalSample];
+      for (size_t iCut = 0; iCut < Cuts.size(); ++iCut) {
+        const double* Ptr = GetPointerToKinematicParameter(Cuts[iCut].ParamToCutOnIt, iEvent);
+        const double Val = ReturnKinematicParameter(Cuts[iCut].ParamToCutOnIt, iEvent);
+        //HW A variable which only exists as a computed value can't be read through a pointer
+        if (Ptr == nullptr || !(*Ptr == Val || (std::isnan(*Ptr) && std::isnan(Val)))) {
+          MACH3LOG_INFO("{}: cut variable {} of event {} can't be read through a pointer, selection cuts "
+                        "go through ReturnKinematicParameter", GetName(), Cuts[iCut].ParamToCutOnIt, iEvent);
+          return;
+        }
+        SelectionPtr[static_cast<size_t>(SelectionPtrStart[iEvent]) + iCut] = Ptr;
+      }
+    }
+  } catch (const std::exception& Err) {
+    MACH3LOG_INFO("{}: no pointer to a selection cut variable ({}), selection cuts go through "
+                  "ReturnKinematicParameter", GetName(), Err.what());
+    return;
+  }
+  SelectionPtrReady = true;
+  MACH3LOG_INFO("{}: full event passes read selection cut variables through pointers", GetName());
+
+  // Cuts on variables no shift touches decide once and for all
+  NeverSelected.assign(static_cast<size_t>(NumberOfEvents), 0);
+  LiveEvents.clear();
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    const auto& Cuts = StoredSelection[MCEvents[iEvent].NominalSample];
+    for (size_t iCut = 0; iCut < Cuts.size(); ++iCut) {
+      if (IsKinematicParameterShifted(Cuts[iCut].ParamToCutOnIt)) continue;
+      const double Val = *SelectionPtr[static_cast<size_t>(SelectionPtrStart[iEvent]) + iCut];
+      if (Val < Cuts[iCut].LowerBound || Val >= Cuts[iCut].UpperBound) { NeverSelected[iEvent] = 1; break; }
+    }
+    if (!NeverSelected[iEvent]) LiveEvents.push_back(iEvent);
+  }
+  if (static_cast<int>(LiveEvents.size()) == NumberOfEvents) {
+    NeverSelected.clear();
+    LiveEvents.clear();
+  } else {
+    MACH3LOG_INFO("{}: {} of {} events fail a cut no shift can change, full event passes skip them",
+                  GetName(), NumberOfEvents - static_cast<int>(LiveEvents.size()), NumberOfEvents);
+  }
+}
+
+// ************************************************
+void SampleHandlerBase::SetupFastBinning() {
+// ************************************************
+  FastBinChecked = true;
+  FastBinReady = false;
+  const int NSamples = GetNSamples();
+  FastAxes.assign(static_cast<size_t>(NSamples), FastAxis{});
+  for (int iSample = 0; iSample < NSamples; ++iSample) {
+    const auto& Info = Binning->GetSampleBinningInfo(iSample);
+    if (Info.BinEdges.size() != 1 || !Info.Uniform || Info.BinLookup.size() != 1 || Info.Strides.size() != 1) return;
+    FastAxis& Axis = FastAxes[static_cast<size_t>(iSample)];
+    Axis.Edges = Info.BinEdges[0].data();
+    Axis.Lookup = Info.BinLookup[0].data();
+    Axis.NBins = Info.AxisNBins[0];
+    Axis.Stride = Info.Strides[0];
+    Axis.Offset = Info.GlobalOffset;
+    if (static_cast<int>(Info.BinEdges[0].size()) != Axis.NBins + 1 || static_cast<int>(Info.BinLookup[0].size()) != Axis.NBins) return;
+  }
+  const int NumberOfEvents = static_cast<int>(GetNEvents());
+  FastBinVar.resize(static_cast<size_t>(NumberOfEvents));
+  FastNomBin.resize(static_cast<size_t>(NumberOfEvents));
+  for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    const EventInfo& Event = MCEvents[iEvent];
+    if (Event.KinVar.size() != 1 || Event.NomBin.size() != 1) return;
+    FastBinVar[iEvent] = Event.KinVar[0];
+    FastNomBin[iEvent] = Event.NomBin[0];
+    //HW Same answer as FindGlobalBin for every event at the current values, or the fast lookup isn't used
+    if (FindGlobalBinFast(Event.NominalSample, iEvent) != Binning->FindGlobalBin(Event.NominalSample, Event.KinVar, Event.NomBin)) {
+      MACH3LOG_WARN("{}: fast bin lookup disagrees with FindGlobalBin for event {}, not using it", GetName(), iEvent);
+      return;
+    }
+  }
+  FastBinReady = true;
+  MACH3LOG_INFO("{}: full event passes use the flat 1D bin lookup", GetName());
+}
+
+// ************************************************
+void SampleHandlerBase::UpdateWeightCache() {
+// ************************************************
+  WeightCacheEnabled = false;
+  if (!AdditionalWeightsAreConstant() || ParHandler == nullptr) return;
+  if (WeightCachePars.empty()) {
+    for (int i = 0; i < ParHandler->GetNumParams(); ++i) {
+      if (ParHandler->GetParamType(i) != SystType::kFunc) WeightCachePars.push_back(i);
+    }
+  }
+  const auto& Values = ParHandler->GetParPropVec();
+  bool Same = (WeightCacheKey.size() == WeightCachePars.size());
+  for (size_t k = 0; Same && k < WeightCachePars.size(); ++k) {
+    if (WeightCacheKey[k] != Values[static_cast<size_t>(WeightCachePars[k])]) Same = false;
+  }
+  if (!Same) {
+    WeightCacheKey.resize(WeightCachePars.size());
+    for (size_t k = 0; k < WeightCachePars.size(); ++k) WeightCacheKey[k] = Values[static_cast<size_t>(WeightCachePars[k])];
+    // Every stamp from before is now stale. Wrapping round would make the oldest ones look fresh
+    if (++WeightCacheVersion == 0) {
+      std::fill(EventWeightStamp.begin(), EventWeightStamp.end(), 0u);
+      WeightCacheVersion = 1;
+    }
+  }
+  if (EventWeightCache.size() != GetNEvents()) {
+    EventWeightCache.assign(GetNEvents(), 0.);
+    EventWeightStamp.assign(GetNEvents(), 0u);
+  }
+  WeightCacheEnabled = true;
 }
 
 // ************************************************
@@ -627,7 +1324,30 @@ void SampleHandlerBase::SetupEventGrouping() {
   EventsBySignature.resize(static_cast<size_t>(NumberOfEvents));
   for (int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) EventsBySignature[static_cast<size_t>(Start[EventSignature[iEvent]]++)] = iEvent;
 
+  // Flat copies of every signature's shared weights and derivatives, from its first event
+  SigWeightPtr.clear(); SigDerivs.clear();
+  SigWeightStart.assign(static_cast<size_t>(NSignatures) + 1, 0);
+  SigDerivStart.assign(static_cast<size_t>(NSignatures) + 1, 0);
+  for (int iSig = 0; iSig < NSignatures; ++iSig) {
+    const int iEvent = SignatureFirstEvent[static_cast<size_t>(iSig)];
+    const auto& Pointers = MCEvents[iEvent].total_weight_pointers;
+    const auto& Derivs = MCEvents[iEvent].total_weight_gradients;
+    const bool HaveDerivs = (Derivs.size() == Pointers.size());
+    const int ConstStart = AdditionalWeightStart[iEvent];
+    const int ConstEnd = AdditionalWeightEnd[iEvent];
+    for (int iWeight = 0; iWeight < static_cast<int>(Pointers.size()); ++iWeight) {
+      if (iWeight >= ConstStart && iWeight < ConstEnd) continue;
+      SigWeightPtr.push_back(Pointers[iWeight]);
+      if (HaveDerivs && Derivs[iWeight].second != &M3::Zero) {
+        SigDerivs.push_back({Derivs[iWeight].first, Derivs[iWeight].second, Pointers[iWeight]});
+      }
+    }
+    SigWeightStart[iSig + 1] = static_cast<int>(SigWeightPtr.size());
+    SigDerivStart[iSig + 1] = static_cast<int>(SigDerivs.size());
+  }
+
   GroupingEnabled = true;
+  ++SignatureVersion;
   MACH3LOG_INFO("{}: {} events share {} distinct sets of varying weights, the kinematic cache will sum "
                 "events with the same set and bin before the event loop", GetName(), NumberOfEvents, NSignatures);
 }
@@ -637,6 +1357,7 @@ void SampleHandlerBase::BuildEventGroups() {
 // ************************************************
   const int NBins = Binning->GetNBins();
   GroupRep.clear();
+  GroupSig.clear();
   GroupConst.clear();
   GroupConst2.clear();
   BinGroupStart.assign(static_cast<size_t>(NBins) + 1, 0);
@@ -656,16 +1377,20 @@ void SampleHandlerBase::BuildEventGroups() {
         if (C > 0.) { if (PosRep < 0) PosRep = iEvent; PosC += C; PosC2 += C * C; }
         else if (C < 0.) { if (NegRep < 0) NegRep = iEvent; NegC += C; NegC2 += C * C; }
       }
-      if (PosRep >= 0) { GroupRep.push_back(PosRep); GroupConst.push_back(PosC); GroupConst2.push_back(PosC2); }
-      if (NegRep >= 0) { GroupRep.push_back(NegRep); GroupConst.push_back(NegC); GroupConst2.push_back(NegC2); }
+      if (PosRep >= 0) { GroupRep.push_back(PosRep); GroupSig.push_back(Sig); GroupConst.push_back(PosC); GroupConst2.push_back(PosC2); }
+      if (NegRep >= 0) { GroupRep.push_back(NegRep); GroupSig.push_back(Sig); GroupConst.push_back(NegC); GroupConst2.push_back(NegC2); }
     }
   }
   BinGroupStart[NBins] = static_cast<int>(GroupRep.size());
+  ++GroupsVersion;
 }
 
 // ************************************************
 void SampleHandlerBase::BuildCachedEventList() {
 // ************************************************
+  #ifdef MaCh3_CUDA
+  if (EventBinsOnDevice) PullEventBins();
+  #endif
   //HW Counting sort on the bin: one pass to count, one to place, events keep their order in a bin
   const int NBins = Binning->GetNBins();
   const int NumberOfEvents = static_cast<int>(EventBinCache.size());
@@ -709,9 +1434,12 @@ void SampleHandlerBase::ResetHistograms() _noexcept_ {
   if (FirstTimeW2) {
     std::fill_n(SampleHandler_array_w2.begin(), nBins, 0.0);
   }
-  //HW The gradients accumulate the same way the MC prediction does, so they need wiping too
+  //HW The gradients accumulate the same way the MC prediction does, so they need wiping too. With
+  //the device reweight on most passes never touch the array, so the CPU passes wipe it themselves
+  //(ZeroGradientsIfDeferred) rather than every reweight paying for it
   if (ComputeGradients && !GradientsPaused) {
-    std::fill(SampleHandler_gradients.begin(), SampleHandler_gradients.end(), 0.0);
+    if (GradResetDeferred()) GradNeedsZero = true;
+    else std::fill(SampleHandler_gradients.begin(), SampleHandler_gradients.end(), 0.0);
   }
 } // end function
 
@@ -727,9 +1455,13 @@ void SampleHandlerBase::ApplyShifts(const int iEvent) {
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  for (auto const &iShift : functional.event_shifts[iEvent]) {
-    auto & shift = functional.shifts[iShift];
-    shift.apply(shift.par_vals, iEvent);
+  if (FastShifts && !ReferencePath) {
+    functional.apply_all(functional, functional.apply_all_events, iEvent);
+  } else {
+    for (auto const &iShift : functional.event_shifts[iEvent]) {
+      auto & shift = functional.shifts[iShift];
+      shift.apply(shift.par_vals, iEvent);
+    }
   }
 
   FinaliseShifts(iEvent);
@@ -952,6 +1684,7 @@ void SampleHandlerBase::SetupReweightArrays() {
 void SampleHandlerBase::SetComputeGradients(const bool Enable) {
 // ************************************************
   ComputeGradients = Enable;
+  if (SplineHandler) SplineHandler->SetComputeDerivatives(Enable);
   // Switching gradients on pads the derivative lists, which the grouping check reads
   GroupingChecked = false;
   InvalidateKinematicCache();
@@ -1207,6 +1940,7 @@ const TH1* SampleHandlerBase::GetDataHist(const std::string& Sample) {
 // ************************************************
 void SampleHandlerBase::AddData(const int Sample, TH1* Data) {
 // ************************************************
+  ++DataVersion;
   int Dim = GetNDim(Sample);
   MACH3LOG_INFO("Adding {}D data histogram: {} with {:.2f} events", Dim, Data->GetTitle(), Data->Integral());
   // delete old histogram
@@ -1279,6 +2013,7 @@ void SampleHandlerBase::AddData(const int Sample, TH1* Data) {
 // ************************************************
 void SampleHandlerBase::AddData(const int Sample, const std::vector<double>& Data_Array) {
 // ************************************************
+  ++DataVersion;
   const int Start = Binning->GetSampleStartBin(Sample);
   const int End = Binning->GetSampleEndBin(Sample);
   const int ExpectedSize = End - Start;
@@ -1677,6 +2412,11 @@ std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
                    TestStatistic_ToString(kPoisson), TestStatistic_ToString(fTestStatistic));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+
+  //HW The device reweight sums the gradient itself, with the same pre-factor and the same skipped bins
+  #ifdef MaCh3_CUDA
+  if (GradFromDevice) return DeviceGrad;
+  #endif
 
   const int NBins = Binning->GetNBins();
   std::vector<double> gradLogL(static_cast<size_t>(nGradPars), 0.);

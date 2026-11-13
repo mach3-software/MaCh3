@@ -14,6 +14,7 @@
 
 // C++ includes
 #include <sstream>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -22,6 +23,12 @@
 #include <limits>
 
 namespace M3 {
+  /// @brief Whether the GPU device reweight is asked for, via MACH3_DEVICE_REWEIGHT=1 in the environment
+  /// @details Prototype switch for Samples/DeviceReweight.h. Only has an effect in a CUDA build
+  inline bool DeviceReweightRequested() {
+    const char* Env = std::getenv("MACH3_DEVICE_REWEIGHT");
+    return Env != nullptr && Env[0] == '1';
+  }
   // Run low or high memory versions of structs
   // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
   #ifdef _LOW_MEMORY_STRUCTS_

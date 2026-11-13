@@ -43,6 +43,31 @@ class BinnedSplineHandler : public SplineBase {
     /// @details Points at M3::Zero for flat splines, whose weight doesn't vary
     const M3::float_t* RetGradPointer(const SplineIndex& Variables) const;
 
+    /// @brief Read-only view of the spline monolith, for a device reweight that evaluates the
+    /// splines itself (see Samples/DeviceReweight.h). Only valid while the CPU arrays exist,
+    /// i.e. when the float GPU spline path is off
+    struct ArrayView {
+      const M3::float_t* XCoeff = nullptr;     ///< _max_knots * nParams knot positions
+      std::size_t NX = 0;
+      const M3::float_t* ManyCoeff = nullptr;  ///< y, b, c, d per segment
+      std::size_t NMany = 0;
+      const std::vector<unsigned int>* NKnots = nullptr;
+      const std::vector<short int>* ParamNo = nullptr;
+      /// Global parameter index of each spline parameter, worked out from the pointer the CPU
+      /// evaluation reads (UniqueSystIndices is gone by the time anything asks, see CleanUpMemory)
+      std::vector<int> GlobalPar;
+      unsigned int NSplines = 0;
+      short int NParams = 0;
+      short int MaxKnots = 0;
+      const M3::float_t* Weights = nullptr;    ///< what RetPointer points into, NSplines long
+      const M3::float_t* Grads = nullptr;      ///< what RetGradPointer points into, NSplines long
+    };
+    /// @copydoc ArrayView
+    ArrayView GetArrayView() const;
+    /// @brief Find every spline parameter's segment at the current parameter values, without
+    /// evaluating anything, and return them (nParams entries)
+    const short int* FindSegments() { FindSplineSegment(); return SplineSegments; }
+
     /// @copydoc SplineBase::PrepareSplineFile
     void PrepareSplineFile(std::string FileName) final;
     /// @copydoc SplineBase::LoadSplineFile

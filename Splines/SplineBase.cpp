@@ -12,6 +12,13 @@ SplineBase::SplineBase([[maybe_unused]] bool Use_GPU) {
 // *****************************************
   #ifdef MaCh3_CUDA
   useGPU = Use_GPU;
+  //HW The device reweight (Samples/DeviceReweight.h) evaluates the splines itself, in double precision
+  //from these coefficients, and the CPU passes have to see the very same weights. So with it on,
+  //the float GPU spline path stays off and the CPU arrays are kept
+  if (useGPU && M3::DeviceReweightRequested()) {
+    useGPU = false;
+    MACH3LOG_INFO("MACH3_DEVICE_REWEIGHT is set, so {} evaluates on the CPU and the device reweight takes the GPU", GetName());
+  }
   if(useGPU) MACH3LOG_INFO("Using GPU version of {}", GetName());
   gpu_monolith = nullptr;
   #else

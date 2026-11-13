@@ -200,6 +200,9 @@ class ParameterHandlerBase {
 
   /// @brief Get matrix used for step proposal
   TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
+  /// @brief The first throw matrix this handler had: the prior covariance, made positive definite,
+  /// before adaption or an external matrix replaced it
+  const TMatrixDSym *GetInitialThrowMatrix() const {return initialThrowMatrix;}
   /// @brief Get matrix used for step proposal
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
 
@@ -449,6 +452,30 @@ class ParameterHandlerBase {
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
 
+  /// @name Sparse prior, for CalcLikelihood and CalcGradient
+  /// HW Only the non-flat rows and columns of InvertCovMatrix enter the prior, and of those only the
+  /// non-zero entries matter. With hundreds of flat-prior parameters (energy norms) that is a small
+  /// fraction of the matrix. Kept in the column order the dense loops use, so every sum adds the same
+  /// numbers in the same order less exact zeros, which leaves it bit for bit the same. Built on first
+  /// use and again after SetCovMatrix or SetFlatPrior, see BuildSparsePrior
+  /// @{
+  /// Whether the lists below match InvertCovMatrix and _fFlatPrior
+  mutable bool SparsePriorValid = false;
+  /// Row of each parameter in the lists below, -1 for a flat prior
+  mutable std::vector<int> PriorRowOf;
+  /// Each non-flat row's entries are PriorRowStart[r] to PriorRowStart[r+1]-1: column and value,
+  /// columns ascending and non-flat, values non-zero
+  mutable std::vector<int> PriorRowStart;
+  /// See PriorRowStart
+  mutable std::vector<int> PriorCol;
+  /// See PriorRowStart
+  mutable std::vector<double> PriorVal;
+  /// How many of each row's entries have column <= row, the part CalcLikelihood sums
+  mutable std::vector<int> PriorLowerCount;
+  /// @brief Build the lists above from InvertCovMatrix and _fFlatPrior
+  void BuildSparsePrior() const;
+  /// @}
+
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
   /// Result of multiplication of Cholesky matrix and randParams
@@ -495,6 +522,8 @@ class ParameterHandlerBase {
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
+  /// HW The first throw matrix, kept for GetInitialThrowMatrix. Throw matrices are never freed, so the pointer stays valid
+  TMatrixDSym* initialThrowMatrix = nullptr;
   /// Bumped every time throwMatrix is replaced, see GetThrowMatrixUpdates
   int throwMatrixUpdates = 0;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss

@@ -320,6 +320,7 @@ void ParameterHandlerBase::SetCovMatrix(TMatrixDSym *cov) {
       InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
     }
   }
+  SparsePriorValid = false;
 
   SetThrowMatrix(cov);
 }
@@ -763,32 +764,61 @@ void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
 }
 
 // ********************************************
+void ParameterHandlerBase::BuildSparsePrior() const {
+// ********************************************
+  const int N = _fNumPar;
+  PriorRowOf.assign(static_cast<size_t>(N), -1);
+  PriorRowStart.assign(1, 0);
+  PriorCol.clear();
+  PriorVal.clear();
+  PriorLowerCount.clear();
+  for (int i = 0; i < N; ++i) {
+    if (_fFlatPrior[static_cast<size_t>(i)]) continue;
+    PriorRowOf[static_cast<size_t>(i)] = static_cast<int>(PriorLowerCount.size());
+    int Lower = 0;
+    for (int j = 0; j < N; ++j) {
+      if (_fFlatPrior[static_cast<size_t>(j)]) continue;
+      const double V = InvertCovMatrix[static_cast<size_t>(i)][static_cast<size_t>(j)];
+      if (V == 0.) continue;
+      PriorCol.push_back(j);
+      PriorVal.push_back(V);
+      if (j <= i) ++Lower;
+    }
+    PriorLowerCount.push_back(Lower);
+    PriorRowStart.push_back(static_cast<int>(PriorCol.size()));
+  }
+  SparsePriorValid = true;
+  MACH3LOG_INFO("{}: prior uses {} of {} inverse covariance entries ({} parameters without a flat prior)", GetName(),
+                PriorCol.size(), static_cast<size_t>(N) * static_cast<size_t>(N), PriorLowerCount.size());
+}
+
+// ********************************************
 // Get the likelihood in the case where we want to include priors on the parameters
 // _fFlatPrior stores if we want to evaluate the likelihood for the given parameter
 //                    true = don't evaluate likelihood (so run without a prior)
 //                    false = evaluate likelihood (so run with a prior)
 double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
+  if (!SparsePriorValid) BuildSparsePrior();
   double logL = 0.0;
+  //HW Same loop over i as the dense version so OpenMP splits it the same way, and the same terms in
+  //the same order within each i, less the ones that are exactly zero. See BuildSparsePrior
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
   for(int i = 0; i < _fNumPar; ++i) {
-    if(_fFlatPrior[i]){
-      //HW: Flat prior, no need to calculate anything
-      continue;
-    }
+    const int r = PriorRowOf[static_cast<size_t>(i)];
+    //HW: Flat prior, no need to calculate anything
+    if (r < 0) continue;
     // KS: Precalculate Diff once per "i" without doing this for every "j"
     const double Diff = _fPropVal[i] - _fPreFitValue[i];
-    #ifdef MULTITHREAD
-    #pragma omp simd
-    #endif
-    for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[j]) {
-        //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-        double scale = (i != j) ? 1. : 0.5;
-        logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
-      }
+    const int Begin = PriorRowStart[static_cast<size_t>(r)];
+    const int End = Begin + PriorLowerCount[static_cast<size_t>(r)];
+    for (int k = Begin; k < End; ++k) {
+      const int j = PriorCol[static_cast<size_t>(k)];
+      //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
+      double scale = (i != j) ? 1. : 0.5;
+      logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*PriorVal[static_cast<size_t>(k)];
     }
   }
   return logL;
@@ -802,6 +832,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 //                    false = evaluate likelihood (so run with a prior)
 std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
 // ********************************************
+  if (!SparsePriorValid) BuildSparsePrior();
   std::vector<double> grad(static_cast<size_t>(_fNumPar), 0.0);
   const size_t NPars = static_cast<size_t>(_fNumPar);
   #ifdef MULTITHREAD
@@ -809,13 +840,14 @@ std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
   #endif
   for (size_t i = 0; i < NPars; ++i) {
     //HW: Flat prior means no penalty, so no gradient either
-    if (_fFlatPrior[i]) continue;
+    const int r = PriorRowOf[i];
+    if (r < 0) continue;
     double g = 0.0;
-    //HW: The whole row here, unlike CalcLikelihood we can't exploit the symmetry to halve the work
-    for (size_t j = 0; j < NPars; ++j) {
-      if (!_fFlatPrior[j]) {
-        g += InvertCovMatrix[i][j] * (_fPropVal[j] - _fPreFitValue[j]);
-      }
+    //HW: The whole row here, unlike CalcLikelihood we can't exploit the symmetry to halve the work.
+    //Only its non-flat, non-zero entries, in the dense loop's order, see BuildSparsePrior
+    for (int k = PriorRowStart[static_cast<size_t>(r)]; k < PriorRowStart[static_cast<size_t>(r) + 1]; ++k) {
+      const int j = PriorCol[static_cast<size_t>(k)];
+      g += PriorVal[static_cast<size_t>(k)] * (_fPropVal[j] - _fPreFitValue[j]);
     }
     grad[i] = g;
   }
@@ -1041,6 +1073,7 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
       MACH3LOG_INFO("Setting {} (parameter {}) to non-flat prior", GetParName(i), i);
     }
     _fFlatPrior[i] = eL;
+    SparsePriorValid = false;
   }
 }
 
@@ -1181,6 +1214,7 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
   }
 
   throwMatrix = Candidate;
+  if (initialThrowMatrix == nullptr) initialThrowMatrix = Candidate;
   ++throwMatrixUpdates;
 
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits

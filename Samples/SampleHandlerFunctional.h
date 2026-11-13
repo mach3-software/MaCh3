@@ -32,8 +32,34 @@ struct Functional {
     std::vector<double> par_vals;
     std::function<void(std::vector<double> &)> update_vals;
     std::function<void(std::vector<double> const &, const int)> apply;
+    /// HW The experiment's shift as a plain function of one parameter, type erased, or nullptr
+    /// when it was registered as anything else. See apply_all
+    void (*raw)() = nullptr;
   };
   std::vector<Shift> shifts;
+  /// HW Applies every shift of one event through the raw functions in a single typed loop, set by
+  /// the first single parameter registration, so one indirect call per event replaces a
+  /// std::function call per shift per event. Only used while every shift has a raw function and
+  /// all of them were registered on the same event vector
+  void (*apply_all)(const Functional &, void *, int) = nullptr;
+  /// HW The experiment's event vector apply_all indexes into
+  void *apply_all_events = nullptr;
+  /// HW Cleared by any registration apply_all can't serve
+  bool apply_all_possible = true;
+  /// HW What apply_all reads, laid out flat so a shift costs one table entry rather than a walk
+  /// through Shift, its std::functions and its par_vals vector
+  struct RawShift {
+    /// The shift's raw function
+    void (*raw)() = nullptr;
+    /// Its parameter's current value, copied from par_vals[0] before each full pass
+    double value = 0.;
+  };
+  /// HW One entry per shift, same order as shifts
+  std::vector<RawShift> raw_table;
+  /// HW event_shifts flattened: event i's shifts are flat_index[flat_start[i]] to flat_index[flat_start[i+1]-1]
+  std::vector<int> flat_start;
+  /// HW See flat_start
+  std::vector<int> flat_index;
   void update_vals() {
     for (auto &shift : shifts) {
       shift.update_vals(shift.par_vals);

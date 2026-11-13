@@ -25,6 +25,7 @@ __host__ void SynchroniseSplines();
 /// @param gpu_nKnots_arr has length = spln_counter (keeps track where current spline starts)
 /// @param gpu_coeff_many has length = nKnots * 4, stores all coefficients for all splines and knots
 /// @param gpu_weights has length = spln_counter * spline_size
+/// @param gpu_grads d(weight)/d(parameter) of each spline, same length as gpu_weights, or nullptr to skip it
 /// @param text_coeff_x array storing info about X coeff, uses texture memory. Has length = n_params * spline_size,
 __global__ void EvalOnGPU_Splines(
     const unsigned int gpu_n_splines,
@@ -35,6 +36,7 @@ __global__ void EvalOnGPU_Splines(
     const float* __restrict__ gpu_par_val,
     const short int* __restrict__ gpu_spline_segment,
     float* __restrict__ gpu_weights,
+    float* __restrict__ gpu_grads,
     const cudaTextureObject_t __restrict__ text_coeff_x);
 
 /// @brief Evaluate the TF1 on the GPU Using first order polynomial
@@ -178,8 +180,10 @@ class SplineMonolithGPU
       // Holds the segments for parameters
       short int *segment);
 
+    /// @param cpu_spline_grad If not nullptr, also filled with d(weight)/d(parameter) of every spline
     __host__ void RunGPU_SplineMonolith_Binned(
       M3::float_t* cpu_spline_weights,
+      M3::float_t* cpu_spline_grad,
       // Holds the changes in parameters
       float *vals,
       // Holds the segments for parameters
@@ -228,6 +232,8 @@ class SplineMonolithGPU
     M3::float_t *gpu_total_weights;
     /// GPU arrays to hold weight for each spline
     float *gpu_weights;
+    /// HW Derivative of each spline's weight with respect to its parameter, for gradient based samplers
+    float *gpu_grads;
     /// GPU arrays to hold weight for each TF1
     float *gpu_weights_tf1;
 
@@ -244,6 +250,8 @@ class SplineMonolithGPU
     #ifndef _LOW_MEMORY_STRUCTS_
     /// Temporary weight needed for conversion from float to double
     std::vector<float> cpu_tmp_weights;
+    /// HW Staging buffer for the derivatives, as cpu_tmp_weights is for the weights
+    std::vector<float> cpu_tmp_grads;
     #endif
 
     // ******************************************

@@ -162,6 +162,21 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       ss_pars.str(), SampleHandlerName, shift.par_vals.size(), neventsaffected);
 }
 
+namespace M3::detail {
+/// @brief HW Run one event's whole list of single parameter shifts through their plain functions
+template <typename EventType>
+void FunctionalApplyAll(const Functional &F, void *Events, const int iEvent) {
+  using RawFn = void (*)(double const &, EventType &);
+  EventType &Ev = (*static_cast<std::vector<EventType> *>(Events))[static_cast<size_t>(iEvent)];
+  const auto *Table = F.raw_table.data();
+  const int End = F.flat_start[static_cast<size_t>(iEvent) + 1];
+  for (int k = F.flat_start[static_cast<size_t>(iEvent)]; k < End; ++k) {
+    const auto &Shift = Table[F.flat_index[static_cast<size_t>(k)]];
+    reinterpret_cast<RawFn>(Shift.raw)(Shift.value, Ev);
+  }
+}
+} // namespace M3::detail
+
 template <typename EventType, typename SFType>
 void SampleHandlerBase::RegisterIndividualFunctionalParameter(
     std::vector<EventType> &ExptEvents, std::string const &par_name,
@@ -173,6 +188,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       "Function call signature for single parameter Functional shift must be "
       "void(double const &, EventType&).");
 
+  const size_t NShiftsBefore = functional.shifts.size();
   RegisterIndividualFunctionalParameter(
       ExptEvents,
       std::vector<std::string>{
@@ -181,6 +197,23 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       [=](std::vector<double> const &par_vals, EventType &ev) {
         shift_func(par_vals[0], ev);
       });
+  // Nothing registered, e.g. the parameter isn't defined for these samples
+  if (functional.shifts.size() == NShiftsBefore) return;
+
+  //HW A plain function, or a lambda without captures, can be called directly, see FunctionalApplyAll
+  using RawFn = void (*)(double const &, EventType &);
+  if constexpr (std::is_convertible_v<SFType, RawFn>) {
+    const RawFn Raw = shift_func;
+    functional.shifts.back().raw = reinterpret_cast<void (*)()>(Raw);
+    if (functional.apply_all == nullptr) {
+      functional.apply_all = &M3::detail::FunctionalApplyAll<EventType>;
+      functional.apply_all_events = &ExptEvents;
+    } else if (functional.apply_all_events != static_cast<void *>(&ExptEvents)) {
+      functional.apply_all_possible = false;
+    }
+  } else {
+    functional.apply_all_possible = false;
+  }
 }
 
 // ***************************************************************************

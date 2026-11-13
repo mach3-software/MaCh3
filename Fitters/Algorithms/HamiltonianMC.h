@@ -122,6 +122,16 @@ protected:
       /// @details Set by BuildMassBlock() when #diagonal_metric threw the off-diagonals away. The
       /// arrays stay the full \f$N \times N\f$ either way, only the loops over them get shorter
       bool IsDiagonal = false;
+      /// HW Skyline of the dense matrices: in row i of Chol, the first column that isn't exactly
+      /// zero; in column i, the last row that isn't. Outside those every element is zero, so the
+      /// loops skip it. Exact: adding a product with an exact zero changes nothing
+      std::vector<int> CholRowFirst;
+      /// See CholRowFirst
+      std::vector<int> CholColLast;
+      /// HW Per row of InvMass, the first and last columns that aren't exactly zero
+      std::vector<int> InvRowFirst;
+      /// See InvRowFirst
+      std::vector<int> InvRowLast;
     };
 
     /// How many times one drift may bounce off a parameter's bounds before we give up on the step
@@ -158,6 +168,10 @@ protected:
     ///
     /// Zero by default, which leaves the metric exactly whatever the throw matrix is
     double metric_shrinkage;
+    /// HW Build the metric from each handler's first throw matrix (the prior covariance) and keep it,
+    /// whatever later replaces the throw matrix. For a fit which loads an adapted matrix for its
+    /// random walk block but should keep the metric the warmup tuned its step size with
+    bool metric_from_prior = false;
 
     /// Number of leapfrog iterations per step
     int n_leapfrog;

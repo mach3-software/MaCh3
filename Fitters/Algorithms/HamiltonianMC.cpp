@@ -14,6 +14,12 @@ HamiltonianMC::HamiltonianMC(Manager *const FitManager) : MCMCBase(FitManager) {
     //HW Damping the correlations by however much adaption hasn't resolved them is what makes an
     //adapted matrix usable as a metric, see the metric_shrinkage docs
     metric_shrinkage = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MetricShrinkage"], 0., __FILE__, __LINE__);
+    metric_from_prior = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MetricFromPrior"], false, __FILE__, __LINE__);
+    if (metric_from_prior && adapt_metric) {
+        MACH3LOG_ERROR("MetricFromPrior and AdaptMetric both set: the metric can't stay at the prior and follow adaption");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if (metric_from_prior) MACH3LOG_INFO("Metric built from each handler's prior covariance, whatever matrix is loaded or adapted");
     ke_init = 0.;
     logL_init = 0.;
 
@@ -240,7 +246,7 @@ void HamiltonianMC::BuildMassBlock(const size_t s) {
 
     // M^-1 is the throw matrix, which is the covariance until adaption replaces it with a better
     // estimate of the target. Either way the prior dynamics become a unit frequency oscillator
-    const TMatrixDSym* Throw = systematics[s]->GetThrowMatrix();
+    const TMatrixDSym* Throw = metric_from_prior ? systematics[s]->GetInitialThrowMatrix() : systematics[s]->GetThrowMatrix();
     if (Throw == nullptr || Throw->GetNrows() != Block.NPars) {
         MACH3LOG_ERROR("{} has no usable throw matrix to build a mass matrix from", systematics[s]->GetName());
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -315,6 +321,26 @@ void HamiltonianMC::BuildMassBlock(const size_t s) {
             }
         }
     }
+    // Skyline, see MassBlock::CholRowFirst
+    {
+        const int NP = Block.NPars;
+        Block.CholRowFirst.assign(static_cast<size_t>(NP), 0);
+        Block.CholColLast.assign(static_cast<size_t>(NP), 0);
+        Block.InvRowFirst.assign(static_cast<size_t>(NP), 0);
+        Block.InvRowLast.assign(static_cast<size_t>(NP), 0);
+        for (int i = 0; i < NP; ++i) {
+            int First = i;
+            for (int j = 0; j < i; ++j) if (Block.Chol[static_cast<size_t>(i) * N + static_cast<size_t>(j)] != 0.) { First = j; break; }
+            Block.CholRowFirst[static_cast<size_t>(i)] = First;
+            int Last = i;
+            for (int j = NP - 1; j > i; --j) if (Block.Chol[static_cast<size_t>(j) * N + static_cast<size_t>(i)] != 0.) { Last = j; break; }
+            Block.CholColLast[static_cast<size_t>(i)] = Last;
+            int InvFirst = NP, InvLast = -1;
+            for (int j = 0; j < NP; ++j) if (Block.InvMass[static_cast<size_t>(i) * N + static_cast<size_t>(j)] != 0.) { InvFirst = std::min(InvFirst, j); InvLast = j; }
+            Block.InvRowFirst[static_cast<size_t>(i)] = (InvLast < 0) ? 0 : InvFirst;
+            Block.InvRowLast[static_cast<size_t>(i)] = InvLast;
+        }
+    }
     Block.BuiltAtUpdate = systematics[s]->GetThrowMatrixUpdates();
 
     MACH3LOG_DEBUG("{} mass matrix for {} built from its {}x{} throw matrix",
@@ -327,7 +353,7 @@ void HamiltonianMC::RefreshMassMatrix() {
 // *******************
     // Leave the metric exactly as SetupMassMatrix() built it, whatever adaption does to the throw
     // matrix underneath us
-    if (!adapt_metric) return;
+    if (!adapt_metric || metric_from_prior) return;
 
     // Adaption only swaps the throw matrix every AdaptiveUpdateStep steps, so the O(N^3) rebuild is
     // amortised over all the steps in between
@@ -368,8 +394,8 @@ void HamiltonianMC::ThrowVelocity() {
         #endif
         for (int i = 0; i < NPars; ++i) {
             double Sum = 0.;
-            //HW Lower triangular, so row i only touches the first i + 1 throws
-            for (int j = 0; j <= i; ++j) {
+            //HW Lower triangular, so row i only touches the first i + 1 throws, from its skyline on
+            for (int j = Block.CholRowFirst[i]; j <= i; ++j) {
                 Sum += L[i * NPars + j] * Throws[j];
             }
             Vel[i] = Sum;
@@ -400,7 +426,7 @@ double HamiltonianMC::KineticEnergy() {
 
         for (int i = 0; i < NPars; ++i) {
             double Sum = Vel[i];
-            for (int j = 0; j < i; ++j) {
+            for (int j = Block.CholRowFirst[i]; j < i; ++j) {
                 Sum -= L[i * NPars + j] * u[j];
             }
             u[i] = Sum / L[i * NPars + i];
@@ -437,7 +463,7 @@ double HamiltonianMC::KineticEnergyAndMomentum(std::vector<double>& Momentum) {
 
         for (int i = 0; i < NPars; ++i) {
             double Sum = Vel[i];
-            for (int j = 0; j < i; ++j) {
+            for (int j = Block.CholRowFirst[i]; j < i; ++j) {
                 Sum -= L[i * NPars + j] * u[j];
             }
             u[i] = Sum / L[i * NPars + i];
@@ -447,7 +473,7 @@ double HamiltonianMC::KineticEnergyAndMomentum(std::vector<double>& Momentum) {
         //HW L^T is upper triangular, so row i only touches the momenta already solved for
         for (int i = NPars - 1; i >= 0; --i) {
             double Sum = u[i];
-            for (int j = i + 1; j < NPars; ++j) {
+            for (int j = i + 1; j <= Block.CholColLast[i]; ++j) {
                 Sum -= L[j * NPars + i] * Mom[j];
             }
             Mom[i] = Sum / L[i * NPars + i];
@@ -556,7 +582,7 @@ void HamiltonianMC::UpdateVelocity(const double Step) {
             #ifdef MULTITHREAD
             #pragma omp simd
             #endif
-            for (int j = 0; j < NPars; ++j) {
+            for (int j = Block.InvRowFirst[i]; j <= Block.InvRowLast[i]; ++j) {
                 Sum += InvMass[i * NPars + j] * Grad[j];
             }
             Vel[i] -= 0.5 * Step * Sum;

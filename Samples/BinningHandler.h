@@ -164,6 +164,8 @@ class BinningHandler {
   int GetNBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nBins);};
   /// @brief Get total number of dimensions for sample iSample
   int GetNDim(const int iSample) const { return int(SampleBinning[iSample].BinEdges.size()); }
+  /// @brief Read access to a sample's binning, for callers which keep their own fast lookup
+  const SampleBinningInfo& GetSampleBinningInfo(const int iSample) const { return SampleBinning[iSample]; }
   /// @brief Get fancy name for a given bin, to help match it with global properties
   /// @param GlobalBin Global Bin integrated over all samples
   std::string GetBinName(const int GlobalBin) const;
