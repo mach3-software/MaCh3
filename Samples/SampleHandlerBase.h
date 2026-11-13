@@ -58,6 +58,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Computes and prints the integral breakdown of all modes and oscillation channels for a given sample.
   /// @param iSample Index of the sample.
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
+  /// @brief Print number of events for a given sample with specified cuts
+  double GetSampleIntegral(const int iSample, const std::vector<KinematicCut> &EventSelectionVec, int WeightStyle);
+  /// @brief Return sample integral after for given sample with specified restriction like only single mode
+  std::vector<double> ReturnSampleIntegralBySelection(const int iSample, const SamplePlotType Selection1,
+                                                      const int Selection2, const int WeightStyle);
 
   /// @brief DB: Add data for a given sample from a ROOT histogram.
   /// @param Sample Index of the sample.

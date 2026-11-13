@@ -1794,20 +1794,12 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   double PDFIntegral = 0.;
 
-  std::vector< std::vector< std::unique_ptr<TH1> > > IntegralList;
-  IntegralList.resize(Modes->GetNModes());
-
-  std::vector<double> ChannelIntegral;
-  ChannelIntegral.resize(GetNOscChannels(iSample));
-  for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
+  /// [mode][]
+  std::vector< std::vector< double > > IntegralList(Modes->GetNModes());
+  std::vector<double> ChannelIntegral(GetNOscChannels(iSample), 0.);
 
   for (int i=0;i<Modes->GetNModes();i++) {
-    if (GetNDim(iSample) == 1) {
-      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0), SamplePlotType::kOscChannelPlot, i, WeightStyle);
-    } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),
-                                                                      SamplePlotType::kOscChannelPlot, i, WeightStyle));
-    }
+    IntegralList[i] = ReturnSampleIntegralBySelection(iSample, SamplePlotType::kOscChannelPlot, i, WeightStyle);
   }
 
   MACH3LOG_INFO("-------------------------------------------------");
@@ -1860,7 +1852,7 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
     table_headings = fmt::format("| {:<8} |", Modes->GetMaCh3ModeName(i)); //Start string with mode name
 
     for (unsigned int j=0;j<IntegralList[i].size();j++) {
-      double Integral = IntegralList[i][j]->Integral();
+      double Integral = IntegralList[i][j];
 
       if (Integral < 1e-100) {Integral=0;}
 
@@ -2094,4 +2086,55 @@ std::vector<double> SampleHandlerBase::GetArrayForSample(const int Sample, std::
   const int End   = Binning->GetSampleEndBin(Sample);
 
   return std::vector<double>(array.begin() + Start, array.begin() + End);
+}
+
+// ***************************************************************************
+double SampleHandlerBase::GetSampleIntegral(const int iSample, const std::vector<KinematicCut> &EventSelectionVec, int WeightStyle) {
+// ***************************************************************************
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
+
+  double Integral = 0.;
+  //DB Loop over all events
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    const int EventSample = MCEvents[iEvent].NominalSample;
+    if(EventSample != iSample) continue;
+    if (IsEventSelected(EventSample, iEvent)) {
+      double Weight = GetEventWeight(iEvent);
+      if (WeightStyle == 1) {
+        Weight = 1.;
+      }
+      //DB Find the relevant bin in the PDF for each event
+      const int GlobalBin = Binning->FindGlobalBin(EventSample, MCEvents[iEvent].KinVar, MCEvents[iEvent].NomBin);
+      if (GlobalBin > M3::UnderOverFlowBin) {
+        Integral += Weight;
+      }
+    }
+  }
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return Integral;
+}
+
+// ************************************************
+std::vector<double> SampleHandlerBase::ReturnSampleIntegralBySelection(const int iSample, const SamplePlotType Selection1,
+                                                                       const int Selection2, const int WeightStyle) {
+// ************************************************
+  std::vector<double> hHistList;
+
+  const int iMax = GetRangeForPlotType(Selection1, iSample);
+  for (int i = 0; i < iMax; i++) {
+    if (Selection1 == SamplePlotType::kModePlot) {
+      auto SelectionVec = BuildModeChannelSelection(iSample, i, Selection2);
+      hHistList.push_back(GetSampleIntegral(iSample, SelectionVec, WeightStyle));
+    }
+    if (Selection1 == SamplePlotType::kOscChannelPlot) {
+      auto SelectionVec = BuildModeChannelSelection(iSample, Selection2, i);
+      hHistList.push_back(GetSampleIntegral(iSample, SelectionVec, WeightStyle));
+    }
+  }
+
+  return hHistList;
 }
