@@ -48,8 +48,10 @@ install(TARGETS Manager
         PUBLIC_HEADER DESTINATION include/Manager)
 
 add_library(MaCh3::Manager ALIAS Manager)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 target_link_libraries(MaCh3 INTERFACE Manager)
-
+list(APPEND mach3_libs Manager)
 
 install(TARGETS yaml-cpp
         EXPORT MaCh3-targets

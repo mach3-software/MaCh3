@@ -42,4 +42,7 @@ install(TARGETS Fitters
         PUBLIC_HEADER DESTINATION include/Fitters/Algorithms)
 
 add_library(MaCh3::Fitters ALIAS Fitters)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 target_link_libraries(MaCh3 INTERFACE Fitters)
+list(APPEND mach3_libs Fitters)

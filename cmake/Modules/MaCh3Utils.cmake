@@ -37,6 +37,26 @@ if(NOT COMMAND SwitchLogic)
   endfunction()
 endif()
 
+#KS: Simple wrapper around ROOT_GENERATE_DICTIONARY
+function(M3_MakeROOTDict DICT HEADER LINKDEF)
+    ROOT_GENERATE_DICTIONARY(MaCh3${DICT}
+        ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
+        LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/${LINKDEF}
+        OPTIONS -p)
+
+    add_library(${DICT} SHARED MaCh3${DICT}.cxx)
+    target_compile_options(${DICT} PRIVATE -Wno-alloc-size-larger-than)
+    target_link_options(${DICT} PRIVATE -Wno-alloc-size-larger-than)
+    target_include_directories(${DICT} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(${DICT} PUBLIC Parameters MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3${DICT}_rdict.pcm DESTINATION lib/)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3${DICT}.rootmap DESTINATION lib/)
+    install(TARGETS ${DICT} EXPORT MaCh3-targets LIBRARY DESTINATION lib/)
+endfunction()
+
 if(NOT COMMAND cmessage)
   function(cmessage)
     if(NOT WIN32)

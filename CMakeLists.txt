@@ -166,6 +166,9 @@ add_subdirectory(Fitters)
 add_subdirectory(Utils)
 add_subdirectory(CLI)
 add_subdirectory(python)
+if (MaCh3_NUDOCK_ENABLED)
+  add_subdirectory(NuDock)
+endif()
 
 if(APPLE)
   set(MaCh3_RPATH_ORIGIN "@loader_path")
@@ -174,7 +177,11 @@ else()
   set(MaCh3_RPATH_ORIGIN "$ORIGIN")
   set(MaCh3_SO_EXTENSION ".so")
 endif()
-foreach(lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;Utils;Plotting;Oscillator;OscProbCalcer;CLIModules )
+set(mach3_libs)
+list(APPEND mach3_libs Oscillator)
+list(APPEND mach3_libs OscProbCalcer)
+
+foreach(lib IN LISTS mach3_libs)
   set_property(
     TARGET
     ${lib}
@@ -182,14 +189,6 @@ foreach(lib Fitters;FitProcessing;Samples;Parameters;Splines;SplineDict;Manager;
       INSTALL_RPATH "${MaCh3_RPATH_ORIGIN}"
   )
 endforeach()
-
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-target_link_libraries(MaCh3 INTERFACE CLIApi Fitters FitProcessing Samples Parameters Splines Manager Utils Plotting)
-if (MaCh3_NUDOCK_ENABLED)
-  add_subdirectory(NuDock)
-  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
-endif()
 
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 install(TARGETS MaCh3

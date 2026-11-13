@@ -1,4 +1,8 @@
-SET(MACH3_LIB_LIST "-libParameters -libManager -libFitters -lFitProcessing -libSamples -libSplines -libPlotting")
+set(MACH3_LIB_LIST "")
+foreach(lib IN LISTS mach3_libs)
+  string(APPEND MACH3_LIB_LIST " -l${lib}")
+endforeach()
+string(STRIP "${MACH3_LIB_LIST}" MACH3_LIB_LIST)
 
 SET(MACH3_FEATURES_LIST)
 

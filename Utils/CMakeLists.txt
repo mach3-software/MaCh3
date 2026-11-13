@@ -28,6 +28,10 @@ install(TARGETS Utils
 
 add_library(MaCh3::Utils ALIAS Utils)
 target_link_libraries(MaCh3 INTERFACE Utils)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
+target_link_libraries(MaCh3 INTERFACE Utils)
+list(APPEND mach3_libs Utils)
 
 # Add new folders
 add_subdirectory(Plotting)

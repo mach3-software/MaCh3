@@ -20,3 +20,4 @@ target_include_directories(CLIPlotModules PUBLIC
 install(TARGETS CLIPlotModules LIBRARY DESTINATION lib)
 
 add_library(MaCh3::CLIPlotModules ALIAS CLIPlotModules)
+list(APPEND mach3_libs CLIPlotModules)
