@@ -11,7 +11,11 @@ add_library(CLIPlotModules SHARED
 target_link_libraries(CLIPlotModules PRIVATE MaCh3::All)
 target_link_libraries(CLIPlotModules PRIVATE MaCh3Warnings)
 
-target_include_directories(CLIPlotModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+# Fix build consistency: source headers must precede stale installed copies in build/include.
+target_include_directories(CLIPlotModules PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../..>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+)
 
 install(TARGETS CLIPlotModules LIBRARY DESTINATION lib)
 

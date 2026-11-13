@@ -151,6 +151,8 @@ if test -d ${MaCh3_ROOT}/pyMaCh3; then
   add_to_PYTHONPATH ${MaCh3_ROOT}
 fi
 
-${MaCh3_ROOT}/bin/mach3 --install-completions
+if ! "${MaCh3_ROOT}/bin/mach3" --install-completions; then
+  printf 'Warning: completions could not be installed for shell "%s"; continuing without them.\n' "${SHELL:-unknown}" >&2
+fi
 
 unset SCRIPT_PATH

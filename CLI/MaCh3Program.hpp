@@ -4,6 +4,7 @@
 #pragma once
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -31,9 +32,8 @@ namespace M3{
             void parse_args(int argc, const char *const argv[]);
 
             /// @brief Destructor that unloads all dynamic plugins
-            virtual ~MaCh3Program(){
-                this->unload_dynamic_plugins();
-            }
+            /// Fix plugin lifetime: shutdown-only unloading keeps borrowed parser references valid during use.
+            virtual ~MaCh3Program() = default;
 
             /// @brief Add a core module to the program
             /// @param module Reference to the module to be added
@@ -43,21 +43,20 @@ namespace M3{
             void load_dynamic_plugins();
 
             /// @brief Install shell completion scripts for bash and zsh
-            void install_completions() const;
+            int install_completions() const;
 
             /// @brief Generate subcommand or long-option suggestions at the active parser depth
             /// @param prefix   The partially-typed word being completed
             /// @param context  Words already typed after the program name but before prefix
             void completions(const std::string& prefix, const std::vector<std::string>& context) const;
 
-            /// @brief Unload all dynamically loaded plugins
-            void unload_dynamic_plugins();
-
             /// @brief Run the selected subcommand
             /// @return Exit code from the executed module
             int Run();
 
         private:
+            void validate_parser(const MaCh3ArgumentParser* parser) const;
+
             /// @brief Detect the user's shell from the SHELL environment variable
             /// @return Shell name ("bash", "zsh", or empty string if not detected)
             std::string detect_shell() const;
@@ -68,13 +67,14 @@ namespace M3{
             /// @return true if successful, false otherwise
             bool write_file(const fs::path& path, std::string_view content) const;
 
-            /// @brief Expand a plugin path (file or directory) into a list of .so files
+            /// @brief Expand a plugin path (file or directory) into a list of canonical shared-library paths
             /// @param path Path to a plugin file or directory containing plugins
             /// @return Vector of plugin file paths
             std::vector<std::string> expand_plugin_path(const std::string& path) const;
 
         private:
             std::map<const MaCh3ArgumentParser*, IModule*> m_module_map;                ///< Map of parsers to core modules (non-owning)
+            std::set<std::string> m_attempted_plugin_paths;  // keeps track of dynamic plugin paths that have been attempted for loading
             std::map<const MaCh3ArgumentParser*, std::unique_ptr<DynamicPlugin>> m_dynamic_plugin_map;  ///< Map of parsers to dynamic plugins (owning)
 
             static constexpr std::string_view BASH_COMPLETION = R"(

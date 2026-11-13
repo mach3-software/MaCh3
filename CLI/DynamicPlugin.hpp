@@ -3,8 +3,10 @@
 
 #pragma once
 #include <dlfcn.h>
+#include <iostream>
 #include <memory>
-#include <functional>
+#include <stdexcept>
+#include <string>
 #include "CLI/API/plugin.hpp"
 
 namespace M3{
@@ -33,38 +35,62 @@ namespace M3{
                     throw std::runtime_error("dlopen failed");
                 }
 
+                try{
+                    // Fix API compatibility: reject legacy/mismatched plugins before calling their factory.
+                    auto version = reinterpret_cast<plugin_api_version_t>(dlsym(m_handle.get(), "plugin_api_version"));
+                    if (!version) {
+                        throw std::runtime_error("Missing plugin_api_version function; rebuild the plugin with the current MaCh3 SDK");
+                    }
+                    const auto plugin_version = version();
+                    if (plugin_version != PLUGIN_API_VERSION) {
+                        throw std::runtime_error("Plugin API version " + std::to_string(plugin_version) +
+                                                 " does not match host version " + std::to_string(PLUGIN_API_VERSION) +
+                                                 "; rebuild the plugin with the current MaCh3 SDK");
+                    }
+                }
+                catch (const std::exception& err){
+                    // Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.
+                    throw std::runtime_error("Cannot initialise plugin '" + std::string(sofile) + "': " + err.what());
+                }
+                catch (...){
+                    throw std::runtime_error("Cannot initialise plugin '" + std::string(sofile) + "': unknown exception");
+                }
+
                 auto create = reinterpret_cast<create_plugin_t>(dlsym(m_handle.get(), "create_plugin"));
                 auto destroy = reinterpret_cast<destroy_plugin_t>(dlsym(m_handle.get(), "destroy_plugin"));
 
                 if (!create || !destroy) {
                     std::cerr << "Invalid plugin: " << sofile << "\n";
-                    m_handle.reset(nullptr);
                     throw std::runtime_error("Invalid plugin - missing create_plugin or destroy_plugin");
                 }
 
                 try{
                     m_plugin = std::unique_ptr<IPlugin, destroy_plugin_t>(create(), destroy);
                     if (!m_plugin){
-                        throw std::runtime_error("null pointer");
+                        throw std::runtime_error("Plugin factory returned a null pointer");
                     }
+                }
+                catch (const std::exception& err){
+                    throw std::runtime_error("Error instantiating plugin '" + std::string(sofile) + "': " + err.what());
                 }
                 catch (...){
                     std::cerr << "Error instantiating plugin: " << sofile << "\n";
-                    m_handle.reset(nullptr);
-                    throw std::runtime_error("Error instantiating plugin");
+                    throw std::runtime_error("Error instantiating plugin '" + std::string(sofile) + "': unknown exception");
                 }
 
                 try{
                     m_parser = m_plugin->get_parser();
                     if (!m_parser){
-                        throw std::runtime_error("null pointer");
+                        throw std::runtime_error("Plugin returned a null parser");
                     }
                 }
-                catch(...){
+                catch (const std::exception& err){
+                    // Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.
+                    throw std::runtime_error("Error retrieving parser '" + std::string(sofile) + "': " + err.what());
+                }
+                catch (...){
                     std::cerr<< "Error retrieving parser" << "\n";
-                    m_plugin.reset(nullptr);
-                    m_handle.reset(nullptr);
-                    throw std::runtime_error("Error retrieving parser");
+                    throw std::runtime_error("Error retrieving parser '" + std::string(sofile) + "': unknown exception");
                 }
             }
 

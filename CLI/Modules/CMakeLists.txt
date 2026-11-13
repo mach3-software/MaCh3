@@ -17,7 +17,11 @@ add_library(CLIModules SHARED
 target_link_libraries(CLIModules PRIVATE MaCh3::All)
 target_link_libraries(CLIModules PRIVATE MaCh3Warnings)
 
-target_include_directories(CLIModules PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+# Fix build consistency: source headers must precede stale installed copies in build/include.
+target_include_directories(CLIModules PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+)
 
 install(TARGETS CLIModules LIBRARY DESTINATION lib)
 
