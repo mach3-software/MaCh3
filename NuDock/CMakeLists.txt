@@ -50,4 +50,6 @@ install(TARGETS MaCh3NuDock
         PUBLIC_HEADER DESTINATION include/MaCh3NuDock)
 
 add_library(MaCh3::MaCh3NuDock ALIAS MaCh3NuDock)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
