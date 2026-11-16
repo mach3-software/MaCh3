@@ -448,7 +448,7 @@ void PredictiveThrower::WriteByModeToys(TDirectory* ByModeDirectory,
           std::string ProjectionName = SampleHandler->GetKinVarName(iSample, iDim);
           std::string PlotSuffix = "_1DProj" + std::to_string(iDim) + "_" + ModeName + "_" + std::to_string(iToy);
 
-          auto hist = SampleHandler->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          auto hist = SampleHandler->Get1DVarHistByValues(iSample, ProjectionName, {"Mode"}, {iMode});
           hist->SetTitle((SampleName + PlotSuffix).c_str());
           hist->SetName((SampleName + PlotSuffix).c_str());
           hist->Write();

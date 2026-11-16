@@ -88,14 +88,14 @@ public:
 
   /// @copydoc SampleHandlerInterface::ReturnKinematicParameterBinning
   std::vector<double> ReturnKinematicParameterBinning([[maybe_unused]] const int Sample, [[maybe_unused]] const std::string &KinematicParameter) const override { return {}; };
-  /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
-  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_Str,
-                                            [[maybe_unused]] int kModeToFill = -1, [[maybe_unused]] int kChannelToFill = -1,
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByValues
+  std::unique_ptr<TH1> Get1DVarHistByValues([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_Str,
+                                            [[maybe_unused]] const std::vector<std::string>& var_name, [[maybe_unused]] const std::vector<int>& value,
                                             [[maybe_unused]] int WeightStyle = 0) override { return nullptr; };
-                                            /// @copydoc SampleHandlerInterface::Get2DVarHistByModeAndChannel
-  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_StrX,
-                                            [[maybe_unused]] const std::string& ProjectionVar_StrY, [[maybe_unused]] int kModeToFill = -1,
-                                            [[maybe_unused]] int kChannelToFill = -1, [[maybe_unused]] int WeightStyle = 0) override { return nullptr;};
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByValues
+  std::unique_ptr<TH2> Get2DVarHistByValues([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string& ProjectionVar_StrX,
+                                            [[maybe_unused]] const std::string& ProjectionVar_StrY, [[maybe_unused]] const std::vector<std::string>& var_name,
+                                            [[maybe_unused]] const std::vector<int>& value, [[maybe_unused]] int WeightStyle = 0) override { return nullptr;};
   /// @copydoc SampleHandlerInterface::Get1DVarHist
   std::unique_ptr<TH1> Get1DVarHist([[maybe_unused]] const int iSample, [[maybe_unused]] const std::string &ProjectionVar,
                            [[maybe_unused]] const std::vector<KinematicCut> &EventSelectionVec = {}, [[maybe_unused]] int WeightStyle = 0,

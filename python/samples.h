@@ -152,30 +152,30 @@ public:
         );
     }
 
-    std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample,
-                                                      const std::string& ProjectionVar_Str,
-                                                      const int kModeToFill = -1,
-                                                      const int kChannelToFill = -1,
-                                                      const int WeightStyle = 0) override {
+    std::unique_ptr<TH1> Get1DVarHistByValues(const int iSample,
+                                              const std::string& ProjectionVar_Str,
+                                              const std::vector<std::string>& var_name,
+                                              const std::vector<int>& values,
+                                              const int WeightStyle = 0) override {
         (void) iSample;
         (void) ProjectionVar_Str;
-        (void) kModeToFill;
-        (void) kChannelToFill;
+        (void) var_name;
+        (void) values;
         (void) WeightStyle;
         return nullptr;
     }
 
-    std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample,
-                                                      const std::string& ProjectionVar_StrX,
-                                                      const std::string& ProjectionVar_StrY,
-                                                      const int kModeToFill = -1,
-                                                      const int kChannelToFill = -1,
-                                                      const int WeightStyle = 0) override {
+    std::unique_ptr<TH2> Get2DVarHistByValues(const int iSample,
+                                              const std::string& ProjectionVar_StrX,
+                                              const std::string& ProjectionVar_StrY,
+                                              const std::vector<std::string>& var_name,
+                                              const std::vector<int>& values,
+                                              const int WeightStyle = 0) override {
       (void) iSample;
       (void) ProjectionVar_StrX;
       (void) ProjectionVar_StrY;
-      (void) kModeToFill;
-      (void) kChannelToFill;
+      (void) var_name;
+      (void) values;
       (void) WeightStyle;
       return nullptr;
     }
