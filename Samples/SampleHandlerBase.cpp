@@ -1700,10 +1700,10 @@ bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) const {
 }
 
 // ************************************************
-KinematicCut SampleHandlerBase::MakeExactValueCut(const std::string& var_name, const int value) const {
+KinematicCut SampleHandlerBase::MakeExactValueCut(const std::string& VarName, const int value) const {
 // ************************************************
   KinematicCut Cut;
-  Cut.ParamToCutOnIt = ReturnKinematicParameterFromString(var_name);
+  Cut.ParamToCutOnIt = ReturnKinematicParameterFromString(VarName);
   Cut.LowerBound = value - 0.5;
   Cut.UpperBound = value + 0.5;
   return Cut;
@@ -1711,33 +1711,35 @@ KinematicCut SampleHandlerBase::MakeExactValueCut(const std::string& var_name, c
 
 // ************************************************
 std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByValues(const int iSample, const std::string& ProjectionVar_Str,
-                                                            const std::vector<std::string>& var_names, const std::vector<int>& values,
+                                                            const std::vector<std::string>& VarNames, const std::vector<int>& Values,
                                                             const int WeightStyle) {
 // ************************************************
-  if (var_names.size() != values.size()) {
-    MACH3LOG_ERROR("Get1DVarHistByValues: var_names and values must have the same size.");
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("{}: VarNames (size={}) and Values (size={}) must have the same size.",
+                   __func__, VarNames.size(), Values.size());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  std::vector<KinematicCut> cuts(var_names.size());
-  for (std::size_t i = 0; i < var_names.size(); ++i) {
-    cuts[i] = MakeExactValueCut(var_names[i], values[i]);
+  std::vector<KinematicCut> cuts(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    cuts[i] = MakeExactValueCut(VarNames[i], Values[i]);
   }
   return Get1DVarHist(iSample, ProjectionVar_Str, cuts, WeightStyle);
 }
 
 // ************************************************
 std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHistByValues(const int iSample, const std::string& ProjectionVar_StrX,
-                                                             const std::string& ProjectionVar_StrY, const std::vector<std::string>& var_names,
-                                                             const std::vector<int>& values, const int WeightStyle) {
+                                                             const std::string& ProjectionVar_StrY, const std::vector<std::string>& VarNames,
+                                                             const std::vector<int>& Values, const int WeightStyle) {
 // ************************************************
-  if (var_names.size() != values.size()) {
-    MACH3LOG_ERROR("Get1DVarHistByValues: var_names and values must have the same size.");
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("{}: VarNames (size={}) and Values (size={}) must have the same size.",
+                   __func__, VarNames.size(), Values.size());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  std::vector<KinematicCut> cuts(var_names.size());
-  for (std::size_t i = 0; i < var_names.size(); ++i) {
-    cuts[i] = MakeExactValueCut(var_names[i], values[i]);
+  std::vector<KinematicCut> cuts(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    cuts[i] = MakeExactValueCut(VarNames[i], Values[i]);
   }
   return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, cuts, WeightStyle);
 }
@@ -1880,23 +1882,23 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 }
 
 // ************************************************
-std::map<int, SplitCategory> SampleHandlerBase::BuildSplitCategories(const int iSample, const std::string& var_name,
-                                                                     const std::map<int, SplitCategory>& categories) const {
+std::map<int, SplitCategory> SampleHandlerBase::BuildSplitCategories(const int iSample, const std::string& VarName,
+                                                                     const std::map<int, SplitCategory>& Categories) const {
 // ************************************************
-  if (!categories.empty()) return categories;
+  if (!Categories.empty()) return Categories;
 
   std::map<int, SplitCategory> split;
-  if (var_name == "Mode") {
+  if (VarName == "Mode") {
     for (int i = 0; i < Modes->GetNModes(); ++i) {
       split[i] = {Modes->GetMaCh3ModeName(i),
         static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i))};
     }
-  } else if (var_name == "OscillationChannel") {
+  } else if (VarName == "OscillationChannel") {
     for (int i = 0; i < GetNOscChannels(iSample); ++i) {
       split[i] = {GetFlavourName(iSample, i), static_cast<Color_t>(kAzure + 2 * i)};
     }
   } else {
-    MACH3LOG_ERROR("No categories given for split variable '{}', and it is not 'Mode' or 'OscillationChannel'", var_name);
+    MACH3LOG_ERROR("No categories given for split variable '{}', and it is not 'Mode' or 'OscillationChannel'", VarName);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   return split;
@@ -1904,16 +1906,16 @@ std::map<int, SplitCategory> SampleHandlerBase::BuildSplitCategories(const int i
 
 // ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                              const std::string& var_name, const std::map<int, SplitCategory>& categories,
+                                                                              const std::string& VarName, const std::map<int, SplitCategory>& Categories,
                                                                               const int WeightStyle) {
 // ************************************************
-  const auto SplitCategories = BuildSplitCategories(iSample, var_name, categories);
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
 
   // New approach: user-defined categories
   std::vector<std::unique_ptr<TH1>> hHistList;
   hHistList.reserve(SplitCategories.size());
   for (const auto& [value, category] : SplitCategories) {
-    const std::vector<KinematicCut> cuts = {MakeExactValueCut(var_name, value)};
+    const std::vector<KinematicCut> cuts = {MakeExactValueCut(VarName, value)};
     auto hist = Get1DVarHist(iSample, KinematicProjection, cuts, WeightStyle);
     hHistList.push_back(std::move(hist));
   }
@@ -1923,15 +1925,15 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                                               const std::string& KinematicProjectionY,
-                                                                              const std::string& var_name, const std::map<int, SplitCategory>& categories,
+                                                                              const std::string& VarName, const std::map<int, SplitCategory>& Categories,
                                                                               const int WeightStyle) {
 // ************************************************
-  const auto SplitCategories = BuildSplitCategories(iSample, var_name, categories);
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
 
   std::vector<std::unique_ptr<TH2>> hHistList;
   hHistList.reserve(SplitCategories.size());
   for (const auto& [value, category] : SplitCategories) {
-    const std::vector<KinematicCut> cuts = {MakeExactValueCut(var_name, value)};
+    const std::vector<KinematicCut> cuts = {MakeExactValueCut(VarName, value)};
     hHistList.push_back(Get2DVarHist(iSample, KinematicProjectionX, KinematicProjectionY, cuts, WeightStyle));
   }
   return hHistList;
@@ -1939,11 +1941,11 @@ std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(co
 
 // ************************************************
 std::pair<std::unique_ptr<THStack>, std::unique_ptr<TLegend>> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample,
-                                                                                      const std::string& KinematicProjection, const std::string& var_name,
-                                                                                      const std::map<int, SplitCategory>& categories, int WeightStyle) {
+                                                                                      const std::string& KinematicProjection, const std::string& VarName,
+                                                                                      const std::map<int, SplitCategory>& Categories, int WeightStyle) {
 // ************************************************
-  const auto SplitCategories = BuildSplitCategories(iSample, var_name, categories);
-  auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, var_name, SplitCategories, WeightStyle);
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
+  auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, VarName, SplitCategories, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
 
   auto THStackLeg = std::make_unique<TLegend>(0.1, 0.1, 0.9, 0.9);
@@ -1961,7 +1963,7 @@ std::pair<std::unique_ptr<THStack>, std::unique_ptr<TLegend>> SampleHandlerBase:
   }
 
   // Note: we use .release() to transfer ownership of each TH1 to THStack.
-  for (unsigned int i = 0; i < HistList.size(); i++) {
+  for (size_t i = 0; i < HistList.size(); i++) {
     StackHist->Add(HistList[i].release());
   }
   return {std::move(StackHist), std::move(THStackLeg)};
@@ -2105,19 +2107,19 @@ double SampleHandlerBase::GetSampleIntegral(const int iSample, const std::vector
 }
 
 // ************************************************
-double SampleHandlerBase::ReturnSampleIntegralByValue(const int iSample, const std::vector<std::string>& var_names,
-                                                      const std::vector<int>& values, const int WeightStyle) {
+double SampleHandlerBase::ReturnSampleIntegralByValue(const int iSample, const std::vector<std::string>& VarNames,
+                                                      const std::vector<int>& Values, const int WeightStyle) {
 // ************************************************
   std::vector<double> hHistList;
 
-  if (var_names.size() != values.size()) {
-    MACH3LOG_ERROR("var_names and values must have the same size.");
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("VarNames and values must have the same size.");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  std::vector<KinematicCut> SelectionVec(var_names.size());
-  for (std::size_t i = 0; i < var_names.size(); ++i) {
-    SelectionVec[i] = MakeExactValueCut(var_names[i], values[i]);
+  std::vector<KinematicCut> SelectionVec(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    SelectionVec[i] = MakeExactValueCut(VarNames[i], Values[i]);
   }
 
 
