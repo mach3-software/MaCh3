@@ -209,12 +209,9 @@ void ProcessMCMCModule::ProcessMCMC(const std::string& inputFile)
   if(PlotCorr)
   {
     Processor->SetSmoothing(GetFromManager<bool>(Settings["Smoothing"], true, __FILE__, __LINE__));
-    // Make the covariance matrix
-    //We have different treatment for multithread
-    Processor->CacheSteps();
     //KS: Since we cached let's make fancy violins :)
     if(GetFromManager<bool>(Settings["MakeViolin"], true, __FILE__, __LINE__)) Processor->MakeViolin();
-    Processor->MakeCovariance_MP();
+    Processor->MakeCovariance();
 
     Processor->DrawCovariance();
     if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true, __FILE__, __LINE__)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], "UpdatedCorrelationMatrix.yaml", __FILE__, __LINE__), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD", __FILE__, __LINE__));

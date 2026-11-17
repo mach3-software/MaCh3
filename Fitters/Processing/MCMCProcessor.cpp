@@ -28,7 +28,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParStep = nullptr;
   StepNumber = nullptr;
   ReweightPosterior = false;
-  WeightValue = nullptr;
 
   Posterior = nullptr;
   hviolin = nullptr;
@@ -47,7 +46,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   printToPDF = false;
   plotBinValue = false;
   PlotFlatPrior = true;
-  CacheMCMC = false;
   ApplySmoothing = true;
   FancyPlotNames = true;
   doDiagMCMC = false;
@@ -117,23 +115,12 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
 
-  if(WeightValue) delete[] WeightValue;
-  for (int i = 0; i < nDraw; ++i)
-  {
-    if(hpost[i] != nullptr) delete hpost[i];
+  CleanVector(hpost);
+  CleanVector(hpost2D);
+  for (int i = 0; i < nDraw; ++i) {
+    if(ParStep) delete[] ParStep[i];
   }
-  if(CacheMCMC)
-  {
-    for (int i = 0; i < nDraw; ++i) 
-    {
-      for (int j = 0; j < nDraw; ++j) 
-      {
-        delete hpost2D[i][j];
-      }
-      delete[] ParStep[i];
-    }
-    delete[] ParStep;
-  }
+  if(ParStep) delete[] ParStep;
   if(StepNumber != nullptr) delete[] StepNumber;
 
   if(OutputFile != nullptr) OutputFile->Close();
@@ -187,8 +174,7 @@ void MCMCProcessor::GetPostfit_Ind(TVectorD *&PDF_Central, TVectorD *&PDF_Errors
 // ***************
 void MCMCProcessor::GetCovariance(TMatrixDSym *&Cov, TMatrixDSym *&Corr) {
 // ***************
-  if (CacheMCMC) MakeCovariance_MP();
-  else MakeCovariance();
+  MakeCovariance();
   Cov = static_cast<TMatrixDSym*>(Covariance->Clone());
   Corr = static_cast<TMatrixDSym*>(Correlation->Clone());
 }
@@ -826,8 +812,6 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 // Make fancy violin plots
 void MCMCProcessor::MakeViolin() {
 // *********************
-  //KS: Make sure we have steps
-  if(!CacheMCMC) CacheSteps();
   MACH3LOG_INFO("Starting {}", __func__);
 
   //KS: Find min and max to make histogram in range
@@ -869,6 +853,39 @@ void MCMCProcessor::MakeViolin() {
 
   TStopwatch clock;
   clock.Start();
+  //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
+  // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
+  #ifdef MULTITHREAD
+  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
+  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
+  #endif
+
+  ROOT::RDataFrame df(*Chain);
+  //KS: Burn in cut
+  auto dfBurnIn = df.Filter("step >= " + std::to_string(BurnInCut));
+
+  //KS: Binning is identical to Y axis of hviolin so bin number maps 1:1, including under/overflow
+  std::vector<ROOT::RDF::RResultPtr<TH1D>> hPar;
+  hPar.reserve(nDraw);
+  for (int x = 0; x < nDraw; ++x) {
+    const ROOT::RDF::TH1DModel model(Form("hviolin_tmp_%d", x), "", vBins, mini_y, maxi_y);
+    if (!ReweightPosterior) {
+      hPar.emplace_back(dfBurnIn.Histo1D<double>(model, BranchNames[x].Data()));
+    } else {
+      hPar.emplace_back(dfBurnIn.Histo1D<double, double>(model, BranchNames[x].Data(), "MCMC_RDF_WEIGHT"));
+    }
+  }
+
+  //KS: First access triggers the event loop, afterwards all histograms are ready
+  for (int x = 0; x < nDraw; ++x) {
+    for (int y = 0; y <= vBins+1; ++y) {
+      hviolin->SetBinContent(x+1, y, hPar[x]->GetBinContent(y));
+    }
+  }
+
+  #ifdef MULTITHREAD
+  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
+  #endif
 
   // nDraw is number of draws we want to do
   #ifdef MULTITHREAD
@@ -876,18 +893,6 @@ void MCMCProcessor::MakeViolin() {
   #endif
   for (int x = 0; x < nDraw; ++x)
   {
-    //KS: Consider another treatment for fixed params
-    //if (ParamVaried[x] == false) continue;
-    for (int k = 0; k < nEntries; ++k)
-    {
-      //KS: Burn in cut
-      if(StepNumber[k] < BurnInCut) continue;
-
-      //KS: We know exactly which x bin we will end up, find y bin. This allow to avoid costly Fill() and enable multithreading because I am master of faster
-      const double y = hviolin->GetYaxis()->FindBin(ParStep[x][k]);
-      hviolin->SetBinContent(x+1, y,  hviolin->GetBinContent(x+1, y)+1);
-    }
-
     //KS: If we set option to not plot flat prior and param has flat prior then we skip this step
     if(!(!PlotFlatPrior && PriorFlatVec[x]))
     {
@@ -909,7 +914,7 @@ void MCMCProcessor::MakeViolin() {
   hviolin->GetYaxis()->SetTitle("Parameter Value");
   hviolin->GetXaxis()->SetTitle();
   hviolin->GetXaxis()->LabelsOption("v");
-  
+
   hviolin_prior->GetYaxis()->SetTitle("Parameter Value");
   hviolin_prior->GetXaxis()->SetTitle();
   hviolin_prior->GetXaxis()->LabelsOption("v");
@@ -929,10 +934,10 @@ void MCMCProcessor::MakeViolin() {
   hviolin->SetFillColorAlpha(kBlue, 0.35);
   hviolin->SetMarkerStyle(20);
   hviolin->SetMarkerSize(1.0);
-  
+
   const double BottomMargin = Posterior->GetBottomMargin();
   Posterior->SetBottomMargin(0.2);
-    
+
   OutputFile->cd();
   hviolin->Write("param_violin");
   hviolin_prior->Write("param_violin_prior");
@@ -961,12 +966,13 @@ void MCMCProcessor::MakeViolin() {
   Posterior->SetBottomMargin(BottomMargin);
 }
 
-
 // *********************
 // Make the post-fit covariance matrix in all dimensions
-void MCMCProcessor::MakeCovariance() {
+void MCMCProcessor::MakeCovariance(bool Mute) {
 // *********************
   if (OutputFile == nullptr) MakeOutputFile();
+
+  if (hpost2D.size() == 0) Prepare2DHistograms();
 
   MACH3LOG_INFO("Making post-fit covariances...");
   // Check that the diagonal entries have been filled
@@ -982,9 +988,19 @@ void MCMCProcessor::MakeCovariance() {
   TStopwatch clock;
   clock.Start();
 
-  TDirectory *PostHistDir = OutputFile->mkdir("Post_2d_hists");
-  PostHistDir->cd();
+  TDirectory *PostHistDir = nullptr;
+  if (!Mute) {
+    PostHistDir = OutputFile->mkdir("Post_2d_hists");
+    PostHistDir->cd();
+  }
   gStyle->SetPalette(55);
+
+  //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
+  // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
+  #ifdef MULTITHREAD
+  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
+  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
+  #endif
 
 
   // Define RDataFrame
@@ -1003,10 +1019,10 @@ void MCMCProcessor::MakeCovariance() {
     dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
   }
 
+  // Only need the indices and the lazy result: titles/ranges live in hpost2D[i][j]
   struct CovarianceHistogram {
     int i, j;
-    TString Title_i, Title_j, DrawMe;
-    ROOT::RDF::RResultPtr<TH2D> Histogram;
+    ROOT::RDF::RResultPtr<TH2D> Result;
   };
 
   std::vector<CovarianceHistogram> Histograms;
@@ -1017,22 +1033,10 @@ void MCMCProcessor::MakeCovariance() {
 
   MACH3LOG_INFO("Booking {} 2D histograms...", nCov);
 
-  // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < nDraw; ++i)
   {
-    TString Title_i = "";
-    double Prior_i, PriorError;
-
-    GetNthParameter(i, Prior_i, PriorError, Title_i);
-    
-    double xmin = hpost[i]->GetXaxis()->GetXmin();
-    double xmax = hpost[i]->GetXaxis()->GetXmax();
-
-    // Loop over the other parameters to get the correlations
-    for (int j = 0; j <= i; ++j) {
-      // Skip the diagonal elements which we've already done above
-      if (j == i) continue;
-
+    for (int j = 0; j < i; ++j) // j < i: diagonal is already done
+    {
       // If this parameter isn't varied
       if (ParamVaried[j] == false) {
         (*Covariance)(i,j) = 0.0;
@@ -1042,47 +1046,37 @@ void MCMCProcessor::MakeCovariance() {
         continue;
       }
 
-      TString Title_j = "";
-      double Prior_j, PriorError_j;
-      GetNthParameter(j, Prior_j, PriorError_j, Title_j);
+      // Clear so repeated calls to MakeCovariance don't double count
+      hpost2D[i][j]->Reset();
 
-      TString DrawMe = BranchNames[j] + ":" + BranchNames[i];
-      double ymin = hpost[j]->GetXaxis()->GetXmin();
-      double ymax = hpost[j]->GetXaxis()->GetXmax();
+      // Build the model (name, title, binning, range) from the existing histogram
+      const ROOT::RDF::TH2DModel model(*hpost2D[i][j]);
 
-      ROOT::RDF::RResultPtr<TH2D> hpost_2D;
-
-      // Book unweighted histogram
-      if (!ReweightPosterior)
-      {
-        hpost_2D = dfToUse.Histo2D({DrawMe.Data(), DrawMe.Data(),
-                                    nBins, xmin, xmax, nBins, ymin, ymax},
-                                    BranchNames[i].Data(), BranchNames[j].Data());
+      ROOT::RDF::RResultPtr<TH2D> result;
+      if (!ReweightPosterior) {
+        result = dfToUse.Histo2D(model, BranchNames[i].Data(), BranchNames[j].Data());
+      } else {
+        result = dfToUse.Histo2D(model, BranchNames[i].Data(), BranchNames[j].Data(),
+                                  "MCMC_RDF_WEIGHT");
       }
-      else // Book weighted histogram[
-      {
-        hpost_2D = dfToUse.Histo2D({DrawMe.Data(), DrawMe.Data(),
-                        nBins, xmin, xmax, nBins, ymin, ymax},
-                        BranchNames[i].Data(), BranchNames[j].Data(), "MCMC_RDF_WEIGHT");
-      }
-      Histograms.push_back({i, j, Title_i, Title_j, DrawMe, hpost_2D});
+      Histograms.push_back({i, j, result});
     } // End j loop
   } // End i loop
   MACH3LOG_INFO("Finished booking {} histograms. Now executing RDF event loop...", Histograms.size());
 
   // The first GetPtr() triggers the RDF event loop.
-  //
-  // Because ALL histograms have already been booked, RDF fills
-  // all of them in the same event loop.
+  // Because ALL histograms have already been booked, RDF fills all of them in one pass.
   if (!Histograms.empty()) {
-    TH2D *dummy = Histograms[0].Histogram.GetPtr();
+    TH2D *dummy = Histograms[0].Result.GetPtr();
     (void)dummy;
   }
-
   clock.Stop();
+  MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries", clock.RealTime(), nEntries);
 
-  MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries",
-                clock.RealTime(), nEntries);
+  #ifdef MULTITHREAD
+  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
+  #endif
+
   TStopwatch processingClock;
   processingClock.Start();
 
@@ -1091,142 +1085,80 @@ void MCMCProcessor::MakeCovariance() {
     const int i = Entry.i;
     const int j = Entry.j;
 
-    TH2D *hpost_2D = Entry.Histogram.GetPtr();
-    hpost_2D->SetMinimum(0);
-    hpost_2D->GetXaxis()->SetTitle(Entry.Title_i);
-    hpost_2D->GetYaxis()->SetTitle(Entry.Title_j);
-    hpost_2D->GetZaxis()->SetTitle("Steps");
+    // Move RDF result into the pre-existing histogram (axis titles, min etc. already set)
+    TH2D *hpost_2D = hpost2D[i][j];
+    hpost_2D->Add(Entry.Result.GetPtr());
 
     if (ApplySmoothing) hpost_2D->Smooth();
+
     // Get the Covariance for these two parameters
-    (*Covariance)(i,j) = hpost_2D->GetCovariance();
+    (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
     (*Covariance)(j,i) = (*Covariance)(i,j);
-    (*Correlation)(i,j) = hpost_2D->GetCorrelationFactor();
+
+    //KS: Since we already have covariance consider calculating correlation using it, right now we effectively calculate covariance twice
+    //https://root.cern.ch/doc/master/TH2_8cxx_source.html#l01099
+    (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
     (*Correlation)(j,i) = (*Correlation)(i,j);
-
-    if(printToPDF)
-    {
-      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
-      {
-        Posterior->cd();
-        hpost_2D->Draw("colz");
-        Posterior->SetName(hpost_2D->GetName());
-        Posterior->SetTitle(hpost_2D->GetTitle());
-        Posterior->Print(CanvasName);
-        hpost_2D->Write(hpost_2D->GetTitle());
-      }
-    }
   }
-  processingClock.Stop();
 
-  MACH3LOG_INFO("Processing covariance histograms took {:.2f}s", processingClock.RealTime());
+  if (!Mute)
+  {
+    if (printToPDF)
+    {
+      Posterior->cd();
+      for (int i = 0; i < nDraw; ++i)
+      {
+        for (int j = 0; j < i; ++j)
+        {
+          if (ParamVaried[j] == false) continue;
 
-  PostHistDir->Close();
-  delete PostHistDir;
-  OutputFile->cd();
-  Covariance->Write("Covariance");
-  Correlation->Write("Correlation");
+          if (ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+          {
+            if (std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+            {
+              hpost2D[i][j]->Draw("colz");
+              Posterior->SetName(hpost2D[i][j]->GetName());
+              Posterior->SetTitle(hpost2D[i][j]->GetTitle());
+              Posterior->Print(CanvasName);
+              hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
+            }
+          }
+        } // End j loop
+      } // End i loop
+    } // end if pdf
+    processingClock.Stop();
+    MACH3LOG_INFO("Processing covariance histograms took {:.2f}s", processingClock.RealTime());
+
+    if (PostHistDir) {
+      PostHistDir->Close();
+      delete PostHistDir;
+    }
+    OutputFile->cd();
+    Covariance->Write("Covariance");
+    Correlation->Write("Correlation");
+  } // end mute
 }
 
 // ***************
 //KS: Cache all steps to allow multithreading, hit RAM quite a bit
-void MCMCProcessor::CacheSteps() {
+void MCMCProcessor::Prepare2DHistograms() {
 // ***************
-  if(CacheMCMC == true) return;
-  
-  CacheMCMC = true;
-  
-  if(ParStep != nullptr)
-  {
-    MACH3LOG_ERROR("It look like ParStep was already filled ");
-    MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC ");
-    MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  MACH3LOG_INFO("Caching input tree...");
-  MACH3LOG_INFO("Allocating {:.2f} MB", double(sizeof(M3::float_t)*nDraw*nEntries)/1.E6);
-  TStopwatch clock;
-  clock.Start();
-  
-  ParStep = new M3::float_t*[nDraw];
-  StepNumber = new unsigned int[nEntries];
-  
-  hpost2D.resize(nDraw);
-  for (int i = 0; i < nDraw; ++i) 
-  {
-    ParStep[i] = new M3::float_t[nEntries];
-    hpost2D[i].resize(nDraw);
-    for (int j = 0; j < nEntries; ++j)
-    {
-      ParStep[i][j] = -999.99;
-      //KS: Set this only once
-      if(i == 0) StepNumber[j] = 0;
-    }
-  }
-
-  // Set all the branches to off
-  Chain->SetBranchStatus("*", false);
-  unsigned int stepBranch = 0;
-  std::vector<double> ParValBranch(nDraw);
-  // Turn on the branches which we want for parameters
-  for (int i = 0; i < nDraw; ++i)
-  {
-    Chain->SetBranchStatus(BranchNames[i].Data(), true);
-    Chain->SetBranchAddress(BranchNames[i].Data(), &ParValBranch[i]);
-  }
-  Chain->SetBranchStatus("step", true);
-  Chain->SetBranchAddress("step", &stepBranch);
-
-  std::vector<double> ReweightWeight(ReweightNames.size(), 1.0);
-  if (ReweightPosterior)
-  {
-    WeightValue = new double[nEntries]();
-    for (size_t i = 0; i < ReweightNames.size(); ++i) {
-      Chain->SetBranchStatus(ReweightNames[i].c_str(), true);
-      Chain->SetBranchAddress(ReweightNames[i].c_str(), &ReweightWeight[i]);
-    }
-  }
-
-  const Long64_t countwidth = nEntries/10;
-
-  // Loop over the entries
-  //KS: This is really a bottleneck right now, thus revisit with ROOT6 https://pep-root6.github.io/docs/analysis/parallell/root.html
-  for (Long64_t j = 0; j < nEntries; ++j) 
-  {
-    if (j % countwidth == 0) {
-        M3::Utils::PrintProgressBar(j, nEntries);
-        M3::Utils::EstimateDataTransferRate(Chain, j);
-    } else {
-      Chain->GetEntry(j);
-    }
-    StepNumber[j] = stepBranch;
-    // Set the branch addresses for params
-    for (int i = 0; i < nDraw; ++i) {
-      ParStep[i][j] = ParValBranch[i];
-    }
-    if (ReweightPosterior) {
-      WeightValue[j] = 1.0;
-      for (size_t i = 0; i < ReweightWeight.size(); ++i) {
-        WeightValue[j] *= ReweightWeight[i];
-      }
-    }
-  }
-  // Set all the branches to on
-  Chain->SetBranchStatus("*", true);
+  if(hpost2D.size() != 0) return;
 
   // Calculate the total number of TH2D objects
   size_t nHistograms = nDraw * (nDraw + 1) / 2;
   MACH3LOG_INFO("Caching 2D posterior histograms...");
   MACH3LOG_INFO("Allocating {:.2f} MB for {} 2D Posteriors (each {}x{} bins)",
                 double(nHistograms * nBins * nBins * sizeof(double)) / 1.E6, nHistograms, nBins, nBins);
+
+  hpost2D.resize(nDraw);
   // Cache max and min in chain for covariance matrix
   for (int i = 0; i < nDraw; ++i)
   {
     TString Title_i = "";
     double Prior_i, PriorError_i;
     GetNthParameter(i, Prior_i, PriorError_i, Title_i);
-
+    hpost2D[i].resize(nDraw);
     for (int j = 0; j <= i; ++j)
     {
       TString Title_j = "";
@@ -1245,119 +1177,6 @@ void MCMCProcessor::CacheSteps() {
       hpost2D[i][j]->GetZaxis()->SetTitle("Steps");
     }
   }
-  clock.Stop();
-  MACH3LOG_INFO("Caching steps took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries );
-}
-
-// *********************
-// Make the post-fit covariance matrix in all dimensions
-void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
-// *********************
-  if (OutputFile == nullptr) MakeOutputFile();
-    
-  if(!CacheMCMC) CacheSteps();
-  
-  // Check that the diagonal entries have been filled
-  // i.e. MakePostfit() has been called
-  for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
-      MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
-      MakePostfit();
-      break;
-    }
-  }
-    
-  TStopwatch clock;
-  TDirectory *PostHistDir = nullptr;
-  if(!Mute)
-  {
-    MACH3LOG_INFO("Calculating covariance matrix");
-    clock.Start();
-    PostHistDir = OutputFile->mkdir("Post_2d_hists");
-    PostHistDir->cd();
-  }
-
-  if(!Mute)
-
-  gStyle->SetPalette(55);
-  // Now we are sure we have the diagonal elements, let's make the off-diagonals
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int i = 0; i < nDraw; ++i)
-  {    
-    for (int j = 0; j <= i; ++j)
-    {
-      // Skip the diagonal elements which we've already done above
-      if (j == i) continue;
-      
-      // If this parameter isn't varied
-      if (ParamVaried[j] == false) {
-        (*Covariance)(i,j) = 0.0;
-        (*Covariance)(j,i) = (*Covariance)(i,j);
-        (*Correlation)(i,j) = 0.0;
-        (*Correlation)(j,i) = (*Correlation)(i,j);
-        continue;
-      }
-      hpost2D[i][j]->SetMinimum(0);
-          
-      for (int k = 0; k < nEntries; ++k)
-      {
-        //KS: Burn in cut
-        if(StepNumber[k] < BurnInCut) continue;
-
-        const double Weight = ReweightPosterior ? WeightValue[i] : 1.;
-        //KS: Fill histogram with cached steps
-        hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k], Weight);
-      }
-      if(ApplySmoothing) hpost2D[i][j]->Smooth();
-      
-      // Get the Covariance for these two parameters
-      (*Covariance)(i,j) = hpost2D[i][j]->GetCovariance();
-      (*Covariance)(j,i) = (*Covariance)(i,j);
-
-      //KS: Since we already have covariance consider calculating correlation using it, right now we effectively calculate covariance twice
-      //https://root.cern.ch/doc/master/TH2_8cxx_source.html#l01099
-      (*Correlation)(i,j) = hpost2D[i][j]->GetCorrelationFactor();
-      (*Correlation)(j,i) = (*Correlation)(i,j);
-    }// End j loop
-  }// End i loop
-
-  if(!Mute) {
-    clock.Stop();
-    MACH3LOG_INFO("Making Covariance took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
-    if(printToPDF)
-    {
-      Posterior->cd();
-      for (int i = 0; i < nDraw; ++i)
-      {
-        for (int j = 0; j <= i; ++j)
-        {
-          // Skip the diagonal elements which we've already done above
-          if (j == i) continue;
-          if (ParamVaried[j] == false) continue;
-
-          if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
-          {
-            if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
-            {
-              hpost2D[i][j]->Draw("colz");
-              Posterior->SetName(hpost2D[i][j]->GetName());
-              Posterior->SetTitle(hpost2D[i][j]->GetTitle());
-              Posterior->Print(CanvasName);
-              hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
-            }
-          }
-          //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) hpost2D[i][j]->Write();
-        }// End j loop
-      }// End i loop
-    } //end if pdf
-    PostHistDir->Close();
-    delete PostHistDir;
-    OutputFile->cd();
-    Covariance->Write("Covariance");
-    Correlation->Write("Correlation");
-  } // end if not mute
 }
 
 // *********************
@@ -1397,7 +1216,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
     //Set threshold for calculating new matrix
     UpperCut = i*IntervalsSize;
     //Calculate cov matrix
-    MakeCovariance_MP(true);
+    MakeCovariance(true);
 
     //Calculate eigen values
     TMatrixDSymEigen eigen(*Covariance);
@@ -1869,7 +1688,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
                                         const bool Draw2DPosterior,
                                         const bool DrawBestFit) {
 // *********************
-  if(hpost2D.size() == 0) MakeCovariance_MP();
+  if(hpost2D.size() == 0) MakeCovariance();
   MACH3LOG_INFO("Making Credible Regions");
 
   CheckCredibleRegionsOrder(CredibleRegions, CredibleRegionStyle, CredibleRegionColor);
@@ -1990,7 +1809,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      // Other
                                      const bool CredibleInSigmas) {
 // *********************
-  if(hpost2D.size() == 0) MakeCovariance_MP();
+  if(hpost2D.size() == 0) MakeCovariance();
 
   const int nParamPlot = int(ParNames.size());
   std::vector<int> ParamNumber;
