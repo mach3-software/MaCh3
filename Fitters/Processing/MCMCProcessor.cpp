@@ -881,9 +881,9 @@ void MCMCProcessor::MakeViolin() {
   for (int x = 0; x < nDraw; ++x) {
     const ROOT::RDF::TH1DModel model(Form("hviolin_tmp_%d", x), "", vBins, mini_y, maxi_y);
     if (!ReweightPosterior) {
-      hPar.emplace_back(dfBurnIn.Histo1D<double>(model, BranchNames[x].Data()));
+      hPar.emplace_back(dfToUse.Histo1D<double>(model, BranchNames[x].Data()));
     } else {
-      hPar.emplace_back(dfBurnIn.Histo1D<double, double>(model, BranchNames[x].Data(), "MCMC_RDF_WEIGHT"));
+      hPar.emplace_back(dfToUse.Histo1D<double, double>(model, BranchNames[x].Data(), "MCMC_RDF_WEIGHT"));
     }
   }
 
