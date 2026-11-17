@@ -145,7 +145,7 @@ void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGr
     auto AllowDifferentConfigs = GetFromManager<bool>(fitMan->raw()["Predictive"]["AllowDifferentConfigs"], false, __FILE__, __LINE__);
 
     ///Let's ask the manager what are the file with covariance matrix
-    YAML::Node ConfigInChain = Processor.GetCovConfig(kXSecPar);
+    YAML::Node ConfigInChain = Processor.GetCovConfig(kModelPar);
     if(ModelSystematic) {
       YAML::Node ConfigNow = ModelSystematic->GetConfig();
       if (!compareYAMLNodes(ConfigNow, ConfigInChain))

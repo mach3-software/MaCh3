@@ -43,9 +43,9 @@ class MCMCProcessorGPU;
 /// KS: Enum for different covariance classes
 /// @warning this is bit of legacy functionality and will become deprecated in future
 enum ParameterEnum {
-  kXSecPar  = 0,
-  kNDPar    = 1,
-  kFDDetPar = 2,
+  kModelPar  = 0,
+  kNDPar     = 1,
+  kFDDetPar  = 2,
   
   kNParameterEnum = 3 //KS: keep it at the end to keep track of all parameters
 };
@@ -208,9 +208,6 @@ class MCMCProcessor {
     // Get the number of parameters
     /// @brief Get total number of used parameters
     int GetNParams() const { return nDraw; };
-    int GetNXSec() const { return nParam[kXSecPar]; };
-    int GetNND() const { return nParam[kNDPar]; };
-    int GetNFD() const { return nParam[kFDDetPar]; };
 
     /// @brief Get Yaml config obtained from a Chain
     YAML::Node GetCovConfig(const int i) const {return CovConfig.at(i); }
@@ -231,7 +228,7 @@ class MCMCProcessor {
     TH2D* GetViolinPrior() const { return hviolin_prior.get(); };
 
     //Covariance getters
-    std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
+    std::vector<std::string> GetModelCov()  const { return CovPos[kModelPar]; };
     std::string GetNDCov() const { return CovPos[kNDPar].back(); };
     std::string GetFDCov() const { return CovPos[kFDDetPar].back(); };
 
@@ -286,7 +283,7 @@ class MCMCProcessor {
       nEntries = NewEntries;
     }
     /// @brief Set reweight branch names
-    void SetReweightNames(std::vector<std::string> NewName) { ReweightNames = NewName; }
+    void SetReweightNames(const std::vector<std::string>& NewName) { ReweightNames = NewName; }
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
     void SetStepCut(const std::string& Cuts);
@@ -314,9 +311,9 @@ class MCMCProcessor {
     void SetUseFFTAutoCorrelation(const bool useFFT){useFFTAutoCorrelation = useFFT; };
 
     /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like param_, then passing "param_" will
-    void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
-    void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
-    void SetExcludedGroups(std::vector<std::string> Name){ExcludedGroups = Name; };
+    void SetExcludedTypes(const std::vector<std::string>& Name){ExcludedTypes = Name; };
+    void SetExcludedNames(const std::vector<std::string>& Name){ExcludedNames = Name; };
+    void SetExcludedGroups(const std::vector<std::string>& Name){ExcludedGroups = Name; };
 
     /// @brief Set value of Nbatches used for batched mean, this need to be done earlier as batches are made when reading tree
     /// @param Batches Number of batches, default is 20

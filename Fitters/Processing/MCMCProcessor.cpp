@@ -1337,7 +1337,7 @@ void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
           if (j == i) continue;
           if (ParamVaried[j] == false) continue;
 
-          if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+          if(ParamType[i] == kModelPar && ParamType[j] == kModelPar)
           {
             if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
             {
@@ -1533,7 +1533,7 @@ void MCMCProcessor::MakeCovarianceYAML(const std::string& OutputYAMLFile, const 
 // *********************
   MACH3LOG_INFO("Making covariance matrix YAML file");
 
-  if (ParamNames[kXSecPar].size() != static_cast<size_t>(nDraw)) {
+  if (ParamNames[kModelPar].size() != static_cast<size_t>(nDraw)) {
     MACH3LOG_ERROR("Using Legacy Parameters i.e. not one from Parameter Handler Generic, this will not work");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1571,12 +1571,12 @@ void MCMCProcessor::MakeCovarianceYAML(const std::string& OutputYAMLFile, const 
   }
 
   //Make std::string param name vector
-  std::vector<std::string> ParamStrings(ParamNames[kXSecPar].size());
-  for (size_t i = 0; i < ParamNames[kXSecPar].size(); ++i) {
-    ParamStrings[i] = static_cast<std::string>(ParamNames[kXSecPar][i]);
+  std::vector<std::string> ParamStrings(ParamNames[kModelPar].size());
+  for (size_t i = 0; i < ParamNames[kModelPar].size(); ++i) {
+    ParamStrings[i] = static_cast<std::string>(ParamNames[kModelPar][i]);
   }
 
-  YAML::Node XSecFile = CovConfig[kXSecPar];
+  YAML::Node XSecFile = CovConfig[kModelPar];
   M3::MakeCorrelationMatrix(XSecFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
 }
 
@@ -1597,8 +1597,8 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   for (int iPar = 0; iPar < nDraw; ++iPar)
   {
     std::string GroupNameCurr;
-    if(ParamType[iPar] == kXSecPar){
-      const int InternalNumeration = iPar - ParamTypeStartPos[kXSecPar];
+    if(ParamType[iPar] == kModelPar){
+      const int InternalNumeration = iPar - ParamTypeStartPos[kModelPar];
       GroupNameCurr = ParameterGroup[InternalNumeration];
     } else {
       GroupNameCurr = "Other"; // Use Other for all legacy params
@@ -1841,8 +1841,8 @@ void MCMCProcessor::ProduceChi2(const std::string& GroupName) const {
   for (int iPar = 0; iPar < nDraw; iPar++)
   {
     std::string GroupNameCurr;
-    if(ParamType[iPar] == kXSecPar){
-      const int InternalNumeration = iPar - ParamTypeStartPos[kXSecPar];
+    if(ParamType[iPar] == kModelPar){
+      const int InternalNumeration = iPar - ParamTypeStartPos[kModelPar];
       GroupNameCurr = ParameterGroup[InternalNumeration];
     } else {
       GroupNameCurr = "Other"; // Use Other for all legacy params
@@ -2532,7 +2532,7 @@ std::unique_ptr<TH1D> MCMCProcessor::MakePrefit() {
 void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
-  if(CovPos[kXSecPar].back() != "none") ReadModelFile();
+  if(CovPos[kModelPar].back() != "none") ReadModelFile();
 }
 
 // **************************
@@ -2567,8 +2567,8 @@ void MCMCProcessor::FindInputFiles() {
 
   bool InputNotFound = false;
   //CW: Get the xsec Covariance matrix
-  CovPos[kXSecPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"}, __FILE__ , __LINE__);
-  if(CovPos[kXSecPar].back() == "none")
+  CovPos[kModelPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"}, __FILE__ , __LINE__);
+  if(CovPos[kModelPar].back() == "none")
   {
     MACH3LOG_WARN("Couldn't find XsecCov branch in output");
     InputNotFound = true;
@@ -2578,12 +2578,12 @@ void MCMCProcessor::FindInputFiles() {
   if (XsecConfig == nullptr) {
     MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
   } else {
-    CovConfig[kXSecPar] = TMacroToYAML(*XsecConfig);
+    CovConfig[kModelPar] = TMacroToYAML(*XsecConfig);
   }
   if(InputNotFound) M3::Utils::PrintConfig(Settings);
 
-  for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
-    M3::AddPath(CovPos[kXSecPar][i]);
+  for(size_t i = 0; i < CovPos[kModelPar].size(); i++)
+    M3::AddPath(CovPos[kModelPar][i]);
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
@@ -2693,7 +2693,7 @@ void MCMCProcessor::FindInputFilesLegacy() {
 // Read the model file and get the input central values and errors
 void MCMCProcessor::ReadModelFile() {
 // ***************
-  YAML::Node XSecFile = CovConfig[kXSecPar];
+  YAML::Node XSecFile = CovConfig[kModelPar];
 
   auto systematics = XSecFile["Systematics"];
   int paramIndex  = 0;
@@ -2725,23 +2725,23 @@ void MCMCProcessor::ReadModelFile() {
     }
     if(rejected) continue;
 
-    ParamNames[kXSecPar].push_back(ParName);
-    ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
-    ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
-    ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__));
+    ParamNames[kModelPar].push_back(ParName);
+    ParamCentral[kModelPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
+    ParamErrors[kModelPar].push_back(param["Systematic"]["Error"].as<double>() );
+    ParamFlat[kModelPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false, __FILE__ , __LINE__));
 
     if(CheckNodeExists(param["Systematic"],"SpecialProposal", "CircularBounds")) {
-      ParamCircular[kXSecPar].push_back(true);
+      ParamCircular[kModelPar].push_back(true);
     } else {
-      ParamCircular[kXSecPar].push_back(false);
+      ParamCircular[kModelPar].push_back(false);
     }
     ParameterGroup.push_back(Group);
 
-    nParam[kXSecPar]++;
-    ParamType.push_back(kXSecPar);
+    nParam[kModelPar]++;
+    ParamType.push_back(kModelPar);
     // Params from osc group have branch name equal to fancy name while all others are basically xsec_0 for example
     if(ParameterGroup.back() == "Osc") {
-      BranchNames.push_back(ParamNames[kXSecPar].back());
+      BranchNames.push_back(ParamNames[kModelPar].back());
     } else {
       BranchNames.push_back("param_" + std::to_string(paramIndex));
     }
@@ -4619,7 +4619,7 @@ void MCMCProcessor::PrintInfo() const {
   MACH3LOG_INFO("************************************************");
   MACH3LOG_INFO("Scanning output branches...");
   MACH3LOG_INFO("# Useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
-  MACH3LOG_INFO("# Model params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar], ParamTypeStartPos[kXSecPar]);
+  MACH3LOG_INFO("# Model params:  \033[1;32m {} starting at {} \033[0m ", nParam[kModelPar], ParamTypeStartPos[kModelPar]);
   MACH3LOG_INFO("# With following groups: ");
   for (const std::string& key : orderedKeys) {
     MACH3LOG_INFO(" # {} params: {}", key, paramCounts[key]);
