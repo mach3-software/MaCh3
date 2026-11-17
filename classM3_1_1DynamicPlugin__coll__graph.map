@@ -1,8 +1,10 @@
 <map id="M3::DynamicPlugin" name="M3::DynamicPlugin">
-<area shape="rect" id="node1" title="Manages the lifecycle of a dynamically loaded plugin." alt="" coords="467,97,603,124"/>
-<area shape="rect" id="node2" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="221,5,309,32"/>
-<area shape="rect" id="node3" title=" " alt="" coords="172,57,357,98"/>
-<area shape="rect" id="node4" title=" " alt="" coords="191,122,338,163"/>
-<area shape="rect" id="node5" href="$classM3_1_1MaCh3ArgumentParser.html" title="Extended ArgumentParser with MaCh3&#45;specific functionality." alt="" coords="172,188,357,215"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,188,123,215"/>
+<area shape="rect" id="node1" title="Manages the lifecycle of a dynamically loaded plugin." alt="" coords="788,97,924,124"/>
+<area shape="rect" id="node2" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="542,5,630,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="493,57,679,98"/>
+<area shape="rect" id="node4" title=" " alt="" coords="513,122,659,163"/>
+<area shape="rect" id="node5" href="$classM3_1_1MaCh3ArgumentParser.html" title="Extended ArgumentParser with MaCh3&#45;specific functionality." alt="" coords="493,188,679,215"/>
+<area shape="rect" id="node6" title=" " alt="" coords="181,163,299,189"/>
+<area shape="rect" id="node7" title=" " alt="" coords="200,213,280,240"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,206,132,247"/>
 </map>

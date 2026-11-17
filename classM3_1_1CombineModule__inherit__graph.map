@@ -1,0 +1,5 @@
+<map id="M3::CombineModule" name="M3::CombineModule">
+<area shape="rect" id="node1" title="Allows you to combine multiple chains or ROOT files into a single output." alt="" coords="5,155,148,181"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title="Base class for core modules in MaCh3." alt="" coords="27,80,126,107"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="33,5,121,32"/>
+</map>

@@ -2801,7 +2801,7 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="comment">// the throw matrix after set up.</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keyword">auto</span> filename =</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      YAMLDocTemp[<span class="stringliteral">&quot;ThrowMatrixOverride&quot;</span>][<span class="stringliteral">&quot;file&quot;</span>].as&lt;std::string&gt;();</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      TFile *submatrix_file = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">TFile::Open</a>(filename.c_str());</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      TFile *submatrix_file = TFile::Open(filename.c_str());</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keyword">auto</span> matrixname =</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      YAMLDocTemp[<span class="stringliteral">&quot;ThrowMatrixOverride&quot;</span>][<span class="stringliteral">&quot;matrix&quot;</span>].as&lt;std::string&gt;();</div>
@@ -2871,7 +2871,6 @@ template&lt;typename FilterFunc , typename ActionFunc &gt; </div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  }</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00589">YamlHelper.h:589</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00771">HistogramUtils.cpp:771</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -145,7 +145,7 @@ mixed syntax binnings allowed</h1>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">if</span> (bin_edges_node.IsMap()) {</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    found_range_specifier = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;{</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <a class="code" href="HistogramUtils_8cpp.html#a6d91627b73b5e98f8417880a5bc65079">BinRangeToBinEdges</a>(bin_edges_node),</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      M3::BinRangeToBinEdges(bin_edges_node),</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    };</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (bin_edges_node.IsSequence()) {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">if</span> (!bin_edges_node.size()) {</div>
@@ -158,13 +158,13 @@ mixed syntax binnings allowed</h1>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> &amp;first_el = bin_edges_node[0];</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span> (first_el.IsScalar() || first_el.IsMap()) { <span class="comment">// 1D binning</span></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;{</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <a class="code" href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a>(bin_edges_node, found_range_specifier),</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        M3::BuildBinEdgesFromNode(bin_edges_node, found_range_specifier),</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      };</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// ND binning</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; dims;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;dim_node : bin_edges_node) {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      dims.push_back(<a class="code" href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a>(dim_node, found_range_specifier));</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      dims.push_back(M3::BuildBinEdgesFromNode(dim_node, found_range_specifier));</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> dims;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  } <span class="keywordflow">else</span> {</div>
@@ -177,8 +177,6 @@ mixed syntax binnings allowed</h1>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;}</div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_a47ece2ae4a458b4de7835e60250d4211"><div class="ttname"><a href="HistogramUtils_8cpp.html#a47ece2ae4a458b4de7835e60250d4211">BuildBinEdgesFromNode</a></div><div class="ttdeci">std::vector&lt; double &gt; BuildBinEdgesFromNode(YAML::Node const &amp;bin_edges_node, bool &amp;found_range_specifier)</div><div class="ttdoc">Builds a single dimension's bin edges from YAML::Node.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00707">HistogramUtils.cpp:707</a></div></div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_a6d91627b73b5e98f8417880a5bc65079"><div class="ttname"><a href="HistogramUtils_8cpp.html#a6d91627b73b5e98f8417880a5bc65079">BinRangeToBinEdges</a></div><div class="ttdeci">std::vector&lt; double &gt; BinRangeToBinEdges(YAML::Node const &amp;bin_range)</div><div class="ttdoc">Converts a range (linspace/logspace) to a std::vector&lt;double&gt;</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00653">HistogramUtils.cpp:653</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 </div><!-- fragment -->

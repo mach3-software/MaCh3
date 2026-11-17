@@ -82,7 +82,8 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">plugin.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -90,18 +91,20 @@ $(function() {
 
 <p>Plugin interface and registration macros for MaCh3.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;memory&gt;</code><br />
+<div class="textblock"><code>#include &lt;cstdint&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;type_traits&gt;</code><br />
 <code>#include &quot;<a class="el" href="m3argparse_8hpp_source.html">CLI/API/m3argparse.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for plugin.hpp:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="plugin_8hpp__incl.svg" width="272" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="plugin_8hpp__incl.svg" width="467" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="plugin_8hpp__dep__incl.svg" width="100%" height="518"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="plugin_8hpp__dep__incl.svg" width="100%" height="529"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 </div>
@@ -136,12 +139,21 @@ Typedefs</h2></td></tr>
 <tr class="memitem:afd98b2e1cfd69589744c3e3a8a155629"><td class="memItemLeft" align="right" valign="top">typedef PluginBase&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#afd98b2e1cfd69589744c3e3a8a155629">M3::IModuleBase</a></td></tr>
 <tr class="memdesc:afd98b2e1cfd69589744c3e3a8a155629"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alias for IPluginBase, used for core modules.  <a href="namespaceM3.html#afd98b2e1cfd69589744c3e3a8a155629">More...</a><br /></td></tr>
 <tr class="separator:afd98b2e1cfd69589744c3e3a8a155629"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace78f6bf1a646e0a31060c2d6c35599f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classM3_1_1IPlugin.html">M3::IPlugin</a> *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plugin_8hpp.html#ace78f6bf1a646e0a31060c2d6c35599f">create_plugin_t</a>) ()</td></tr>
-<tr class="memdesc:ace78f6bf1a646e0a31060c2d6c35599f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function pointer type for plugin factory function.  <a href="plugin_8hpp.html#ace78f6bf1a646e0a31060c2d6c35599f">More...</a><br /></td></tr>
-<tr class="separator:ace78f6bf1a646e0a31060c2d6c35599f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4782599a8f4dcb7316731ef866bff6d3"><td class="memItemLeft" align="right" valign="top">typedef std::uint32_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">plugin_api_version_t</a>) ()</td></tr>
+<tr class="memdesc:a4782599a8f4dcb7316731ef866bff6d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function pointer type for the plugin API-version query.  <a href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">More...</a><br /></td></tr>
+<tr class="separator:a4782599a8f4dcb7316731ef866bff6d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c629ac51de1e70a2dfd26908386f450"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classM3_1_1IPlugin.html">M3::IPlugin</a> *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">create_plugin_t</a>) ()</td></tr>
+<tr class="memdesc:a4c629ac51de1e70a2dfd26908386f450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function pointer type for the plugin factory.  <a href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">More...</a><br /></td></tr>
+<tr class="separator:a4c629ac51de1e70a2dfd26908386f450"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af546a73be42388bff0034557021cebb2"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">destroy_plugin_t</a>) (<a class="el" href="classM3_1_1IPlugin.html">M3::IPlugin</a> *)</td></tr>
 <tr class="memdesc:af546a73be42388bff0034557021cebb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function pointer type for plugin destructor function.  <a href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">More...</a><br /></td></tr>
 <tr class="separator:af546a73be42388bff0034557021cebb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a4e3953002879bfcd61eb57de12dae762"><td class="memItemLeft" align="right" valign="top">constexpr std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">M3::PLUGIN_API_VERSION</a> = 1</td></tr>
+<tr class="memdesc:a4e3953002879bfcd61eb57de12dae762"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fix API compatibility: increment when the plugin/parser contract changes incompatibly.  <a href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">More...</a><br /></td></tr>
+<tr class="separator:a4e3953002879bfcd61eb57de12dae762"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Plugin interface and registration macros for MaCh3. </p>
@@ -164,16 +176,21 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">static_assert(std::is_base_of&lt;M3::IPlugin, PluginClass&gt;::value, <span class="stringliteral">&quot;PluginClass must derive from M3::IPlugin&quot;</span>);  \</div>
-<div class="line">extern <span class="stringliteral">&quot;C&quot;</span> <a class="code" href="classM3_1_1IPlugin.html">M3::IPlugin</a>* create_plugin() {                   \</div>
+<div class="line">extern <span class="stringliteral">&quot;C&quot;</span> __attribute__((visibility(<span class="stringliteral">&quot;default&quot;</span>))) std::uint32_t plugin_api_version() { \</div>
+<div class="line">    return <a class="code" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">M3::PLUGIN_API_VERSION</a>;                              \</div>
+<div class="line">}                                                              \</div>
+<div class="line">extern <span class="stringliteral">&quot;C&quot;</span> __attribute__((visibility(<span class="stringliteral">&quot;default&quot;</span>))) <a class="code" href="namespaceM3.html">M3</a>::IPlugin* create_plugin() { \</div>
 <div class="line">    return <span class="keyword">new</span> PluginClass();                                  \</div>
 <div class="line">}                                                              \</div>
-<div class="line">extern <span class="stringliteral">&quot;C&quot;</span> <span class="keywordtype">void</span> destroy_plugin(<a class="code" href="classM3_1_1IPlugin.html">M3::IPlugin</a>* p) {            \</div>
+<div class="line">extern <span class="stringliteral">&quot;C&quot;</span> __attribute__((visibility(<span class="stringliteral">&quot;default&quot;</span>))) void destroy_plugin(<a class="code" href="namespaceM3.html">M3</a>::IPlugin* p) { \</div>
 <div class="line">    delete p;                                                  \</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassM3_1_1IPlugin_html"><div class="ttname"><a href="classM3_1_1IPlugin.html">M3::IPlugin</a></div><div class="ttdoc">Interface for MaCh3 plugins and modules.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00016">plugin.hpp:16</a></div></div>
+<div class="ttc" id="anamespaceM3_html"><div class="ttname"><a href="namespaceM3.html">M3</a></div><div class="ttdoc">Main namespace for MaCh3 software.</div></div>
+<div class="ttc" id="anamespaceM3_html_a4e3953002879bfcd61eb57de12dae762"><div class="ttname"><a href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">M3::PLUGIN_API_VERSION</a></div><div class="ttdeci">constexpr std::uint32_t PLUGIN_API_VERSION</div><div class="ttdoc">Fix API compatibility: increment when the plugin/parser contract changes incompatibly.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00014">plugin.hpp:14</a></div></div>
 </div><!-- fragment -->
 <p>Macro to register a plugin class with MaCh3. </p>
-<p>This macro generates the required factory and destructor functions for a plugin class. Use it in your plugin implementation file.</p>
+<p>This macro generates the required API-version, factory and destructor functions for a plugin class. Use it in your plugin implementation file.</p>
+<p>Fix API compatibility: export the version and factories even with hidden default visibility. functions generated by MACH3_REGISTER_PLUGIN are now visible to code outside the plugin’s shared library. thanks to <b>attribute</b>((visibility("default"))) that matters when a plugin is built with hidden visibility by default, for example with -fvisibility=hidden.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">PluginClass</td><td>The plugin class that implements <a class="el" href="classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules.">M3::IPlugin</a></td></tr>
@@ -184,28 +201,29 @@ Typedefs</h2></td></tr>
 <div class="line">    <span class="comment">// ... implementation</span></div>
 <div class="line">};</div>
 <div class="line"><a class="code" href="plugin_8hpp.html#af4ee15ffb2d7160a1f03b5239d2c7ec8">MACH3_REGISTER_PLUGIN</a>(MyPlugin)</div>
-<div class="ttc" id="aplugin_8hpp_html_af4ee15ffb2d7160a1f03b5239d2c7ec8"><div class="ttname"><a href="plugin_8hpp.html#af4ee15ffb2d7160a1f03b5239d2c7ec8">MACH3_REGISTER_PLUGIN</a></div><div class="ttdeci">#define MACH3_REGISTER_PLUGIN(PluginClass)</div><div class="ttdoc">Macro to register a plugin class with MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00080">plugin.hpp:80</a></div></div>
+<div class="ttc" id="aclassM3_1_1IPlugin_html"><div class="ttname"><a href="classM3_1_1IPlugin.html">M3::IPlugin</a></div><div class="ttdoc">Interface for MaCh3 plugins and modules.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00021">plugin.hpp:21</a></div></div>
+<div class="ttc" id="aplugin_8hpp_html_af4ee15ffb2d7160a1f03b5239d2c7ec8"><div class="ttname"><a href="plugin_8hpp.html#af4ee15ffb2d7160a1f03b5239d2c7ec8">MACH3_REGISTER_PLUGIN</a></div><div class="ttdeci">#define MACH3_REGISTER_PLUGIN(PluginClass)</div><div class="ttdoc">Macro to register a plugin class with MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00092">plugin.hpp:92</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00080">80</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00092">92</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="ace78f6bf1a646e0a31060c2d6c35599f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace78f6bf1a646e0a31060c2d6c35599f">&#9670;&nbsp;</a></span>create_plugin_t</h2>
+<a id="a4c629ac51de1e70a2dfd26908386f450"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c629ac51de1e70a2dfd26908386f450">&#9670;&nbsp;</a></span>create_plugin_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">create_plugin_t</td>
+          <td class="memname">typedef <a class="el" href="classM3_1_1IPlugin.html">M3::IPlugin</a>*(* create_plugin_t) ()</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Function pointer type for plugin factory function. </p>
+<p>Function pointer type for the plugin factory. </p>
 
-<p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00058">58</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00065">65</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
 
 </div>
 </div>
@@ -222,6 +240,24 @@ Typedefs</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function pointer type for plugin destructor function. </p>
+
+<p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00069">69</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4782599a8f4dcb7316731ef866bff6d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4782599a8f4dcb7316731ef866bff6d3">&#9670;&nbsp;</a></span>plugin_api_version_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::uint32_t(* plugin_api_version_t) ()</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function pointer type for the plugin API-version query. </p>
 
 <p class="definition">Definition at line <a class="el" href="plugin_8hpp_source.html#l00062">62</a> of file <a class="el" href="plugin_8hpp_source.html">plugin.hpp</a>.</p>
 

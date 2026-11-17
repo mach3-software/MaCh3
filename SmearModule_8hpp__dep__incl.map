@@ -1,0 +1,6 @@
+<map id="CLI/Modules/SmearModule.hpp" name="CLI/Modules/SmearModule.hpp">
+<area shape="rect" id="node1" title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ..." alt="" coords="141,5,346,32"/>
+<area shape="rect" id="node2" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="5,80,116,107"/>
+<area shape="rect" id="node3" href="$SmearModule_8cpp.html" title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ..." alt="" coords="141,80,346,107"/>
+<area shape="rect" id="node4" href="$SmearChain_8cpp.html" title=" " alt="" coords="371,80,588,107"/>
+</map>

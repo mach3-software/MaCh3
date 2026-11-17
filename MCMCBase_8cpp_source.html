@@ -82,7 +82,7 @@ $(function() {
 <div class="title">MCMCBase.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="MCMCBase_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MCMCBase_8h.html">Algorithms/MCMCBase.h</a>&quot;</span></div>
+<a href="MCMCBase_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MCMCBase_8h.html">Fitters/Algorithms/MCMCBase.h</a>&quot;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// *************************</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// Initialise the Manager and make it an object of mcmc class</span></div>
@@ -282,7 +282,7 @@ $(function() {
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <a class="code" href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a>(FitName);</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="comment">// For MCMC we also need to set stepStart</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    TFile *infile = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    TFile *infile = M3::Open(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> step_val = 0;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
@@ -414,7 +414,6 @@ $(function() {
 <div class="ttc" id="aclassManager_html_a6cfc76d6af382b177ac35be0a2fb5aab"><div class="ttname"><a href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">Manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw() const</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00048">Manager.h:48</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html"><div class="ttname"><a href="classParameterHandlerBase.html">ParameterHandlerBase</a></div><div class="ttdoc">Base class for handling systematic uncertainty parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00027">ParameterHandlerBase.h:27</a></div></div>
 <div class="ttc" id="anamespaceM3_1_1rand_html_a3da28d5da445f3b96e00cf563a6bbcd7"><div class="ttname"><a href="namespaceM3_1_1rand.html#a3da28d5da445f3b96e00cf563a6bbcd7">M3::rand::Uniform</a></div><div class="ttdeci">double Uniform(const double min=0.0, const double max=1.0)</div><div class="ttdoc">Generate a uniform random number in [min, max).</div><div class="ttdef"><b>Definition:</b> <a href="Random_8h_source.html#l00116">Random.h:116</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00771">HistogramUtils.cpp:771</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">

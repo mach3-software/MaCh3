@@ -1,0 +1,7 @@
+<map id="M3::UmbrellaModule" name="M3::UmbrellaModule">
+<area shape="rect" id="node1" title="Module for performing Umbrella sampling." alt="" coords="33,288,176,315"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title="Base class for core modules in MaCh3." alt="" coords="27,109,126,136"/>
+<area shape="rect" id="node5" href="$classM3_1_1UmbrellaPlotModule.html" title="Module for Umbrella sampling plot analysis." alt="" coords="22,199,187,225"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="23,13,111,39"/>
+<area shape="rect" id="node4" title=" " alt="" coords="135,5,314,47"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="CLI/Modules/UmbrellaPlotModule.hpp" name="CLI/Modules/UmbrellaPlotModule.hpp">
+<area shape="rect" id="node1" title="Module for Umbrella sampling plot analysis." alt="" coords="149,5,323,47"/>
+<area shape="rect" id="node2" href="$plugin_8hpp.html" title="Plugin interface and registration macros for MaCh3." alt="" coords="112,95,243,121"/>
+<area shape="rect" id="node8" title=" " alt="" coords="267,95,322,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,169,67,196"/>
+<area shape="rect" id="node4" title=" " alt="" coords="91,169,162,196"/>
+<area shape="rect" id="node5" title=" " alt="" coords="187,169,269,196"/>
+<area shape="rect" id="node6" href="$m3argparse_8hpp.html" title="MaCh3 wrapper for argparse library with additional functionality." alt="" coords="294,169,461,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="301,244,454,271"/>
+</map>

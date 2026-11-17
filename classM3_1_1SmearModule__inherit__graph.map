@@ -1,0 +1,5 @@
+<map id="M3::SmearModule" name="M3::SmearModule">
+<area shape="rect" id="node1" title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ..." alt="" coords="5,155,133,181"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title="Base class for core modules in MaCh3." alt="" coords="20,80,119,107"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="25,5,113,32"/>
+</map>

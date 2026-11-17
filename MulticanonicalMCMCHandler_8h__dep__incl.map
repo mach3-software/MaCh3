@@ -1,10 +1,10 @@
 <map id="Fitters/Algorithms/MulticanonicalMCMCHandler.h" name="Fitters/Algorithms/MulticanonicalMCMCHandler.h">
-<area shape="rect" id="node1" title=" " alt="" coords="419,5,625,47"/>
-<area shape="rect" id="node2" href="$MCMCBase_8h.html" title=" " alt="" coords="144,95,271,136"/>
-<area shape="rect" id="node13" href="$MulticanonicalMCMCHandler_8cpp.html" title=" " alt="" coords="295,95,515,136"/>
-<area shape="rect" id="node14" href="$UmbrellaPlotting_8cpp.html" title=" " alt="" coords="539,95,740,136"/>
-<area shape="rect" id="node15" href="$UmbrellaSolver_8cpp.html" title=" " alt="" coords="764,95,957,136"/>
-<area shape="rect" id="node3" href="$MCMCBase_8cpp.html" title=" " alt="" coords="69,184,196,225"/>
+<area shape="rect" id="node1" title=" " alt="" coords="608,5,815,47"/>
+<area shape="rect" id="node2" href="$MCMCBase_8h.html" title=" " alt="" coords="329,95,456,136"/>
+<area shape="rect" id="node13" href="$MulticanonicalMCMCHandler_8cpp.html" title=" " alt="" coords="480,95,700,136"/>
+<area shape="rect" id="node14" href="$UmbrellaModule_8hpp.html" title=" " alt="" coords="725,102,943,129"/>
+<area shape="rect" id="node18" href="$UmbrellaPlotModule_8cpp.html" title=" " alt="" coords="968,95,1143,136"/>
+<area shape="rect" id="node3" href="$MCMCBase_8cpp.html" title=" " alt="" coords="371,184,497,225"/>
 <area shape="rect" id="node4" href="$MR2T2_8h.html" title=" " alt="" coords="220,184,347,225"/>
 <area shape="rect" id="node5" href="$DelayedMR2T2_8h.html" title=" " alt="" coords="169,273,296,315"/>
 <area shape="rect" id="node7" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="11,363,137,404"/>
@@ -14,4 +14,7 @@
 <area shape="rect" id="node8" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="5,452,143,493"/>
 <area shape="rect" id="node10" href="$pyMaCh3_8h.html" title=" " alt="" coords="317,459,449,486"/>
 <area shape="rect" id="node11" href="$pyMaCh3_8cpp.html" title=" " alt="" coords="310,541,457,568"/>
+<area shape="rect" id="node15" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="779,191,889,218"/>
+<area shape="rect" id="node16" href="$UmbrellaModule_8cpp.html" title=" " alt="" coords="914,191,1133,218"/>
+<area shape="rect" id="node17" href="$UmbrellaSolver_8cpp.html" title=" " alt="" coords="561,184,755,225"/>
 </map>

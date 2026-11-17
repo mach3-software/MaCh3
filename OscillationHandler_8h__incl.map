@@ -1,6 +1,6 @@
 <map id="Samples/OscillationHandler.h" name="Samples/OscillationHandler.h">
-<area shape="rect" id="node1" title=" " alt="" coords="747,5,942,32"/>
-<area shape="rect" id="node2" href="$SampleStructs_8h.html" title=" " alt="" coords="757,80,932,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="818,5,1012,32"/>
+<area shape="rect" id="node2" href="$SampleStructs_8h.html" title=" " alt="" coords="828,80,1002,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="139,229,179,256"/>
 <area shape="rect" id="node4" title=" " alt="" coords="204,229,242,256"/>
 <area shape="rect" id="node5" title=" " alt="" coords="266,229,377,256"/>
@@ -14,7 +14,8 @@
 <area shape="rect" id="node26" title=" " alt="" coords="1072,229,1128,256"/>
 <area shape="rect" id="node27" title=" " alt="" coords="1152,229,1235,256"/>
 <area shape="rect" id="node28" title=" " alt="" coords="1259,229,1318,256"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1206,155,1418,181"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1206,155,1344,181"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1368,155,1580,181"/>
 <area shape="rect" id="node7" title=" " alt="" coords="300,453,372,480"/>
 <area shape="rect" id="node8" title=" " alt="" coords="469,379,524,405"/>
 <area shape="rect" id="node9" title=" " alt="" coords="560,304,638,331"/>

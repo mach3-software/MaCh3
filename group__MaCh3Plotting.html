@@ -145,9 +145,8 @@ Plotting Config</h2>
 </div><!-- fragment --><p>These tell the plotting manager where to find the other config files that are needed. <code>translationConfig</code> tells the manager where to find the translation config and <code>styleConfig</code> where to find the style config. These should be paths relative to the <code>MACH3</code> environment variable e.g. if your MaCh3 directory contained your configs in a subdirectory called <code>Cool-Configs</code> then it would look something like:</p>
 <div class="fragment"><div class="line">${MaCh3}/..</div>
 <div class="line">${MaCh3}/Cool-Configs/Cool-Translation-Config.yaml</div>
-<div class="line">${MaCh3}/Cool-Configs/Cool-<a class="code" href="PlotSigmaVariation_8cpp.html#a2c1881be081f561337336d11d34572a9">Style</a>-Config.yaml</div>
+<div class="line">${MaCh3}/Cool-Configs/Cool-Style-Config.yaml</div>
 <div class="line">${MaCh3}/..</div>
-<div class="ttc" id="aPlotSigmaVariation_8cpp_html_a2c1881be081f561337336d11d34572a9"><div class="ttname"><a href="PlotSigmaVariation_8cpp.html#a2c1881be081f561337336d11d34572a9">Style</a></div><div class="ttdeci">constexpr ELineStyle Style[NVars]</div><div class="ttdef"><b>Definition:</b> <a href="PlotSigmaVariation_8cpp_source.html#l00022">PlotSigmaVariation.cpp:22</a></div></div>
 </div><!-- fragment --><p>and your config options would look like:</p>
 <div class="fragment"><div class="line">ManagerOptions:</div>
 <div class="line">    translationConfig: <span class="stringliteral">&quot;Cool-Configs/Cool-Translation-Config.yaml&quot;</span></div>

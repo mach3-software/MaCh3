@@ -1,5 +1,5 @@
 <map id="Samples/SampleStructs.h" name="Samples/SampleStructs.h">
-<area shape="rect" id="node1" title=" " alt="" coords="757,5,932,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="828,5,1002,32"/>
 <area shape="rect" id="node2" title=" " alt="" coords="139,155,179,181"/>
 <area shape="rect" id="node3" title=" " alt="" coords="204,155,242,181"/>
 <area shape="rect" id="node4" title=" " alt="" coords="266,155,377,181"/>
@@ -13,7 +13,8 @@
 <area shape="rect" id="node25" title=" " alt="" coords="1072,155,1128,181"/>
 <area shape="rect" id="node26" title=" " alt="" coords="1152,155,1235,181"/>
 <area shape="rect" id="node27" title=" " alt="" coords="1259,155,1318,181"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1206,80,1418,107"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1206,80,1344,107"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1368,80,1580,107"/>
 <area shape="rect" id="node6" title=" " alt="" coords="300,379,372,405"/>
 <area shape="rect" id="node7" title=" " alt="" coords="469,304,524,331"/>
 <area shape="rect" id="node8" title=" " alt="" coords="560,229,638,256"/>

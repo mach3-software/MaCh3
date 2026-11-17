@@ -1,0 +1,8 @@
+<map id="CLI/Modules/LLHMapModule.hpp" name="CLI/Modules/LLHMapModule.hpp">
+<area shape="rect" id="node1" title="Module for processing LLHMap outputs." alt="" coords="270,5,486,32"/>
+<area shape="rect" id="node2" href="$DiagModule_8hpp.html" title=" " alt="" coords="51,80,246,107"/>
+<area shape="rect" id="node5" href="$LLHMapModule_8cpp.html" title="Processing n&#45;dimensional LLHMap outputs generating 1D and 2D profiled likelihoods as defined in confi..." alt="" coords="270,80,486,107"/>
+<area shape="rect" id="node6" href="$PlotLLHMap_8cpp.html" title="Processing n&#45;dimensional LLHMap outputs generating 1D and 2D profiled likelihoods as defined in confi..." alt="" coords="511,80,728,107"/>
+<area shape="rect" id="node3" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="5,155,116,181"/>
+<area shape="rect" id="node4" href="$DiagModule_8cpp.html" title=" " alt="" coords="141,155,335,181"/>
+</map>

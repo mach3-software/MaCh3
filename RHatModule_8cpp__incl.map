@@ -1,0 +1,52 @@
+<map id="CLI/Modules/RHatModule.cpp" name="CLI/Modules/RHatModule.cpp">
+<area shape="rect" id="node1" title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence." alt="" coords="749,5,948,32"/>
+<area shape="rect" id="node2" href="$RHatCalculator_8h.html" title=" " alt="" coords="691,80,820,121"/>
+<area shape="rect" id="node46" href="$RHatModule_8hpp.html" title="Module for computing the R&#45;hat diagnostic for MCMC chains." alt="" coords="2235,87,2433,114"/>
+<area shape="rect" id="node3" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="691,169,820,211"/>
+<area shape="rect" id="node22" title=" " alt="" coords="5,259,156,285"/>
+<area shape="rect" id="node23" title=" " alt="" coords="180,259,285,285"/>
+<area shape="rect" id="node29" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="2223,169,2421,211"/>
+<area shape="rect" id="node4" title=" " alt="" coords="2790,632,2862,659"/>
+<area shape="rect" id="node5" title=" " alt="" coords="675,259,745,285"/>
+<area shape="rect" id="node6" title=" " alt="" coords="769,259,835,285"/>
+<area shape="rect" id="node7" title=" " alt="" coords="2565,483,2623,509"/>
+<area shape="rect" id="node8" title=" " alt="" coords="859,259,934,285"/>
+<area shape="rect" id="node9" title=" " alt="" coords="310,259,369,285"/>
+<area shape="rect" id="node10" href="$Manager_8h.html" title=" " alt="" coords="959,259,1096,285"/>
+<area shape="rect" id="node24" title=" " alt="" coords="1317,259,1401,285"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1425,259,1491,285"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1121,259,1198,285"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1223,259,1293,285"/>
+<area shape="rect" id="node28" title=" " alt="" coords="495,259,651,285"/>
+<area shape="rect" id="node11" href="$SampleStructs_8h.html" title=" " alt="" coords="3237,333,3412,360"/>
+<area shape="rect" id="node13" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="2987,557,3174,584"/>
+<area shape="rect" id="node16" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="2663,483,2818,509"/>
+<area shape="rect" id="node17" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="2790,408,2921,435"/>
+<area shape="rect" id="node20" href="$Random_8h.html" title=" " alt="" coords="2683,333,2817,360"/>
+<area shape="rect" id="node12" title=" " alt="" coords="3233,483,3273,509"/>
+<area shape="rect" id="node14" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="3264,408,3471,435"/>
+<area shape="rect" id="node15" title=" " alt="" coords="3477,483,3540,509"/>
+<area shape="rect" id="node18" title=" " alt="" coords="2943,483,3010,509"/>
+<area shape="rect" id="node19" title=" " alt="" coords="3035,483,3137,509"/>
+<area shape="rect" id="node21" title=" " alt="" coords="3026,408,3087,435"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1515,259,1599,285"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1623,259,1738,285"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1762,259,1847,285"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1871,259,1959,285"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1984,259,2052,285"/>
+<area shape="rect" id="node35" title=" " alt="" coords="2076,259,2144,285"/>
+<area shape="rect" id="node36" title=" " alt="" coords="2168,259,2239,285"/>
+<area shape="rect" id="node37" title=" " alt="" coords="2263,259,2381,285"/>
+<area shape="rect" id="node38" title=" " alt="" coords="2405,259,2481,285"/>
+<area shape="rect" id="node39" title=" " alt="" coords="2506,259,2653,285"/>
+<area shape="rect" id="node40" title=" " alt="" coords="2677,259,2796,285"/>
+<area shape="rect" id="node41" title=" " alt="" coords="2821,259,2938,285"/>
+<area shape="rect" id="node42" title=" " alt="" coords="2963,259,3025,285"/>
+<area shape="rect" id="node43" title=" " alt="" coords="3050,259,3122,285"/>
+<area shape="rect" id="node44" title=" " alt="" coords="3147,259,3212,285"/>
+<area shape="rect" id="node45" title=" " alt="" coords="3237,259,3319,285"/>
+<area shape="rect" id="node47" href="$plugin_8hpp.html" title="Plugin interface and registration macros for MaCh3." alt="" coords="3615,177,3746,203"/>
+<area shape="rect" id="node48" title=" " alt="" coords="3788,259,3859,285"/>
+<area shape="rect" id="node49" title=" " alt="" coords="3883,259,3966,285"/>
+<area shape="rect" id="node50" href="$m3argparse_8hpp.html" title="MaCh3 wrapper for argparse library with additional functionality." alt="" coords="3597,259,3764,285"/>
+</map>

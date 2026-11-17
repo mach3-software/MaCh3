@@ -1039,7 +1039,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;    <a class="code" href="classTSpline3__red.html">TSpline3_red</a>* Spline = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160; </div>
 <div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;    std::set&lt;std::string&gt; SplineFileNames;</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;    <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(<a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">TFile::Open</a>(OscChanFileNames[iOscChan].c_str()));</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;    <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(TFile::Open(OscChanFileNames[iOscChan].c_str()));</div>
 <div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160; </div>
 <div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;    <span class="keywordflow">if</span> (!File || File-&gt;IsZombie()) {</div>
 <div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} not found&quot;</span>, OscChanFileNames[iOscChan]);</div>
@@ -1156,7 +1156,6 @@ Henry Wallace </dd></dl>
 <div class="ttc" id="aclassMaCh3Modes_html_a94d555d153fd328abd3c4411a285b3d3"><div class="ttname"><a href="classMaCh3Modes.html#a94d555d153fd328abd3c4411a285b3d3">MaCh3Modes::GetSplineSuffixFromMaCh3Mode</a></div><div class="ttdeci">std::string GetSplineSuffixFromMaCh3Mode(const int Index)</div><div class="ttdoc">DB: Get binned spline mode suffix from MaCh3 Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00243">MaCh3Modes.cpp:243</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html"><div class="ttname"><a href="classTSpline3__red.html">TSpline3_red</a></div><div class="ttdoc">CW: Reduced TSpline3 class.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00268">SplineStructs.h:268</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a2aed672aeeb4fcf51069966193176ff3"><div class="ttname"><a href="namespaceM3.html#a2aed672aeeb4fcf51069966193176ff3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">constexpr static const double _BAD_DOUBLE_</div><div class="ttdoc">Default value used for double initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00053">Core.h:53</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00771">HistogramUtils.cpp:771</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1203,7 +1202,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <span class="keywordtype">int</span> iSample = <a class="code" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  TH1* Axis_Hist = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(<a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">TFile::Open</a>(FileName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>));</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keyword">auto</span> File = std::unique_ptr&lt;TFile&gt;(TFile::Open(FileName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>));</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <span class="keywordflow">if</span> (!File || File-&gt;IsZombie())</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  {</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} not found&quot;</span>, FileName);</div>

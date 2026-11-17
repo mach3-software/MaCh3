@@ -80,6 +80,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classM3_1_1MaCh3ArgumentParser-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">M3::MaCh3ArgumentParser Class Reference</div>  </div>
@@ -99,7 +100,7 @@ Inheritance diagram for M3::MaCh3ArgumentParser:</div>
 <div class="dynheader">
 Collaboration diagram for M3::MaCh3ArgumentParser:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classM3_1_1MaCh3ArgumentParser__coll__graph.svg" width="196" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classM3_1_1MaCh3ArgumentParser__coll__graph.svg" width="303" height="218"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -110,6 +111,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a02b7bee87741f76204d89ed52b1c3168"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> () const</td></tr>
 <tr class="memdesc:a02b7bee87741f76204d89ed52b1c3168"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of this parser/subcommand.  <a href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">More...</a><br /></td></tr>
 <tr class="separator:a02b7bee87741f76204d89ed52b1c3168"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b393799d7c74498735649556b9dcb94"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a6b393799d7c74498735649556b9dcb94">description</a> () const</td></tr>
+<tr class="memdesc:a6b393799d7c74498735649556b9dcb94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the description of this parser/subcommand.  <a href="classM3_1_1MaCh3ArgumentParser.html#a6b393799d7c74498735649556b9dcb94">More...</a><br /></td></tr>
+<tr class="separator:a6b393799d7c74498735649556b9dcb94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2bf28f6bc580200692b5b3ea2a8548b"><td class="memItemLeft" align="right" valign="top">const std::list&lt; std::reference_wrapper&lt; ArgumentParser &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#aa2bf28f6bc580200692b5b3ea2a8548b">subparsers</a> () const</td></tr>
 <tr class="memdesc:aa2bf28f6bc580200692b5b3ea2a8548b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the list of registered subparsers.  <a href="classM3_1_1MaCh3ArgumentParser.html#aa2bf28f6bc580200692b5b3ea2a8548b">More...</a><br /></td></tr>
 <tr class="separator:aa2bf28f6bc580200692b5b3ea2a8548b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,6 +126,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae1deca44852b5bbfdcc82510d31db8de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#ae1deca44852b5bbfdcc82510d31db8de">option_takes_value</a> (const std::string &amp;<a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>) const</td></tr>
 <tr class="memdesc:ae1deca44852b5bbfdcc82510d31db8de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the named option expects a value (not a flag)  <a href="classM3_1_1MaCh3ArgumentParser.html#ae1deca44852b5bbfdcc82510d31db8de">More...</a><br /></td></tr>
 <tr class="separator:ae1deca44852b5bbfdcc82510d31db8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4236458e7f4a3ee0053ce2e3e0461d27"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a4236458e7f4a3ee0053ce2e3e0461d27">get_completions</a> (const std::string &amp;prefix, const std::vector&lt; std::string &gt; &amp;context) const</td></tr>
+<tr class="memdesc:a4236458e7f4a3ee0053ce2e3e0461d27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complete subcommands or long options at any depth without parsing incomplete arguments.  <a href="classM3_1_1MaCh3ArgumentParser.html#a4236458e7f4a3ee0053ce2e3e0461d27">More...</a><br /></td></tr>
+<tr class="separator:a4236458e7f4a3ee0053ce2e3e0461d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaff4fc861fcbc53f50373d6f4baaa16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#afaff4fc861fcbc53f50373d6f4baaa16">set_default_subcommand</a> (const std::string &amp;<a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>)</td></tr>
+<tr class="memdesc:afaff4fc861fcbc53f50373d6f4baaa16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a subcommand to use when none of the registered subcommands is given.  <a href="classM3_1_1MaCh3ArgumentParser.html#afaff4fc861fcbc53f50373d6f4baaa16">More...</a><br /></td></tr>
+<tr class="separator:afaff4fc861fcbc53f50373d6f4baaa16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaeaada866a52a2cbad8f9b4c5a0b8a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#acaeaada866a52a2cbad8f9b4c5a0b8a9">insert_default_subcommands</a> (std::vector&lt; std::string &gt; &amp;args, std::size_t pos=0) const</td></tr>
+<tr class="memdesc:acaeaada866a52a2cbad8f9b4c5a0b8a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert default subcommands into args where no explicit subcommand was given.  <a href="classM3_1_1MaCh3ArgumentParser.html#acaeaada866a52a2cbad8f9b4c5a0b8a9">More...</a><br /></td></tr>
+<tr class="separator:acaeaada866a52a2cbad8f9b4c5a0b8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a86c7896c1aeec88e3e012406e3061ca0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">m_default_subcommand</a></td></tr>
+<tr class="separator:a86c7896c1aeec88e3e012406e3061ca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Extended ArgumentParser with MaCh3-specific functionality. </p>
@@ -155,6 +173,127 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a6b393799d7c74498735649556b9dcb94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b393799d7c74498735649556b9dcb94">&#9670;&nbsp;</a></span>description()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; M3::MaCh3ArgumentParser::description </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the description of this parser/subcommand. </p>
+<dl class="section return"><dt>Returns</dt><dd>The description string </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00030">30</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                                                {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                <span class="keywordflow">return</span> this-&gt;m_description;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4236458e7f4a3ee0053ce2e3e0461d27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4236458e7f4a3ee0053ce2e3e0461d27">&#9670;&nbsp;</a></span>get_completions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; M3::MaCh3ArgumentParser::get_completions </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>prefix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Complete subcommands or long options at any depth without parsing incomplete arguments. </p>
+<dl class="section return"><dt>Returns</dt><dd>Matching names, or an empty list to allow shell file completion </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00075">75</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                                                                                               {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                <span class="keyword">const</span> MaCh3ArgumentParser* parser = <span class="keyword">this</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                <span class="keywordtype">bool</span> positional = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; context.size(); ++i) {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                    <span class="keyword">const</span> <span class="keyword">auto</span>&amp; word = context[i];</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                    <span class="keywordflow">if</span> (word == <span class="stringliteral">&quot;--&quot;</span>) <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                    <span class="keywordflow">if</span> (!positional) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                        <span class="keyword">auto</span> sub = parser-&gt;m_subparser_map.find(word);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                        <span class="keywordflow">if</span> (sub != parser-&gt;m_subparser_map.end()) {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                            parser = &amp;<span class="keyword">static_cast&lt;</span><span class="keyword">const </span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(sub-&gt;second-&gt;get());</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                            <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                        }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                        <span class="keyword">auto</span> fallback = parser-&gt;m_subparser_map.find(parser-&gt;m_default_subcommand);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                        <span class="keywordflow">if</span> (fallback != parser-&gt;m_subparser_map.end())</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                            parser = &amp;<span class="keyword">static_cast&lt;</span><span class="keyword">const </span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(fallback-&gt;second-&gt;get());</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                    }</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                    <span class="keywordflow">if</span> (!word.empty() &amp;&amp; word[0] == <span class="charliteral">&#39;-&#39;</span>) {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                        <span class="keyword">const</span> <span class="keyword">auto</span> equals = word.find(<span class="charliteral">&#39;=&#39;</span>);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                        <span class="keywordflow">if</span> (equals == std::string::npos &amp;&amp; parser-&gt;option_takes_value(word)) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                            <span class="keywordflow">if</span> (++i == context.size()) <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                        }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                        <span class="comment">// Once positional arguments start, later filenames are not subcommands.</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                        positional = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                    }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                std::vector&lt;std::string&gt; names;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                <span class="keywordflow">if</span> (!prefix.empty() &amp;&amp; prefix[0] == <span class="charliteral">&#39;-&#39;</span>) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                    <span class="keyword">auto</span> fallback = parser-&gt;m_subparser_map.find(parser-&gt;m_default_subcommand);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                    <span class="keywordflow">if</span> (fallback != parser-&gt;m_subparser_map.end())</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                        parser = &amp;<span class="keyword">static_cast&lt;</span><span class="keyword">const </span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(fallback-&gt;second-&gt;get());</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> : parser-&gt;get_long_option_names()) {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                        <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>.rfind(prefix, 0) == 0) names.push_back(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                    }</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!positional) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>, sub] : parser-&gt;m_subparser_map) {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; child = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(sub-&gt;get());</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                        <span class="keywordflow">if</span> (!child.m_suppress &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>.rfind(prefix, 0) == 0)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                            names.push_back(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                    }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;                }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                <span class="keywordflow">return</span> names;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            }</div>
+<div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a02b7bee87741f76204d89ed52b1c3168"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">M3::MaCh3ArgumentParser::name</a></div><div class="ttdeci">const std::string name() const</div><div class="ttdoc">Get the name of this parser/subcommand.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00024">m3argparse.hpp:24</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a9b5ed8a22ecbb4c93968e73207a9f891"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9b5ed8a22ecbb4c93968e73207a9f891">&#9670;&nbsp;</a></span>get_long_option_names()</h2>
 
@@ -180,16 +319,15 @@ Public Member Functions</h2></td></tr>
 
 <p>Return all long option names (&ndash;xxx) registered with this parser. </p>
 
-<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00050">50</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                                                               {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                std::vector&lt;std::string&gt; names;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>, _] : this-&gt;m_argument_map) {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                    <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>.size() &gt;= 2 &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[0] == <span class="charliteral">&#39;-&#39;</span> &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[1] == <span class="charliteral">&#39;-&#39;</span>)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                        names.push_back(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                <span class="keywordflow">return</span> names;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            }</div>
-<div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a02b7bee87741f76204d89ed52b1c3168"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">M3::MaCh3ArgumentParser::name</a></div><div class="ttdeci">const std::string name() const</div><div class="ttdoc">Get the name of this parser/subcommand.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00024">m3argparse.hpp:24</a></div></div>
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00056">56</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                                                               {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                std::vector&lt;std::string&gt; names;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>, _] : this-&gt;m_argument_map) {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                    <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>.size() &gt;= 2 &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[0] == <span class="charliteral">&#39;-&#39;</span> &amp;&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>[1] == <span class="charliteral">&#39;-&#39;</span>)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                        names.push_back(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keywordflow">return</span> names;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -220,15 +358,85 @@ Public Member Functions</h2></td></tr>
 <p>Recursively traverses the subparser hierarchy to find the deepest subcommand that was actually invoked.</p>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the <a class="el" href="classM3_1_1MaCh3ArgumentParser.html" title="Extended ArgumentParser with MaCh3-specific functionality.">MaCh3ArgumentParser</a> of the used subcommand </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00040">40</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                                                  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> std::reference_wrapper&lt;ArgumentParser&gt;&amp; subparser : this-&gt;m_subparsers) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;                    <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(subparser.get())) {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>MaCh3ArgumentParser*<span class="keyword">&gt;</span>(&amp;(subparser.get()))-&gt;get_subcommand_used();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                    }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                <span class="keywordflow">return</span> (*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00046">46</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                                                  {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> std::reference_wrapper&lt;ArgumentParser&gt;&amp; subparser : this-&gt;m_subparsers) {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                    <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(subparser.get())) {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(subparser.get()).<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#ae4202f8c5464c41255fd881019b3f6be">get_subcommand_used</a>();</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                    }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keywordflow">return</span> (*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            }</div>
+<div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_ae4202f8c5464c41255fd881019b3f6be"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#ae4202f8c5464c41255fd881019b3f6be">M3::MaCh3ArgumentParser::get_subcommand_used</a></div><div class="ttdeci">const MaCh3ArgumentParser &amp; get_subcommand_used() const</div><div class="ttdoc">Get the subcommand that was used in parsing.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00046">m3argparse.hpp:46</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="acaeaada866a52a2cbad8f9b4c5a0b8a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaeaada866a52a2cbad8f9b4c5a0b8a9">&#9670;&nbsp;</a></span>insert_default_subcommands()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void M3::MaCh3ArgumentParser::insert_default_subcommands </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>pos</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Insert default subcommands into args where no explicit subcommand was given. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Full argument list </td></tr>
+    <tr><td class="paramname">pos</td><td>Index in args of this parser's own name (0 for the program itself) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00132">132</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;                                                                                                {</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                <span class="keyword">const</span> std::size_t next = pos + 1;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                <span class="keywordflow">if</span> (next &lt; args.size()) {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                    <span class="keyword">auto</span> it = this-&gt;m_subparser_map.find(args[next]);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                    <span class="keywordflow">if</span> (it != this-&gt;m_subparser_map.end()) {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                        <span class="keyword">auto</span>&amp; sub = <span class="keyword">static_cast&lt;</span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(it-&gt;second-&gt;get());</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;                        <span class="comment">// argparse only prefixes the immediate parent&#39;s name, so rebuild the full path</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                        sub.m_parser_path = this-&gt;m_parser_path + <span class="stringliteral">&quot; &quot;</span> + sub.m_program_name;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;                        sub.insert_default_subcommands(args, next);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;                    }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;                }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">m_default_subcommand</a>.empty()) {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                    <span class="keyword">auto</span> it = this-&gt;m_subparser_map.find(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">m_default_subcommand</a>);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                    <span class="keywordflow">if</span> (it != this-&gt;m_subparser_map.end()) {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                        <span class="comment">// hide the default subcommand name in its usage/help line</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                        <span class="keyword">static_cast&lt;</span>MaCh3ArgumentParser&amp;<span class="keyword">&gt;</span>(it-&gt;second-&gt;get()).m_parser_path = this-&gt;m_parser_path;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                    }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                    args.insert(args.begin() + <span class="keyword">static_cast&lt;</span>std::ptrdiff_t<span class="keyword">&gt;</span>(next), <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">m_default_subcommand</a>);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;                }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            }</div>
+<div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a86c7896c1aeec88e3e012406e3061ca0"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">M3::MaCh3ArgumentParser::m_default_subcommand</a></div><div class="ttdeci">std::string m_default_subcommand</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00155">m3argparse.hpp:155</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -291,13 +499,52 @@ Public Member Functions</h2></td></tr>
 
 <p>Return true if the named option expects a value (not a flag) </p>
 
-<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00060">60</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                                                 {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="keyword">auto</span> it = this-&gt;m_argument_map.find(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keywordflow">if</span> (it == this-&gt;m_argument_map.end()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="comment">// get_usage_full() appends a metavar when max nargs &gt; 0</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="keywordflow">return</span> it-&gt;second-&gt;get_usage_full().find(<span class="charliteral">&#39; &#39;</span>) != std::string::npos;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00066">66</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                                                 {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <span class="keyword">auto</span> it = this-&gt;m_argument_map.find(<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                <span class="keywordflow">if</span> (it == this-&gt;m_argument_map.end()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                <span class="comment">// get_usage_full() appends a metavar when max nargs &gt; 0</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                <span class="keywordflow">return</span> it-&gt;second-&gt;get_usage_full().find(<span class="charliteral">&#39; &#39;</span>) != std::string::npos;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afaff4fc861fcbc53f50373d6f4baaa16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afaff4fc861fcbc53f50373d6f4baaa16">&#9670;&nbsp;</a></span>set_default_subcommand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void M3::MaCh3ArgumentParser::set_default_subcommand </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set a subcommand to use when none of the registered subcommands is given. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of the default subcommand </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00125">125</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                                                              {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;                <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a86c7896c1aeec88e3e012406e3061ca0">m_default_subcommand</a> = <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -327,11 +574,36 @@ Public Member Functions</h2></td></tr>
 <p>Get the list of registered subparsers. </p>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the list of subparsers </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00030">30</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                                                                                   {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                <span class="keywordflow">return</span> this-&gt;m_subparsers;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00036">36</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                                                                   {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                <span class="keywordflow">return</span> this-&gt;m_subparsers;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            }</div>
 </div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a86c7896c1aeec88e3e012406e3061ca0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86c7896c1aeec88e3e012406e3061ca0">&#9670;&nbsp;</a></span>m_default_subcommand</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string M3::MaCh3ArgumentParser::m_default_subcommand</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="m3argparse_8hpp_source.html#l00155">155</a> of file <a class="el" href="m3argparse_8hpp_source.html">m3argparse.hpp</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

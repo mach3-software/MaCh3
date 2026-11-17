@@ -1,0 +1,6 @@
+<map id="CLI/Modules/CombineModule.hpp" name="CLI/Modules/CombineModule.hpp">
+<area shape="rect" id="node1" title="Allows you to combine multiple chains or ROOT files into a single output." alt="" coords="141,5,359,32"/>
+<area shape="rect" id="node2" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="5,87,116,114"/>
+<area shape="rect" id="node3" href="$CombineModule_8cpp.html" title="Implementation of the CombineModule class." alt="" coords="141,87,359,114"/>
+<area shape="rect" id="node4" href="$CombineMaCh3Chains_8cpp.html" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="384,80,575,121"/>
+</map>

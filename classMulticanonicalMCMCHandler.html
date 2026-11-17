@@ -310,7 +310,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Adjust the parameter-of-interest's step scale according to the width of the umbrella bias function. </p>
-<p>This is used to adjust the step scale of the parameter to keep the size of the step scale relative to the new biased space the chain sees the same. Current assumes that your are sampling delta cp (ie circular on 2pi) </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000021">Todo:</a></b></dt><dd>grab the step scale from the object directly and update based on the radtio to the umbrella width, removing assumption that its dcp </dd></dl>
+<p>This is used to adjust the step scale of the parameter to keep the size of the step scale relative to the new biased space the chain sees the same. Current assumes that your are sampling delta cp (ie circular on 2pi) </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000020">Todo:</a></b></dt><dd>grab the step scale from the object directly and update based on the radtio to the umbrella width, removing assumption that its dcp </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html#l00180">180</a> of file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                                                                                                           {</div>
@@ -527,7 +527,7 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="anamespaceM3_html_a2aed672aeeb4fcf51069966193176ff3"><div class="ttname"><a href="namespaceM3.html#a2aed672aeeb4fcf51069966193176ff3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">constexpr static const double _BAD_DOUBLE_</div><div class="ttdoc">Default value used for double initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00053">Core.h:53</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575"><div class="ttname"><a href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7a134d4fa95e6a389f0be94b0b4faed575">M3::BiasFunction::kVonMises</a></div><div class="ttdeci">@ kVonMises</div></div>
 <div class="ttc" id="anamespaceM3_html_aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c"><div class="ttname"><a href="namespaceM3.html#aac995ad2de0eca11488028f2d4a964e7aaa719f96e9fcf06f97d8a0fa3e79bd8c">M3::BiasFunction::kGeneralisedGaussian</a></div><div class="ttdeci">@ kGeneralisedGaussian</div></div>
-<div class="ttc" id="anamespaceM3_html_afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2"><div class="ttname"><a href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::kGaussian</a></div><div class="ttdeci">@ kGaussian</div><div class="ttdoc">Assumes gaussian prior.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00034">ReweightMCMC.cpp:34</a></div></div>
+<div class="ttc" id="anamespaceM3_html_afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2"><div class="ttname"><a href="namespaceM3.html#afee9f50ad950e4e28ec5863bd2d18f89a948df6c0488d99af392d82b14197e1d2">M3::kGaussian</a></div><div class="ttdeci">@ kGaussian</div><div class="ttdoc">Assumes gaussian prior.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightModule_8hpp_source.html#l00029">ReweightModule.hpp:29</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -578,7 +578,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Compute a generalised-Gaussian multicanonical penalty. </p>
-<p>the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger constraint in the tails of the distribution, more like a tophat function. The normalisation is a little ugly and uses gamma functions, so for now it is hardcoded to n=2. This is the current recommended configuration for umbrella sampling. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000022">Todo:</a></b></dt><dd><p class="startdd">implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary </p>
+<p>the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger constraint in the tails of the distribution, more like a tophat function. The normalisation is a little ugly and uses gamma functions, so for now it is hardcoded to n=2. This is the current recommended configuration for umbrella sampling. </p><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000021">Todo:</a></b></dt><dd><p class="startdd">implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary </p>
 <p class="enddd">implement the normalisation for n != 2, and allow n to be set in the yaml configuration file </p>
 </dd></dl>
 
@@ -734,7 +734,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Read multicanonical configuration from the yaml via manager and initialise handler state. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000020">Todo:</a></b></dt><dd>DR: I realised this will fail if you set spline to true but don't </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000019">Todo:</a></b></dt><dd>DR: I realised this will fail if you set spline to true but don't </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html#l00071">71</a> of file <a class="el" href="MulticanonicalMCMCHandler_8cpp_source.html">MulticanonicalMCMCHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                                                                                                                                    {</div>
@@ -777,7 +777,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="comment">// setup for spline bias mode</span></div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classMulticanonicalMCMCHandler.html#a5587d86f1761385497ab30887cc23963">multicanonicalSpline</a>) {</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">auto</span> splineFileName = Get&lt;std::string&gt;(mcmcConfig[<span class="stringliteral">&quot;Multicanonical&quot;</span>][<span class="stringliteral">&quot;Spline&quot;</span>][<span class="stringliteral">&quot;SplineFile&quot;</span>], __FILE__, __LINE__);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    TFile* splineFile = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(splineFileName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>,__FILE__, __LINE__);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    TFile* splineFile = M3::Open(splineFileName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>,__FILE__, __LINE__);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">// grab the splines and do a quick check that they are evaluatable</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    TSpline3* dcp_spline_IO_fromfile = <span class="keyword">static_cast&lt;</span>TSpline3*<span class="keyword">&gt;</span>(splineFile-&gt;Get(<span class="stringliteral">&quot;dcp_spline_IO&quot;</span>));</div>
@@ -852,7 +852,6 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="aclassMulticanonicalMCMCHandler_html_a9318289fd2dd074e26100b8b160cd05f"><div class="ttname"><a href="classMulticanonicalMCMCHandler.html#a9318289fd2dd074e26100b8b160cd05f">MulticanonicalMCMCHandler::umbrellaBiasFunctionName</a></div><div class="ttdeci">std::string umbrellaBiasFunctionName</div><div class="ttdoc">Configured bias function name for logging.</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8h_source.html#l00154">MulticanonicalMCMCHandler.h:154</a></div></div>
 <div class="ttc" id="aclassMulticanonicalMCMCHandler_html_ae5eba4d2dc1ba286d038da5ac11fbf73"><div class="ttname"><a href="classMulticanonicalMCMCHandler.html#ae5eba4d2dc1ba286d038da5ac11fbf73">MulticanonicalMCMCHandler::umbrellaNumber</a></div><div class="ttdeci">int umbrellaNumber</div><div class="ttdoc">Number of total umbrellas used for the current configuration.</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8h_source.html#l00174">MulticanonicalMCMCHandler.h:174</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a116e94960ba2df3ac2ec3ebe499307ae"><div class="ttname"><a href="namespaceM3.html#a116e94960ba2df3ac2ec3ebe499307ae">M3::ParseBiasFunction</a></div><div class="ttdeci">M3::BiasFunction ParseBiasFunction(const std::string &amp;biasFunctionName)</div><div class="ttdef"><b>Definition:</b> <a href="MulticanonicalMCMCHandler_8h_source.html#l00021">MulticanonicalMCMCHandler.h:21</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00771">HistogramUtils.cpp:771</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
