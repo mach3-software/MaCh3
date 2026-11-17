@@ -214,7 +214,7 @@ class ParameterHandlerBase {
   /// @brief Get the pre-fit values of the parameters.
   std::vector<double> GetPreFitValues() const {return _fPreFitValue;}
   /// @brief Get vector of all proposed parameter values
-  std::vector<double> GetProposed() const {return _fPropVal;};
+  std::vector<double> GetProposed() const {return return std::vector<double>(_fPropVal.begin(), _fPropVal.end());;};
   /// @brief Get proposed parameter value
   /// @param i Parameter index
   M3::float_t GetParProp(const int i) const { return _fPropVal[i]; }
