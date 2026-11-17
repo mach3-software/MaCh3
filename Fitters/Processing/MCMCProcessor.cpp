@@ -1576,8 +1576,8 @@ void MCMCProcessor::MakeCovarianceYAML(const std::string& OutputYAMLFile, const 
     ParamStrings[i] = static_cast<std::string>(ParamNames[kModelPar][i]);
   }
 
-  YAML::Node XSecFile = CovConfig[kModelPar];
-  M3::MakeCorrelationMatrix(XSecFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
+  YAML::Node ModelFile = CovConfig[kModelPar];
+  M3::MakeCorrelationMatrix(ModelFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
 }
 
 // *********************
@@ -2693,9 +2693,9 @@ void MCMCProcessor::FindInputFilesLegacy() {
 // Read the model file and get the input central values and errors
 void MCMCProcessor::ReadModelFile() {
 // ***************
-  YAML::Node XSecFile = CovConfig[kModelPar];
+  YAML::Node ModelFile = CovConfig[kModelPar];
 
-  auto systematics = XSecFile["Systematics"];
+  auto systematics = ModelFile["Systematics"];
   int paramIndex  = 0;
   for (auto it = systematics.begin(); it != systematics.end(); ++it, ++paramIndex )
   {
