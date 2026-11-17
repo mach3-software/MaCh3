@@ -861,8 +861,19 @@ void MCMCProcessor::MakeViolin() {
   #endif
 
   ROOT::RDataFrame df(*Chain);
-  //KS: Burn in cut
-  auto dfBurnIn = df.Filter("step >= " + std::to_string(BurnInCut));
+
+  // Apply selection once
+  ROOT::RDF::RNode dfToUse = df.Filter(StepCut);
+
+  // Apply reweighting once
+  if (ReweightPosterior)
+  {
+    TString WeightExpression = "1.0";
+    for (const auto &name : ReweightNames) {
+      WeightExpression = "(" + WeightExpression + ")*(" + name + ")";
+    }
+    dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
+  }
 
   //KS: Binning is identical to Y axis of hviolin so bin number maps 1:1, including under/overflow
   std::vector<ROOT::RDF::RResultPtr<TH1D>> hPar;
