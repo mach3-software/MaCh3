@@ -192,6 +192,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   std::vector<std::map<std::string,double>> Correlations(_fNumPar);
   std::map<std::string, int> CorrNamesMap;
 
+  std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPar for Names,
   //PreFitValues etc etc.
@@ -219,7 +220,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     }
 
     if(param["Systematic"]["SpecialProposal"]) {
-      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i);
+      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i, PendingFunctionalFlipParameters);
     }
 
     //Fill the map to get the correlations later as well
@@ -240,7 +241,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  ResolveFunctionalFlips();
+  ResolveFunctionalFlips(PendingFunctionalFlipParameters);
 
   // load correlation
   LoadCorrelationFromConfig(Correlations, CorrNamesMap);

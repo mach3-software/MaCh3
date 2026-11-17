@@ -104,7 +104,9 @@ void ParameterHandlerBase::InitFromFile(const std::string& name, const std::stri
 }
 
 // ********************************************
-void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const int Index){
+void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param,
+                                                 const int Index,
+                                                 std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters){
 // ********************************************
   doSpecialStepProposal = true;
 
@@ -193,7 +195,7 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (FunctionalFlipEnabled) {
     FlipGroups[flip_group];
-    QueueFunctionalFlip(functional_flip, Index, flip_group); // leave the resolution of the functional flips until after all the params have been loaded in
+    QueueFunctionalFlip(PendingFunctionalFlipParameters, functional_flip, Index, flip_group); // leave the resolution of the functional flips until after all the params have been loaded in
 
     MACH3LOG_INFO("Enabling Functional Flipping for parameter {} in group {} with config {}",
                   GetParFancyName(Index),
@@ -226,7 +228,8 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 }
 
 // ********************************************
-void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name) {
+void ParameterHandlerBase::QueueFunctionalFlip(std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters,
+                                               const YAML::Node& param, const int index, const std::string& group_name) {
 // ********************************************
   PendingFunctionalFlipProposal pending_flip;
   pending_flip.target_index = index;
@@ -236,7 +239,7 @@ void ParameterHandlerBase::QueueFunctionalFlip(const YAML::Node& param, const in
 }
 
 // ********************************************
-void ParameterHandlerBase::ResolveFunctionalFlips() {
+void ParameterHandlerBase::ResolveFunctionalFlips(std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters) {
 // ********************************************
   for (const auto& pending_flip : PendingFunctionalFlipParameters) {
     AddFunctionalFlip(pending_flip.config, pending_flip.target_index, pending_flip.group_name);
@@ -379,14 +382,6 @@ void ParameterHandlerBase::SetPar(const int i , const double val) {
 
   // Transfer the parameter values to the PCA basis
   if (pca) PCAObj->TransferToPCA();
-}
-
-// ********************************************
-std::vector<double> ParameterHandlerBase::GetProposed() const {
-// ********************************************
-  std::vector<double> props(_fNumPar);
-  for (int i = 0; i < _fNumPar; ++i) props[i] = _fPropVal[i];
-  return props;
 }
 
 // *************************************
