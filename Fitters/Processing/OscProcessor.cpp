@@ -77,17 +77,17 @@ void OscProcessor::LoadAdditionalInfo() {
   {
     Chain->SetAlias("J_cp", "TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)");
     BranchNames.push_back("J_cp");
-    ParamType.push_back(kXSecPar);
-    nParam[kXSecPar]++;
+    ParamType.push_back(kModelPar);
+    nParam[kModelPar]++;
     nDraw++;
 
     /// @todo we should actually calculate central value and prior error but leave it for now...
-    ParamCentral[kXSecPar].push_back( 0. );
-    ParamErrors[kXSecPar].push_back( 1. );
+    ParamCentral[kModelPar].push_back( 0. );
+    ParamErrors[kModelPar].push_back( 1. );
     // Push back the name
-    ParamNames[kXSecPar].push_back("J_cp");
-    ParamFlat[kXSecPar].push_back( false );
-    ParamCircular[kXSecPar].push_back( false );
+    ParamNames[kModelPar].push_back("J_cp");
+    ParamFlat[kModelPar].push_back( false );
+    ParamCircular[kModelPar].push_back( false );
   } else if(PlotJarlskog && !OscEnabled) {
     MACH3LOG_ERROR("Trying to enable Jarlskog without oscillations");
     throw MaCh3Exception(__FILE__,__LINE__);
