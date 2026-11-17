@@ -154,13 +154,13 @@ public:
 
     std::unique_ptr<TH1> Get1DVarHistByValues(const int iSample,
                                               const std::string& ProjectionVar_Str,
-                                              const std::vector<std::string>& var_name,
-                                              const std::vector<int>& values,
+                                              const std::vector<std::string>& VarName,
+                                              const std::vector<int>& Values,
                                               const int WeightStyle = 0) override {
         (void) iSample;
         (void) ProjectionVar_Str;
-        (void) var_name;
-        (void) values;
+        (void) VarName;
+        (void) Values;
         (void) WeightStyle;
         return nullptr;
     }
@@ -168,14 +168,14 @@ public:
     std::unique_ptr<TH2> Get2DVarHistByValues(const int iSample,
                                               const std::string& ProjectionVar_StrX,
                                               const std::string& ProjectionVar_StrY,
-                                              const std::vector<std::string>& var_name,
-                                              const std::vector<int>& values,
+                                              const std::vector<std::string>& VarName,
+                                              const std::vector<int>& Values,
                                               const int WeightStyle = 0) override {
       (void) iSample;
       (void) ProjectionVar_StrX;
       (void) ProjectionVar_StrY;
-      (void) var_name;
-      (void) values;
+      (void) VarName;
+      (void) Values;
       (void) WeightStyle;
       return nullptr;
     }
