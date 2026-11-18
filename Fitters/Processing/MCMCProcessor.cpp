@@ -4322,6 +4322,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     delete[] ParStep[i];
   }
   delete[] ParStep;
+  ParStep = nullptr;
 
   GewekeDir->Close();
   delete GewekeDir;
