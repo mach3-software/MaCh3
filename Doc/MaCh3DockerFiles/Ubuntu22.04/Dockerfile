@@ -15,7 +15,7 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
 RUN apt-get install -y --no-install-recommends \
-    vim less nano gdb csh tcsh ed quota python3.10 python3.10-dev python3.10-pip \
+    vim less nano gdb csh tcsh ed quota python3.10 python3.10-dev python3-pip \
     cvs procmail ca-certificates cmake ninja-build
 
 # Declare the build argument
