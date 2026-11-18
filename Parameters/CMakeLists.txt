@@ -43,5 +43,7 @@ install(TARGETS Parameters
 )
 
 add_library(MaCh3::Parameters ALIAS Parameters)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 target_link_libraries(MaCh3 INTERFACE Parameters)
-
+list(APPEND mach3_libs Parameters)

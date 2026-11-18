@@ -26,3 +26,4 @@ target_include_directories(CLIModules PUBLIC
 install(TARGETS CLIModules LIBRARY DESTINATION lib)
 
 add_library(MaCh3::CLIModules ALIAS CLIModules)
+list(APPEND mach3_libs CLIModules)

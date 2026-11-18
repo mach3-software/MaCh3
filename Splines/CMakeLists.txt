@@ -1,8 +1,3 @@
-ROOT_GENERATE_DICTIONARY(MaCh3SplineDict
-    ${CMAKE_CURRENT_SOURCE_DIR}/SplineCommon.h
-    LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/MaCh3SplinesLinkDef.h
-    OPTIONS -p)
-
 set(HEADERS
     SplineBase.h
     BinnedSplineHandler.h
@@ -43,26 +38,14 @@ install(TARGETS Splines
         PUBLIC_HEADER DESTINATION include/Splines)
 
 add_library(MaCh3::Splines ALIAS Splines)
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
 target_link_libraries(MaCh3 INTERFACE Splines)
 
 # KS: Now we generate root dictionary, we can't add it to above as ROOT is bit dumb and things will fail due to MaCh3Warnings etc
-add_library(SplineDict SHARED MaCh3SplineDict.cxx)
-target_compile_options(SplineDict PRIVATE -Wno-alloc-size-larger-than)
-target_link_options(SplineDict PRIVATE -Wno-alloc-size-larger-than)
-
-target_include_directories(SplineDict PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
-    $<INSTALL_INTERFACE:include>
-)
-target_link_libraries(SplineDict PUBLIC Parameters MaCh3CompilerOptions MaCh3GPUCompilerOptions)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict_rdict.pcm DESTINATION lib/)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict.rootmap DESTINATION lib/)
-
-install(TARGETS SplineDict
-        EXPORT MaCh3-targets
-        LIBRARY DESTINATION lib/
-        PUBLIC_HEADER DESTINATION include/splines)
-
+M3_MakeROOTDict(SplineDict SplineCommon.h MaCh3SplinesLinkDef.h)
 # KS: Make sure Spline links SplineDict this way everything that would like to Spline will link SplineDict.
 target_link_libraries(Splines PUBLIC SplineDict)
+
+list(APPEND mach3_libs Splines)
+list(APPEND mach3_libs SplineDict)
