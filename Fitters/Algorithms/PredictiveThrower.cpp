@@ -650,11 +650,11 @@ void PredictiveThrower::ProduceToys() {
     // This set some params to prior value this way you can evaluate errors from subset of errors
     SetParamters(ParameterGroupsNotVaried, ParameterOnlyToVary);
 
-    Penalty = 0;
+    Penalty = 0.;
     if(FullLLH) {
       for (size_t s = 0; s < systematics.size(); ++s) {
         //KS: do times 2 because banff reports chi2
-        Penalty = 2.0 * systematics[s]->GetLikelihood();
+        Penalty += 2.0 * systematics[s]->GetLikelihood();
       }
     }
 
