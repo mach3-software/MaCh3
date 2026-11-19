@@ -214,7 +214,7 @@ class ParameterHandlerBase {
   /// @brief Get the pre-fit values of the parameters.
   std::vector<double> GetPreFitValues() const {return _fPreFitValue;}
   /// @brief Get vector of all proposed parameter values
-  std::vector<double> GetProposed() const;
+  std::vector<double> GetProposed() const {return std::vector<double>(_fPropVal.begin(), _fPropVal.end());}
   /// @brief Get proposed parameter value
   /// @param i Parameter index
   M3::float_t GetParProp(const int i) const { return _fPropVal[i]; }
@@ -378,16 +378,18 @@ class ParameterHandlerBase {
   void CircularParBounds(const int i, const double LowBound, const double UpBound);
 
   /// @brief Enable special proposal
-  void EnableSpecialProposal(const YAML::Node& param, const int Index);
+  void EnableSpecialProposal(const YAML::Node& param, const int Index,
+                             std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters);
 
   /// @brief Parse and register a functional flip defined in YAML.
   void AddFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
 
   /// @brief Queue a functional flip until all parameters have been loaded.
-  void QueueFunctionalFlip(const YAML::Node& param, const int index, const std::string& group_name);
+  void QueueFunctionalFlip(std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters,
+                           const YAML::Node& param, const int index, const std::string& group_name);
 
   /// @brief Resolve queued functional flips after parameter names are known.
-  void ResolveFunctionalFlips();
+  void ResolveFunctionalFlips(std::vector<PendingFunctionalFlipProposal>& PendingFunctionalFlipParameters);
 
   /// @brief Perform Special Step Proposal
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
@@ -468,8 +470,6 @@ class ParameterHandlerBase {
 
   /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
   std::map<std::string, FlipGroup> FlipGroups;
-  /// Functional flips waiting for full parameter-name registration.
-  std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
