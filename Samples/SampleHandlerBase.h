@@ -16,11 +16,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TLegend.h"
 _MaCh3_Safe_Include_End_ //}
 
-enum SamplePlotType {
-  kModePlot = 0,
-  kOscChannelPlot = 1
-};
-
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 ///
 /// @details This class manages samples used in the analysis. It supports event-by-event reweighting and allows
@@ -61,8 +56,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Print number of events for a given sample with specified cuts
   double GetSampleIntegral(const int iSample, const std::vector<KinematicCut> &EventSelectionVec, int WeightStyle);
   /// @brief Return sample integral after for given sample with specified restriction like only single mode
-  std::vector<double> ReturnSampleIntegralBySelection(const int iSample, const SamplePlotType Selection1,
-                                                      const int Selection2, const int WeightStyle);
+  double ReturnSampleIntegralByValue(const int iSample, const std::vector<std::string>& var_names,
+                                     const std::vector<int>& value, const int WeightStyle);
 
   /// @brief DB: Add data for a given sample from a ROOT histogram.
   /// @param Sample Index of the sample.
@@ -129,7 +124,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                     int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
   /// @brief Construct vector of kinematic cuts that will be applied, on top of default cuts include stuff like cut on mode etc.
   /// @param iSample Index of the sample.
-  std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
+  std::map<int, SplitCategory> BuildSplitCategories(const int iSample, const std::string& var_name,
+                                                    const std::map<int, SplitCategory>& categories) const;
   /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
@@ -137,31 +133,25 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Fill projection histogram by looping over all events, and skipping one which doesn't pass specified condition
   void Fill2DSubEventHist(const int iSample, TH2* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
-  /// @copydoc SampleHandlerInterface::Get1DVarHistByModeAndChannel
-  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                                    const int kModeToFill = -1, const int kChannelToFill = -1,
-                                                    const int WeightStyle = 0) final;
-  /// @copydoc SampleHandlerInterface::Get2DVarHistByModeAndChannel
-  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                                    const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
-                                                    const int kChannelToFill = -1, const int WeightStyle = 0) final;
-
-  /// @brief KS: Return range for plot type, for example number of modes, osc channels etc
-  /// @param TypeEnum Plot type enumerator see @ref SamplePlotType
-  /// @param iSample Sample enumerator
-  int GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const;
+  /// @copydoc SampleHandlerInterface::Get1DVarHistByValues
+  std::unique_ptr<TH1> Get1DVarHistByValues(const int iSample, const std::string& ProjectionVar_Str,
+                                            const std::vector<std::string>& var_name, const std::vector<int>& value,
+                                            const int WeightStyle = 0) final;
+  /// @copydoc SampleHandlerInterface::Get2DVarHistByValues
+  std::unique_ptr<TH2> Get2DVarHistByValues(const int iSample, const std::string& ProjectionVar_StrX,
+                                            const std::string& ProjectionVar_StrY, const std::vector<std::string>& var_name,
+                                            const std::vector<int>& value, const int WeightStyle = 0) final;
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                             const SamplePlotType Selection1, const int Selection2 = -1,
+                                                             const std::string& var_name, const std::map<int, SplitCategory>& categories = {},
                                                              const int WeightStyle = 0);
   std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                              const std::string& KinematicProjectionY,
-                                                             const SamplePlotType Selection1, const int Selection2 = -1,
-                                                             const int WeightStyle=0);
-  std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          const SamplePlotType Selection1, const int Selection2 = -1, const int WeightStyle = 0);
-  /// @brief Return the legend used for stacked histograms with sample info
-  const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
+                                                             const std::string& var_name, const std::map<int, SplitCategory>& categories,
+                                                             const int WeightStyle);
+  std::pair<std::unique_ptr<THStack>, std::unique_ptr<TLegend>> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                                        const std::string& var_name, const std::map<int, SplitCategory>& categories = {},
+                                                                        int WeightStyle = 0);
 
   /// @brief ETA function to generically convert a string from param handler to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
@@ -215,6 +205,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void CheckEmptyBins() const;
 
  protected:
+  /// @brief Return vector of cuts
+  KinematicCut MakeExactValueCut(const std::string& var_name, const int value) const;
+
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   /// @brief Get pointer to NuOscillator weight for a given event
@@ -442,10 +435,6 @@ class SampleHandlerBase :  public SampleHandlerInterface
   std::unique_ptr<Manager> SampleManager;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
-
-  //===============================================================================
-  /// DB: Legend associated with stacked histograms produced by this class.
-  TLegend* THStackLeg = nullptr;
 
   /// KS:Super hacky to update W2 or not
   bool FirstTimeW2;

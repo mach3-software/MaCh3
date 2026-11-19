@@ -1492,14 +1492,14 @@ void WriteHistogramsByMode(SampleHandlerInterface *sample,
       // Probably a better way of handling this logic
       if (by_mode) {
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-          auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          auto modeHist = sample->Get1DVarHistByValues(iSample, ProjectionName, {"Mode"}, {iMode});
           WriteHistograms(modeHist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
         }
       }
 
       if (by_channel) {
         for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
-          auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, -1, iChan); // -1 skips over mode plotting
+          auto chanHist = sample->Get1DVarHistByValues(iSample, ProjectionName, {"OscillationChannel"}, {iChan});
           WriteHistograms(chanHist.get(), sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
         }
       }
@@ -1507,7 +1507,7 @@ void WriteHistogramsByMode(SampleHandlerInterface *sample,
       if (by_mode && by_channel) {
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
-            auto hist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode, iChan);
+            auto hist = sample->Get1DVarHistByValues(iSample, ProjectionName, {"Mode", "OscillationChannel"}, {iMode, iChan});
             WriteHistograms(hist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
           }
         }
