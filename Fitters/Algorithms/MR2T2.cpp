@@ -3,7 +3,15 @@
 // ***************
 MR2T2::MR2T2(Manager *man) : MCMCBase(man) {
 // ***************
-    AlgorithmName = "MR2T2";
+    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
+    if (AnnealTemp < 0) {
+        anneal = false;
+        AlgorithmName = "MR2T2";
+    } else {
+        MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
+        anneal = true;
+        AlgorithmName = "MR2T2_Annealed";
+    }
 }
 
 // *******************
