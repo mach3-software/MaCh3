@@ -41,6 +41,7 @@ struct UmbrellaConfig {
   bool use_openmp;
   bool robustness_check;
   bool cache_windows;
+  Long64_t burnin_cutoff;
 };
 
 /// YAML-based config parser using yaml-cpp library
@@ -63,6 +64,12 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     config.use_openmp = GetFromManager<bool>(yaml_config["use_openmp"], true, __FILE__ , __LINE__);
     config.robustness_check = GetFromManager<bool>(yaml_config["robustness_check"], true, __FILE__, __LINE__);
     config.cache_windows = GetFromManager<bool>(yaml_config["cache_windows"], true, __FILE__, __LINE__);
+    config.burnin_cutoff = GetFromManager<Long64_t>(yaml_config["burnin_cutoff"], 0, __FILE__, __LINE__);
+    if (config.burnin_cutoff < 0 || config.max_iterations <= 0 ||
+        config.print_frequency <= 0 || !std::isfinite(config.tolerance) || config.tolerance <= 0) {
+      MACH3LOG_ERROR("Require burnin_cutoff >= 0, positive max_iterations/print_frequency, and positive finite tolerance.");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     if (!config.dynamic_files) {
       // TODO: these are mostly redundant now that the MaCh3_Config macro is
@@ -127,26 +134,19 @@ double vonMisesWindow(double x, double center, double kappa) {
   }
 }
 
-// Generalised Gaussian window allows harsher constraints on the tails of the distribution, better for controlling windows in highly disfavoured regions
-double generalisedGaussian2(double x, double mean, double width) {
-  constexpr int n = 2; // this controls the tightness of the gaussian fixed at 2
-                       // for now due to normalisation
-  const double normFactor = 1 / ((M3::UmbrellaGaussianNormFactor) * 2 * std::sqrt(2) * width); // the normalisation is a little ugly (uses gamma functions),
-                   // im just going to hardcode them for now
-  double likelihood = normFactor * std::exp(-std::pow((std::pow(x - mean, 2) / (2 * std::pow(width, 2))), n));
-  return likelihood;
-}
-
-/// @todo modify this to instead use atan2 implementation for wrapping
 double GetMulticanonicalWeightGenGaussian(double deltacp, double mean, double width) {
-  // implementation of the generalised gaussian as a bias function
-  // for now with a fixed n = 2 for simplicity
+  const double normFactor = 1 / (M3::UmbrellaGaussianNormFactor * 2 * std::sqrt(2) * width);
+  const double twoWidthSquared = 2 * (width * width);
+  const auto generalisedGaussianN2 = [=](double shiftedMean) {
+    const double difference = deltacp - shiftedMean;
+    const double scaledSquare = (difference * difference) / twoWidthSquared;
+    return normFactor * std::exp(-(scaledSquare * scaledSquare));
+  };
 
-  double g0 = generalisedGaussian2(deltacp, mean, width);
-  double g1 = generalisedGaussian2(deltacp, mean - 2 * TMath::Pi(),width); // these two repeats are required for wrapping the gaussian around -+pi
-  double g2 = generalisedGaussian2(deltacp, mean + 2 * TMath::Pi(), width);
-  double multicanonicalBeta = 1.0;
-  return (g0 + g1 + g2) * (multicanonicalBeta);
+  const double g0 = generalisedGaussianN2(mean);
+  const double g1 = generalisedGaussianN2(mean - 2 * TMath::Pi());
+  const double g2 = generalisedGaussianN2(mean + 2 * TMath::Pi());
+  return (g0 + g1 + g2);
 }
 
 double evaluateWindow(double x, const WindowConfig &window) {
@@ -288,21 +288,24 @@ std::vector<std::vector<double>> calcFmatrixOnDemand(
   #ifdef MULTITHREAD
   #pragma omp parallel for schedule(dynamic) if(use_openmp)
   #endif
-  // Recompute each sample's window values instead of retaining the sample-by-window cache.
+  // Reuse only the immediately preceding sample's window evaluations.
   for (size_t i = 0; i < n_windows; ++i) {
     std::vector<double> values(n_windows);
+    double inverse_denominator = 0.0;
     for (size_t s = 0; s < samples[i].size(); ++s) {
-      double denominator = 0.0;
-      for (size_t j = 0; j < n_windows; ++j) {
-        values[j] = evaluateWindow(samples[i][s], windows[j]);
-        denominator += values[j] * z_inv[j];
+      if (s == 0 || samples[i][s] != samples[i][s - 1]) {
+        double denominator = 0.0;
+        for (size_t j = 0; j < n_windows; ++j) {
+          values[j] = evaluateWindow(samples[i][s], windows[j]);
+          denominator += values[j] * z_inv[j];
+        }
+        if (!std::isfinite(denominator) || denominator <= 0.0 ||
+            !std::isfinite(1.0 / denominator)) {
+          invalid_sample[i] = s;
+          break;
+        }
+        inverse_denominator = 1.0 / denominator;
       }
-      if (!std::isfinite(denominator) || denominator <= 0.0 ||
-          !std::isfinite(1.0 / denominator)) {
-        invalid_sample[i] = s;
-        break;
-      }
-      const double inverse_denominator = 1.0 / denominator;
       // Accumulate this sample's normalized contribution to each F-matrix column.
       for (size_t j = 0; j < n_windows; ++j) {
         F[i][j] += (values[j] * z_inv[i]) * inverse_denominator;
@@ -747,35 +750,40 @@ void UmbrellaSolver(const std::string &config_file) {
       }
     }
 
-    double var_value;
-    double logL_value;
-    tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value);
-    tree->SetBranchAddress("LogL", &logL_value);
+    double var_value = 0.0;
+    double logL_value = 0.0;
     // Read only the needed branches; all 60 trees stay open, and buffering every branch costs ~160 MB per tree.
     tree->SetBranchStatus("*", false);
     tree->SetBranchStatus(config.variable_of_interest.c_str(), true);
     tree->SetBranchStatus("LogL", true);
+    if (tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value) < 0 ||
+        tree->SetBranchAddress("LogL", &logL_value) < 0) {
+      MACH3LOG_ERROR("Cannot bind required observable/LogL branches in {}.", file->GetName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     Long64_t nentries = tree->GetEntries();
+    if (config.burnin_cutoff >= nentries) {
+      MACH3LOG_ERROR("burnin_cutoff {} leaves no entries in {} ({} entries).",
+                    config.burnin_cutoff, file->GetName(), nentries);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     //Long64_t filtered_entries = 0;
-    MACH3LOG_INFO("Window {}: {} entries", i, nentries);
-    samples[i].reserve(static_cast<size_t>(nentries));
+    MACH3LOG_INFO("Window {}: retaining entries [{}, {}) ({} samples).",
+                  i, config.burnin_cutoff, nentries, nentries - config.burnin_cutoff);
+    samples[i].reserve(static_cast<size_t>(nentries - config.burnin_cutoff));
 
-    for (Long64_t entry = 0; entry < nentries; entry++) {
-      tree->GetEntry(entry);
-      //if (logL_value > 50.0) { // logl cut no longer needed as the posterior
-      //                         // chain start has been fixed
-      //  filtered_entries++;
-      //  continue;
-      //}
+    for (Long64_t entry = config.burnin_cutoff; entry < nentries; entry++) {
+      if (tree->GetEntry(entry) <= 0 || !std::isfinite(var_value)) {
+        MACH3LOG_ERROR("Unreadable or non-finite observable in {}, entry {}.", file->GetName(), entry);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
       samples[i].push_back(var_value);
     }
     tree->DropBaskets();
     tree->SetBranchStatus("*", true);
-    //if (filtered_entries > 0) {
-    //  std::cout << "Filtered " << filtered_entries
-    //            << " entries with LogL > 500 from window " << i << std::endl;
-    //}
+
   }
 
   // Sort by window center and keep all per-window containers aligned.
@@ -921,6 +929,7 @@ void UmbrellaSolver(const std::string &config_file) {
   }
   // Iterative solver
   int total_output_lines = 0; // Track total lines printed for clearing
+  bool converged = false;
   for (int iteration = 0; iteration < config.max_iterations; iteration++) {
     if (iteration % config.print_frequency == 0 || iteration == 1) {
       auto current_time = std::chrono::high_resolution_clock::now();
@@ -951,8 +960,7 @@ void UmbrellaSolver(const std::string &config_file) {
       }
       if (iteration > 0) {
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_print_time);
-        double avg_time_per_iteration = static_cast<double>(duration.count()) /
-                                        static_cast<double>(config.print_frequency);
+        double avg_time_per_iteration = static_cast<double>(duration.count()) / static_cast<double>(config.print_frequency);
         std::cout << "] (avg: " << std::setw(6) << std::setprecision(1) << avg_time_per_iteration << " ms/iter)" << std::endl;
         std::cout << "Avg relative change: " << std::scientific << std::setprecision(3) << avg_relative_change << " (target: " << config.tolerance << ")" << std::endl;
         total_output_lines = 2;
@@ -1000,7 +1008,7 @@ void UmbrellaSolver(const std::string &config_file) {
     // check to see if the solution is stable or if it is just meeting the
     // convergence criteria by chance due to small changes in z values
     bool apply_robustness_check = config.robustness_check;
-    if (iteration % 100 == 0 &&
+    if ((iteration % 100 == 0 || iteration == config.max_iterations - 1) &&
         (checkConvergence(z_current, z_prev, config.tolerance) || checkConvergenceStalled(z_current, z_prev, config.tolerance))) {
       if (!converged_robustness_check && apply_robustness_check) {
         MACH3LOG_INFO("Convergence check passed at iteration {}. Starting robustness check with random perturbation...", iteration);
@@ -1020,13 +1028,10 @@ void UmbrellaSolver(const std::string &config_file) {
           MACH3LOG_INFO("Applied random perturbation to z values for robustness check.");
       } else {
         if (checkConvergence(z_current, z_prev, config.tolerance)) {
+          converged = true;
           MACH3LOG_INFO("Convergence achieved at iteration {}", iteration);
         } else {
           MACH3LOG_WARN("Convergence appears to be stalled at iteration {}", iteration);
-        }
-
-        if (iteration == config.max_iterations - 1) {
-          MACH3LOG_WARN("Reached maximum iterations without convergence.");
         }
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -1041,6 +1046,12 @@ void UmbrellaSolver(const std::string &config_file) {
         break;
       }
     }
+  }
+
+  if (!converged) {
+    if (F_file && F_file->IsOpen()) F_file->Close();
+    MACH3LOG_ERROR("Solver stopped without confirmed convergence (max_iterations = {}). No weighted solution will be written.", config.max_iterations);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   std::ostringstream oss;
@@ -1093,8 +1104,11 @@ void UmbrellaSolver(const std::string &config_file) {
     }
     window_id = static_cast<int>(i);
 
-    for (Long64_t entry = 0; entry < nentries; entry++) {
-      tree->GetEntry(entry);
+    for (Long64_t entry = config.burnin_cutoff; entry < nentries; entry++) {
+      if (tree->GetEntry(entry) <= 0) {
+        MACH3LOG_ERROR("Cannot read {} entry {} during output.", input_files[i]->GetName(), entry);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
 
       if (z_current[i] == 0) {
         umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set it to 0 (completely downweigh this window's contribution)
@@ -1207,6 +1221,7 @@ void UmbrellaSolver(const std::string &config_file) {
 // Main function for compiled version
 int main(int argc, char *argv[]) {
   SetMaCh3LoggerFormat();
+  gROOT->SetBatch(true);
   std::string config_file = "umbrella_config.yaml";
   if (argc > 1) {
     config_file = argv[1];
