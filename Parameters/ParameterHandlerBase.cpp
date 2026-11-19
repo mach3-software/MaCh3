@@ -1230,8 +1230,8 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
     SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
 
     ResetIndivStepScale();
-    // HH: Set individual step scales for non-adapting parameters to the default individual step scales
-    // global step scale should be 1 so no need to adjust for that
+    // Frozen MaCh3 matrices already include the original global scale.
+    if (!use_adaptive) _fGlobalStepScaleInitial = 1.;
     SetIndivStepScaleForSkippedAdaptParams();
 
     MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
@@ -1269,8 +1269,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
     AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
     SetIndivStepScaleForSkippedAdaptParams();
-    MACH3LOG_INFO("Robbins-Monro update for matrix {}: step scale = {:.6e}", GetName(), _fGlobalStepScale);
-    // MACH3LOG_DEBUG("Robbins-Monro update for matrix {}: step scale = {:.6e}", GetName(), _fGlobalStepScale);
+    MACH3LOG_DEBUG("Robbins-Monro update for matrix {}: step scale = {:.6e}", GetName(), _fGlobalStepScale);
   }
 
   // Call main adaption function
