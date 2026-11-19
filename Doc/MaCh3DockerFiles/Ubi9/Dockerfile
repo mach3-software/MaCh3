@@ -8,6 +8,7 @@ LABEL website="https://mach3-software.github.io/MaCh3/"
 LABEL compiler="GNU 11.5.0"
 LABEL root_version="v6.38.04"
 LABEL cuda_version="v12.6.2"
+LABEL python_version="v3.9.25"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
