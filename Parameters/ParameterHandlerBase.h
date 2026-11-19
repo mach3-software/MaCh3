@@ -160,7 +160,10 @@ class ParameterHandlerBase {
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
 
-  /// @brief Set individual step scale for parameters which are skipped during adaption to initial values
+  /// @brief Capture current individual and global scales as the nominal adaptive step scales
+  void CaptureAdaptiveStepScaleNominal();
+
+  /// @brief Restore step scales for skipped parameters using the nominal snapshot
   void SetIndivStepScaleForSkippedAdaptParams();
 
   /// @brief Initialise adaptive MCMC

@@ -22,6 +22,9 @@ _MaCh3_Safe_Include_End_ //}
 /// - **Robbins-Monro style**: Dynamically updates the scale factor to target
 ///   a specific acceptance rate, potentially improving mixing.
 ///
+/// Parameters skipped during adaptation retain the effective step scales captured
+/// at StartThrow, including runtime adjustments such as umbrella step scaling.
+///
 class AdaptiveMCMCHandler
 {
  public:
@@ -216,6 +219,12 @@ class AdaptiveMCMCHandler
   double GetAdaptionScale() const
   {
     return adaption_scale;
+  }
+
+  /// @brief Set the nominal global scale used when saving skipped and initial matrices
+  void SetInitialStepScale(const double scale)
+  {
+    initial_scale = scale;
   }
 
   /// Use Robbins-Monro approach?

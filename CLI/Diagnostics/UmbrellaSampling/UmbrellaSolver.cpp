@@ -41,6 +41,8 @@ struct UmbrellaConfig {
   int print_frequency;
   bool use_openmp;
   int burnin_cut;
+  bool robustness_check;
+  bool cache_windows;
 };
 
 /// YAML-based config parser using yaml-cpp library
@@ -61,6 +63,8 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     config.dynamic_pattern = Get<std::string>(yaml_config["dynamic_pattern"], __FILE__ , __LINE__);
     config.dynamic_n_windows = Get<int>(yaml_config["dynamic_n_windows"], __FILE__ , __LINE__);
     config.use_openmp = GetFromManager<bool>(yaml_config["use_openmp"], true, __FILE__ , __LINE__);
+    config.robustness_check = GetFromManager<bool>(yaml_config["robustness_check"], true, __FILE__, __LINE__);
+    config.cache_windows = GetFromManager<bool>(yaml_config["cache_windows"], true, __FILE__, __LINE__);
 
     if (!config.dynamic_files) {
       // TODO: these are mostly redundant now that the MaCh3_Config macro is
@@ -147,23 +151,24 @@ double GetMulticanonicalWeightGenGaussian(double deltacp, double mean, double wi
   return (g0 + g1 + g2) * (multicanonicalBeta);
 }
 
+double evaluateWindow(double x, const WindowConfig &window) {
+  if (window.umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
+    return vonMisesWindow(x, window.center, window.vonMises_kappa);
+  } else if (window.umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
+    return gaussianWindow(x, window.center, window.width);
+  } else if (window.umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
+    return GetMulticanonicalWeightGenGaussian(x, window.center, window.width);
+  }
+  MACH3LOG_ERROR("Unrecognised BiasFunction!!");
+  throw MaCh3Exception(__FILE__, __LINE__);
+}
+
 // A sub calculation for the overlap matrix
 // Sum of all windows weighted by z values
 double summedWindowsWeighted(double x, const std::vector<WindowConfig> &windows, const std::vector<double> &z_values) {
   double sum = 0.0;
   for (size_t k = 0; k < windows.size(); k++) {
-    double window_val;
-    if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-      window_val = vonMisesWindow(x, windows[k].center, windows[k].vonMises_kappa);
-    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-      window_val = gaussianWindow(x, windows[k].center, windows[k].width);
-    } else if (windows[k].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-      window_val = GetMulticanonicalWeightGenGaussian(x, windows[k].center, windows[k].width);
-    } else {
-      MACH3LOG_ERROR("Unrecognised BiasFunction!!");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    sum += window_val / z_values[k];
+    sum += evaluateWindow(x, windows[k]) / z_values[k];
   }
   return sum;
 }
@@ -190,16 +195,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-            cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-            cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-            cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
-          } else {
-            MACH3LOG_ERROR("Unrecognised BiasFunction!!");
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
+          cache[i][j][s] = evaluateWindow(samples[i][s], windows[j]);
         }
       }
     }
@@ -207,16 +203,7 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
     for (int i = 0; i < n_windows; i++) {
       for (int j = 0; j < n_windows; j++) {
         for (size_t s = 0; s < samples[i].size(); s++) {
-          if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kVonMises) {
-            cache[i][j][s] = vonMisesWindow(samples[i][s], windows[j].center, windows[j].vonMises_kappa);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGaussian) {
-            cache[i][j][s] = gaussianWindow(samples[i][s], windows[j].center, windows[j].width);
-          } else if (windows[j].umbrellaBiasFunction == M3::BiasFunction::kGeneralisedGaussian) {
-            cache[i][j][s] = GetMulticanonicalWeightGenGaussian(samples[i][s], windows[j].center, windows[j].width);
-          } else {
-            MACH3LOG_ERROR("Unrecognised function!!!!!");
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
+          cache[i][j][s] = evaluateWindow(samples[i][s], windows[j]);
         }
       }
     }
@@ -272,11 +259,86 @@ std::vector<std::vector<std::vector<double>>> buildWindowCache(const std::vector
   return cache;
 }
 
+std::vector<std::vector<double>> calcFmatrixOnDemand(
+    const std::vector<double> &z_current,
+    const std::vector<WindowConfig> &windows,
+    const std::vector<std::vector<double>> &samples,
+    bool use_openmp) {
+  const size_t n_windows = windows.size();
+  if (n_windows == 0 || z_current.size() != n_windows || samples.size() != n_windows) {
+    MACH3LOG_ERROR("On-demand F matrix requires matching, non-empty window, sample and z containers.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  std::vector<double> z_inv(n_windows);
+  for (size_t i = 0; i < n_windows; ++i) {
+    if (!std::isfinite(z_current[i]) || z_current[i] <= 0.0 ||
+        !std::isfinite(1.0 / z_current[i]) || samples[i].empty()) {
+      MACH3LOG_ERROR("On-demand F matrix requires positive finite z and non-empty samples in window {}.", i);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    z_inv[i] = 1.0 / z_current[i];
+    // Validate the bias type before entering the OpenMP region.
+    evaluateWindow(windows[i].center, windows[i]);
+  }
+
+  std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
+  std::vector<size_t> invalid_sample(n_windows);
+  for (size_t i = 0; i < n_windows; ++i) invalid_sample[i] = samples[i].size();
+  #ifndef MULTITHREAD
+  (void)use_openmp;
+  #endif
+  #ifdef MULTITHREAD
+  #pragma omp parallel for schedule(dynamic) if(use_openmp)
+  #endif
+  // Recompute each sample's window values instead of retaining the sample-by-window cache.
+  for (size_t i = 0; i < n_windows; ++i) {
+    std::vector<double> values(n_windows);
+    for (size_t s = 0; s < samples[i].size(); ++s) {
+      double denominator = 0.0;
+      for (size_t j = 0; j < n_windows; ++j) {
+        values[j] = evaluateWindow(samples[i][s], windows[j]);
+        denominator += values[j] * z_inv[j];
+      }
+      if (!std::isfinite(denominator) || denominator <= 0.0 ||
+          !std::isfinite(1.0 / denominator)) {
+        invalid_sample[i] = s;
+        break;
+      }
+      const double inverse_denominator = 1.0 / denominator;
+      // Accumulate this sample's normalized contribution to each F-matrix column.
+      for (size_t j = 0; j < n_windows; ++j) {
+        F[i][j] += (values[j] * z_inv[i]) * inverse_denominator;
+      }
+    }
+    for (size_t j = 0; j < n_windows; ++j) {
+      F[i][j] /= static_cast<double>(samples[i].size());
+    }
+  }
+  // Exceptions must be raised outside the OpenMP region.
+  for (size_t i = 0; i < n_windows; ++i) {
+    if (invalid_sample[i] != samples[i].size()) {
+      MACH3LOG_ERROR("Invalid on-demand F matrix denominator in window {}, sample {}.", i, invalid_sample[i]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    for (size_t j = 0; j < n_windows; ++j) {
+      if (!std::isfinite(F[i][j])) {
+        MACH3LOG_ERROR("Non-finite on-demand F matrix element [{}, {}].", i, j);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+  }
+  return F;
+}
+
 // Main function to calculate the F matrix from a given set of samples plus weights
 std::vector<std::vector<double>> calcFmatrix(std::vector<double> &z_current,
             const std::vector<WindowConfig> &windows,
             const std::vector<std::vector<double>> &samples,
-            const std::vector<std::vector<std::vector<double>>> &window_cache) {
+            const std::vector<std::vector<std::vector<double>>> &window_cache,
+            bool cache_windows = true, bool use_openmp = true) {
+  if (!cache_windows) {
+    return calcFmatrixOnDemand(z_current, windows, samples, use_openmp);
+  }
   int n_windows = static_cast<int>(windows.size());
   std::vector<std::vector<double>> F(n_windows, std::vector<double>(n_windows, 0.0));
 
@@ -341,7 +403,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
         const std::vector<std::vector<double>> &samples,
         const std::vector<std::vector<std::vector<double>>> &window_cache,
         bool use_openmp = true, bool verbose = false,
-        [[maybe_unused]] int *total_lines = nullptr) {
+        [[maybe_unused]] int *total_lines = nullptr, bool cache_windows = true) {
   int n_windows = static_cast<int>(windows.size());
   if (verbose && !use_openmp) {
     MACH3LOG_INFO("Using single-threaded computation for F matrix...");
@@ -349,8 +411,7 @@ std::vector<double> zSolver(const std::vector<double> &z_current,
 
   // F matrix and update z values
   std::vector<double> z_working = z_current;
-  std::vector<std::vector<double>> F =
-      calcFmatrix(z_working, windows, samples, window_cache);
+  std::vector<std::vector<double>> F = calcFmatrix(z_working, windows, samples, window_cache, cache_windows, use_openmp);
 
   // if (verbose) {
   //     if (total_lines) *total_lines = 1; // Start counting from F matrix
@@ -733,12 +794,17 @@ void UmbrellaSolver(const std::string &config_file) {
     double logL_value;
     tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value);
     tree->SetBranchAddress("LogL", &logL_value);
+    // Read only the needed branches; all 60 trees stay open, and buffering every branch costs ~160 MB per tree.
+    tree->SetBranchStatus("*", false);
+    tree->SetBranchStatus(config.variable_of_interest.c_str(), true);
+    tree->SetBranchStatus("LogL", true);
 
     //Long64_t nentries = tree->GetEntries();
     TEntryList *elist = input_lists[i];
     //Long64_t filtered_entries = 0;
     //MACH3LOG_INFO("Window {}: {} entries", i, nentries);
     MACH3LOG_INFO("Window {}: {} entries", i, elist->GetN());
+    samples[i].reserve(static_cast<size_t>(elist->GetN()));
 
     //for (Long64_t entry = 0; entry < nentries; entry++) {
     for (Long64_t j = 0; j < elist->GetN(); ++j) {
@@ -752,6 +818,8 @@ void UmbrellaSolver(const std::string &config_file) {
       //}
       samples[i].push_back(var_value);
     }
+    tree->DropBaskets();
+    tree->SetBranchStatus("*", true);
     //if (filtered_entries > 0) {
     //  std::cout << "Filtered " << filtered_entries
     //            << " entries with LogL > 500 from window " << i << std::endl;
@@ -856,10 +924,13 @@ void UmbrellaSolver(const std::string &config_file) {
     }
   }
 
-  MACH3LOG_INFO("Precomputing window cache...");
-  // TODO: this is slow as hell and causes massive memory usage, what's a smarter
-  // way to do this? break out to a file? RDataFrame?
-  std::vector<std::vector<std::vector<double>>> window_cache = buildWindowCache(config.windows, samples, openmp_works);
+  std::vector<std::vector<std::vector<double>>> window_cache;
+  if (config.cache_windows) {
+    MACH3LOG_INFO("Precomputing window cache...");
+    window_cache = buildWindowCache(config.windows, samples, openmp_works);
+  } else {
+    MACH3LOG_INFO("Evaluating windows on demand; retaining samples but not the window or denominator caches.");
+  }
 
   // TFile to hold the F matrix evolution for the first 15 iterations if needed
   bool save_matrix = true; // Set to true to enable saving F matrix evolution
@@ -874,7 +945,7 @@ void UmbrellaSolver(const std::string &config_file) {
       save_matrix = false; // Disable saving if file cannot be created
     }
     // add an initial FMatrix with the initial z values for reference
-    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache);
+    std::vector<std::vector<double>> initial_F = calcFmatrix(z_current, config.windows, samples, window_cache, config.cache_windows, openmp_works);
     int n_windows = static_cast<int>(config.windows.size());
     TH2D initial_F_TH2D("F_matrix_initial", "Initial F matrix;Window j;Window i", n_windows, 0, n_windows, n_windows, 0, n_windows);
     for (int i = 0; i < n_windows; i++) {
@@ -942,7 +1013,7 @@ void UmbrellaSolver(const std::string &config_file) {
     }
 
     z_prev = z_current;
-    z_current = zSolver(z_current, config.windows, samples, window_cache, openmp_works, iteration % config.print_frequency == 0, &total_output_lines);
+    z_current = zSolver(z_current, config.windows, samples, window_cache, openmp_works, iteration % config.print_frequency == 0, &total_output_lines, config.cache_windows);
     z_evolution.push_back(z_current);
 
     // save the first 15 iterations of the F matrix to check convergence
@@ -950,7 +1021,7 @@ void UmbrellaSolver(const std::string &config_file) {
     // plotting in root, with axes of iteration number and window index, and the
     // value being the F matrix element
     if (save_matrix && (iteration < 15 || iteration % config.print_frequency == 0)) {
-      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache);
+      std::vector<std::vector<double>> F_matrix = calcFmatrix(z_current, config.windows, samples, window_cache, config.cache_windows, openmp_works);
       // convert F_matrix to Th2D for saving to root file
       int n_windows = static_cast<int>(config.windows.size());
       TH2D F_TH2D(Form("F_matrix_iter_%02d", iteration),Form("F matrix at iteration %02d;Window j;Window i", iteration), n_windows, 0, n_windows, n_windows, 0, n_windows);
@@ -977,7 +1048,7 @@ void UmbrellaSolver(const std::string &config_file) {
     // values to see if they return to the same values, this is a robustness
     // check to see if the solution is stable or if it is just meeting the
     // convergence criteria by chance due to small changes in z values
-    bool apply_robustness_check = true;
+    bool apply_robustness_check = config.robustness_check;
     if (iteration % 100 == 0 &&
         (checkConvergence(z_current, z_prev, config.tolerance) || checkConvergenceStalled(z_current, z_prev, config.tolerance))) {
       if (!converged_robustness_check && apply_robustness_check) {
@@ -1094,6 +1165,7 @@ void UmbrellaSolver(const std::string &config_file) {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }
+    tree->DropBaskets();
   }
   // Write final results
   combined_tree->Write(input_tree->GetName(), TObject::kOverwrite);
