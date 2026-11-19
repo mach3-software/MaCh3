@@ -76,7 +76,6 @@ int main(int argc, char *argv[]) try {
         program.parse_args(argc, argv);
     }
     catch (const std::exception& err) {
-
         std::cerr << err.what() << std::endl;
         std::cerr << program.get_subcommand_used();
         // Fix error diagnostics: exception text is data, not a logger format string.
@@ -114,7 +113,6 @@ int main(int argc, char *argv[]) try {
         std::cerr << "An unknown exception occurred during program execution." << std::endl;
         return 3;
     }
-
 }
 catch (const std::exception& err) {
     MACH3LOG_ERROR("CLI initialisation failed: {}", err.what());

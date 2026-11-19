@@ -263,7 +263,7 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
 
   FunctionalFlipProposal flip;
   flip.target_index = index;
-  flip.formula = Get<std::string>(formula, __FILE__, __LINE__);
+  auto formula_name = Get<std::string>(formula, __FILE__, __LINE__);
   flip.argument_names = Get<std::vector<std::string>>(parameters, __FILE__, __LINE__);
 
   for (const auto& name : flip.argument_names) {
@@ -280,11 +280,11 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
                                             matrixName,
                                             group_name,
                                             FlipGroups[group_name].FunctionalFlipParameters.size());
-  flip.evaluator = std::make_unique<TF1>(flip_name.c_str(), flip.formula.c_str(), 0.0, 1.0);
+  flip.evaluator = std::make_unique<TF1>(flip_name.c_str(), formula_name.c_str(), 0.0, 1.0);
 
   if (!flip.evaluator || flip.evaluator->IsZombie()) {
     MACH3LOG_ERROR("Failed to parse FunctionalFlip formula for parameter {}: {}",
-                   GetParFancyName(index), flip.formula);
+                   GetParFancyName(index), formula_name);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
@@ -296,7 +296,7 @@ void ParameterHandlerBase::AddFunctionalFlip(const YAML::Node& param, const int 
   }
 
   MACH3LOG_INFO("Enabling FunctionalFlip for parameter {} with formula '{}'",
-                GetParFancyName(index), flip.formula);
+                GetParFancyName(index), formula_name);
   FlipGroups[group_name].FunctionalFlipParameters.push_back(std::move(flip));
 }
 

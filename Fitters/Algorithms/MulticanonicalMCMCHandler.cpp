@@ -20,7 +20,6 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
 
 // Destructor
 MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
-
 }
 
 #ifdef MACH3_DEBUG

@@ -22,7 +22,7 @@ class MCMCBase : public FitterBase {
     void StartFromPreviousFit(const std::string &FitName) final;
 
     /// @copydoc FitterBase::GetFancyName
-    virtual std::string GetFancyName() const final;
+    std::string GetFancyName() const final;
 
     /// @brief Set how long chain should be
     /// @param L new chain length
