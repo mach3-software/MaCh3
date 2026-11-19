@@ -7,9 +7,7 @@
 #include <type_traits>
 #include "CLI/API/m3argparse.hpp"
 
-
 namespace M3 {
-
     /// Fix API compatibility: increment when the plugin/parser contract changes incompatibly.
     inline constexpr std::uint32_t PLUGIN_API_VERSION = 1;
 
@@ -49,12 +47,9 @@ namespace M3 {
             std::unique_ptr<MaCh3ArgumentParser> m_parser;  ///< Argument parser for this plugin
     };
 
-
-
     /// @typedef IModuleBase
     /// @brief Alias for IPluginBase, used for core modules
     typedef PluginBase IModuleBase;
-
 }
 
 extern "C" {

@@ -14,11 +14,14 @@ _MaCh3_Safe_Include_End_
 /// @author David Riley
 struct FunctionalFlipProposal {
   int target_index = M3::_BAD_INT_;
+  /// parameter indices passed to evaluator
   std::vector<int> argument_indices;
+  /// Parameter names that are passed to evaluator
   std::vector<std::string> argument_names;
-  std::string formula;
+  /// function used to evaluate flipping formula
   std::unique_ptr<TF1> evaluator;
-
+  /// @brief get original formula used for evaluator
+  std::string GetFormula() const {return evaluator->GetTitle();}
   FunctionalFlipProposal() = default;
   FunctionalFlipProposal(FunctionalFlipProposal&&) _noexcept_ = default;
   FunctionalFlipProposal& operator=(FunctionalFlipProposal&&) _noexcept_ = default;

@@ -111,7 +111,6 @@ void MR2T2::ProposeStep() {
                 debugFile << "LLH after sample " << i << " " << llh << std::endl;
 #endif
         }
-
         // For when we don't have to reweight, set sample to madness
     }
     else
@@ -138,10 +137,10 @@ double MR2T2::AcceptanceProbability() {
     double acc_prob = 0.0;
 
     // Calculate acceptance probability
-    if (anneal)
+    if (anneal) {
         acc_prob = std::min(1., std::exp(-(logLProp - logLCurr) / (std::exp(-step / AnnealTemp))));
-    else
+    } else {
         acc_prob = std::min(1., std::exp(logLCurr - logLProp));
-
+    }
     return acc_prob;
 }

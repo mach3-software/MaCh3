@@ -17,7 +17,6 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
     }
 }
 
-
 // *******************
 // Run the Markov chain with all the systematic objects added
 void MCMCBase::RunMCMC() {
@@ -276,4 +275,3 @@ std::string MCMCBase::GetFancyName() const {
     OutName += originalName;
     return OutName;
 }
-
