@@ -75,11 +75,6 @@ class MCMCBase : public FitterBase {
     /// number of steps in chain
     unsigned int chainLength;
 
-    /// simulated annealing
-    bool anneal;
-    /// simulated annealing temperature
-    double AnnealTemp;
-
     /// multi-canonical method toggle on/off
     bool multicanonical;
 };

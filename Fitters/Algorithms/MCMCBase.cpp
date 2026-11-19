@@ -15,15 +15,6 @@ MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
         MACH3LOG_ERROR("MCMC chain length must be at least 10 steps, otherwise this will result in a floating point exception.");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-
-    AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999, __FILE__ , __LINE__);
-    if (AnnealTemp < 0)
-        anneal = false;
-    else
-    {
-        MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
-        anneal = true;
-    }
 }
 
 // *******************
@@ -273,6 +264,9 @@ std::string MCMCBase::GetFancyName() const {
 
     for(unsigned int i = 0; i < systematics.size(); ++i){
         if(systematics[i]->GetDoAdaption()){
+            if(systematics[i]->GetAdaptiveHandler()->GetUseRobbinsMonro()){
+                OutName += "RobbinsMonro_";
+            }
             OutName += "Adaptive_";
             break;
         }

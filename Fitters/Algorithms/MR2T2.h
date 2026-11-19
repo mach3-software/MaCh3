@@ -39,4 +39,9 @@ class MR2T2 : public MCMCBase {
     void ProposeStep() final;
     /// @brief Step acceptance probability
     double AcceptanceProbability() override;
+
+    /// simulated annealing
+    bool anneal;
+    /// simulated annealing temperature
+    double AnnealTemp;
 };
