@@ -5,6 +5,7 @@ ROOT_GENERATE_DICTIONARY(MaCh3SplineDict
 
 set(HEADERS
     SplineBase.h
+    WeightDerivativeSource.h
     BinnedSplineHandler.h
     UnbinnedSplineHandler.h
     SplineCommon.h

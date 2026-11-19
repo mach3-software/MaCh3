@@ -29,6 +29,23 @@ double SampleHandlerInterface::GetPoissonLLH(const double data, const double mc)
   return ( mc - data + data * std::log( data / mc ) );
 }
 
+// ***************************************************************************
+double SampleHandlerInterface::GetTestStatDerivative(const double data, const double mc) const {
+// ***************************************************************************
+  if (fTestStatistic != kPoisson) {
+    MACH3LOG_ERROR("Likelihood gradients are only implemented for the {} test statistic, {} uses {}",
+                   TestStatistic_ToString(kPoisson), GetName(), TestStatistic_ToString(fTestStatistic));
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  // The branches of GetPoissonLLH, differentiated in mc one by one
+  if ( data == 0 ) return 1.;
+  if ( mc < M3::_LOW_MC_BOUND_ ) {
+    if ( data > M3::_LOW_MC_BOUND_ ) return 0.;
+    else if ( data >= mc ) return 0.;
+  }
+  return 1. - data / mc;
+}
+
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double SampleHandlerInterface::GetTestStatLLH(const double data, const double mc, const double w2) const {

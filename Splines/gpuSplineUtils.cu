@@ -64,6 +64,7 @@ SplineMonolithGPU::SplineMonolithGPU() {
   cpu_spline_size = 0;
 
   gpu_weights = nullptr;
+  gpu_grads = nullptr;
   gpu_total_weights = nullptr;
   gpu_nParamPerEvent = nullptr;
   gpu_nPoints_arr = nullptr;
@@ -95,6 +96,7 @@ SplineMonolithGPU::~SplineMonolithGPU() {
   cudaFree(gpu_paramNo_TF1_arr);
   // free weights on the gpu
   cudaFree(gpu_weights);
+  cudaFree(gpu_grads);
   cudaFree(gpu_weights_tf1);
   cudaFree(gpu_total_weights);
   //KS: Before removing variable let's destroy texture
@@ -128,6 +130,8 @@ __host__ void SplineMonolithGPU::InitGPU_SplineMonolith(
 
   // Allocate memory for the array of weights to be returned to CPU
   cudaMalloc((void **) &gpu_weights, n_splines*sizeof(float));
+  CudaCheckError();
+  cudaMalloc((void **) &gpu_grads, n_splines*sizeof(float));
   CudaCheckError();
 
   // Now TF1 specific
@@ -346,6 +350,7 @@ __host__ void SplineMonolithGPU::CopyToGPU_SplineMonolith_Binned(
   cudaMalloc(&gpu_spline_segment, n_params * sizeof(short int));
   #ifndef _LOW_MEMORY_STRUCTS_
   cpu_tmp_weights.resize(cpu_n_splines);
+  cpu_tmp_grads.resize(cpu_n_splines);
   // Convert M3::float_t -> float for GPU
   std::vector<float> coeff_many_float(manycoeff_arr, manycoeff_arr + total_nknots * _nCoeff_);
   std::vector<float> coeff_x_float(xcoeff_arr, xcoeff_arr + spline_size * n_params);
@@ -411,6 +416,7 @@ __global__ void EvalOnGPU_Splines(
   const float* __restrict__ gpu_par_val,
   const short int* __restrict__ gpu_spline_segment,
   float* __restrict__ gpu_weights,
+  float* __restrict__ gpu_grads,
   const cudaTextureObject_t __restrict__ text_coeff_x) {
 //*********************************************************
   // points per spline is the offset to skip in the index to move between splines
@@ -444,6 +450,8 @@ __global__ void EvalOnGPU_Splines(
 
     //CW: Wooow, let's use some fancy intrinsics and pull down the processing time by <1% from normal multiplication! HURRAY
     gpu_weights[splineNum] = fmaf(dx, fmaf(dx, fmaf(dx, fD, fC), fB), fY);
+    //HW Derivative of the same cubic, as the CPU loop takes it: b + 2*c*dx + 3*d*dx^2
+    if (gpu_grads != nullptr) gpu_grads[splineNum] = fmaf(dx, fmaf(dx, 3.f*fD, 2.f*fC), fB);
     // Or for the more "easy to read" version:
     //gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
 
@@ -549,6 +557,7 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Unbinned(
     gpu_spline_segment,
 
     gpu_weights,
+    nullptr,
     text_coeff_x
   );
   CudaCheckError();
@@ -594,6 +603,7 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Unbinned(
 // (binary search already performed in SplineBase::FindSplineSegment()
 __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
   M3::float_t* cpu_spline_weights,
+  M3::float_t* cpu_spline_grad,
   // Holds the changes in parameters
   float *vals,
   // Holds the segments for parameters
@@ -626,6 +636,7 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
     gpu_spline_segment,
 
     gpu_weights,
+    cpu_spline_grad != nullptr ? gpu_grads : nullptr,
     text_coeff_x
   );
   CudaCheckError();
@@ -639,11 +650,20 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith_Binned(
   for (unsigned int i = 0; i < cpu_n_splines; ++i) {
     cpu_spline_weights[i] = static_cast<M3::float_t>(cpu_tmp_weights[i]);
   }
+  if (cpu_spline_grad != nullptr) {
+    cudaMemcpy(cpu_tmp_grads.data(), gpu_grads, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
+    CudaCheckError();
+    for (unsigned int i = 0; i < cpu_n_splines; ++i) cpu_spline_grad[i] = static_cast<M3::float_t>(cpu_tmp_grads[i]);
+  }
   #else
   // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
   /// @todo KS: Make cpu_spline_weight pinned for faster load
   cudaMemcpy(cpu_spline_weights, gpu_weights, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
   CudaCheckError();
+  if (cpu_spline_grad != nullptr) {
+    cudaMemcpy(cpu_spline_grad, gpu_grads, cpu_n_splines * sizeof(float), cudaMemcpyDeviceToHost);
+    CudaCheckError();
+  }
   #endif
 
   #ifdef MACH3_DEBUG

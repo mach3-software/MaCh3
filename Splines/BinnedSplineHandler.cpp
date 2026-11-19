@@ -286,6 +286,7 @@ void BinnedSplineHandler::Evaluate() {
     // The main call to the GPU
     gpu_monolith->RunGPU_SplineMonolith_Binned(
       cpu_spline_weights.data(),
+      ComputeDerivatives ? cpu_spline_grad.data() : nullptr,
       ParamValues,
       SplineSegments);
   } else
@@ -299,39 +300,86 @@ void BinnedSplineHandler::Evaluate() {
 //****************************************
 void BinnedSplineHandler::CalcSplineWeights() {
 //****************************************
+  //HW Two copies of the same loop rather than a test inside it, so neither loses vectorisation
+  if (ComputeDerivatives) {
+    CalcSplineWeightsAndDerivatives();
+    return;
+  }
   #ifdef MULTITHREAD
   #pragma omp parallel for simd
   #endif
   for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
   {
-    //CW: Which Parameter we are accessing
-    const short int Param = paramNo_arr[splineNum];
-    //CW: Avoids doing costly binary search on GPU
-    const short int segment = short(SplineSegments[Param]);
-
-    //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
-    const short int segment_X = short(Param*_max_knots+segment);
-
-    //KS: Find knot position in out monolithical structure
-    const unsigned int CurrentKnotPos = (nKnots_arr[splineNum]+segment) * _nCoeff_;
-
-    // These are what we can extract from the TSpline3
-    const M3::float_t y = manycoeff_arr[CurrentKnotPos+kCoeffY];
-    const M3::float_t b = manycoeff_arr[CurrentKnotPos+kCoeffB];
-    const M3::float_t c = manycoeff_arr[CurrentKnotPos+kCoeffC];
-    const M3::float_t d = manycoeff_arr[CurrentKnotPos+kCoeffD];
-
-    // Get the variation for this reconfigure for the i-th parameter
-    /// @todo KS: Once could use "ParamValues" but this will result in tiny bit different results due to floating point precision
-    const M3::float_t xvar = (*SplineInfoArray[Param].splineParsPointer);
-    // The Delta(x) = xvar - x
-    const M3::float_t dx = xvar - xcoeff_arr[segment_X];
-
+    M3::float_t y, b, c, d, dx;
+    GetSegment(splineNum, y, b, c, d, dx);
     //CW: Wooow, let's use some fancy intrinsic and pull down the processing time by <1% from normal multiplication! HURRAY
     cpu_spline_weights[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
     // Or for the more "easy to read" version:
     //cpu_spline_weights[splineNum]  = (fY+dx*(fB+dx*(fC+dx*fD)));
   }
+}
+
+//****************************************
+void BinnedSplineHandler::CalcSplineWeightsAndDerivatives() {
+//****************************************
+  constexpr M3::float_t Two = 2;
+  constexpr M3::float_t Three = 3;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for simd
+  #endif
+  for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum)
+  {
+    M3::float_t y, b, c, d, dx;
+    GetSegment(splineNum, y, b, c, d, dx);
+    cpu_spline_weights[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, M3::fmaf_t(dx, d, c), b), y);
+    //HW The same cubic's derivative, from the coefficients already in hand: b + 2c dx + 3d dx^2
+    cpu_spline_grad[splineNum] = M3::fmaf_t(dx, M3::fmaf_t(dx, Three*d, Two*c), b);
+  }
+}
+
+//****************************************
+bool BinnedSplineHandler::SetComputeDerivatives(const bool Enable) {
+//****************************************
+  if (!Enable) {
+    ComputeDerivatives = false;
+    cpu_spline_grad.clear();
+    cpu_spline_grad.shrink_to_fit();
+    return true;
+  }
+  //HW The GPU kernel computes the derivatives too when handed somewhere to put them
+  ComputeDerivatives = true;
+  cpu_spline_grad.assign(NSplines_valid, 0.);
+  return true;
+}
+
+//****************************************
+WeightDerivativeSource BinnedSplineHandler::GetWeightDerivativeSource() const {
+//****************************************
+  WeightDerivativeSource Source;
+  if (!ComputeDerivatives) return Source;
+  if (paramNo_arr.size() != static_cast<size_t>(NSplines_valid)) {
+    MACH3LOG_ERROR("{}: {} spline parameter indices for {} splines, the gradient can't place their derivatives",
+                   GetName(), paramNo_arr.size(), NSplines_valid);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  Source.Weights = cpu_spline_weights.data();
+  Source.Derivatives = cpu_spline_grad.data();
+  Source.N = NSplines_valid;
+  Source.ParamOfWeight = paramNo_arr.data();
+  //HW Each spline parameter reads its value through a pointer into the parameter handler, so its
+  //index there is that pointer's offset from the first parameter
+  const M3::float_t* First = ParHandler->RetPointer(0);
+  Source.GlobalParam.resize(static_cast<size_t>(nParams));
+  for (int i = 0; i < nParams; ++i) {
+    const M3::float_t* Value = SplineInfoArray[static_cast<size_t>(i)].splineParsPointer;
+    const long Offset = static_cast<long>(Value - First);
+    if (Value == nullptr || Offset < 0 || Offset >= ParHandler->GetNumParams()) {
+      MACH3LOG_ERROR("{}: spline parameter {} doesn't point into the parameter handler", GetName(), i);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    Source.GlobalParam[static_cast<size_t>(i)] = static_cast<int>(Offset);
+  }
+  return Source;
 }
 
 //****************************************
@@ -878,7 +926,8 @@ void BinnedSplineHandler::MoveToGPU() {
   // Delete all the coefficient arrays from the CPU once they are on the GPU
   delete[] manycoeff_arr; manycoeff_arr = nullptr;
   delete[] xcoeff_arr; xcoeff_arr = nullptr;
-  CleanVector(paramNo_arr);
+  //HW paramNo_arr stays: GetWeightDerivativeSource() hands it out as each weight's parameter, so the
+  //gradient can tell which parameter a spline derivative belongs to. Two bytes per spline
   CleanVector(nKnots_arr);
   MACH3LOG_INFO("Good GPU loading");
   #endif

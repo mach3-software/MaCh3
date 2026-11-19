@@ -220,8 +220,13 @@ void SampleHandlerBase::Initialise() {
   SetupNormParameters();
   MACH3LOG_INFO("Setting up Functional Pointers..");
   RegisterFunctionalParameters();
+  //HW Every shift is registered, so store each distinct list of them once, see EventShiftLists
+  functional.event_shifts.Compact();
   MACH3LOG_INFO("Setting up Additional Weight Pointers..");
+  //HW Where the experiment's own weights land in each event's list, for the fast backends
+  ConstWeightStart = WeightPointerCounts();
   AddAdditionalWeightPointers();
+  ConstWeightEnd = WeightPointerCounts();
   MACH3LOG_INFO("Setting up Kinematic Map..");
   SetupKinematicMap();
   clock.Stop();
@@ -230,6 +235,7 @@ void SampleHandlerBase::Initialise() {
   InititialiseData();
   MACH3LOG_INFO("=======================================================");
   CheckEmptyBins();
+  SetupReweightBackend();
 }
 
 // ************************************************
@@ -349,17 +355,15 @@ void SampleHandlerBase::Reweight() {
   //KS: Reset the histograms before reweight
   ResetHistograms();
 
-  //You only need to do these things if Oscillator has been initialised
-  //if not then you're not considering oscillations
-  if (Oscillator) Oscillator->Evaluate();
-
-  // Calculate weight coming from all splines if we initialised handler
-  if(SplineHandler) SplineHandler->Evaluate();
+  // Oscillation and spline weights
+  EvaluateWeights();
 
   //update the list of parameter values passed to shift functionals
   functional.update_vals();
   // Update the functional parameter values to the latest proposed values
   PrepFunctionalParameters();
+  // And copy them to where the flat shift table reads them
+  RefreshShiftTable();
 
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
@@ -378,6 +382,20 @@ void SampleHandlerBase::FillArray() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
+  if (Backend && !UseLegacyLoop) {
+    Backend->Fill(CurrentShiftKey(), FirstTimeW2, SampleHandler_array.data(), SampleHandler_array_w2.data());
+    // Linear shifts don't write the shifted variables to the events
+    if (FastAccess && FastAccess->UsesLinearShifts()) KinematicsStale = true;
+    // A backend can give the gradient after any fill, paused or not
+    GradientCurrent = (Gradient != nullptr);
+    return;
+  }
+  FillArrayLegacy();
+}
+
+// ************************************************
+void SampleHandlerBase::FillArrayLegacy() {
+// ************************************************
 
   // NOTE comment below is left for historical reasons
   //DB - Brain dump of speedup ideas
@@ -398,6 +416,10 @@ void SampleHandlerBase::FillArray() {
 
   double* _restrict_ MC_Array_for_reduction = SampleHandler_array.data();
   double* _restrict_ W2_array_for_reduction = SampleHandler_array_w2.data();
+  //HW Only with gradients on: each event's bin and weight, for the gradient's own pass
+  LikelihoodGradient* const Record = (Gradient && !GradientsPaused) ? Gradient.get() : nullptr;
+  GradientCurrent = (Record != nullptr);
+
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
   #endif
@@ -409,6 +431,7 @@ void SampleHandlerBase::FillArray() {
     const EventInfo* _restrict_ MCEvent = &MCEvents[iEvent];
     //ETA - generic functions to apply shifts to kinematic variable
     if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
+      if (Record) Record->MarkUnused(iEvent);
       continue;
     }
 
@@ -418,11 +441,16 @@ void SampleHandlerBase::FillArray() {
     const M3::float_t totalweight = CalcWeightTotal(MCEvent);
     //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
+      if (Record) Record->MarkUnused(iEvent);
       continue;
     }
 
     //DB Find the relevant bin in the PDF for each event
     const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
+    if (Record) {
+      if (GlobalBin > M3::UnderOverFlowBin) Record->Record(iEvent, GlobalBin, totalweight);
+      else Record->MarkUnused(iEvent);
+    }
 
     //ETA - we can probably remove this final if check on the -1?
     //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -449,6 +477,33 @@ void SampleHandlerBase::ResetHistograms() _noexcept_ {
   }
 } // end function
 
+// ************************************************
+std::vector<std::uint16_t> SampleHandlerBase::WeightPointerCounts() const {
+// ************************************************
+  std::vector<std::uint16_t> Counts(GetNEvents());
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
+    Counts[iEvent] = static_cast<std::uint16_t>(MCEvents[iEvent].total_weight_pointers.size());
+  }
+  return Counts;
+}
+
+// ***************************************************************************
+void SampleHandlerBase::RefreshShiftTable() {
+// ***************************************************************************
+  auto& F = functional;
+  F.table_ready = false;
+  if (F.apply_all == nullptr || !F.apply_all_possible || F.shifts.empty()) return;
+  for (const auto& Shift : F.shifts) {
+    if (Shift.raw == nullptr || Shift.par_vals.size() != 1) return;
+  }
+  F.raw_table.resize(F.shifts.size());
+  for (size_t iShift = 0; iShift < F.shifts.size(); ++iShift) {
+    F.raw_table[iShift].raw = F.shifts[iShift].raw;
+    F.raw_table[iShift].value = F.shifts[iShift].par_vals[0];
+  }
+  F.table_ready = true;
+}
+
 // ***************************************************************************
 void SampleHandlerBase::ApplyShifts(const int iEvent) {
 // ***************************************************************************
@@ -461,9 +516,14 @@ void SampleHandlerBase::ApplyShifts(const int iEvent) {
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  for (auto const &iShift : functional.event_shifts[iEvent]) {
-    auto & shift = functional.shifts[iShift];
-    shift.apply(shift.par_vals, iEvent);
+  //HW The same shift functions with the same values, through one typed call, see RefreshShiftTable
+  if (functional.table_ready) {
+    functional.apply_all(functional, functional.apply_all_events, iEvent);
+  } else {
+    for (auto const &iShift : functional.event_shifts[iEvent]) {
+      auto & shift = functional.shifts[iShift];
+      shift.apply(shift.par_vals, iEvent);
+    }
   }
 
   FinaliseShifts(iEvent);
@@ -1372,6 +1432,8 @@ void SampleHandlerBase::InitialiseSplineObject() {
 std::vector<std::vector<KinematicCut>> SampleHandlerBase::ApplyTemporarySelection(const int iSample,
                                          const std::vector<KinematicCut>& ExtraCuts) {
 // ************************************************
+  // Every caller goes on to read the events' shifted variables
+  SyncShiftedKinematics();
   // Backup current selection
   auto originalSelection = Selection;
 

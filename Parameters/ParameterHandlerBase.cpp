@@ -1,6 +1,9 @@
 #include "Parameters/ParameterHandlerBase.h"
+#include "Parameters/FlipMap.h"
 #include "Utils/IOUtils.h"
 
+#include <cmath>
+#include <limits>
 #include <regex>
 
 // ********************************************
@@ -320,6 +323,7 @@ void ParameterHandlerBase::SetCovMatrix(TMatrixDSym *cov) {
       InvertCovMatrix[i][j] = (*invCovMatrix)(i,j);
     }
   }
+  Prior.Invalidate();
 
   SetThrowMatrix(cov);
 }
@@ -538,8 +542,65 @@ void ParameterHandlerBase::SpecialStepProposal() {
   }
 
   // // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  if (!FlipsInProposeStep) return;
   for (const auto& [group_name, group] : FlipGroups) {
     FlipParameterGroup(group_name);
+  }
+}
+
+// ************************************************
+double ParameterHandlerBase::ProposeFlips() {
+// ************************************************
+  if (pca) {
+    MACH3LOG_ERROR("{}: ProposeFlips() works on the parameters themselves, not in the PCA basis", GetName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
+  for (int i = 0; i < _fNumPar; ++i) _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i]);
+  #pragma GCC diagnostic pop
+  if (FlipGroups.empty()) return 0.;
+  //HW One group per move, chosen uniformly. The reverse move picks the same group with the same
+  //probability, so this stays symmetric, and two unlikely flips never have to be accepted together
+  auto Chosen = FlipGroups.begin();
+  std::advance(Chosen, std::min(static_cast<std::size_t>(M3::rand::Uniform() * static_cast<double>(FlipGroups.size())),
+                                FlipGroups.size() - 1));
+  const FlipMap Map(Chosen->second, [this](const int i) { return IsParameterFixed(i); });
+  const std::vector<int>& Changed = Map.Changed();
+  if (Changed.empty()) return 0.;
+
+  const std::vector<double> Y = Map.Apply(_fCurrVal);
+  for (const double y : Y) {
+    // A functional flip can have no solution here (a square root of something negative, say): no move
+    if (!std::isfinite(y)) return std::numeric_limits<double>::quiet_NaN();
+  }
+  RequireSelfInverse(Map, Chosen->first, Y);
+  const double LogDet = Map.LogAbsJacobian(_fCurrVal);
+  if (std::isnan(LogDet)) return LogDet;
+
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
+  for (std::size_t k = 0; k < Changed.size(); ++k) _fPropVal[static_cast<std::size_t>(Changed[k])] = static_cast<M3::float_t>(Y[k]);
+  #pragma GCC diagnostic pop
+  return LogDet;
+}
+
+// ************************************************
+void ParameterHandlerBase::RequireSelfInverse(const FlipMap& Map, const std::string& GroupName, const std::vector<double>& Y) const {
+// ************************************************
+  //HW A deterministic move is only reversible if it is its own inverse. A plain reflection always is,
+  //a functional flip only if its formula was written to be, so check it rather than trust it
+  const std::vector<int>& Changed = Map.Changed();
+  std::vector<double> Flipped = _fCurrVal;
+  for (std::size_t k = 0; k < Changed.size(); ++k) Flipped[static_cast<std::size_t>(Changed[k])] = Y[k];
+  const std::vector<double> Back = Map.Apply(Flipped);
+  for (std::size_t k = 0; k < Changed.size(); ++k) {
+    const double X0 = _fCurrVal[static_cast<std::size_t>(Changed[k])];
+    if (std::fabs(Back[k] - X0) <= 1e-7 * std::max(1., std::fabs(X0))) continue;
+    MACH3LOG_ERROR("{}: flip group {} isn't its own inverse: flipping {} twice gives {:.10g}, not {:.10g}. "
+                   "Without that the flip move breaks detailed balance, so check the FunctionalFlip formula",
+                   GetName(), GroupName, GetParFancyName(Changed[k]), Back[k], X0);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
@@ -582,6 +643,21 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
 }
 
 // ************************************************
+void ParameterHandlerBase::SetProposalMask(const std::vector<char>& Mask) {
+// ************************************************
+  if (Mask.size() != static_cast<size_t>(_fNumPar)) {
+    MACH3LOG_ERROR("Proposal mask for {} has {} entries but the handler has {} parameters", GetName(), Mask.size(), _fNumPar);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  if (pca) {
+    MACH3LOG_ERROR("{} is PCA'd, so a proposal mask on the un-rotated parameters is meaningless: one principal "
+                   "component mixes masked in and masked out parameters", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  ProposalMask = Mask;
+}
+
+// ************************************************
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
 void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // ************************************************
@@ -594,6 +670,16 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
     #pragma omp parallel for
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
+      //HW Another kernel owns this parameter on this step, so put the proposal back onto the last
+      //accepted value. Without this a rejected step of the other kernel would leak into the
+      //likelihood this kernel accepts against
+      if (!IsParameterProposable(i)) {
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wuseless-cast"
+        _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i]);
+        #pragma GCC diagnostic pop
+        continue;
+      }
       if (!IsParameterFixed(i) > 0.) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -743,29 +829,27 @@ void ParameterHandlerBase::PrintPreFitCurrPropValues() const {
 //                    false = evaluate likelihood (so run with a prior)
 double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
-  double logL = 0.0;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for reduction(+:logL)
-  #endif
-  for(int i = 0; i < _fNumPar; ++i) {
-    if(_fFlatPrior[i]){
-      //HW: Flat prior, no need to calculate anything
-      continue;
-    }
-    // KS: Precalculate Diff once per "i" without doing this for every "j"
-    const double Diff = _fPropVal[i] - _fPreFitValue[i];
-    #ifdef MULTITHREAD
-    #pragma omp simd
-    #endif
-    for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[j]) {
-        //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
-        double scale = (i != j) ? 1. : 0.5;
-        logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
-      }
-    }
+  return GetSparsePrior().LogLikelihood(_fPropVal, _fPreFitValue);
+}
+
+// ********************************************
+// Gradient of CalcLikelihood with respect to every parameter, zero where the prior is flat
+std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
+// ********************************************
+  return GetSparsePrior().Gradient(_fPropVal, _fPreFitValue);
+}
+
+// ********************************************
+const SparsePrior& ParameterHandlerBase::GetSparsePrior() const {
+// ********************************************
+  // Rebuilt whenever the flat prior flags differ from the ones it was built with, so a derived
+  // class which sets _fFlatPrior directly is still picked up. SetCovMatrix invalidates it
+  if (!Prior.Matches(_fFlatPrior)) {
+    Prior.Build(InvertCovMatrix, _fFlatPrior);
+    MACH3LOG_DEBUG("{}: prior uses {} of {} inverse covariance entries", GetName(), Prior.GetNEntries(),
+                   static_cast<size_t>(_fNumPar) * static_cast<size_t>(_fNumPar));
   }
-  return logL;
+  return Prior;
 }
 
 // ********************************************
@@ -1064,6 +1148,20 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 }
 
 // ********************************************
+bool ParameterHandlerBase::TryCholeskyDecompose(const TMatrixDSym& Matrix, std::vector<std::vector<double>>& Decomposed) const {
+// ********************************************
+  //HW MakePosDef asks ROOT's TDecompChol whether a matrix is decomposable, but the decomposition
+  //the proposal uses is M3::GetCholeskyDecomposedMatrix, with a different tolerance. A matrix can
+  //pass the first and fail the second, so ask the routine that will consume the answer
+  try {
+    Decomposed = M3::GetCholeskyDecomposedMatrix(Matrix, matrixName);
+  } catch (const MaCh3Exception&) {
+    return false;
+  }
+  return true;
+}
+
+// ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
 // ********************************************
@@ -1079,25 +1177,46 @@ void ParameterHandlerBase::SetThrowMatrix(const TMatrixDSym *cov) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
+  //HW Build the replacement off to the side. Its decomposition can fail, and the matrix already
+  //being thrown from has to still be there if it does
+  std::unique_ptr<TMatrixDSym> Candidate(static_cast<TMatrixDSym*>(cov->Clone()));
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) {
-    MakeClosestPosDef(throwMatrix);
+    MakeClosestPosDef(Candidate.get());
   } else {
     // HW: Prevent spam from adaptive handler
     bool verbose = AdaptiveHandler ? AdaptiveHandler->GetTotalSteps() < 2 : true;
-    MakePosDef(throwMatrix, verbose);
+    MakePosDef(Candidate.get(), verbose);
   }
 
   // Simple sanitizer
   for (int i = 0; i < _fNumPar; ++i) {
-    const double variance = (*throwMatrix)(i, i);
+    const double variance = (*Candidate)(i, i);
     if(!std::isfinite(variance) || variance <= 0.) {
       MACH3LOG_WARN("Invalid variance for param {} ({}): {}, after posdef this will cause proposal to fail",
                     i, _fFancyNames[i], variance);
     }
   }
 
-  auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
+  std::vector<std::vector<double>> throwMatrix_CholDecomp;
+  if (!TryCholeskyDecompose(*Candidate, throwMatrix_CholDecomp)) {
+    //HW Nothing to fall back on if this is the first one, so that stays fatal
+    if (throwMatrix == nullptr) {
+      MACH3LOG_ERROR("The first throw matrix for {} cannot be Cholesky decomposed, even after being "
+                     "made positive definite, and there is no earlier one to keep", matrixName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    MACH3LOG_WARN("Proposed throw matrix for {} cannot be Cholesky decomposed, even after being made "
+                  "positive definite. Keeping the one already in use and skipping this update", matrixName);
+    MACH3LOG_WARN("  this is usually an adapted covariance from fewer effective samples than it has "
+                  "parameters ({}), which fixes itself as the chain accumulates", _fNumPar);
+    return;
+  }
+
+  //HW The matrix being replaced is not freed here, as before: UpdateThrowMatrix() is the call
+  //which owns that, and frees it only once this has succeeded
+  if (initialThrowMatrix == nullptr) initialThrowMatrix.reset(static_cast<TMatrixDSym*>(Candidate->Clone()));
+  throwMatrix = Candidate.release();
+  ++throwMatrixUpdates;
 
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD
@@ -1139,9 +1258,12 @@ void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
 // ********************************************
 void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
 // ********************************************
-  delete throwMatrix;
-  throwMatrix = nullptr;
+  //HW Free the old matrix only after the new one is in place. SetThrowMatrix() keeps the old one
+  //when the new one can't be decomposed, and it has to still exist for that
+  TMatrixDSym* Replaced = throwMatrix;
+  const int UpdatesBefore = throwMatrixUpdates;
   SetThrowMatrix(cov);
+  if (throwMatrixUpdates != UpdatesBefore) delete Replaced;
 }
 
 // ********************************************

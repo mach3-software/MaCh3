@@ -6,6 +6,7 @@
 
 // MaCh3  includes
 #include "Splines/SplineStructs.h"
+#include "Splines/WeightDerivativeSource.h"
 #include "Splines/SplineCommon.h"
 
 _MaCh3_Safe_Include_Start_ //{
@@ -48,6 +49,16 @@ class SplineBase {
     /// @brief KS: Load preprocessed spline file
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
     virtual void LoadSplineFile(std::string FileName) = 0;
+
+    /// @brief Ask Evaluate() to also compute d(weight)/d(parameter) for every weight
+    /// @param Enable Whether the derivatives are wanted. Off by default, since only gradient based
+    /// fitters read them and gradient free ones shouldn't pay for them
+    /// @return Whether this handler can provide them. The base class can't
+    virtual bool SetComputeDerivatives(const bool Enable) { (void)Enable; return false; }
+
+    /// @brief Where this handler's weights and their derivatives live, see WeightDerivativeSource
+    /// @details Invalid unless SetComputeDerivatives(true) succeeded
+    virtual WeightDerivativeSource GetWeightDerivativeSource() const { return {}; }
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer() const;

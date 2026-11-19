@@ -7,6 +7,8 @@ set(HEADERS
     ParameterTunes.h
     ParameterStructs.h
     SpecialProposals.h
+    SparsePrior.h
+    FlipMap.h
 )
 
 add_library(Parameters SHARED
@@ -15,6 +17,7 @@ add_library(Parameters SHARED
     AdaptiveMCMCHandler.cpp
     PCAHandler.cpp
     ParameterTunes.cpp
+    FlipMap.cpp
 )
 
 set_target_properties(Parameters PROPERTIES

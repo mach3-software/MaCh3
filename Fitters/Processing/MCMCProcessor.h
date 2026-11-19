@@ -372,6 +372,9 @@ class MCMCProcessor {
     // MCMC Diagnostic
     /// @brief CW: Prepare branches etc. for DiagMCMC
     void PrepareDiagMCMC();
+    /// @brief The first chain entry at or after a step number, nEntries if there is none
+    /// @details A chain continued from an earlier fit does not start at step zero, so entry index and step differ
+    int FirstEntryFromStep(unsigned int Step);
     /// @brief Computes the average of each parameter across all MCMC entries. Useful for autocorrelation
     std::vector <double> GetParameterSums();
     /// @brief CW: Draw trace plots of the parameters i.e. parameter vs step
@@ -451,6 +454,12 @@ class MCMCProcessor {
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
     int nEntries;
+    /// Entries cached for the MCMC diagnostics, i.e. nEntries with the burn-in taken off
+    /// @details PrepareDiagMCMC() drops every entry below StepCut before it caches anything, so
+    /// the diagnostics index their arrays from zero over the post burn-in chain only. Use this,
+    /// not nEntries, anywhere that walks ParStep, AccProbValues, StepNumber, SampleValues or
+    /// SystValues, or the tail of those arrays will be read uninitialised
+    int nDiagEntries;
     /// KS: For merged chains number of entries will be different from nSteps
     int nSteps;
     /// Number of sample PDF objects

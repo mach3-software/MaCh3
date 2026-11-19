@@ -100,6 +100,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
   }
 
   shift.par_vals.resize(par_indices.size());
+  shift.par_indices = par_indices;
   shift.update_vals = [par_indices,this](std::vector<double> &par_vals) {
     for (size_t i = 0; i < par_indices.size(); ++i) {
       auto const &fpi = par_indices[i];
@@ -153,7 +154,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
           matched_pars.size());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    functional.event_shifts[iEvent].push_back(iShift);
+    functional.event_shifts.Add(static_cast<size_t>(iEvent), iShift);
     neventsaffected++;
   }
   MACH3LOG_INFO(
@@ -161,6 +162,20 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       "[ {}] for SampleHandler: {}, with {} par vals affecting {} events.",
       ss_pars.str(), SampleHandlerName, shift.par_vals.size(), neventsaffected);
 }
+
+namespace M3::detail {
+/// @brief HW Run all of one event's single parameter shifts through their plain functions
+template <typename EventType>
+void FunctionalApplyAll(const Functional &F, void *Events, const int iEvent) {
+  using RawFn = void (*)(double const &, EventType &);
+  EventType &Ev = (*static_cast<std::vector<EventType> *>(Events))[static_cast<size_t>(iEvent)];
+  const auto *Table = F.raw_table.data();
+  for (const int iShift : F.event_shifts[static_cast<size_t>(iEvent)]) {
+    const auto &Shift = Table[iShift];
+    reinterpret_cast<RawFn>(Shift.raw)(Shift.value, Ev);
+  }
+}
+} // namespace M3::detail
 
 template <typename EventType, typename SFType>
 void SampleHandlerBase::RegisterIndividualFunctionalParameter(
@@ -173,6 +188,7 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       "Function call signature for single parameter Functional shift must be "
       "void(double const &, EventType&).");
 
+  const size_t NShiftsBefore = functional.shifts.size();
   RegisterIndividualFunctionalParameter(
       ExptEvents,
       std::vector<std::string>{
@@ -181,6 +197,26 @@ void SampleHandlerBase::RegisterIndividualFunctionalParameter(
       [=](std::vector<double> const &par_vals, EventType &ev) {
         shift_func(par_vals[0], ev);
       });
+  // Nothing registered, e.g. the parameter isn't defined for these samples
+  if (functional.shifts.size() == NShiftsBefore) return;
+
+  //HW A plain function, or a lambda without captures, can be called directly, see FunctionalApplyAll
+  using RawFn = void (*)(double const &, EventType &);
+  if constexpr (std::is_convertible_v<SFType, RawFn>) {
+    const RawFn Raw = shift_func;
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wcast-function-type"
+    functional.shifts.back().raw = reinterpret_cast<void (*)()>(Raw);
+    #pragma GCC diagnostic pop
+    if (functional.apply_all == nullptr) {
+      functional.apply_all = &M3::detail::FunctionalApplyAll<EventType>;
+      functional.apply_all_events = &ExptEvents;
+    } else if (functional.apply_all_events != static_cast<void *>(&ExptEvents)) {
+      functional.apply_all_possible = false;
+    }
+  } else {
+    functional.apply_all_possible = false;
+  }
 }
 
 // ***************************************************************************

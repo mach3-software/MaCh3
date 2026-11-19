@@ -6,6 +6,9 @@
 #include "Fitters/Algorithms/DelayedMR2T2.h"
 #include "Fitters/Algorithms/PSO.h"
 #include "Fitters/Algorithms/LikelihoodFit.h"
+#include "Fitters/Algorithms/HamiltonianMC.h"
+#include "Fitters/Algorithms/NoUTurnMC.h"
+#include "Fitters/Algorithms/HybridMCMC.h"
 #ifdef MaCh3_MINUIT2
 #include "Fitters/Algorithms/MinuitFit.h"
 #endif

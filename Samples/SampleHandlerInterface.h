@@ -21,6 +21,8 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TString.h"
 _MaCh3_Safe_Include_End_ //}
 
+class ParameterHandlerBase;
+
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 ///
 /// @details It serves as basic interface for fit running, as well as other functionalities like llh scan, sigma var or even posterior predictive distribution.
@@ -64,6 +66,53 @@ class SampleHandlerInterface
   virtual void Reweight()=0;
   /// @brief Return likelihood (-LogL) for all samples
   virtual double GetLikelihood() const = 0;
+
+  /// @name Likelihood gradient, for gradient based fitters (HMC, NUTS)
+  /// @{
+  /// @brief Switch book keeping of the likelihood gradient on or off
+  /// @details Off by default, so fitters that don't need it pay nothing. Takes effect from the next
+  /// Reweight()
+  virtual void SetComputeGradients([[maybe_unused]] const bool Enable) {
+    MACH3LOG_ERROR("{} does not provide likelihood gradients", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  /// @brief Leave the gradient out of the next reweights without giving up what it has set up
+  /// @details For a sampler that mixes gradient free updates in, which don't need it
+  virtual void SetGradientsPaused([[maybe_unused]] const bool Paused) {}
+  /// @brief \f$\partial(-\log\mathcal{L})/\partial x_i\f$ at the last Reweight(), for every parameter
+  /// of GetGradParHandler()
+  /// @details Needs SetComputeGradients(true) before that reweight, and gradients not paused
+  virtual std::vector<double> GetGradLikelihood() const {
+    MACH3LOG_ERROR("{} does not provide likelihood gradients", GetName());
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  /// @brief The parameter handler GetGradLikelihood() is indexed by, nullptr if there is none
+  virtual const ParameterHandlerBase* GetGradParHandler() const { return nullptr; }
+  /// @brief Per parameter of GetGradParHandler(), whether GetGradLikelihood() carries its derivative
+  /// @details False means the entry is zero whatever the true derivative, because the handler has
+  /// no way to differentiate with respect to that parameter (a functional shift, say). True includes
+  /// parameters no event depends on, whose derivative really is zero. Empty if gradients are off
+  virtual std::vector<bool> GetGradientCoverage() const { return {}; }
+  /// @}
+
+  /// @name Cheap surrogate likelihood, for delayed acceptance of moves of the shifts alone
+  /// @details The surrogate centred on an anchor x, at a proposal y, is the exact prediction at x
+  /// plus the bin migrations of a sample of the events between x and y, scaled up. It is exact at
+  /// x, and because it is centred on the current point the same migrations, reversed, give the
+  /// surrogate centred on y at x, which a delayed acceptance second stage needs to stay exact
+  /// @{
+  /// @brief Set the surrogate up, sampling every Stride-th event
+  /// @return Whether this handler can give one
+  virtual bool EnableSurrogate([[maybe_unused]] const int Stride) { return false; }
+  /// @brief Take the last Reweight() as the anchor; it must have been at the current parameters
+  virtual void AnchorSurrogate() {}
+  /// @brief Fill the prediction with the surrogate at the proposed parameters, so GetLikelihood()
+  /// gives the surrogate -lnL. Only shift parameters may differ from the anchor
+  virtual void ReweightSurrogate() {}
+  /// @brief After an exact Reweight() at the proposal that the last ReweightSurrogate() was at: the
+  /// -lnL of the surrogate centred on the proposal, at the anchor. Leaves the prediction as it is
+  virtual double ReverseSurrogateLikelihood() const { return 0.; }
+  /// @}
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
@@ -145,6 +194,11 @@ class SampleHandlerInterface
   /// @param data is data
   /// @param mc is mc
   double GetPoissonLLH(const double data, const double mc) const;
+  /// @brief Derivative of the test statistic of one bin with respect to its MC prediction
+  /// @details Only the Poisson statistic: the others also depend on the sum of squared weights,
+  /// whose derivative isn't tracked. Follows GetPoissonLLH() exactly, so it is zero wherever that
+  /// clamps the prediction to M3::_LOW_MC_BOUND_
+  double GetTestStatDerivative(const double data, const double mc) const;
 
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of @p fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
   ///

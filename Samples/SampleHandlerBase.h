@@ -8,6 +8,11 @@
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
+#include "Samples/LikelihoodGradient.h"
+#include "Samples/ReweightOptions.h"
+#include "Samples/FastEventAccess.h"
+#include "Samples/OscillationGradient.h"
+#include "Samples/WeightParameterSnapshot.h"
 #include "Samples/BinningHandler.h"
 #include "Samples/SampleHandlerFunctional.h"
 
@@ -78,6 +83,51 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void PrintRates(const bool DataOnly = false) final;
   /// @copydoc SampleHandlerInterface::GetLikelihood
   double GetLikelihood() const override;
+  /// @copydoc SampleHandlerInterface::SetComputeGradients
+  void SetComputeGradients(const bool Enable) override;
+  /// @copydoc SampleHandlerInterface::SetGradientsPaused
+  void SetGradientsPaused(const bool Paused) override { GradientsPaused = Paused; }
+  /// @copydoc SampleHandlerInterface::GetGradLikelihood
+  std::vector<double> GetGradLikelihood() const override;
+  /// @copydoc SampleHandlerInterface::GetGradParHandler
+  const ParameterHandlerBase* GetGradParHandler() const override;
+  /// @copydoc SampleHandlerInterface::GetGradientCoverage
+  std::vector<bool> GetGradientCoverage() const override;
+  /// @copydoc SampleHandlerInterface::EnableSurrogate
+  bool EnableSurrogate(const int Stride) override;
+  /// @copydoc SampleHandlerInterface::AnchorSurrogate
+  void AnchorSurrogate() override;
+  /// @copydoc SampleHandlerInterface::ReweightSurrogate
+  void ReweightSurrogate() override;
+  /// @copydoc SampleHandlerInterface::ReverseSurrogateLikelihood
+  double ReverseSurrogateLikelihood() const override;
+  /// @brief Compare the reweight backend in use with the plain event loop
+  /// @details Moves the parameters through NPoints points, cycling between moving only the
+  /// functional (shift) parameters, only the others, and both, which takes the backend through each
+  /// of its passes. At every point it reweights with the backend and then with the plain loop, and
+  /// compares the MC prediction and W2 bin by bin, the likelihood and, if gradients are on, the
+  /// gradient. The parameters are put back and the handler reweighted before returning.
+  /// @param NPoints Number of points
+  /// @param Tolerance Differences above this are logged as errors
+  /// @param Width Parameters are thrown this many prior widths around their prefit values
+  /// @param Seed For the points
+  /// @return The largest relative difference found, 0 if no backend is in use
+  double CheckReweightBackend(int NPoints = 3, double Tolerance = 1e-9, double Width = 1., unsigned int Seed = 2026);
+  /// @brief Name of the reweight backend in use, "legacy" for the plain event loop
+  std::string GetReweightBackendName() const { return Backend ? Backend->Name() : "legacy"; }
+  /// @brief How closely the reweight backend in use reproduces the plain event loop, see ReweightBackend::Precision
+  double GetReweightBackendPrecision() const { return Backend ? Backend->Precision() : 0.; }
+  /// @brief Bring every event's shifted kinematic variables up to date with the last reweight
+  /// @details Only does anything with the opt-in linear shifts (Reweight: LinearShifts), which work
+  /// out the shifted variables without writing them to the events. Core's own plotting and integral
+  /// functions call this first; experiment code that reads shifted variables itself after a
+  /// reweight has to call it too
+  void SyncShiftedKinematics();
+  /// @brief Forget everything the reweight backend reuses between reweights
+  /// @details For an experiment that changes how events are shifted, cut or weighted outside the
+  /// parameters (its own cached kinematics, say), so the next reweight starts from scratch
+  void InvalidateReweightCache();
+
   /// @copydoc SampleHandlerInterface::GetSampleLikelihood
   double GetSampleLikelihood(const int iSample) const override;
   //===============================================================================
@@ -229,6 +279,17 @@ class SampleHandlerBase :  public SampleHandlerInterface
 
   /// @brief DB Function to determine which weights apply to which types of samples
   virtual void AddAdditionalWeightPointers() = 0;
+  /// @brief Promise that every weight AddAdditionalWeightPointers() adds is constant for the whole
+  /// fit, and that CalcWeightFunc() does nothing
+  /// @details The fast reweight backends need this: they multiply each event's constant weights out
+  /// once, and sum events that share their varying weights. Off unless a handler opts in, in which
+  /// case the plain event loop is used
+  virtual bool AdditionalWeightsAreConstant() const { return false; }
+  /// @brief Whether a functional shift (or ResetShifts / FinaliseShifts) can change this kinematic variable
+  /// @details A cut on a variable no shift touches gives the same answer whatever the shifts do, so
+  /// events failing one can never be selected and the fast backends leave them out entirely.
+  /// Every variable counts as shifted unless a handler says otherwise
+  virtual bool IsKinematicParameterShifted([[maybe_unused]] const int KinematicVariable) const { return true; }
 
   /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
   void SetupKinematicMap();
@@ -311,6 +372,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief ETA - generic function applying shifts
   /// @note It is virtual so we can perform unorthodox shifts, ideally we should de-virtualise once we ensure we can support everything in core
   virtual void ApplyShifts(const int iEvent);
+  /// @brief Copy the shift parameters' current values into the flat shift table ApplyShifts uses
+  /// @details The table holds every shift's plain function and value, and every event's shifts as
+  /// one flat list, so an event's shifts take one typed call rather than a std::function call each.
+  /// Only used when every shift was registered as a plain function of one parameter
+  void RefreshShiftTable();
   /// @brief HH - reset the shifted values to the original values
   virtual void ResetShifts([[maybe_unused]] const int iEvent) {};
   /// @brief LP - Optionally calculate derived observables after all shifts have been applied
@@ -413,6 +479,101 @@ class SampleHandlerBase :  public SampleHandlerInterface
   //DB Covariance Objects
   /// ETA - All experiments will need an xsec, det and osc cov
   ParameterHandlerGeneric *ParHandler = nullptr;
+
+  /// HW The likelihood gradient, null unless SetComputeGradients(true). The reweight records each
+  /// event's bin and weight in it, and GetGradLikelihood() runs its pass over the events
+  std::unique_ptr<LikelihoodGradient> Gradient;
+  /// HW Whether reweights currently leave the gradient out, see SetGradientsPaused()
+  bool GradientsPaused = false;
+  /// HW Whether Gradient holds the events of the last reweight, false after a paused one
+  bool GradientCurrent = false;
+  /// HW Per parameter, whether GetGradLikelihood() carries its derivative, see GetGradientCoverage()
+  std::vector<bool> GradientCoverage;
+  /// HW Derivatives of the oscillation weights, null unless gradients are on and the oscillation
+  /// calculation is one OscillationGradient can differentiate
+  std::unique_ptr<OscillationGradient> OscGradient;
+  /// @brief Set up OscGradient, if the oscillation calculation allows it
+  void SetupOscillationGradient();
+
+  /// @name Reweight backend
+  /// HW See ReweightBackend. Null means the plain event loop in FillArray, which is also the
+  /// reference CheckReweightBackend() compares against
+  /// @{
+  /// Lets a backend shift, cut and bin this handler's events
+  class BackendEventAccess final : public ReweightEventAccess {
+   public:
+    /// @brief Serve the given handler
+    explicit BackendEventAccess(SampleHandlerBase& Handler_) : Handler(Handler_) {}
+    /// @copydoc ReweightEventAccess::ShiftEvent
+    void ShiftEvent(const int iEvent) override { Handler.ApplyShifts(iEvent); }
+    /// @copydoc ReweightEventAccess::PassesCuts
+    bool PassesCuts(const int iEvent) override {
+      return Handler.IsEventSelected(Handler.MCEvents[static_cast<std::size_t>(iEvent)].NominalSample, iEvent);
+    }
+    /// @copydoc ReweightEventAccess::GlobalBinOf
+    int GlobalBinOf(const int iEvent) override {
+      const EventInfo& Event = Handler.MCEvents[static_cast<std::size_t>(iEvent)];
+      return Handler.Binning->FindGlobalBin(Event.NominalSample, Event.KinVar, Event.NomBin);
+    }
+   private:
+    /// The handler served
+    SampleHandlerBase& Handler;
+  };
+  /// The backend in use, null for the plain event loop
+  std::unique_ptr<ReweightBackend> Backend;
+  /// @brief The surrogate for moves of the shifts alone, see SampleHandlerInterface::ReweightSurrogate
+  struct SurrogateState {
+    /// Whether EnableSurrogate succeeded
+    bool On = false;
+    /// Whether the anchor's W2 moves with the events (UpdateW2), or stays as it was filled
+    bool MoveW2 = false;
+    /// The prediction at the anchor
+    std::vector<double> AnchorMC;
+    /// W2 at the anchor
+    std::vector<double> AnchorW2;
+    /// The sampled migrations of the last ReweightSurrogate()
+    std::vector<double> DeltaMC;
+    /// Their squared weights
+    std::vector<double> DeltaW2;
+  } Surrogate;
+  /// What Backend calls back into
+  std::unique_ptr<BackendEventAccess> BackendAccess;
+  /// The faster access Backend uses when it could be set up and checked, see FastEventAccess
+  std::unique_ptr<FastEventAccess> FastAccess;
+  /// @brief Set up FastAccess, using each of its shortcuts only if it agrees with the generic access
+  /// for every live event
+  void SetupFastEventAccess(const std::vector<char>& NeverSelected);
+  /// @brief Log how much memory the reweight's own structures hold
+  void ReportReweightMemory() const;
+  /// @brief Measure the linear shift table and check it against the experiment's shifts, see LinearShiftTable
+  void SetupLinearShifts(const std::vector<char>& NeverSelected);
+  /// Whether the events' shifted variables may be behind the last reweight, see SyncShiftedKinematics
+  bool KinematicsStale = false;
+  /// Set while CheckReweightBackend() runs the plain loop for comparison
+  bool UseLegacyLoop = false;
+  /// Per event, where the weights AddAdditionalWeightPointers() added start and end in total_weight_pointers
+  std::vector<std::uint16_t> ConstWeightStart;
+  /// @brief Per event, how many weight pointers it has so far
+  std::vector<std::uint16_t> WeightPointerCounts() const;
+  /// See ConstWeightStart
+  std::vector<std::uint16_t> ConstWeightEnd;
+  /// The parameters the oscillation and spline weights were last evaluated at, see EvaluateWeights()
+  WeightParameterSnapshot WeightSnapshot;
+  /// @brief Choose and build the backend, as the sample config's Reweight section asks
+  void SetupReweightBackend();
+  /// @brief Compare the new backend with the plain loop at a few points: throw if it differs and was
+  /// asked for by name, fall back to the plain loop if it was chosen automatically
+  void SelfCheckReweightBackend(const ReweightOptions& Options);
+  /// @brief Per event, non-zero if a cut on a variable no shift changes rejects it
+  std::vector<char> FindNeverSelected();
+  /// @brief The current values of every functional parameter, as the shifts see them
+  std::vector<double> CurrentShiftKey() const;
+  /// @brief Evaluate the oscillation and spline weights, unless with a backend in use no parameter
+  /// they can depend on has moved since they were last evaluated
+  void EvaluateWeights();
+  /// @brief The plain event loop
+  void FillArrayLegacy();
+  /// @}
 
   //===============================================================================
   /// @brief Identifier of this Sample Handler, mostly used for fancy printing in FitterBase

@@ -1,7 +1,11 @@
 #pragma once
 
 // MaCh3 includes
+#include "Manager/Manager.h"
 #include "Parameters/ParameterStructs.h"
+
+// C++ includes
+#include <regex>
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -98,7 +102,7 @@ inline double* MatrixMult(double *A, double *B, int n) {
       C[i*n+j] = sum;
     }
   }
-  delete BT;
+  delete[] BT;
 
   return C;
 }
@@ -120,8 +124,8 @@ inline double** MatrixMult(double **A, double **B, int n) {
   }
   //CW: Now call the monolithic calculator
   double *C_mon = MatrixMult(A_mon, B_mon, n);
-  delete A_mon;
-  delete B_mon;
+  delete[] A_mon;
+  delete[] B_mon;
 
   // Return the double pointer
   double **C = new double*[n];
@@ -134,7 +138,7 @@ inline double** MatrixMult(double **A, double **B, int n) {
       C[i][j] = C_mon[i*n+j];
     }
   }
-  delete C_mon;
+  delete[] C_mon;
 
   return C;
 }

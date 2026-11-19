@@ -15,6 +15,13 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Destructor
     virtual ~BinnedSplineHandler();
 
+    /// @copydoc SplineBase::SetComputeDerivatives
+    /// @details On the GPU as well as the CPU: the GPU kernel works the derivative out alongside the
+    /// weight when asked to
+    bool SetComputeDerivatives(const bool Enable) override;
+    /// @copydoc SplineBase::GetWeightDerivativeSource
+    WeightDerivativeSource GetWeightDerivativeSource() const override;
+
     /// @copydoc SplineBase::Evaluate
     void Evaluate() final;
 
@@ -46,6 +53,33 @@ class BinnedSplineHandler : public SplineBase {
   protected:
     /// @copydoc SplineBase::CalcSplineWeights
     void CalcSplineWeights() final;
+    /// @brief CalcSplineWeights() for when the derivatives are wanted too
+    void CalcSplineWeightsAndDerivatives();
+    /// @brief The coefficients of the cubic segment a spline is on, and how far into it we are
+    /// @param splineNum Index of the spline among the valid ones
+    /// @param y,b,c,d The cubic \f$y + b\,dx + c\,dx^2 + d\,dx^3\f$
+    /// @param dx Distance of the parameter from the segment's first knot
+    inline void GetSegment(const unsigned int splineNum, M3::float_t& y, M3::float_t& b, M3::float_t& c,
+                           M3::float_t& d, M3::float_t& dx) const {
+      //CW: Which Parameter we are accessing
+      const short int Param = paramNo_arr[splineNum];
+      //CW: Avoids doing costly binary search on GPU
+      const short int segment = SplineSegments[Param];
+      //KS: Segment for coeff_x is simply parameter*max knots + segment as each parameters has the same spacing
+      const short int segment_X = short(Param*_max_knots+segment);
+      //KS: Find knot position in out monolithical structure
+      const unsigned int CurrentKnotPos = (nKnots_arr[splineNum]+segment) * _nCoeff_;
+      // These are what we can extract from the TSpline3
+      y = manycoeff_arr[CurrentKnotPos+kCoeffY];
+      b = manycoeff_arr[CurrentKnotPos+kCoeffB];
+      c = manycoeff_arr[CurrentKnotPos+kCoeffC];
+      d = manycoeff_arr[CurrentKnotPos+kCoeffD];
+      // Get the variation for this reconfigure for the i-th parameter
+      /// @todo KS: Once could use "ParamValues" but this will result in tiny bit different results due to floating point precision
+      const M3::float_t xvar = (*SplineInfoArray[Param].splineParsPointer);
+      // The Delta(x) = xvar - x
+      dx = xvar - xcoeff_arr[segment_X];
+    }
     /// @brief Initialise flat structure
     void PrepForReweight();
     /// Only need 1 indexing array everything else interfaces with this to get binning properties
@@ -124,6 +158,11 @@ class BinnedSplineHandler : public SplineBase {
 
     /// Stores weight from spline evaluation for each single spline
     std::vector<M3::float_t> cpu_spline_weights;
+    /// HW d(weight)/d(parameter) of every spline, filled by CalcSplineWeights() only while
+    /// ComputeDerivatives is set, see SetComputeDerivatives()
+    std::vector<M3::float_t> cpu_spline_grad;
+    /// HW Whether CalcSplineWeights() also fills cpu_spline_grad
+    bool ComputeDerivatives = false;
     /// CW: CPU array with the number of points per spline (not per spline point!)
     std::vector<short int> paramNo_arr;
 

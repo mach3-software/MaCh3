@@ -39,8 +39,20 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   endif()
 endif()
 
-# KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+# HW: Clang's -Wconversion is wider than GCC's. For C++, GCC leaves sign conversions and
+# double-to-float narrowing in function arguments out of it, so warning about them here would hold
+# Clang builds to a stricter standard than the GCC ones the code is developed against. The
+# GCC-only groups named in "#pragma GCC diagnostic" lines are unknown to Clang, which is fine
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(MaCh3Warnings INTERFACE
+    -Wno-sign-conversion
+    -Wno-implicit-float-conversion
+    -Wno-unknown-warning-option
+  )
+endif()
+
+# KS: IntelLLVM is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   set(MaCh3_WERROR_ENABLED FALSE)
 endif()
 

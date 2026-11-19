@@ -175,6 +175,21 @@ void ParameterHandlerGeneric::LoadCorrelationFromConfig(std::vector<std::map<std
   SetCovMatrix(_fCovMatrix);
 }
 
+
+namespace {
+/// @brief Read a parameter's step scale, written either as a number or as a map keyed by algorithm
+/// @details Some covariance files (the DUNE TDR ones) give `StepScale: {MCMC: x, ...}`. The MCMC
+/// entry is the one the proposal uses, so that is what a map resolves to
+double ReadStepScale(const YAML::Node& StepScaleNode, const std::string& ParName) {
+  if (!StepScaleNode.IsMap()) return Get<double>(StepScaleNode, __FILE__ , __LINE__);
+  if (!StepScaleNode["MCMC"]) {
+    MACH3LOG_ERROR("StepScale for parameter {} is a map without an MCMC key", ParName);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  return Get<double>(StepScaleNode["MCMC"], __FILE__ , __LINE__);
+}
+} // namespace
+
 // ********************************************
 // ETA An init function for the YAML constructor
 // All you really need from the YAML file is the number of Systematics
@@ -199,7 +214,7 @@ void ParameterHandlerGeneric::InitialiseFromConfig(const std::vector<std::string
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"], __FILE__ , __LINE__);
+    _fIndivStepScale[i] = ReadStepScale(param["Systematic"]["StepScale"], _fFancyNames[i]);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     if(_fError[i] <= 0) {
       MACH3LOG_ERROR("Error for param {}({}) is negative and equal to {}", _fFancyNames[i], i, _fError[i]);

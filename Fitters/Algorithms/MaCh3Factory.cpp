@@ -20,6 +20,18 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
   {
     MaCh3Fitter = std::make_unique<PSO>(fitMan);
   }
+  else if (Algorithm == "HMC" || Algorithm == "HamiltonianMC")
+  {
+    MaCh3Fitter = std::make_unique<HamiltonianMC>(fitMan);
+  }
+  else if (Algorithm == "NUTS" || Algorithm == "NoUTurnMC")
+  {
+    MaCh3Fitter = std::make_unique<NoUTurnMC>(fitMan);
+  }
+  else if (Algorithm == "Hybrid" || Algorithm == "HybridMCMC" || Algorithm == "Auto")
+  {
+    MaCh3Fitter = std::make_unique<HybridMCMC>(fitMan);
+  }
   else if (Algorithm == "Minuit2")
   {
     #ifdef MaCh3_MINUIT2

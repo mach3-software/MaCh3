@@ -9,6 +9,14 @@ set(HEADERS
     MaCh3Factory.h
     PredictiveThrower.h
     MulticanonicalMCMCHandler.h
+    DualAveraging.h
+    HamiltonianMC.h
+    HamiltonianMetric.h
+    NoUTurnMC.h
+    HybridMCMC.h
+    HybridSettings.h
+    HybridBlocks.h
+    RandomWalkTuner.h
 )
 
 add_library(Fitters SHARED
@@ -22,6 +30,15 @@ add_library(Fitters SHARED
     PredictiveThrower.cpp
     MulticanonicalMCMCHandler.cpp
     MaCh3Factory.cpp
+    HamiltonianMC.cpp
+    HamiltonianMetric.cpp
+    NoUTurnMC.cpp
+    HybridMCMC.cpp
+    HybridSettings.cpp
+    HybridBlocks.cpp
+    HybridRandomWalk.cpp
+    HybridDelayedAcceptance.cpp
+    HybridFlipMoves.cpp
 )
 
 set_target_properties(Fitters PROPERTIES

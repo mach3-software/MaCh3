@@ -8,6 +8,9 @@
 #include "Parameters/ParameterTunes.h"
 #include "Manager/TablePrinter.h"
 #include "Parameters/SpecialProposals.h"
+#include "Parameters/SparsePrior.h"
+
+class FlipMap;
 
 /// @brief Base class for handling systematic uncertainty parameters.
 /// @details Provides core functionality for managing systematic parameters,
@@ -127,6 +130,10 @@ class ParameterHandlerBase {
   /// @brief Return inverted covariance matrix
   TMatrixDSym *GetInvCovMatrix() const { return invCovMatrix; }
   /// @brief Return inverted covariance matrix
+  /// @brief Gradient of CalcLikelihood() with respect to every parameter
+  /// @return \f$\partial(-\log\mathcal{L})/\partial x_i = (M^{-1}\Delta)_i\f$, zero for a
+  /// parameter with a flat prior, matching its absence from CalcLikelihood()
+  std::vector<double> CalcGradient() const _noexcept_;
   double GetInvCovMatrix(const int i, const int j) const { return InvertCovMatrix[i][j]; }
 
   /// @brief Return correlated throws
@@ -185,6 +192,48 @@ class ParameterHandlerBase {
 
   /// @brief Get matrix used for step proposal
   TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
+  /// @brief The first throw matrix this handler had: the prior covariance, made positive definite,
+  /// before adaption or an external matrix replaced it. nullptr until one has been set
+  const TMatrixDSym *GetInitialThrowMatrix() const {return initialThrowMatrix.get();}
+  /// @brief Restrict ProposeStep() to a subset of this handler's parameters
+  /// @param Mask One entry per parameter, non-zero for the ones this handler may propose for
+  /// @details For a sampler that updates the parameters one block at a time. The parameters the mask
+  /// excludes are written back to their current value rather than left alone, so the block another
+  /// kernel owns ends up exactly where that kernel's last accepted step left it.
+  ///
+  /// The random throws are left alone, so every parameter still draws its standard normal and the
+  /// excluded directions keep contributing to the correlated throw. The proposal for the masked in
+  /// block is then a Gaussian with the block's own marginal covariance, which is symmetric and so
+  /// needs no Hastings correction. Zeroing the excluded throws instead would give a covariance that
+  /// depends on the parameter ordering
+  void SetProposalMask(const std::vector<char>& Mask);
+  /// @brief Go back to proposing for every parameter
+  void ClearProposalMask() { ProposalMask.clear(); }
+
+  /// @brief Whether ProposeStep() applies the flip groups (on by default, as it always has)
+  /// @details HW For a sampler which proposes the flips as a move of their own, see ProposeFlips(). A
+  /// flip riding on every random walk proposal would have half of them carry a jump which is usually
+  /// rejected, taking the rest of the proposal down with it
+  void SetFlipsInProposeStep(const bool Enable) { FlipsInProposeStep = Enable; }
+  /// @brief Whether any flip group is defined
+  bool HasFlips() const { return !FlipGroups.empty(); }
+  /// @brief Propose one flip group's flip, chosen uniformly, and nothing else: every other parameter
+  /// is put back to its current value
+  /// @details HW The move is deterministic, so it is reversible only if it is its own inverse, which
+  /// is checked on every call. A FlipParameter reflection always is, and has unit Jacobian. A
+  /// FunctionalFlip is a nonlinear map whose volume change has to enter the acceptance: the caller
+  /// multiplies the posterior ratio by the \f$|\det J|\f$ this returns, worked out by central
+  /// differences over the parameters the group changes
+  /// @return \f$\log|\det J|\f$ of the move, 0 for plain reflections, NaN if the map has no value
+  /// here (the move is then simply rejected)
+  double ProposeFlips();
+  /// @brief Whether ProposeStep() is currently allowed to move a parameter
+  bool IsParameterProposable(const int i) const {
+    return ProposalMask.empty() || ProposalMask[static_cast<size_t>(i)] != 0;
+  }
+  /// @brief How many times the throw matrix has been replaced, adaption included
+  /// @details Lets a fitter which builds something from the throw matrix notice that it has moved on
+  int GetThrowMatrixUpdates() const {return throwMatrixUpdates;}
   /// @brief Get matrix used for step proposal
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
 
@@ -227,6 +276,16 @@ class ParameterHandlerBase {
   /// @brief Get prior parameter value
   /// @param i Parameter index
   double GetParPreFit(const int i) const { return _fPreFitValue[i]; }
+  /// @brief Whether parameter i has circular bounds (delta_cp), and if so what they are
+  bool GetCircularBounds(const int i, double& LowBound, double& UpBound) const {
+    for (size_t k = 0; k < CircularBoundsIndex.size(); ++k) {
+      if (CircularBoundsIndex[k] != i) continue;
+      LowBound = CircularBoundsValues[k].first;
+      UpBound = CircularBoundsValues[k].second;
+      return true;
+    }
+    return false;
+  }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   double GetUpperBound(const int i) const { return _fUpBound[i];}
@@ -395,6 +454,8 @@ class ParameterHandlerBase {
 
   /// Check if any of special step proposal were enabled
   bool doSpecialStepProposal;
+  /// Whether SpecialStepProposal() applies the flips, see SetFlipsInProposeStep()
+  bool FlipsInProposeStep = true;
 
   /// The input root file we read in
   std::string inputFile;
@@ -407,6 +468,10 @@ class ParameterHandlerBase {
   TMatrixDSym *invCovMatrix;
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
+  /// The entries of InvertCovMatrix the prior needs, see SparsePrior. Built on first use
+  mutable SparsePrior Prior;
+  /// @brief Prior, rebuilt first if the covariance or the flat prior flags changed since it was built
+  const SparsePrior& GetSparsePrior() const;
 
   /// Random number taken from gaussian around prior error used for corr_throw
   double* randParams;
@@ -450,7 +515,16 @@ class ParameterHandlerBase {
   std::vector<bool> param_skip_adapt_flags;
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
-  TMatrixDSym* throwMatrix;
+  TMatrixDSym* throwMatrix = nullptr;
+  /// Which parameters ProposeStep() may move, empty when every parameter is proposable, see SetProposalMask()
+  std::vector<char> ProposalMask;
+  /// A copy of the first throw matrix, see GetInitialThrowMatrix()
+  std::unique_ptr<TMatrixDSym> initialThrowMatrix;
+  /// Bumped every time throwMatrix is replaced, see GetThrowMatrixUpdates()
+  int throwMatrixUpdates = 0;
+  /// @brief Cholesky decompose a throw matrix candidate with the routine the proposal uses
+  /// @return false if it can't be decomposed, in which case Decomposed is left alone
+  bool TryCholeskyDecompose(const TMatrixDSym& Matrix, std::vector<std::vector<double>>& Decomposed) const;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
 
@@ -468,6 +542,11 @@ class ParameterHandlerBase {
 
   /// @brief Map of flip groups, where the key is the group name and the value is a FlipGroup struct
   std::map<std::string, FlipGroup> FlipGroups;
+  /// @brief Throw unless flipping twice with this map returns the current values, see ProposeFlips()
+  /// @param Map The chosen group's map
+  /// @param GroupName For the message
+  /// @param Y The map's values at the current point
+  void RequireSelfInverse(const FlipMap& Map, const std::string& GroupName, const std::vector<double>& Y) const;
   /// Functional flips waiting for full parameter-name registration.
   std::vector<PendingFunctionalFlipProposal> PendingFunctionalFlipParameters;
   /// Indices of parameters with circular bounds

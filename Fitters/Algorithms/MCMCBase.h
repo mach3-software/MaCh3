@@ -15,7 +15,9 @@ class MCMCBase : public FitterBase {
     virtual ~MCMCBase() = default;
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC() final;
+    /// @note Not final: algorithms that need setup before the chain starts (HamiltonianMC) override
+    /// it and call back into it
+    void RunMCMC() override;
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
