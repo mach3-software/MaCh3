@@ -71,13 +71,10 @@ class MCMCProcessor {
     /// @brief Make 1D projection for each parameter and prepare structure
     void MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges = {});
     /// @brief Calculate covariance by making 2D projection of each combination of parameters
-    /// @warning This is deprecated and slower, however it is less RAM intensive
-    void MakeCovariance();
-    /// @brief KS:By caching each step we use multithreading
-    void CacheSteps();
-    /// @brief Calculate covariance by making 2D projection of each combination of parameters using multithreading
     /// @param Mute Allow silencing many messages, especially important if we calculate matrix many times
-    void MakeCovariance_MP(const bool Mute = false);
+    void MakeCovariance(const bool Mute = false);
+    /// @brief KS: Allocate histograms for 2D plot
+    void Prepare2DHistograms();
     /// @brief Make and Draw SubOptimality
     /// @cite roberts2009adaptive
     /// @author Henry Wallace
@@ -572,8 +569,6 @@ class MCMCProcessor {
     /// Drawrange for SetMaximum
     double DrawRange;
     
-    /// MCMC Chain has been cached
-    bool CacheMCMC;
     /// Doing MCMC Diagnostic
     bool doDiagMCMC;
     
@@ -600,8 +595,6 @@ class MCMCProcessor {
     bool ReweightPosterior;
     /// Name of branch used for chain reweighting
     std::vector<std::string> ReweightNames;
-    /// Stores value of weight for each step
-    double* WeightValue;
 
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
