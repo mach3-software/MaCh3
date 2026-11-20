@@ -116,7 +116,6 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Negative;
 
   CleanVector(hpost);
-  CleanVector(hpost2D);
   for (int i = 0; i < nDraw; ++i) {
     if(ParStep) delete[] ParStep[i];
   }
@@ -473,7 +472,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
-  std::unique_ptr<TH1D> paramPlot_Gauss = M3::Clone(paramPlot.get());
+  std::unique_ptr<TH1D> paramPlot_Gauss = M3::Clone(paramPlot);
   paramPlot_Gauss->SetMarkerColor(kOrange-5);
   paramPlot_Gauss->SetMarkerStyle(23);
   paramPlot_Gauss->SetLineWidth(2);
@@ -484,7 +483,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_Gauss->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
-  std::unique_ptr<TH1D> paramPlot_HPD = M3::Clone(paramPlot.get());
+  std::unique_ptr<TH1D> paramPlot_HPD = M3::Clone(paramPlot);
   paramPlot_HPD->SetMarkerColor(kBlack);
   paramPlot_HPD->SetMarkerStyle(25);
   paramPlot_HPD->SetLineWidth(2);
@@ -1061,7 +1060,7 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
       hpost2D[i][j]->Reset();
 
       // Build the model (name, title, binning, range) from the existing histogram
-      const ROOT::RDF::TH2DModel model(*hpost2D[i][j]);
+      const ROOT::RDF::TH2DModel model(*hpost2D[i][j].get());
 
       ROOT::RDF::RResultPtr<TH2D> result;
       if (!ReweightPosterior) {
@@ -1097,7 +1096,7 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
     const int j = Entry.j;
 
     // Move RDF result into the pre-existing histogram (axis titles, min etc. already set)
-    TH2D *hpost_2D = hpost2D[i][j];
+    TH2D *hpost_2D = hpost2D[i][j].get();
     hpost_2D->Add(Entry.Result.GetPtr());
 
     if (ApplySmoothing) hpost_2D->Smooth();
@@ -1179,9 +1178,10 @@ void MCMCProcessor::Prepare2DHistograms() {
       auto range_x = GetHistRange(i);
       auto range_y = GetHistRange(j);
       // TH2D to hold the Correlation
-      hpost2D[i][j] = new TH2D((Title_i + "_" + Title_j).Data(), (Title_i + "_" + Title_j).Data(),
-                               nBins, range_x.first, range_x.second,
-                               nBins, range_y.first, range_y.second);
+      hpost2D[i][j] = std::make_unique<TH2D>((Title_i + "_" + Title_j).Data(), (Title_i + "_" + Title_j).Data(),
+                                              nBins, range_x.first, range_x.second,
+                                              nBins, range_y.first, range_y.second);
+      hpost2D[i][j]->SetDirectory(nullptr);
       hpost2D[i][j]->SetMinimum(0);
       hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
       hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
@@ -1417,7 +1417,7 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   MACH3LOG_INFO("Starting {}", __func__);
   const double RightMargin = Posterior->GetRightMargin();
   Posterior->SetRightMargin(0.15);
-  auto MatrixCopy = M3::Clone(CorrMatrix.get());
+  auto MatrixCopy = M3::Clone(CorrMatrix);
 
   std::vector<std::string> GroupName;
   std::vector<int> GroupStart;
@@ -1878,7 +1878,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   const int nCredibleRegions = int(CredibleRegions.size());
 
   //KS: Initialise Tpad histograms etc we will need
-  std::vector<TPad*> TrianglePad(Npad);
+  std::vector<std::unique_ptr<TPad>> TrianglePad(Npad);
   //KS: 1D copy of posterior, we need it as we modify them
   std::vector<std::unique_ptr<TH1D>> hpost_copy(nParamPlot);
   std::vector<std::vector<std::unique_ptr<TH1D>>> hpost_cl(nParamPlot);
@@ -1949,7 +1949,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     {
       //KS: Need to go to canvas every time to have our pads in the same canvas, not pads in the pads
       Posterior->cd();
-      TrianglePad[counterPad] = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
+      TrianglePad[counterPad] = std::make_unique<TPad>(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
 
       TrianglePad[counterPad]->SetTopMargin(0);
       TrianglePad[counterPad]->SetRightMargin(0);
@@ -2109,9 +2109,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   // Write it to root file
   OutputFile->cd();
   Posterior->Write();
-
-  //KS: Remove allocated structures
-  for(int i = 0; i < Npad; i++) delete TrianglePad[i];
 
   //KS: Restore margin
   SetMargins(Posterior, Margins);
@@ -3815,8 +3812,8 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("Making ESS plots...");
-  TVectorD* EffectiveSampleSize = new TVectorD(nDraw);
-  TVectorD* SamplingEfficiency = new TVectorD(nDraw);
+  TVectorD EffectiveSampleSize(nDraw);
+  TVectorD SamplingEfficiency(nDraw);
   std::vector<double> TempDenominator(nDraw);
 
   constexpr int Nhists = 5;
@@ -3849,8 +3846,8 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   //KS: Calculate ESS and MCMC efficiency for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
-    (*EffectiveSampleSize)(j) = M3::_BAD_DOUBLE_;
-    (*SamplingEfficiency)(j) = M3::_BAD_DOUBLE_;
+    EffectiveSampleSize(j) = M3::_BAD_DOUBLE_;
+    SamplingEfficiency(j) = M3::_BAD_DOUBLE_;
     TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autocorrelations
     for (int k = 0; k < nLags; ++k)
@@ -3858,19 +3855,19 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
       TempDenominator[j] += LagL[j][k];
     }
     TempDenominator[j] = 1+2*TempDenominator[j];
-    (*EffectiveSampleSize)(j) = double(nEntries)/TempDenominator[j];
+    EffectiveSampleSize(j) = double(nEntries)/TempDenominator[j];
     // 100 because we convert to percentage
-    (*SamplingEfficiency)(j) = 100 * 1/TempDenominator[j];
+    SamplingEfficiency(j) = 100 * 1/TempDenominator[j];
 
     for(int i = 0; i < Nhists; ++i)
     {
       EffectiveSampleSizeHist[i]->SetBinContent(j+1, 0);
       EffectiveSampleSizeHist[i]->SetBinError(j+1, 0);
 
-      const double TempEntry = std::fabs((*EffectiveSampleSize)(j)) / double(nEntries);
+      const double TempEntry = std::fabs(EffectiveSampleSize(j)) / double(nEntries);
       if(Thresholds[i] >= TempEntry && TempEntry > Thresholds[i+1])
       {
-        if( std::isnan((*EffectiveSampleSize)(j)) ) continue;
+        if( std::isnan(EffectiveSampleSize(j)) ) continue;
         EffectiveSampleSizeHist[i]->SetBinContent(j+1, TempEntry);
       }
     }
@@ -3879,8 +3876,8 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   //KS Write to the output tree
   //Save to file
   OutputFile->cd();
-  EffectiveSampleSize->Write("EffectiveSampleSize");
-  SamplingEfficiency->Write("SamplingEfficiency");
+  EffectiveSampleSize.Write("EffectiveSampleSize");
+  SamplingEfficiency.Write("SamplingEfficiency");
 
   EffectiveSampleSizeHist[0]->SetTitle("Effective Sample Size");
   EffectiveSampleSizeHist[0]->Draw();
@@ -3897,10 +3894,6 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   }  leg->Draw("SAME");
 
   Posterior->Write("EffectiveSampleSizeCanvas");
-
-  //Delete all variables
-  delete EffectiveSampleSize;
-  delete SamplingEfficiency;
 }
 
 // **************************
@@ -3972,9 +3965,9 @@ void MCMCProcessor::BatchedAnalysis() {
   }
 
   // Calculate variance estimator using batched means following @cite chakraborty2019estimating see Eq. 1.2
-  TVectorD* BatchedVariance = new TVectorD(nDraw);
+  TVectorD BatchedVariance(nDraw);
   //KS: The hypothesis is rejected if C > z α for a given confidence level α. If the batch means do not pass the test, Correlated is reported for the half-width on the statistical reports following @cite rossetti2024batch alternatively for more old-school see Alexopoulos and Seila 1998 section 3.4.3
-  TVectorD* C_Test_Statistics = new TVectorD(nDraw);
+  TVectorD C_Test_Statistics(nDraw);
  
   std::vector<double> OverallBatchMean(nDraw);
   std::vector<double> C_Rho_Nominator(nDraw);
@@ -3999,8 +3992,8 @@ void MCMCProcessor::BatchedAnalysis() {
     C_Nominator[j] = 0.0;
     C_Denominator[j] = 0.0;
 
-    (*BatchedVariance)(j) = 0.0;
-    (*C_Test_Statistics)(j) = 0.0;
+    BatchedVariance(j) = 0.0;
+    C_Test_Statistics(j) = 0.0;
     for (int i = 0; i < nBatches; ++i)
     {
       OverallBatchMean[j] += BatchedAverages[i][j];
@@ -4016,9 +4009,9 @@ void MCMCProcessor::BatchedAnalysis() {
   {
     for (int i = 0; i < nBatches; ++i)
     {
-      (*BatchedVariance)(j) += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i][j]);
+      BatchedVariance(j) += (OverallBatchMean[j] - BatchedAverages[i][j])*(OverallBatchMean[j] - BatchedAverages[i][j]);
     }
-    (*BatchedVariance)(j) = (BatchLength/(nBatches-1))* (*BatchedVariance)(j);
+    BatchedVariance(j) = (BatchLength/(nBatches-1)) * BatchedVariance(j);
   }
   
   //KS: Now we focus on C test statistic, again use nowait as next is calculation is independent
@@ -4059,7 +4052,7 @@ void MCMCProcessor::BatchedAnalysis() {
   #endif
   for (int j = 0; j < nDraw; ++j)
   {
-    (*C_Test_Statistics)(j) = std::sqrt((nBatches*nBatches - 1)/(nBatches-2)) * ( C_Rho_Nominator[j]/C_Rho_Denominator[j] + C_Nominator[j]/ C_Denominator[j]);
+    C_Test_Statistics(j) = std::sqrt((nBatches*nBatches - 1)/(nBatches-2)) * ( C_Rho_Nominator[j]/C_Rho_Denominator[j] + C_Nominator[j]/ C_Denominator[j]);
   }
 #ifdef MULTITHREAD
 } //End parallel region
@@ -4067,12 +4060,8 @@ void MCMCProcessor::BatchedAnalysis() {
 
   //Save to file
   OutputFile->cd();
-  BatchedVariance->Write("BatchedMeansVariance");
-  C_Test_Statistics->Write("C_Test_Statistics");
-
-  //Delete all variables
-  delete BatchedVariance;
-  delete C_Test_Statistics;
+  BatchedVariance.Write("BatchedMeansVariance");
+  C_Test_Statistics.Write("C_Test_Statistics");
 }
 
 // **************************
@@ -4139,7 +4128,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   TDirectory *PowerDir = OutputFile->mkdir("PowerSpectrum");
   PowerDir->cd();
 
-  TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
+  TVectorD PowerSpectrumStepSize(nPrams);
   for (int j = 0; j < nPrams; ++j)
   {
     auto plot = std::make_unique<TGraph>(v_size, k_j[j].data(), P_j[j].data());
@@ -4178,11 +4167,10 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     func->Draw("SAME");
 
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
-    (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
+    PowerSpectrumStepSize(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
   }
 
-  PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
-  delete PowerSpectrumStepSize;
+  PowerSpectrumStepSize.Write("PowerSpectrumStepSize");
   PowerDir->Close();
   delete PowerDir;
 

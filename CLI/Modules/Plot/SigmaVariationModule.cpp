@@ -274,7 +274,7 @@ void SigmaVariationModule::MakeRatio(const std::vector<std::unique_ptr<TH1D>>& P
   size_t ratio_index = 0; // Track position in Ratio vector
   for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
     if (i == PriorKnot) continue; // Skip PriorKnot
-    Ratio[ratio_index] = M3::Clone(Poly[i].get());
+    Ratio[ratio_index] = M3::Clone(Poly[i]);
     Ratio[ratio_index]->Divide(Poly[PriorKnot].get());
     ratio_index++;
   }
@@ -466,7 +466,7 @@ void SigmaVariationModule::PlotRatio2D(const std::vector<std::unique_ptr<TH2>>& 
 
   for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
     if (i == PriorKnot) continue; // Skip PriorKnot
-    std::unique_ptr<TH2> Ratio = M3::Clone(Poly[i].get());
+    std::unique_ptr<TH2> Ratio = M3::Clone(Poly[i]);
     Ratio->Divide(Poly[PriorKnot].get());
     Ratio->SetTitle((Title + " " + std::to_string(static_cast<int>(sigmaArray[i])) + "sigma").c_str());
 

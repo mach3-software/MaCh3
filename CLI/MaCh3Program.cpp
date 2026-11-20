@@ -23,7 +23,7 @@ namespace {
   std::string executable_path() {
       std::error_code error;
 #ifdef __APPLE__
-      std::uint32_t size = 1024;
+      constexpr std::uint32_t size = 1024;
       std::vector<char> buffer(size);
       if (_NSGetExecutablePath(buffer.data(), &size) != 0) {
           buffer.resize(size);

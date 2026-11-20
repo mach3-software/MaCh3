@@ -8,7 +8,7 @@ LLHModule::~LLHModule() = default;
 
 MaCh3ArgumentParser* LLHModule::get_parser(){
   m_parser = std::make_unique<MaCh3ArgumentParser>("llhscan", "1.0", argparse::default_arguments::help);
-  m_parser->add_description("new version of the old PlotLLH binary.");
+  m_parser->add_description("Tool for plotting LLH scans.");
   m_parser->add_argument("-o", "--outputfile")
   .help("Output file.")
   .metavar("OUTPUTFILE");

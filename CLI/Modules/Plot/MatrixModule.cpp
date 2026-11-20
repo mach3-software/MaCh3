@@ -6,7 +6,7 @@ MatrixModule::~MatrixModule() = default;
 
 MaCh3ArgumentParser* MatrixModule::get_parser(){
   m_parser = std::make_unique<MaCh3ArgumentParser>("matrix", "1.0", argparse::default_arguments::help);
-  m_parser->add_description("Module for plotting and analyzing matrices.");
+  m_parser->add_description("Module for plotting and analyzing posterior matrices.");
   m_parser->add_argument("config")
   .help("Config file.")
   .metavar("CONFIG")

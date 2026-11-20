@@ -21,7 +21,7 @@ MaCh3ArgumentParser* UmbrellaModule::get_parser(){
   auto* plotParser = m_plotModule.get_parser();
   m_parser->add_subparser(*plotParser);
   m_parser->set_default_subcommand(m_default_parser->name());
-  m_parser->add_description("Tool for Umbrella Sampling.");
+  m_parser->add_description("Tool for calculating umbrella weight based on several chains.");
   m_default_parser->add_argument("config")
     .help("Config file.")
     .metavar("CONFIG")
