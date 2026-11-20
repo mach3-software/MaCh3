@@ -2089,7 +2089,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     if(CredibleInSigmas)
       legend->AddEntry(hpost_cl[0][j].get(), Form("%.0f#sigma Credible Interval", CredibleIntervals[j]), "f");
     else
-      legend->AddEntry(hpost_cl[0][j].get(), Form("%.0f%% Credible Interval", CredibleRegions[j]*100), "f");
+      legend->AddEntry(hpost_cl[0][j].get(), Form("%.0f%% Credible Interval", CredibleIntervals[j]*100), "f");
   }
   for (int k = nCredibleRegions-1; k >= 0; --k)
   {
