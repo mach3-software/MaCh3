@@ -6,7 +6,7 @@ PostFitParamModule::~PostFitParamModule() = default;
 
 MaCh3ArgumentParser* PostFitParamModule::get_parser(){
   m_parser = std::make_unique<MaCh3ArgumentParser>("postfitparam", "1.0", argparse::default_arguments::help);
-  m_parser->add_description("Plotting and overlaying posterior paremeters.");
+  m_parser->add_description("Plots and overlays posterior distributions from MCMC processing tool.");
   m_parser->add_argument("-o", "--outputfile")
   .help("Output file. If omitted, use the plotting manager's default output name.")
   .metavar("OUTPUTFILE");
