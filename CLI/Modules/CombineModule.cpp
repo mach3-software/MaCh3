@@ -12,7 +12,7 @@ CombineModule::~CombineModule() = default;
 
 MaCh3ArgumentParser* CombineModule::get_parser(){
     m_parser = std::make_unique<MaCh3ArgumentParser>("combine", "1.0", argparse::default_arguments::help);
-    m_parser->add_description("Tool for combining multiple chains or ROOT files into a single output.");
+    m_parser->add_description("Tool for combining multiple MaCh3 chains into a single output.");
     m_parser->add_argument("-o", "--output")
     .help("Output ROOT file.")
     .store_into(OutFileName)

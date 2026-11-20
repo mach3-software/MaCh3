@@ -240,31 +240,31 @@ void OscProcessor::PerformJarlskogAnalysis() {
   jarl_th23->SetTitle("Jarlskog Invariant;J #equiv s_{13}c_{13}^{2}s_{12}c_{12}s_{23}c_{23}sin#delta;Posterior probability");
 
   // Clones
-  auto jarl_IH  = M3::Clone(jarl.get(), "jarl_IH");
-  auto jarl_NH  = M3::Clone(jarl.get(), "jarl_NH");
+  auto jarl_IH  = M3::Clone(jarl, "jarl_IH");
+  auto jarl_NH  = M3::Clone(jarl, "jarl_NH");
 
-  auto jarl_th23_IH  = M3::Clone(jarl_th23.get(), "jarl_th23_IH");
-  auto jarl_th23_NH  = M3::Clone(jarl_th23.get(), "jarl_th23_NH");
+  auto jarl_th23_IH  = M3::Clone(jarl_th23, "jarl_th23_IH");
+  auto jarl_th23_NH  = M3::Clone(jarl_th23, "jarl_th23_NH");
 
-  auto jarl_dcp_IH  = M3::Clone(jarl_dcp.get(), "jarl_dcp_IH");
-  auto jarl_dcp_NH  = M3::Clone(jarl_dcp.get(), "jarl_dcp_NH");
+  auto jarl_dcp_IH  = M3::Clone(jarl_dcp, "jarl_dcp_IH");
+  auto jarl_dcp_NH  = M3::Clone(jarl_dcp, "jarl_dcp_NH");
 
-  auto jarl_flatsindcp          = M3::Clone(jarl.get(), "jarl_flatsindcp");
-  auto jarl_IH_flatsindcp       = M3::Clone(jarl.get(), "jarl_IH_flatsindcp");
-  auto jarl_NH_flatsindcp       = M3::Clone(jarl.get(), "jarl_NH_flatsindcp");
+  auto jarl_flatsindcp          = M3::Clone(jarl, "jarl_flatsindcp");
+  auto jarl_IH_flatsindcp       = M3::Clone(jarl, "jarl_IH_flatsindcp");
+  auto jarl_NH_flatsindcp       = M3::Clone(jarl, "jarl_NH_flatsindcp");
 
   auto jarl_th23_flatsindcp     = M3::Clone(jarl_th23.get(), "jarl_th23_flatsindcp");
   auto jarl_th23_IH_flatsindcp  = M3::Clone(jarl_th23.get(), "jarl_th23_IH_flatsindcp");
   auto jarl_th23_NH_flatsindcp  = M3::Clone(jarl_th23.get(), "jarl_th23_NH_flatsindcp");
 
-  auto jarl_prior               = M3::Clone(jarl.get(), "jarl_prior");
-  auto jarl_prior_flatsindcp    = M3::Clone(jarl.get(), "jarl_prior_flatsindcp");
+  auto jarl_prior               = M3::Clone(jarl, "jarl_prior");
+  auto jarl_prior_flatsindcp    = M3::Clone(jarl, "jarl_prior_flatsindcp");
   std::unique_ptr<TH1D> jarl_wRC_prior, jarl_wRC_prior_flatsindcp, jarl_wRC_prior_t2kth23;
   // Only use this if chain has reweigh weight [mostly coming from Reactor Constrains]
   if(DoReweight){
-    jarl_wRC_prior            = M3::Clone(jarl.get(), "jarl_wRC_prior");
-    jarl_wRC_prior_flatsindcp = M3::Clone(jarl.get(), "jarl_wRC_prior_flatsindcp");
-    jarl_wRC_prior_t2kth23    = M3::Clone(jarl.get(), "jarl_wRC_prior_flatsindcp");
+    jarl_wRC_prior            = M3::Clone(jarl, "jarl_wRC_prior");
+    jarl_wRC_prior_flatsindcp = M3::Clone(jarl, "jarl_wRC_prior_flatsindcp");
+    jarl_wRC_prior_t2kth23    = M3::Clone(jarl, "jarl_wRC_prior_flatsindcp");
   }
 
   // to apply a prior that is flat in sin(dcp) intead of dcp
@@ -413,7 +413,7 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
       j_hist_sdcp = M3::Clone(jarl_NH_flatsindcp.get(), "");
       j_hist->SetTitle(";J_{CP} #equiv s_{13}c^{2}_{13}s_{12}c_{12}s_{23}c_{23}sin#delta_{CP};Posterior probability");
     } else if(hierarchy == 0) {
-      j_hist = M3::Clone(jarl.get(), "");
+      j_hist = M3::Clone(jarl, "");
       j_hist_sdcp = M3::Clone(jarl_flatsindcp.get(), "");
       j_hist->SetTitle(";J_{CP} #equiv s_{13}c^{2}_{13}s_{12}c_{12}s_{23}c_{23}sin#delta_{CP};Posterior probability");
     } else if(hierarchy == -1) {

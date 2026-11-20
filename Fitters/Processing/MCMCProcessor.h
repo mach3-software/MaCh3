@@ -218,11 +218,11 @@ class MCMCProcessor {
     /// @brief Get 2D posterior for a given parameter combination
     /// @param i parameter index X
     /// @param j parameter index Y
-    TH2D* GetHpost2D(const int i, const int j) const { return hpost2D[i][j]; };
+    const std::unique_ptr<TH2D>& GetHpost2D(const int i, const int j) const { return hpost2D[i][j]; };
     /// @brief Get Violin plot for all parameters with posterior values
-    TH2D* GetViolin() const { return hviolin.get(); };
+    const std::unique_ptr<TH2D>& GetViolin() const { return hviolin; };
     /// @brief Get Violin plot for all parameters with prior values
-    TH2D* GetViolinPrior() const { return hviolin_prior.get(); };
+    const std::unique_ptr<TH2D>& GetViolinPrior() const { return hviolin_prior; };
 
     //Covariance getters
     std::vector<std::string> GetModelCov()  const { return CovPos[kModelPar]; };
@@ -553,7 +553,7 @@ class MCMCProcessor {
     /// Holds 1D Posterior Distributions
     std::vector<TH1D*> hpost;
     /// Holds 2D Posterior Distributions
-    std::vector<std::vector<TH2D*>> hpost2D;
+    std::vector<std::vector<std::unique_ptr<TH2D>>> hpost2D;
     /// Holds violin plot for all dials
     std::unique_ptr<TH2D> hviolin;
     /// Holds prior violin plot for all dials,

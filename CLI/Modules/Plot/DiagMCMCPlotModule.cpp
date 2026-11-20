@@ -456,7 +456,7 @@ void DiagMCMCPlotModule::CompareAverageAC(const std::vector<std::vector<std::uni
 
     if (draw_errors)
     {
-      error_hist[i] = M3::Clone(averages[i].get());
+      error_hist[i] = M3::Clone(averages[i]);
       error_hist[i]->SetFillColorAlpha(colour, 0.3f);
       error_hist[i]->SetLineWidth(0);
       error_hist[i]->SetTitle("Average Auto Correlation");

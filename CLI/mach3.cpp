@@ -3,6 +3,8 @@
 ///
 /// This file contains the main function that initializes the MaCh3 program,
 /// registers core modules, loads dynamic plugins, and processes command-line arguments.
+///
+/// @author Alexander Richards
 
 #include "CLI/Modules/ProcessMCMCModule.hpp"
 #include "CLI/Modules/DiagModule.hpp"

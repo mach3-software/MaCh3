@@ -401,12 +401,12 @@ namespace M3 {
         line->SetLineColor(kBlack);
         line->Draw("");
 
-        std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist.get());
+        std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist);
         std::vector<std::unique_ptr<TH1D>> RatioPlot(nFiles);
 
         for(int ig = 0; ig < nFiles; ig++ )
         {
-          RatioPlot[ig] = M3::Clone(DataHist.get());
+          RatioPlot[ig] = M3::Clone(DataHist);
           RatioPlot[ig]->SetLineColor(PosteriorColor[ig]);
           RatioPlot[ig]->SetMarkerColor(PosteriorColor[ig]);
           RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
@@ -535,7 +535,7 @@ namespace M3 {
           PretifyHistogram(Sample_MC[iMode].get(), SampleName);
 
           if(Sample_MC_Other == nullptr) {
-            Sample_MC_Other = M3::Clone(Sample_MC[iMode].get());
+            Sample_MC_Other = M3::Clone(Sample_MC[iMode]);
             Sample_MC_Other->Reset();
             Sample_MC_Other->SetFillColor(DefaultColor);
             Sample_MC_Other->SetLineColor(DefaultColor);

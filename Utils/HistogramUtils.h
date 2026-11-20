@@ -121,6 +121,12 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
   return Hist;
 }
 
+/// @brief Allows cloning directly from a smart pointer
+template <typename ObjectType>
+std::unique_ptr<ObjectType> Clone(const std::unique_ptr<ObjectType>& obj, const std::string& name = "") {
+  return Clone<ObjectType>(obj.get(), name);
+}
+
 /// @brief Scale histogram to get divided by bin width
 void ScaleHistogram(TH1* Sample_Hist, const double scale);
 
