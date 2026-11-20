@@ -86,6 +86,11 @@ class SampleHandlerInterface
     MACH3LOG_ERROR("{} does not provide likelihood gradients", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+  /// @brief As GetGradLikelihood(), into a buffer the caller owns
+  /// @param Out Resized to one entry per parameter of GetGradParHandler() and overwritten
+  /// @details A sampler asks for this every leapfrog step, so the buffer is worth reusing. The
+  /// default forwards to GetGradLikelihood(), so a handler only overrides it to save the allocation
+  virtual void GetGradLikelihood(std::vector<double>& Out) const { Out = GetGradLikelihood(); }
   /// @brief The parameter handler GetGradLikelihood() is indexed by, nullptr if there is none
   virtual const ParameterHandlerBase* GetGradParHandler() const { return nullptr; }
   /// @brief Per parameter of GetGradParHandler(), whether GetGradLikelihood() carries its derivative

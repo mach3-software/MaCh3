@@ -9,14 +9,6 @@ set(HEADERS
     MaCh3Factory.h
     PredictiveThrower.h
     MulticanonicalMCMCHandler.h
-    DualAveraging.h
-    HamiltonianMC.h
-    HamiltonianMetric.h
-    NoUTurnMC.h
-    HybridMCMC.h
-    HybridSettings.h
-    HybridBlocks.h
-    RandomWalkTuner.h
 )
 
 add_library(Fitters SHARED
@@ -30,15 +22,15 @@ add_library(Fitters SHARED
     PredictiveThrower.cpp
     MulticanonicalMCMCHandler.cpp
     MaCh3Factory.cpp
-    HamiltonianMC.cpp
-    HamiltonianMetric.cpp
-    NoUTurnMC.cpp
-    HybridMCMC.cpp
-    HybridSettings.cpp
-    HybridBlocks.cpp
-    HybridRandomWalk.cpp
-    HybridDelayedAcceptance.cpp
-    HybridFlipMoves.cpp
+    Hamiltonian/HamiltonianMC.cpp
+    Hamiltonian/HamiltonianMetric.cpp
+    Hamiltonian/NoUTurnMC.cpp
+    Hybrid/HybridMCMC.cpp
+    Hybrid/HybridSettings.cpp
+    Hybrid/HybridBlocks.cpp
+    Hybrid/HybridRandomWalk.cpp
+    Hybrid/HybridDelayedAcceptance.cpp
+    Hybrid/HybridFlipMoves.cpp
 )
 
 set_target_properties(Fitters PROPERTIES
@@ -57,6 +49,10 @@ install(TARGETS Fitters
         EXPORT MaCh3-targets
         LIBRARY DESTINATION lib/
         PUBLIC_HEADER DESTINATION include/Fitters/Algorithms)
+#HW The gradient samplers, one folder each. PUBLIC_HEADER would flatten them, so they are installed
+#with their folders kept, which is how they are included
+install(DIRECTORY Hamiltonian/ DESTINATION include/Fitters/Algorithms/Hamiltonian FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY Hybrid/ DESTINATION include/Fitters/Algorithms/Hybrid FILES_MATCHING PATTERN "*.h")
 
 add_library(MaCh3::Fitters ALIAS Fitters)
 target_link_libraries(MaCh3 INTERFACE Fitters)

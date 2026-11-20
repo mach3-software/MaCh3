@@ -7,6 +7,7 @@
 // ************************************************
 FlipMap::FlipMap(const FlipGroup& Group_, const std::function<bool(int)>& IsFixed) : Group(Group_) {
 // ************************************************
+  // Fixed parameters are skipped everywhere, so the map and its Jacobian only cover what moves
   for (const int index : Group.FlipParameterIndex) {
     UseReflection.push_back(IsFixed(index) ? 0 : 1);
     if (UseReflection.back()) ChangedIndex.push_back(index);
@@ -48,6 +49,7 @@ double FlipMap::LogAbsJacobian(const std::vector<double>& X0) const {
   for (std::size_t c = 0; c < K; ++c) {
     const std::size_t index = static_cast<std::size_t>(ChangedIndex[c]);
     const double Centre = X[index];
+    // Relative step, with a floor so a parameter at zero still gets a usable one
     const double H = 1e-6 * std::max(std::fabs(Centre), 1e-3);
     X[index] = Centre + H;
     const std::vector<double> Up = Apply(X);
@@ -62,8 +64,10 @@ double FlipMap::LogAbsJacobian(const std::vector<double>& X0) const {
 // ************************************************
 double LogAbsDeterminant(std::vector<double> A, const std::size_t K) {
 // ************************************************
+  // Reduce A to upper triangular; |det A| is then the product of the pivots
   double LogDet = 0.;
   for (std::size_t c = 0; c < K; ++c) {
+    // Largest entry in this column as the pivot, for stability; a zero one means A is singular
     std::size_t Pivot = c;
     for (std::size_t r = c + 1; r < K; ++r) if (std::fabs(A[r * K + c]) > std::fabs(A[Pivot * K + c])) Pivot = r;
     if (!(std::fabs(A[Pivot * K + c]) > 0.)) return std::numeric_limits<double>::quiet_NaN();

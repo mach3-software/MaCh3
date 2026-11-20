@@ -555,6 +555,7 @@ double ParameterHandlerBase::ProposeFlips() {
     MACH3LOG_ERROR("{}: ProposeFlips() works on the parameters themselves, not in the PCA basis", GetName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  // Start from the current point, so after this call only the flipped parameters differ from it
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wuseless-cast"
   for (int i = 0; i < _fNumPar; ++i) _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i]);
@@ -574,6 +575,7 @@ double ParameterHandlerBase::ProposeFlips() {
     // A functional flip can have no solution here (a square root of something negative, say): no move
     if (!std::isfinite(y)) return std::numeric_limits<double>::quiet_NaN();
   }
+  // The move is only valid if it undoes itself, and its acceptance needs its volume change
   RequireSelfInverse(Map, Chosen->first, Y);
   const double LogDet = Map.LogAbsJacobian(_fCurrVal);
   if (std::isnan(LogDet)) return LogDet;
@@ -837,6 +839,13 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 std::vector<double> ParameterHandlerBase::CalcGradient() const _noexcept_ {
 // ********************************************
   return GetSparsePrior().Gradient(_fPropVal, _fPreFitValue);
+}
+
+// ********************************************
+// As CalcGradient(), into a buffer the caller owns
+void ParameterHandlerBase::CalcGradient(std::vector<double>& Out) const _noexcept_ {
+// ********************************************
+  GetSparsePrior().Gradient(_fPropVal, _fPreFitValue, Out);
 }
 
 // ********************************************

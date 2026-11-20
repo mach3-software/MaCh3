@@ -80,10 +80,13 @@ class SparsePrior {
   }
 
   /// @brief The gradient of LogLikelihood(), \f$M^{-1}\Delta\f$, zero for flat prior parameters
+  /// @param Out Resized to one entry per parameter and overwritten; pass the same buffer each time
+  /// to keep a sampler's gradient evaluations from allocating, see ParameterHandlerBase::CalcGradient
   template <typename ValueVector, typename CentralVector>
-  std::vector<double> Gradient(const ValueVector& Values, const CentralVector& Central) const {
+  void Gradient(const ValueVector& Values, const CentralVector& Central, std::vector<double>& Out) const {
     const int NPars = static_cast<int>(RowOf.size());
-    std::vector<double> Grad(static_cast<size_t>(NPars), 0.);
+    Out.assign(static_cast<size_t>(NPars), 0.);
+    double* Grad = Out.data();
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -97,7 +100,14 @@ class SparsePrior {
       }
       Grad[static_cast<size_t>(i)] = Sum;
     }
-    return Grad;
+  }
+
+  /// @brief Gradient() into a fresh vector, for callers that aren't on a hot path
+  template <typename ValueVector, typename CentralVector>
+  std::vector<double> Gradient(const ValueVector& Values, const CentralVector& Central) const {
+    std::vector<double> Out;
+    Gradient(Values, Central, Out);
+    return Out;
   }
 
  private:

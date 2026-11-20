@@ -2,7 +2,7 @@
 // cache, and the likelihood gradient. Kept apart from SampleHandlerBase.cpp, which deals with
 // loading and describing samples.
 #include "Samples/SampleHandlerBase.h"
-#include "Samples/LinearShiftBuilder.h"
+#include "Samples/Reweight/LinearShiftBuilder.h"
 
 #include <algorithm>
 #include <cmath>
@@ -56,8 +56,11 @@ void SampleHandlerBase::SetupReweightBackend() {
     return;
   }
 
+  // Build the backend's description of the events, leaving out any that can never be selected
   const std::vector<char> NeverSelected = FindNeverSelected();
   ReweightModel Model = BuildReweightModel(MCEvents, ConstWeightStart, ConstWeightEnd, NeverSelected, Binning->GetNBins());
+  // How the backend shifts, cuts and bins events: the experiment's own code, or the faster
+  // pointer and table lookups when they agree with it
   BackendAccess = std::make_unique<BackendEventAccess>(*this);
   ReweightEventAccess* Access = BackendAccess.get();
   if (Options.FastAccess) {
@@ -69,6 +72,7 @@ void SampleHandlerBase::SetupReweightBackend() {
   }
   Backend = MakeReweightBackend(Options.Backend, std::move(Model), *Access);
   MACH3LOG_INFO("{}: reweighting with the {} backend. {}", GetName(), Backend->Name(), Backend->Summary());
+  // Gradients switched on before the backend existed have to be re-attached to it
   if (Gradient) SetComputeGradients(true);
   ReportReweightMemory();
   SelfCheckReweightBackend(Options);
@@ -182,6 +186,7 @@ void SampleHandlerBase::SetupLinearShifts(const std::vector<char>& NeverSelected
     return;
   }
   // Each shift is stepped by its parameter's prior width, which is the scale it is linear over
+  // (1 for a shift without a single parameter or with no width)
   std::vector<double> Width(NShifts, 1.);
   for (std::size_t s = 0; s < NShifts; ++s) {
     const auto& Indices = functional.shifts[s].par_indices;
@@ -446,6 +451,14 @@ void SampleHandlerBase::SetupOscillationGradient() {
 // ************************************************
 std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
 // ************************************************
+  std::vector<double> Out;
+  GetGradLikelihood(Out);
+  return Out;
+}
+
+// ************************************************
+void SampleHandlerBase::GetGradLikelihood(std::vector<double>& Out) const {
+// ************************************************
   if (!Gradient) {
     MACH3LOG_ERROR("Asked {} for the likelihood gradient without SetComputeGradients(true)", GetName());
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -456,13 +469,13 @@ std::vector<double> SampleHandlerBase::GetGradLikelihood() const {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   const int NBins = Binning->GetNBins();
-  std::vector<double> BinFactor(static_cast<std::size_t>(NBins));
+  GradBinFactor.resize(static_cast<std::size_t>(NBins));
   for (int iBin = 0; iBin < NBins; ++iBin) {
-    BinFactor[static_cast<std::size_t>(iBin)] = GetTestStatDerivative(SampleHandler_data[static_cast<std::size_t>(iBin)],
+    GradBinFactor[static_cast<std::size_t>(iBin)] = GetTestStatDerivative(SampleHandler_data[static_cast<std::size_t>(iBin)],
                                                                        SampleHandler_array[static_cast<std::size_t>(iBin)]);
   }
-  if (Backend && !UseLegacyLoop) return Backend->Gradient(BinFactor);
-  return Gradient->Compute(MCEvents, BinFactor);
+  if (Backend && !UseLegacyLoop) Backend->Gradient(GradBinFactor, Out);
+  else Gradient->Compute(MCEvents, GradBinFactor, Out);
 }
 
 // ************************************************

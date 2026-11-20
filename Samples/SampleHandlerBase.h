@@ -8,11 +8,11 @@
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Samples/SampleHandlerInterface.h"
 #include "Samples/OscillationHandler.h"
-#include "Samples/LikelihoodGradient.h"
-#include "Samples/ReweightOptions.h"
-#include "Samples/FastEventAccess.h"
-#include "Samples/OscillationGradient.h"
-#include "Samples/WeightParameterSnapshot.h"
+#include "Samples/Gradient/LikelihoodGradient.h"
+#include "Samples/Reweight/ReweightOptions.h"
+#include "Samples/Reweight/FastEventAccess.h"
+#include "Samples/Oscillation/OscillationGradient.h"
+#include "Samples/Reweight/WeightParameterSnapshot.h"
 #include "Samples/BinningHandler.h"
 #include "Samples/SampleHandlerFunctional.h"
 
@@ -89,6 +89,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void SetGradientsPaused(const bool Paused) override { GradientsPaused = Paused; }
   /// @copydoc SampleHandlerInterface::GetGradLikelihood
   std::vector<double> GetGradLikelihood() const override;
+  /// @copydoc SampleHandlerInterface::GetGradLikelihood(std::vector<double>&) const
+  void GetGradLikelihood(std::vector<double>& Out) const override;
   /// @copydoc SampleHandlerInterface::GetGradParHandler
   const ParameterHandlerBase* GetGradParHandler() const override;
   /// @copydoc SampleHandlerInterface::GetGradientCoverage
@@ -489,6 +491,9 @@ class SampleHandlerBase :  public SampleHandlerInterface
   bool GradientCurrent = false;
   /// HW Per parameter, whether GetGradLikelihood() carries its derivative, see GetGradientCoverage()
   std::vector<bool> GradientCoverage;
+  /// HW GetGradLikelihood()'s per bin factors, kept so a gradient every leapfrog step doesn't
+  /// allocate one. Mutable because that method is const and this is only scratch
+  mutable std::vector<double> GradBinFactor;
   /// HW Derivatives of the oscillation weights, null unless gradients are on and the oscillation
   /// calculation is one OscillationGradient can differentiate
   std::unique_ptr<OscillationGradient> OscGradient;

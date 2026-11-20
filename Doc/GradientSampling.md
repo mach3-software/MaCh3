@@ -102,13 +102,13 @@ Reweight:
 - **`cuda`** (`CudaReweight`): the cpu backend with its cached pass and gradient on an NVIDIA GPU, in double precision.
   - Full passes, where the shifts moved, stay on the CPU, since they run the experiment's own code.
   - Each pass reads the weight pool into pinned memory, copies it over once and copies the bins (or the gradient) back. The sums run in a fixed order, so the results match the cpu backend to rounding and repeat exactly.
-  - It is built with `-DMaCh3_GPU_ENABLED=ON`. The kernels are in `CudaReweightDevice.cu`, which includes no MaCh3 headers.
+  - It is built with `-DMaCh3_GPU_ENABLED=ON`. The kernels are in `Samples/Reweight/GPU/CudaReweightDevice.cu`, which includes no MaCh3 headers.
 - **`metal`** (`MetalReweight`): the cpu backend with its cached pass and gradient on an Apple GPU.
   - It works in single precision, for testing on Macs only.
   - It is built with `-DMaCh3_METAL_ENABLED=ON` and is never picked by `auto`.
 - **`auto`**: if the handler declares its additional weights constant, `cuda` in a CUDA build with a GPU present, otherwise `cpu`; `legacy` if the handler doesn't declare it. If the start-up self-check finds a difference, it falls back to `legacy` with a warning.
 
-Every backend gives the plain loop's sums to rounding (single precision: about \f$10^{-6}\f$), the gradient included. Fixed-seed chains are reproducible bit for bit at a fixed thread count.
+Every backend gives the plain loop's sums to rounding (single precision: about \f$10^{-6}\f$), the gradient included. Fixed-seed chains are reproducible bit for bit on one thread. With several threads the event sums are not added in a fixed order, so two runs differ in the last digits, and a NUTS chain amplifies that within a few steps into a different (equally valid) chain.
 
 ### Linear shifts
 
@@ -154,28 +154,30 @@ With NuOscillator's `CUDAProb3Linear`, `OscillationGradient` works out the oscil
 
 ## Where the code lives {#gs_layout}
 
+The sample handlers experiments build on (`SampleHandlerInterface`, `SampleHandlerBase` and the rest of develop's `Samples/`) are where they always were. Everything added for gradient sampling is in subfolders of `Samples/` by topic, apart from `Samples/SampleHandlerReweight.cpp`, which implements `SampleHandlerBase`'s side of it.
+
 | Area | Files | What they hold |
 |---|---|---|
-| Samplers | `Fitters/Algorithms/HamiltonianMC`, `NoUTurnMC`, `HamiltonianMetric`, `DualAveraging.h` | leapfrog with reflection at bounds, NUTS tree building, the metric, step size tuning |
-| Hybrid sampler | `HybridMCMC.h`, `HybridMCMC.cpp` | set-up and the two schemes (composition, mixture) |
+| Samplers | `Fitters/Algorithms/Hamiltonian/`: `HamiltonianMC`, `NoUTurnMC`, `HamiltonianMetric`, `DualAveraging.h` | leapfrog with reflection at bounds, NUTS tree building, the metric, step size tuning |
+| Hybrid sampler | `Fitters/Algorithms/Hybrid/`: `HybridMCMC.h`, `HybridMCMC.cpp` | set-up and the two schemes (composition, mixture) |
 | | `HybridSettings` | reading and checking `General.MCMC.Hybrid` |
 | | `HybridBlocks` | which parameters the random walk owns and which NUTS owns |
 | | `HybridRandomWalk.cpp`, `RandomWalkTuner.h` | the random walk kernel, its width and the sweep count, and their tuning in warmup |
 | | `HybridDelayedAcceptance.cpp` | the random walk screened on a surrogate (`RandomWalkSurrogateStride`) |
 | | `HybridFlipMoves.cpp` | flip moves between separated modes |
-| Gradient | `Samples/LikelihoodGradient`, `Splines/WeightDerivativeSource.h`, `Parameters/SparsePrior.h`, `Samples/GradientCheck` | the per-event gradient pass, where each weight's derivative lives, the prior and its gradient, the finite difference check |
-| Reweight backends | `Samples/ReweightBackend.h`, `ReweightModel`, `EventGroups`, `CpuReweight`, `CudaReweight*`, `MetalReweight*` | the backend interface, the shared description of the events, and each backend |
-| | `Samples/ReweightOptions` | reading the `Reweight` section and building the backend it asks for |
+| Gradient | `Samples/Gradient/LikelihoodGradient`, `Splines/WeightDerivativeSource.h`, `Parameters/SparsePrior.h`, `Samples/Gradient/GradientCheck` | the per-event gradient pass, where each weight's derivative lives, the prior and its gradient, the finite difference check |
+| Reweight backends | `Samples/Reweight/`: `ReweightBackend.h`, `ReweightModel`, `EventGroups`, `CpuReweight`; `Samples/Reweight/GPU/`: `CudaReweight*`, `MetalReweight*` | the backend interface, the shared description of the events, and each backend |
+| | `Samples/Reweight/ReweightOptions` | reading the `Reweight` section and building the backend it asks for |
 | | `Samples/SampleHandlerReweight.cpp` | `SampleHandlerBase`'s side: choosing and checking the backend, the gradient, the surrogate |
-| | `Samples/FastEventAccess.h`, `SweepTables.h` | shifted cuts and bins read through pointers and flat lookups |
-| | `Samples/LinearShifts.h`, `LinearShiftBuilder` | the linear shift table, and measuring and checking it |
-| | `Samples/WeightParameterSnapshot.h` | skipping the oscillation and spline weights when only shifts moved |
-| Oscillation | `Samples/OscillationProbability.h`, `OscillationGradient`, `OscillationGradientDevice*`, `NuFastProbability.h` | the oscillation formulae in dual numbers, matched against NuOscillator |
+| | `Samples/Reweight/FastEventAccess.h`, `SweepTables.h` | shifted cuts and bins read through pointers and flat lookups |
+| | `Samples/Reweight/LinearShifts.h`, `LinearShiftBuilder` | the linear shift table, and measuring and checking it |
+| | `Samples/Reweight/WeightParameterSnapshot.h` | skipping the oscillation and spline weights when only shifts moved |
+| Oscillation | `Samples/Oscillation/`: `OscillationProbability.h`, `OscillationGradient`, `OscillationGradientDevice*`, `NuFastProbability.h` | the oscillation formulae in dual numbers, matched against NuOscillator |
 | Flips | `Parameters/FlipMap` | a flip group's map, its self-inverse check and Jacobian, for `ParameterHandlerBase::ProposeFlips()` |
 
 ## Checking {#gs_checks}
 
 - **`SampleHandlerBase::CheckReweightBackend`**: compares the backend in use with the plain event loop at random points. It cycles through moving only the shifts, only the rest, and both, and compares the MC prediction, W2, the likelihood and, with gradients on, the gradient.
-- **`CheckLikelihoodGradient`** (`Samples/GradientCheck.h`): compares the gradient with central finite differences. It picks parameters from each type in turn, and checks the prior gradient for every parameter.
+- **`CheckLikelihoodGradient`** (`Samples/Gradient/GradientCheck.h`): compares the gradient with central finite differences. It picks parameters from each type in turn, and checks the prior gradient for every parameter.
   - Its default step, \f$10^{-4}\f$ of each prior error, suits double precision weights. With single precision spline weights (any GPU build), the finite differences are rounding noise at that step: spline parameters disagree by up to 20% on every backend, the plain loop included. A step of \f$10^{-2}\f$ brings that down to about \f$10^{-4}\f$, with a few small gradients near \f$2\times10^{-3}\f$. `CheckReweight` takes the step as `GradientRelativeStep`.
 - **`CheckReweight`** in MaCh3_DUNE runs both and exits non-zero on a failure. Run it on any new configuration, and after any change to the reweight.

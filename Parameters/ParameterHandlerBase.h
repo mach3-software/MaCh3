@@ -130,11 +130,17 @@ class ParameterHandlerBase {
   /// @brief Return inverted covariance matrix
   TMatrixDSym *GetInvCovMatrix() const { return invCovMatrix; }
   /// @brief Return inverted covariance matrix
+  double GetInvCovMatrix(const int i, const int j) const { return InvertCovMatrix[i][j]; }
+
   /// @brief Gradient of CalcLikelihood() with respect to every parameter
   /// @return \f$\partial(-\log\mathcal{L})/\partial x_i = (M^{-1}\Delta)_i\f$, zero for a
   /// parameter with a flat prior, matching its absence from CalcLikelihood()
   std::vector<double> CalcGradient() const _noexcept_;
-  double GetInvCovMatrix(const int i, const int j) const { return InvertCovMatrix[i][j]; }
+  /// @brief As CalcGradient(), into a buffer the caller owns
+  /// @param Out Resized to GetNumParams() and overwritten
+  /// @details For a sampler that asks for the gradient every leapfrog step, where a fresh vector
+  /// per call is pure allocation traffic
+  void CalcGradient(std::vector<double>& Out) const _noexcept_;
 
   /// @brief Return correlated throws
   /// @param i Parameter index
