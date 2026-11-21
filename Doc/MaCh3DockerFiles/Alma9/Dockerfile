@@ -1,7 +1,6 @@
 #To run use:  docker build -t mach3 .
-# KS: Get glorious container from Luke which will work as a base
+# KS: Get glorious container from Kamil which will work as a base
 FROM kamilskwarczynski/nukamil:alma9root64004 AS mach3_build
-kamilskwarczynski/nukamil:alma9root64004
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
