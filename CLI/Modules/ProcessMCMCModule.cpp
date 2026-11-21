@@ -299,7 +299,7 @@ void ProcessMCMCModule::MultipleProcessMCMC()
   std::map<std::string, std::pair<double, double>> ParamEdges;
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) {
     // Get the histogram for the i-th parameter
-    TH1D* hist = Processor[0]->GetHpost(i);
+    const auto& hist = Processor[0]->GetHpost(i);
     if (!hist) {
       MACH3LOG_DEBUG("Histogram for parameter {} is null.", i);
       continue;
