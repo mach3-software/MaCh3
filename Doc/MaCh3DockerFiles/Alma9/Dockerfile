@@ -1,13 +1,12 @@
 #To run use:  docker build -t mach3 .
-# KS: Get glorious container from Luke which will work as a base
-FROM picker24/root_v6_26_10:alma9 AS mach3_build
-
+# KS: Get glorious container from Kamil which will work as a base
+FROM kamilskwarczynski/nukamil:alma9root64004 AS mach3_build
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-LABEL compiler="GNU 11.3.1"
-LABEL root_version="v6.26.10"
-LABEL python_version="v3.9.16"
+LABEL compiler="GNU 11.5.0"
+LABEL root_version="v6.40.04"
+LABEL python_version="v3.12.16"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
