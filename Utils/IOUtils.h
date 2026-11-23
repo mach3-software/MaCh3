@@ -28,4 +28,10 @@ namespace M3 {
 /// @param Line The line number where the exception occurred.
 /// @return Pointer to the opened ROOT file.
 TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
+
+
+/// @brief Simple wrapper around ROOT implicit multithreading functionality
+void EnableROOTMultiThreading();
+/// @brief Simple wrapper around ROOT implicit multithreading functionality
+void DisableROOTMultiThreading();
 } //end M3

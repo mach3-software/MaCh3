@@ -374,11 +374,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
 
-  #ifdef MULTITHREAD
-  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
-  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
-  #endif
-
+  M3::EnableROOTMultiThreading();
   auto dfToUse = GetFilteredDataFrame();
   OutputFile->cd();
   std::vector<ROOT::RDF::RResultPtr<TH1D>> Histograms(nDraw);
@@ -413,9 +409,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   }
   MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries", clock.RealTime(), nEntries);
 
-  #ifdef MULTITHREAD
-  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
-  #endif
+  M3::DisableROOTMultiThreading();
   // Now we can plot actual histogram
   for (int i = 0; i < nDraw; ++i) {
     if (i % std::max(1, nDraw/5) == 0) {
@@ -895,10 +889,7 @@ void MCMCProcessor::MakeViolin() {
   clock.Start();
   //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
   // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
-  #ifdef MULTITHREAD
-  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
-  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
-  #endif
+  M3::EnableROOTMultiThreading();
 
   // Get RDataFrame
   auto dfToUse = GetFilteredDataFrame();
@@ -917,10 +908,7 @@ void MCMCProcessor::MakeViolin() {
     }
   }
 
-  #ifdef MULTITHREAD
-  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
-  #endif
-
+  M3::DisableROOTMultiThreading();
   // nDraw is number of draws we want to do
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -1027,10 +1015,7 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
 
   //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
   // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
-  #ifdef MULTITHREAD
-  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
-  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
-  #endif
+  M3::EnableROOTMultiThreading();
 
   // Apply selection once
   auto dfToUse = GetFilteredDataFrame();
@@ -1076,10 +1061,7 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
   }
   clock.Stop();
   MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries", clock.RealTime(), nEntries);
-
-  #ifdef MULTITHREAD
-  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
-  #endif
+  M3::DisableROOTMultiThreading();
 
   TStopwatch processingClock;
   processingClock.Start();
