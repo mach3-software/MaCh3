@@ -12,8 +12,6 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   // Initialize member variables with defaults
   dcp_spline_IO = nullptr;
   dcp_spline_NO = nullptr;
-  flipWindow = false;
-
   vonMises_kappa = -1.0;
   vonMises_I0_kappa = -1.0;
 }
@@ -131,16 +129,18 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
     umbrellaMean = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaMean"], 0, __FILE__, __LINE__);
     MACH3LOG_INFO("Setting multicanonical mean to {}", umbrellaMean);
 
-    umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5, __FILE__, __LINE__);
+    // Number of total umbrellas used for the current configuration.
+    // Currently only used when auto-overlap mode is enabled. This is not fully tested.
+    auto umbrellaNumber = GetFromManager<int>(mcmcConfig["Multicanonical"]["Umbrella"]["UmbrellaNumber"], 5, __FILE__, __LINE__);
 
     // dynamically adjust the width of the gaussians to ensure a certain level
     // of overlap? be careful, not enough windows here will lead to posterior
     // (rather than bias) dominated results
-    umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false, __FILE__, __LINE__);
+    auto umbrellaOverlapMode = GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["AutoOverlapMode"], false, __FILE__, __LINE__);
 
     if (umbrellaOverlapMode) {
       MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
-      umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0, __FILE__, __LINE__);
+      auto umbrellaSigmaOverlap = GetFromManager<double>(mcmcConfig["Multicanonical"]["Umbrella"]["SigmaOverlap"], 3.0, __FILE__, __LINE__);
       MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
       umbrellaWidth = TMath::Pi() / ((umbrellaNumber - 1) * (umbrellaSigmaOverlap));
     } else {
@@ -157,6 +157,7 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(Manager* f
     AdjustUmbrellaStepScale(systematics);
 
     // Set the flip window flag for the oscillation systematic DO NOT USE THIS
+    // briefly tested feature to mirror windows about their centres. Not tested but may be useful in the future. Currently disabled and not used.
     // flipWindow =
     // GetFromManager<bool>(mcmcConfig["Multicanonical"]["Umbrella"]["FlipWindow"],
     // false, __FILE__, __LINE__); MACH3LOG_INFO("Flip Window: {}", flipWindow);
@@ -208,49 +209,49 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<Param
   }
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double deltacp) const {
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double param_value) const {
   // calculate the Log form of the von Mises instead to avoid numerical issues
   // and return directly
-  double log_vonMises = vonMises_kappa * std::cos(deltacp - umbrellaMean) - std::log(2 * TMath::Pi() * vonMises_I0_kappa);
+  double log_vonMises = vonMises_kappa * std::cos(param_value - umbrellaMean) - std::log(2 * TMath::Pi() * vonMises_I0_kappa);
   // return the log likelihood, ie the log of the normalised von Mises
   return -log_vonMises * (multicanonicalBeta);
 }
 
 // this now sorts through the available bias functions in a single function
 double MulticanonicalMCMCHandler::GetMulticanonicalWeight() const {
-  auto deltacp = *multicanonicalVarValue;
+  auto param_value = *multicanonicalVarValue;
 
   if (multicanonicalSpline) {
     auto delm23 = *multicanonicalVar_dm23_value;
-    return GetMulticanonicalWeightSpline(deltacp, delm23);
+    return GetMulticanonicalWeightSpline(param_value, delm23);
   }
 
   switch (umbrellaBiasFunction) {
   case M3::BiasFunction::kGaussian:
-    return GetMulticanonicalWeightGaussian(deltacp);
+    return GetMulticanonicalWeightGaussian(param_value);
   case M3::BiasFunction::kVonMises:
-    return GetMulticanonicalWeightVonMises(deltacp);
+    return GetMulticanonicalWeightVonMises(param_value);
   case M3::BiasFunction::kGeneralisedGaussian:
-    return GetMulticanonicalWeightGenGaussian(deltacp);
+    return GetMulticanonicalWeightGenGaussian(param_value);
   }
   return M3::_BAD_DOUBLE_;
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, double delm23) const {
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double param_value, double delm23) const {
   if (delm23 < 0) {
-    double dcp_spline_val = dcp_spline_IO->Eval(deltacp);
+    double dcp_spline_val = dcp_spline_IO->Eval(param_value);
     return -(-std::log(dcp_spline_val) + std::log(dcp_spline_IO->Eval(-TMath::Pi() / 2))) * (multicanonicalBeta); // do I want this offset?? does it matter?
   } else {
-    double dcp_spline_val = dcp_spline_NO->Eval(deltacp);
+    double dcp_spline_val = dcp_spline_NO->Eval(param_value);
     return -(-std::log(dcp_spline_val) + std::log(dcp_spline_NO->Eval(-TMath::Pi() / 2))) * (multicanonicalBeta);
   }
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp) const {
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double param_value) const {
   const double inv_sqrt_2pi = 1 / std::sqrt(2 * TMath::Pi());
   const double neg_half_sigma_sq = -1 / (2 * umbrellaWidth * umbrellaWidth);
   // return the log likelihood, ie the log of the normalised gaussian
-  return (-std::log(inv_sqrt_2pi * (1 / umbrellaWidth) * std::exp(neg_half_sigma_sq * (deltacp - umbrellaMean) * (deltacp - umbrellaMean)))) * (multicanonicalBeta);
+  return (-std::log(inv_sqrt_2pi * (1 / umbrellaWidth) * std::exp(neg_half_sigma_sq * (param_value - umbrellaMean) * (param_value - umbrellaMean)))) * (multicanonicalBeta);
 }
 
 double MulticanonicalMCMCHandler::generalisedGaussian2(double x, double mean, double width) const {
@@ -265,28 +266,28 @@ double MulticanonicalMCMCHandler::circularDistance(double x, double mean) const 
   return std::atan2(std::sin(x - mean), std::cos(x - mean));
 }
 
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double deltacp) const {
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightGenGaussian(double param_value) const {
   // implementation of the generalised gaussian as a bias function
   // for now with a fixed n = 2 for simplicity
-  double g0 = generalisedGaussian2(deltacp, umbrellaMean, umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
-  double g1 = generalisedGaussian2(deltacp, umbrellaMean - 2 * TMath::Pi(), umbrellaWidth);
-  double g2 = generalisedGaussian2(deltacp, umbrellaMean + 2 * TMath::Pi(), umbrellaWidth);
+  double g0 = generalisedGaussian2(param_value, umbrellaMean, umbrellaWidth); // these two repeats are required for wrapping the gaussian around -pi and pi
+  double g1 = generalisedGaussian2(param_value, umbrellaMean - 2 * TMath::Pi(), umbrellaWidth);
+  double g2 = generalisedGaussian2(param_value, umbrellaMean + 2 * TMath::Pi(), umbrellaWidth);
 
   MACH3LOG_TRACE("g0: {}, g1: {}, g2: {}", g0, g1, g2);
   return -std::log(g0 + g1 + g2) * (multicanonicalBeta);
 }
 
 // pretty much deprecated at this point, just here for testing
-double MulticanonicalMCMCHandler::GetMulticanonicalWeightTripleGaussian(double deltacp) const {
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightTripleGaussian(double param_value) const {
   // precalculated constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   double sigma = umbrellaWidth;
   const double neg_half_sigma_sq = -1 / (2 * sigma * sigma);
   // three gaussians centered at -pi, 0, pi with sigma pre-defined above
-  double exp1 = std::exp(neg_half_sigma_sq * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
-  double exp2 = std::exp(neg_half_sigma_sq * (deltacp) * (deltacp));
-  double exp3 = std::exp(neg_half_sigma_sq * (deltacp + TMath::Pi()) * (deltacp + TMath::Pi()));
-  /// delta_cp_log_likelihood = -TMath::Log(TMath::Gaus(deltacp,TMath::Pi(),1,kTRUE)+TMath::Gaus(deltacp,0,1,kTRUE)+TMath::Gaus(deltacp,-TMath::Pi(),1,kTRUE));
+  double exp1 = std::exp(neg_half_sigma_sq * (param_value - TMath::Pi()) * (param_value - TMath::Pi()));
+  double exp2 = std::exp(neg_half_sigma_sq * (param_value) * (param_value));
+  double exp3 = std::exp(neg_half_sigma_sq * (param_value + TMath::Pi()) * (param_value + TMath::Pi()));
+  /// delta_cp_log_likelihood = -TMath::Log(TMath::Gaus(param_value,TMath::Pi(),1,kTRUE)+TMath::Gaus(param_value,0,1,kTRUE)+TMath::Gaus(param_value,-TMath::Pi(),1,kTRUE));
 
   // return the log likelihood, ie the log of the normalised sum of the
   // gaussians
