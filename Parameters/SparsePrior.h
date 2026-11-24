@@ -11,7 +11,10 @@
 /// diagonal covariance, that leaves a small fraction of the matrix. This keeps those entries in
 /// compressed rows, in ascending column order, which is the order the dense loops visit them in.
 /// Every sum therefore adds the same numbers in the same order as the dense version, less terms
-/// that are exactly zero, and gives the same result bit for bit.
+/// that are exactly zero. On one thread that gives the same result bit for bit. It does not under
+/// MULTITHREAD: LogLikelihood() is an OpenMP reduction, whose cross-thread combining order is
+/// implementation defined, and a 16 thread run on Rorqual (19 Nov) was measured varying in the last
+/// digits between two runs of the same build.
 ///
 /// The object remembers which parameters were flat when it was built, so Matches() can tell a
 /// caller that the flags have changed underneath it.

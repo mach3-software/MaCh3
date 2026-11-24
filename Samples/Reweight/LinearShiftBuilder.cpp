@@ -33,9 +33,8 @@ LinearShiftTable LinearShiftBuilder::Build() {
   for (std::size_t e = 0; e < NEvents; ++e) Table.VarStart[e + 1] = Table.VarStart[e] + static_cast<std::uint32_t>(NVariables(e));
   Table.Base.assign(Table.VarStart[NEvents], 0.);
 
-  // Measure the coefficients (twice, see the class description), then check the model holds
-  CountTerms();
-  FillTerms();
+  // Measure the coefficients, then check the model holds
+  MeasureTerms();
   Dense.clear();
   Dense.shrink_to_fit();
 
@@ -77,7 +76,9 @@ void LinearShiftBuilder::MeasureBlock(const std::size_t First, const std::size_t
       if (NeverSelected[e]) continue;
       // Events this shift doesn't touch keep a coefficient of zero
       bool Applies = false;
-      for (const int iShift : Shifts.event_shifts[e]) Applies = Applies || (iShift == static_cast<int>(sh));
+      for (const int iShift : Shifts.event_shifts[e]) {
+        if (iShift == static_cast<int>(sh)) { Applies = true; break; }
+      }
       if (!Applies) continue;
       Generic.ShiftEvent(i);
       for (std::size_t k = 0; k < NVariables(e); ++k) {
@@ -90,43 +91,36 @@ void LinearShiftBuilder::MeasureBlock(const std::size_t First, const std::size_t
 }
 
 // ************************************************
-void LinearShiftBuilder::CountTerms() {
+void LinearShiftBuilder::MeasureTerms() {
 // ************************************************
   const std::size_t NVars = Table.VarStart[NEvents];
   Table.TermStart.assign(NVars + 1, 0);
+  Table.TermShift.clear();
+  Table.TermCoef.clear();
+  //HW One term per variable is the smallest a live variable can be, so this is the right order of
+  //magnitude and usually the only allocation each array needs
+  Table.TermShift.reserve(NVars);
+  Table.TermCoef.reserve(NVars);
   for (std::size_t First = 0; First < NEvents; First += BlockSize) {
     const std::size_t Last = std::min(NEvents, First + BlockSize);
     MeasureBlock(First, Last);
+    // Blocks ascend and so do the variables within one, so appending visits the terms in exactly
+    // the order their offsets describe: a variable's terms start wherever the arrays have reached
     for (std::size_t v = 0; v < Table.VarStart[Last] - Table.VarStart[First]; ++v) {
-      std::uint32_t Count = 0;
-      for (std::size_t sh = 0; sh < NShifts; ++sh) Count += (Dense[v * NShifts + sh] != 0.) ? 1 : 0;
-      Table.TermStart[Table.VarStart[First] + v + 1] = Count;
-    }
-  }
-  // Counts to start offsets
-  for (std::size_t v = 0; v < NVars; ++v) Table.TermStart[v + 1] += Table.TermStart[v];
-}
-
-// ************************************************
-void LinearShiftBuilder::FillTerms() {
-// ************************************************
-  const std::size_t NTerms = Table.TermStart[Table.VarStart[NEvents]];
-  Table.TermShift.resize(NTerms);
-  Table.TermCoef.resize(NTerms);
-  for (std::size_t First = 0; First < NEvents; First += BlockSize) {
-    const std::size_t Last = std::min(NEvents, First + BlockSize);
-    MeasureBlock(First, Last);
-    for (std::size_t v = 0; v < Table.VarStart[Last] - Table.VarStart[First]; ++v) {
-      std::uint32_t t = Table.TermStart[Table.VarStart[First] + v];
+      Table.TermStart[Table.VarStart[First] + v] = static_cast<std::uint32_t>(Table.TermShift.size());
       for (std::size_t sh = 0; sh < NShifts; ++sh) {
         const double c = Dense[v * NShifts + sh];
         if (c == 0.) continue;
-        Table.TermShift[t] = static_cast<std::uint16_t>(sh);
-        Table.TermCoef[t] = c;
-        ++t;
+        Table.TermShift.push_back(static_cast<std::uint16_t>(sh));
+        Table.TermCoef.push_back(c);
       }
     }
   }
+  // The last variable's end, which no later start fills in
+  Table.TermStart[NVars] = static_cast<std::uint32_t>(Table.TermShift.size());
+  // Growing the arrays leaves slack that the old count-then-fill pair didn't
+  Table.TermShift.shrink_to_fit();
+  Table.TermCoef.shrink_to_fit();
 }
 
 // ************************************************

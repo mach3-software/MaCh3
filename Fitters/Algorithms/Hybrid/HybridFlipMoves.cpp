@@ -9,7 +9,6 @@
 // *******************
 void HybridMCMC::SetupFlipMoves() {
 // *******************
-    // Flips are proposed only by DoFlipStep(), never as part of a handler's ordinary ProposeStep()
     flips.Handlers.clear();
     for (size_t s = 0; s < systematics.size(); ++s) {
         systematics[s]->SetFlipsInProposeStep(false);
@@ -57,7 +56,6 @@ void HybridMCMC::DoFlipStep() {
         RestoreCurrentPosition();
         return;
     }
-    // In bounds: reweight the samples at the flipped point
     logLProp = AddSampleLikelihoods(Prior);
 
     // As for the sweeps, the global accepted step counter isn't this move's to keep

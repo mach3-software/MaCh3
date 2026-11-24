@@ -101,14 +101,21 @@ Reweight:
   - When they have moved (every random-walk sweep), the experiment's own shift, cut and bin code runs, but each weight costs one multiply.
 - **`cuda`** (`CudaReweight`): the cpu backend with its cached pass and gradient on an NVIDIA GPU, in double precision.
   - Full passes, where the shifts moved, stay on the CPU, since they run the experiment's own code.
-  - Each pass reads the weight pool into pinned memory, copies it over once and copies the bins (or the gradient) back. The sums run in a fixed order, so the results match the cpu backend to rounding and repeat exactly.
+  - Each pass reads the weight pool into pinned memory, copies it over once and copies the bins (or the gradient) back. The kernels sum in a fixed order, so the GPU's own result matches the cpu backend to rounding and repeats exactly. That doesn't make a chain repeatable on its own: full passes stay on the CPU, so the thread caveat below applies to this backend too.
   - It is built with `-DMaCh3_GPU_ENABLED=ON`. The kernels are in `Samples/Reweight/GPU/CudaReweightDevice.cu`, which includes no MaCh3 headers.
 - **`metal`** (`MetalReweight`): the cpu backend with its cached pass and gradient on an Apple GPU.
   - It works in single precision, for testing on Macs only.
   - It is built with `-DMaCh3_METAL_ENABLED=ON` and is never picked by `auto`.
 - **`auto`**: if the handler declares its additional weights constant, `cuda` in a CUDA build with a GPU present, otherwise `cpu`; `legacy` if the handler doesn't declare it. If the start-up self-check finds a difference, it falls back to `legacy` with a warning.
 
-Every backend gives the plain loop's sums to rounding (single precision: about \f$10^{-6}\f$), the gradient included. Fixed-seed chains are reproducible bit for bit on one thread. With several threads the event sums are not added in a fixed order, so two runs differ in the last digits, and a NUTS chain amplifies that within a few steps into a different (equally valid) chain.
+Every backend gives the plain loop's sums to rounding (single precision: about \f$10^{-6}\f$), the gradient included.
+
+**Reproducibility** (measured on Rorqual, 19 Nov, gcc 12, same seeds, two runs of the same build):
+
+- On **one thread** a fixed-seed chain repeats bit for bit, on every leaf of every configuration tested.
+- At **16 threads** it does not. The OpenMP reductions are not combined in a fixed order, so two runs differ in the last digits, and a NUTS chain amplifies that within a few steps into a different, equally valid chain. Observed at \f$10^{-12}\f$ on `MR2T2`'s likelihood after 18 steps, and from the very first entry on the deeper NUTS configurations.
+- This is not confined to the event sums. The prior's own reduction varies too (`SparsePrior::LogLikelihood`), which is why a handler's `LogL_systematic_*` moves between runs with no sample involved. Which individual reduction varies has not been isolated; a per-reduction test would call each sum many times at one point and see which ever changes.
+- **So compare code changes on one thread.** A multithreaded comparison cannot tell a regression from the run-to-run noise. `Chains/cleanup_checks/check_tree.sh` runs single-threaded for this reason.
 
 ### Linear shifts
 

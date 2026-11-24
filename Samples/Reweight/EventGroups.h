@@ -38,6 +38,9 @@ class EventGroups {
  private:
   /// Live events ordered by bin, and within a bin by signature. Kept to save reallocating
   std::vector<int> Ordered;
+  /// First live event of every bin, the counting sort's offsets. Kept to save reallocating: Build()
+  /// runs again whenever the bins change, i.e. on every full pass where the shifts moved
+  std::vector<int> EventStart;
   /// Next free slot of every bin while Ordered is filled
   std::vector<int> Next;
   /// @brief Add one run of a signature's events as up to two groups, split by the sign of the constant

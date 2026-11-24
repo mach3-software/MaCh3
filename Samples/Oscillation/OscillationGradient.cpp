@@ -60,13 +60,13 @@ std::unique_ptr<OscillationGradient> OscillationGradient::Create(const std::stri
   const YAML::Node Config = M3OpenConfig(NuOscConfigFile);
   if (!SupportsConfig(Config, Name) || !HasAllParameters(ParIndex, ParValue, Free, Name)) return nullptr;
 
-  // Describe every distinct weight, then the parameters, then how weights share transition matrices
   std::unique_ptr<OscillationGradient> Gradient(new OscillationGradient());
   if (!Gradient->CollectDistinctWeights(Events, EvaluationEnergy(Config), Name)) return nullptr;
   Gradient->SetParameters(ParIndex, ParValue, Free);
   Gradient->GroupBySharedTransition();
 
-  // Only used if the formulae reproduce NuOscillator's own weights
+  // The derivatives are only offered if the formulae reproduce NuOscillator's own weights, since
+  // everything downstream differentiates the formulae rather than the calculation being used
   constexpr double Tolerance = 1e-10;
   const double Difference = Gradient->CompareWithNuOscillator();
   if (!(Difference <= Tolerance)) {

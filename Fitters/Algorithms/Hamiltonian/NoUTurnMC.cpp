@@ -51,17 +51,6 @@ NoUTurnMC::NoUTurnMC(Manager *const FitManager) : HamiltonianMC(FitManager) {
         throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    step_size_frozen = false;
-    metric_changed = false;
-    sum_metro_prob = 0.;
-    max_energy_error = 0.;
-    energy_error_step = 0.;
-    hamiltonian_init_step = 0.;
-    tree_depth_step = 0;
-    n_leapfrog_step = 0;
-    n_divergent_step = 0;
-    n_max_depth_hit = 0;
-
     MACH3LOG_INFO("Running NUTS with max tree depth {}, so up to {} leapfrog steps per step",
                   MaxTreeDepth, (1 << MaxTreeDepth) - 1);
     MACH3LOG_INFO("Divergence threshold MaxDeltaH = {}", MaxDeltaH);
@@ -157,14 +146,6 @@ void NoUTurnMC::ValidateCompatibility() const {
                        "target distribution");
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    // for (const auto& syst : systematics) {
-    //     auto* Adaptive = syst->GetAdaptiveHandler();
-    //     if (Adaptive != nullptr && Adaptive->GetUseRobbinsMonro()) {
-    //         MACH3LOG_WARN("{} has Robbins-Monro enabled, which tunes the random walk step scale that "
-    //                       "NUTS never reads. Only its adapted matrix matters here", syst->GetName());
-    //     }
-    // }
-
     if (adapt_metric) {
         MACH3LOG_INFO("NUTS will re-metric itself whenever adaption swaps a throw matrix");
     } else {
@@ -310,6 +291,9 @@ bool NoUTurnMC::BuildTree(const int Depth, const double SignedStep, const double
         // Every leaf counts towards the acceptance statistic, discarded ones included, so that
         // divergences pull the step size down
         sum_metro_prob += Finite ? std::min(1., std::exp(LogWeight)) : 0.;
+        // A non-finite Hamiltonian has no finite error to report, so it counts as exactly the
+        // divergence threshold. EnergyErrorMax therefore saturates at MaxDeltaH rather than
+        // distinguishing "just past the threshold" from "NaN"
         max_energy_error = std::max(max_energy_error, Finite ? -LogWeight : MaxDeltaH);
 
         if (!Finite || -LogWeight > MaxDeltaH) {
@@ -474,7 +458,7 @@ double NoUTurnMC::FindReasonableStepSize() {
     const double KineticInit = KineticEnergyAndMomentum(momentum);
     const double HamiltonianInit = PotentialInit + KineticInit;
 
-    MACH3LOG_INFO("  [stepsize hunt] U0 {:.6g} KE0 {:.6g} H0 {:.6g}", PotentialInit, KineticInit, HamiltonianInit);
+    MACH3LOG_DEBUG("  [stepsize hunt] U0 {:.6g} KE0 {:.6g} H0 {:.6g}", PotentialInit, KineticInit, HamiltonianInit);
 
     TrajectoryEnd Start;
     Start.Position.assign(velocity.size(), 0.);
@@ -487,7 +471,7 @@ double NoUTurnMC::FindReasonableStepSize() {
 
     for (int Try = 0; Try < MaxTries; ++Try) {
         const double LogRatio = TryStepSize(Start, StepSize, HamiltonianInit);
-        MACH3LOG_INFO("  [stepsize hunt] try {} step {:.6g} logRatio {:.6g}", Try, StepSize, LogRatio);
+        MACH3LOG_DEBUG("  [stepsize hunt] try {} step {:.6g} logRatio {:.6g}", Try, StepSize, LogRatio);
         const double Want = (LogRatio > LogHalf) ? 1. : -1.;
 
         // Once we cross the threshold we've bracketed it, so stop

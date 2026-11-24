@@ -26,15 +26,16 @@ check procedure.
 
 ## Conventions
 - **Builds use `-Werror`** with the project's warning set (`MaCh3Warnings`); the option is `ON` by
-  default in `CMakeLists.txt`. New code must be warning-free with clang (Mac) and gcc 12 (Rorqual),
-  and with CUDA on. Note: this branch narrowed the exemption in
-  `cmake/Modules/MaCh3CompilerOptions.cmake` so `-Werror` now applies to clang, where develop
-  disabled it. That change is unreviewed and has no cross-compiler CI behind it, so a clang-only
-  `-Werror` failure may be its fault rather than yours.
-- **Comments the branch adds start `//HW`.** Never tag a new comment with someone else's initials
-  (KS, CW, DB, ETA, ...); those mark their own code. The comments already in the gradient sampling
-  files are inconsistent about this (many use a bare `//`) and are being cleaned up, so follow the
-  rule rather than the surrounding style.
+  default in `CMakeLists.txt`, but as on develop, clang is exempt
+  (`cmake/Modules/MaCh3CompilerOptions.cmake`, identical to develop since 20 Nov). So gcc 12 on
+  Rorqual is the build that fails on a warning. A clang build on the Mac prints hundreds of warnings
+  (mostly `-Wsign-conversion` in develop's own code) without failing. Don't count that as clean or
+  dirty; new code must still be warning-free under gcc, and with CUDA on.
+- **`//HW` marks a substantive note**, the kind that explains why something is the way it is; an
+  ordinary explanatory comment uses a plain `//`. That is what the branch already does (plain `//`
+  outnumbers `//HW` roughly three to one), so don't mass-tag, and don't read a plain `//` as a
+  mistake. Never tag a new comment with someone else's initials (KS, CW, DB, ETA, ...); those mark
+  their own code.
 - **When splitting or moving code,** keep comments as they are. Wording changes go in a separate change from path changes.
 
 ## Correctness

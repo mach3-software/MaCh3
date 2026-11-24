@@ -56,7 +56,6 @@ HybridSettings HybridSettings::Read(const YAML::Node& Hybrid, const bool AutoMod
   S.RandomWalkProb = GetFromManager<double>(Hybrid["RandomWalkProb"], 0.5, __FILE__, __LINE__);
   S.RandomWalkProbGiven = static_cast<bool>(Hybrid["RandomWalkProb"]);
 
-  // Random walk sweeps per step
   //HW "auto" (and Auto's default) chooses the number of sweeps during warmup, see HybridMCMC::TuneSweepCount.
   //It starts from 10
   S.AutoSweeps = Hybrid["RandomWalkSweeps"] ? (Hybrid["RandomWalkSweeps"].as<std::string>() == "auto") : AutoMode;
@@ -64,7 +63,6 @@ HybridSettings HybridSettings::Read(const YAML::Node& Hybrid, const bool AutoMod
   S.TimeShare = GetFromManager<double>(Hybrid["RandomWalkTimeShare"], 0.4, __FILE__, __LINE__);
   RequireOpenUnitInterval(S.TimeShare, "RandomWalkTimeShare");
 
-  // Which parameters go to the random walk by name, and the flip moves
   S.Names = GetFromManager<std::vector<std::string>>(Hybrid["RandomWalkNames"], {}, __FILE__, __LINE__);
   S.FlipMoves = GetFromManager<int>(Hybrid["FlipMoves"], -1, __FILE__, __LINE__);
 

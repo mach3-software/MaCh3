@@ -3402,18 +3402,25 @@ bool AllUnique(unsigned int* StepNumber, size_t size) {
 //HW The first chain entry at or after a step number, nEntries if there is none
 int MCMCProcessor::FirstEntryFromStep(const unsigned int Step) {
 // **************************
-  int First = nEntries;
   Chain->SetBranchStatus("*", false);
   Chain->SetBranchStatus("step", true);
   unsigned int StepScan = 0;
   Chain->SetBranchAddress("step", &StepScan);
-  for (int i = 0; i < nEntries; ++i) {
-    Chain->GetEntry(i);
-    if (StepScan >= Step) { First = i; break; }
+  //HW Step numbers only increase along a single chain, so bisect: one GetEntry per halving rather
+  //than one per entry before the cut, which on a multi-million step chain is the difference between
+  //a few reads and reading the whole branch. A merged chain would break that assumption, and is
+  //refused by the duplicate-step check later in PrepareDiagMCMC()
+  int Low = 0, High = nEntries;
+  while (Low < High) {
+    const int Mid = Low + (High - Low) / 2;
+    Chain->GetEntry(Mid);
+    if (StepScan >= Step) High = Mid;
+    else Low = Mid + 1;
   }
   Chain->ResetBranchAddresses();
   Chain->SetBranchStatus("*", true);
-  return First;
+  // nEntries if no entry is at or past Step, as before
+  return Low;
 }
 
 // **************************

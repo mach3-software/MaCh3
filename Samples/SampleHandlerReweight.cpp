@@ -59,8 +59,9 @@ void SampleHandlerBase::SetupReweightBackend() {
   // Build the backend's description of the events, leaving out any that can never be selected
   const std::vector<char> NeverSelected = FindNeverSelected();
   ReweightModel Model = BuildReweightModel(MCEvents, ConstWeightStart, ConstWeightEnd, NeverSelected, Binning->GetNBins());
-  // How the backend shifts, cuts and bins events: the experiment's own code, or the faster
-  // pointer and table lookups when they agree with it
+  // How the backend shifts, cuts and bins events: the experiment's own code, or the faster pointer
+  // and table lookups if the config asks for them. Nothing is checked here; the start-up self-check
+  // at the end of this function is what compares the result with the plain loop
   BackendAccess = std::make_unique<BackendEventAccess>(*this);
   ReweightEventAccess* Access = BackendAccess.get();
   if (Options.FastAccess) {
@@ -185,8 +186,9 @@ void SampleHandlerBase::SetupLinearShifts(const std::vector<char>& NeverSelected
     MACH3LOG_WARN("{}: too many shifts or events for the linear shift table, so linear shifts are off", GetName());
     return;
   }
-  // Each shift is stepped by its parameter's prior width, which is the scale it is linear over
-  // (1 for a shift without a single parameter or with no width)
+  // Each shift is stepped by its parameter's prior width, which is the scale it is linear over.
+  // A shift that isn't a function of exactly one parameter, or whose parameter has no prior width,
+  // keeps a step of 1
   std::vector<double> Width(NShifts, 1.);
   for (std::size_t s = 0; s < NShifts; ++s) {
     const auto& Indices = functional.shifts[s].par_indices;

@@ -17,7 +17,7 @@ ReweightOptions ReweightOptions::Read(const YAML::Node& Config, const std::strin
   if (CheckNodeExists(Config, "Reweight", "FastAccess")) O.FastAccess = Get<bool>(Config["Reweight"]["FastAccess"], __FILE__ , __LINE__);
   if (CheckNodeExists(Config, "Reweight", "LinearShifts")) O.LinearShifts = Get<bool>(Config["Reweight"]["LinearShifts"], __FILE__ , __LINE__);
 
-  // Refuse a backend that doesn't exist, or wasn't built into this MaCh3
+  // Refuse a name that isn't a backend; the two blocks after this refuse one this build lacks
   if (O.Backend != "auto" && O.Backend != "legacy" && O.Backend != "cpu" && O.Backend != "metal" && O.Backend != "cuda") {
     MACH3LOG_ERROR("{}: Reweight.Backend is '{}', but has to be one of auto, legacy, cpu, cuda or metal", SampleName, O.Backend);
     throw MaCh3Exception(__FILE__ , __LINE__ );

@@ -138,17 +138,17 @@ protected:
     /// Tunes #delta_t during warmup
     DualAveragingStepSize dual_averaging;
     /// Whether to adapt #delta_t at all, or take DeltaT as given
-    bool adapt_step_size;
+    bool adapt_step_size = true;
     /// Whether to hunt for a starting step size before the chain begins
-    bool find_initial_step_size;
+    bool find_initial_step_size = true;
     /// Whether a rebuilt mass matrix restarts the adaptation
-    bool restart_on_metric_update;
+    bool restart_on_metric_update = true;
     /// Steps of adaptation before #delta_t is frozen
-    unsigned int warmup_steps;
+    unsigned int warmup_steps = 0;
     /// Set once the warmup is over and #delta_t stops moving
-    bool step_size_frozen;
+    bool step_size_frozen = false;
     /// Set when the last ProposeStep() saw a mass matrix block rebuilt
-    bool metric_changed;
+    bool metric_changed = false;
 
     /// Most doublings per step, so at most \f$2^{MaxTreeDepth} - 1\f$ leapfrog steps
     int MaxTreeDepth;
@@ -167,19 +167,19 @@ protected:
     std::vector<double> momentum;
 
     /// Summed \f$\min(1, e^{H_0 - H})\f$ over every leapfrog step this trajectory took
-    double sum_metro_prob;
+    double sum_metro_prob = 0.;
     /// Largest \f$H - H_0\f$ seen this trajectory
-    double max_energy_error;
+    double max_energy_error = 0.;
     /// \f$H - H_0\f$ at the selected sample
-    double energy_error_step;
+    double energy_error_step = 0.;
     /// \f$H\f$ where this trajectory started
-    double hamiltonian_init_step;
+    double hamiltonian_init_step = 0.;
     /// Doublings this trajectory managed
-    int tree_depth_step;
+    int tree_depth_step = 0;
     /// Leapfrog steps this trajectory took, discarded subtrees included
-    int n_leapfrog_step;
+    int n_leapfrog_step = 0;
     /// Divergent states this trajectory hit
-    int n_divergent_step;
+    int n_divergent_step = 0;
     /// Steps which ran out of doublings rather than U-turning, over the whole chain
-    int n_max_depth_hit;
+    int n_max_depth_hit = 0;
 };

@@ -10,8 +10,10 @@
 /// @details Each shift is moved by its parameter's prior width with the others at their base values,
 /// and every live event's variables are read before and after: the change per width is that shift's
 /// coefficient. The events are measured a block at a time, so the dense coefficients exist for one
-/// block only before the zeros are dropped, in two passes (count the terms, then fill them) so the
-/// term arrays are allocated once at their final size.
+/// block only before the zeros are dropped. One pass does it: blocks and the variables within them
+/// are visited in the order the term offsets describe, so each variable's terms can simply be
+/// appended, and the measurement, which runs the experiment's own shift code once per event per
+/// shift, is not repeated to size the arrays first.
 ///
 /// The model is then compared with the experiment's shifts at random points a few widths out; an
 /// event it doesn't hold for (a clamp, say) is marked to keep going through the experiment's code.
@@ -39,10 +41,8 @@ class LinearShiftBuilder {
   double Read(std::size_t e, std::size_t k) const { return *Fast.VariablePointer(static_cast<int>(e), k); }
   /// @brief Fill #Dense for the events in [First, Last): each variable's change per width of each shift
   void MeasureBlock(std::size_t First, std::size_t Last);
-  /// @brief Pass one: how many non-zero terms each variable has, into Table.TermStart
-  void CountTerms();
-  /// @brief Pass two: the terms themselves, in shift order
-  void FillTerms();
+  /// @brief Measure every block and collect each variable's non-zero terms, in shift order
+  void MeasureTerms();
   /// @brief Mark the events the linear model doesn't reproduce at random points
   void CheckAtRandomPoints();
   /// @brief Every shift back to its base value, with the events shifted to it

@@ -19,8 +19,9 @@ void HybridMCMC::SetupRandomWalkScale() {
 // *******************
     rw_step_scale = RandomWalkStepScale();
 
-    // Every random walk parameter's own step scale is about to be reset to 1 (the throw matrix
-    // already carries the prior widths), so say what is being overridden and by how much, because these came from someone's config
+    // EnforceRandomWalkStepScale() at the end of this function resets every random walk
+    // parameter's own step scale to 1, since the throw matrix already carries the prior widths.
+    // Measure first what that will override, and by how much: it came from someone's config
     double ScaleLo = 1e30, ScaleHi = -1e30;
     int NOverridden = 0;
     for (size_t s = 0; s < systematics.size(); ++s) {
@@ -223,7 +224,8 @@ void HybridMCMC::TuneSweepCount() {
     const double PerSweep = sweep_timing.SweepSeconds / static_cast<double>(sweep_timing.Sweeps);
     const double PerNuts = sweep_timing.NutsSeconds / static_cast<double>(sweep_timing.NutsSteps);
     const double Wanted = settings.TimeShare / (1. - settings.TimeShare) * PerNuts / PerSweep;
-    // At least one sweep, so the block always moves, and at most 500, so a mismeasured batch can't stall a step
+    // At least one sweep, so the block always moves, and at most 500, so a mismeasured
+    // batch can't stall a step
     rw_sweeps = std::max(1, std::min(500, static_cast<int>(std::lround(Wanted))));
     MACH3LOG_INFO("Random walk sweeps: {:.3g} ms each against {:.3g} ms per NUTS step, so {} per step for "
                   "{:.0f}% of the time on the random walk", 1e3 * PerSweep, 1e3 * PerNuts, rw_sweeps,

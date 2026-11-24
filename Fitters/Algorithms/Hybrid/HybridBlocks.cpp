@@ -43,7 +43,9 @@ void HybridBlocks::Build(const std::vector<ParameterHandlerBase*>& Systematics,
                   "for goes to the random walk. Set RandomWalkTypes to choose by type instead");
   }
 
-  // One mask per handler for each kernel; every parameter is in exactly one of them
+  // One mask per handler for each kernel. Every parameter is set in exactly one of the two masks,
+  // fixed ones included; that is masking, not ownership, and the counts below treat a fixed
+  // parameter as belonging to neither block
   RandomWalkMask.assign(Systematics.size(), {});
   NutsMask.assign(Systematics.size(), {});
   NRandomWalk_ = NNuts_ = NFixed = 0;
@@ -94,8 +96,6 @@ void HybridBlocks::FindParametersWithoutGradient(const std::vector<ParameterHand
 bool HybridBlocks::BelongsToRandomWalk(const ParameterHandlerBase& Handler, const size_t s, const int i,
                                        const HybridSettings& Settings) const {
 // *******************
-  // In order: a name in RandomWalkNames always wins, then either gradient coverage (no
-  // RandomWalkTypes) or the parameter's type
   const std::string Name = Handler.GetParFancyName(i);
   for (const auto& Pattern : Settings.Names) {
     if (NameMatches(Pattern, Name)) return true;

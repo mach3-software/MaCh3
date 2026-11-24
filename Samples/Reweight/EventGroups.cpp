@@ -7,7 +7,7 @@ void EventGroups::Build(const ReweightModel& Model, const std::vector<int>& Live
 // ************************************************
   const int NBins = Model.NBins;
   // Counting sort by bin, visiting events in signature order so each bin comes out sorted by signature
-  std::vector<int> EventStart(static_cast<std::size_t>(NBins) + 1, 0);
+  EventStart.assign(static_cast<std::size_t>(NBins) + 1, 0);
   for (const int Bin : LiveBin) if (Bin >= 0) ++EventStart[static_cast<std::size_t>(Bin) + 1];
   for (int b = 0; b < NBins; ++b) EventStart[static_cast<std::size_t>(b) + 1] += EventStart[static_cast<std::size_t>(b)];
   Ordered.resize(static_cast<std::size_t>(EventStart[static_cast<std::size_t>(NBins)]));

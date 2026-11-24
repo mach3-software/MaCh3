@@ -224,7 +224,7 @@ void HybridMCMC::ClearProposalMasks() {
 // *******************
 double HybridMCMC::EvaluatePriors() {
 // *******************
-    // Summed in handler order, as everywhere else, so the total is the same to the last bit
+    // Summed in handler order, which is the order every other prior sum in the fitter uses
     double LogL = 0.;
     for (size_t s = 0; s < systematics.size(); ++s) {
         syst_llh[s] = systematics[s]->GetLikelihood();

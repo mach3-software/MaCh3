@@ -83,7 +83,9 @@ void CpuReweight::FullPass(const bool FillW2, double* MC, double* W2) {
   int* Bin = LiveBin.data();
   //HW Small chunks dealt round robin: events differ in how many shifts they carry, and one block
   //per thread leaves threads waiting on the slowest. Static rather than dynamic, so each thread
-  //always gets the same events and the sums, hence the chain, are the same from run to run
+  //always gets the same events in the same order, which makes each thread's own partial sum
+  //repeatable. The reduction that combines them is not ordered, so this does not make the total,
+  //or the chain, repeatable at more than one thread: see Doc/GradientSampling.md
   #ifdef MULTITHREAD
   #pragma omp parallel for schedule(static, 2048) reduction(+:MC[:NBins], W2[:NBins])
   #endif
