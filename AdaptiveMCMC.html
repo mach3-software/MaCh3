@@ -114,9 +114,15 @@ When Does This Fail?</h2>
 <p><img src="https://github.com/user-attachments/assets/27663413-7b4f-499e-b76a-f76e1aa01ac4" alt="" width="500" class="inline"/></p>
 <p><em>MCMC fit with adaption switched off for all parameters (blue), non-oscillation parameters (green) and all parameters (red). One can see that they converge to totally different values.</em></p>
 <p>Adaptive MCMC can also run into problems with highly correlated parameters. This can be partially avoided by defining the highly correlated space as a separate "block". This separates your throw matrix into several independent block matrices, with the correlated parts being separate to the less correlated parts. One example of this is with cross-section and flux parameters in T2K.</p>
-<h1><a class="anchor" id="autotoc_md161"></a>
+<h2><a class="anchor" id="autotoc_md161"></a>
+Adaptive and Flipping</h2>
+<p>During the adaptation process, we calculate the mean and variance of the parameters.</p>
+<p>Flipping is a method of moving between potentially disjoint regions. A good example is mass orderings.</p>
+<p>If we run flipping and adaptation together, the mean and variance might end up around the flipping point, which for mass ordering is around 0. Therefore, running adaptation with flipping is prohibited by MaCh3.</p>
+<p>A way to mitigate this is to run adaptation without flipping. Once we have a mature throw matrix, we disable adaptation and enable flipping again. Such a tuned throw matrix provides a good approximation.</p>
+<h1><a class="anchor" id="autotoc_md162"></a>
 FAQ</h1>
-<h2><a class="anchor" id="autotoc_md162"></a>
+<h2><a class="anchor" id="autotoc_md163"></a>
 What values should I set the adaptive settings to?</h2>
 <p>My typical recommendation is:</p><ol type="1">
 <li>Run a quick test chain without adaption + see how well tuned the chain is. Adaption requires some accepted steps as well so check that the chain accepts anything. Getting accepted steps can be as simple as decreasing your global step scale.</li>
@@ -131,21 +137,21 @@ What values should I set the adaptive settings to?</h2>
 <div class="line">$ c1-&gt;Print(<span class="stringliteral">&quot;logl_check.png&quot;</span>)</div>
 </div><!-- fragment --> If this has plateaued you've probably done enough adaption!</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md163"></a>
+<h2><a class="anchor" id="autotoc_md164"></a>
 My matrix cannot be Cholesky decomposed</h2>
 <p>If this happens you've simply not accepted enough steps. Set the gap between StartUpdate and StartThrow to be even larger</p>
-<h2><a class="anchor" id="autotoc_md164"></a>
+<h2><a class="anchor" id="autotoc_md165"></a>
 My chain suddenly gets worse when adaption stops</h2>
 <ul>
 <li>Try plotting the log-likelihood vs step plot. If the plot you've got looks something like this:</li>
 </ul>
 <p><img src="https://github.com/user-attachments/assets/3be7e0cf-06fc-4c6c-863b-82086f0d8c12" alt="image" width="500" class="inline"/></p>
 <p>you simply need to adapt for longer!</p>
-<h2><a class="anchor" id="autotoc_md165"></a>
+<h2><a class="anchor" id="autotoc_md166"></a>
 I've plotted my Likelihood-trace it looks like a saw-tooth</h2>
 <p><img src="https://github.com/user-attachments/assets/b5d8871e-5575-4fce-ac3b-4d6f6e01de1b" alt="image" width="500" class="inline"/></p>
 <p>This is caused by over-zealous use of Robbins-Monro's reset functionality. Typically we want to reset maybe once or twice to ensure the process is stable + not too badly affected by burn-in.</p>
-<h3><a class="anchor" id="autotoc_md166"></a>
+<h3><a class="anchor" id="autotoc_md167"></a>
 Additional Reading</h3>
 <p>For more information on adaptive MCMC in MaCh3: <a href="https://etheses.whiterose.ac.uk/id/eprint/35901/">https://etheses.whiterose.ac.uk/id/eprint/35901/</a></p>
 <p>For more information about adaptive MCMC in general: <a href="http://www.probability.ca/jeff/ftpdir/adaptex.pdf">http://www.probability.ca/jeff/ftpdir/adaptex.pdf</a></p>

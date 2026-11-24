@@ -182,7 +182,7 @@ Private Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00022">22</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;                : <a class="code" href="classM3_1_1DynamicPlugin.html#ad9afe4c4add0aaef16a6ceec3e94b8f3">DynamicPlugin</a>(sofile.c_str()) {}</div>
+<div class="fragment"><div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;          : <a class="code" href="classM3_1_1DynamicPlugin.html#ad9afe4c4add0aaef16a6ceec3e94b8f3">DynamicPlugin</a>(sofile.c_str()) {}</div>
 <div class="ttc" id="aclassM3_1_1DynamicPlugin_html_ad9afe4c4add0aaef16a6ceec3e94b8f3"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#ad9afe4c4add0aaef16a6ceec3e94b8f3">M3::DynamicPlugin::DynamicPlugin</a></div><div class="ttdeci">DynamicPlugin(const std::string &amp;sofile)</div><div class="ttdoc">Constructor that loads a plugin from a shared library file.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00022">DynamicPlugin.hpp:22</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -220,82 +220,81 @@ Private Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00027">27</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                : <a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>(<span class="keyword">nullptr</span>, &amp;<a class="code" href="classM3_1_1DynamicPlugin.html#abcf95fb164d0084f84d32cf03bb35b82">DynamicPlugin::dlcloser</a>),</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                  <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>(<span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>){</div>
+<div class="fragment"><div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;          : <a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>(<span class="keyword">nullptr</span>, &amp;<a class="code" href="classM3_1_1DynamicPlugin.html#abcf95fb164d0084f84d32cf03bb35b82">DynamicPlugin::dlcloser</a>),</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>(<span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>){</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                <a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.reset(dlopen(sofile, RTLD_NOW));</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>) {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;dlopen failed - shared library &#39;&quot;</span>&lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;&#39; not loaded: &quot;</span> &lt;&lt; dlerror() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;dlopen failed&quot;</span>);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                    <span class="comment">// Fix API compatibility: reject legacy/mismatched plugins before calling their factory.</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                    <span class="keyword">auto</span> version = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">plugin_api_version_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;plugin_api_version&quot;</span>));</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                    <span class="keywordflow">if</span> (!version) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Missing plugin_api_version function; rebuild the plugin with the current MaCh3 SDK&quot;</span>);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                    }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                    <span class="keyword">const</span> <span class="keyword">auto</span> plugin_version = version();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                    <span class="keywordflow">if</span> (plugin_version != <a class="code" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">PLUGIN_API_VERSION</a>) {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin API version &quot;</span> + std::to_string(plugin_version) +</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                                 <span class="stringliteral">&quot; does not match host version &quot;</span> + std::to_string(<a class="code" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">PLUGIN_API_VERSION</a>) +</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                                                 <span class="stringliteral">&quot;; rebuild the plugin with the current MaCh3 SDK&quot;</span>);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                    }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                }</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                    <span class="comment">// Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot initialise plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                <span class="keywordflow">catch</span> (...){</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot initialise plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <span class="keyword">auto</span> create = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">create_plugin_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;create_plugin&quot;</span>));</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                <span class="keyword">auto</span> destroy = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">destroy_plugin_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;destroy_plugin&quot;</span>));</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keywordflow">if</span> (!create || !destroy) {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid plugin: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Invalid plugin - missing create_plugin or destroy_plugin&quot;</span>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                    <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a> = std::unique_ptr&lt;IPlugin, destroy_plugin_t&gt;(create(), destroy);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                    <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>){</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin factory returned a null pointer&quot;</span>);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                    }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error instantiating plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                <span class="keywordflow">catch</span> (...){</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Error instantiating plugin: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error instantiating plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                    <a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a> = <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>-&gt;get_parser();</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                    <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a>){</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin returned a null parser&quot;</span>);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                    }</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;                <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                    <span class="comment">// Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error retrieving parser &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                <span class="keywordflow">catch</span> (...){</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                    std::cerr&lt;&lt; <span class="stringliteral">&quot;Error retrieving parser&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error retrieving parser &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            }</div>
-<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_aa3df17a7e81c4dc5daa76f0e240c5cc6"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">M3::DynamicPlugin::m_plugin</a></div><div class="ttdeci">std::unique_ptr&lt; IPlugin, destroy_plugin_t &gt; m_plugin</div><div class="ttdoc">Smart pointer to plugin with custom deleter.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00122">DynamicPlugin.hpp:122</a></div></div>
-<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_abcf95fb164d0084f84d32cf03bb35b82"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#abcf95fb164d0084f84d32cf03bb35b82">M3::DynamicPlugin::dlcloser</a></div><div class="ttdeci">static void dlcloser(void *h)</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00116">DynamicPlugin.hpp:116</a></div></div>
-<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_abfb6218ec509f1a0e09a9ba78e7115bf"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">M3::DynamicPlugin::m_parser</a></div><div class="ttdeci">MaCh3ArgumentParser * m_parser</div><div class="ttdoc">Pointer to the plugin's argument parser, owned by the shared library.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00119">DynamicPlugin.hpp:119</a></div></div>
-<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_ad6ca7a77a7fe64787837dea21e18acae"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">M3::DynamicPlugin::m_handle</a></div><div class="ttdeci">std::unique_ptr&lt; void, decltype(&amp;dlcloser)&gt; m_handle</div><div class="ttdoc">Handle to the loaded shared library.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00121">DynamicPlugin.hpp:121</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a4e3953002879bfcd61eb57de12dae762"><div class="ttname"><a href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">M3::PLUGIN_API_VERSION</a></div><div class="ttdeci">constexpr std::uint32_t PLUGIN_API_VERSION</div><div class="ttdoc">Fix API compatibility: increment when the plugin/parser contract changes incompatibly.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00014">plugin.hpp:14</a></div></div>
-<div class="ttc" id="aplugin_8hpp_html_a4782599a8f4dcb7316731ef866bff6d3"><div class="ttname"><a href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">plugin_api_version_t</a></div><div class="ttdeci">std::uint32_t(* plugin_api_version_t)()</div><div class="ttdoc">Function pointer type for the plugin API-version query.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00062">plugin.hpp:62</a></div></div>
-<div class="ttc" id="aplugin_8hpp_html_a4c629ac51de1e70a2dfd26908386f450"><div class="ttname"><a href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">create_plugin_t</a></div><div class="ttdeci">M3::IPlugin *(* create_plugin_t)()</div><div class="ttdoc">Function pointer type for the plugin factory.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00065">plugin.hpp:65</a></div></div>
-<div class="ttc" id="aplugin_8hpp_html_af546a73be42388bff0034557021cebb2"><div class="ttname"><a href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">destroy_plugin_t</a></div><div class="ttdeci">void(* destroy_plugin_t)(M3::IPlugin *)</div><div class="ttdoc">Function pointer type for plugin destructor function.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00069">plugin.hpp:69</a></div></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;          <a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.reset(dlopen(sofile, RTLD_NOW));</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;          <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>) {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;              std::cerr &lt;&lt; <span class="stringliteral">&quot;dlopen failed - shared library &#39;&quot;</span>&lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;&#39; not loaded: &quot;</span> &lt;&lt; dlerror() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;dlopen failed&quot;</span>);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;          }</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;          <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;              <span class="comment">// Fix API compatibility: reject legacy/mismatched plugins before calling their factory.</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;              <span class="keyword">auto</span> version = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">plugin_api_version_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;plugin_api_version&quot;</span>));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;              <span class="keywordflow">if</span> (!version) {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                  <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Missing plugin_api_version function; rebuild the plugin with the current MaCh3 SDK&quot;</span>);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;              }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;              <span class="keyword">const</span> <span class="keyword">auto</span> plugin_version = version();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;              <span class="keywordflow">if</span> (plugin_version != <a class="code" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">PLUGIN_API_VERSION</a>) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                  <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin API version &quot;</span> + std::to_string(plugin_version) +</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                            <span class="stringliteral">&quot; does not match host version &quot;</span> + std::to_string(<a class="code" href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">PLUGIN_API_VERSION</a>) +</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                            <span class="stringliteral">&quot;; rebuild the plugin with the current MaCh3 SDK&quot;</span>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;              }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;          }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;          <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;              <span class="comment">// Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot initialise plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;          }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;          <span class="keywordflow">catch</span> (...){</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Cannot initialise plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;          <span class="keyword">auto</span> create = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">create_plugin_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;create_plugin&quot;</span>));</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;          <span class="keyword">auto</span> destroy = <span class="keyword">reinterpret_cast&lt;</span><a class="code" href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">destroy_plugin_t</a><span class="keyword">&gt;</span>(dlsym(<a class="code" href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">m_handle</a>.get(), <span class="stringliteral">&quot;destroy_plugin&quot;</span>));</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          <span class="keywordflow">if</span> (!create || !destroy) {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;              std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid plugin: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Invalid plugin - missing create_plugin or destroy_plugin&quot;</span>);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;          }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;          <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;              <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a> = std::unique_ptr&lt;IPlugin, destroy_plugin_t&gt;(create(), destroy);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;              <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>){</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                  <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin factory returned a null pointer&quot;</span>);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;              }</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;          <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error instantiating plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;          }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;          <span class="keywordflow">catch</span> (...){</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;              std::cerr &lt;&lt; <span class="stringliteral">&quot;Error instantiating plugin: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error instantiating plugin &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;          }</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;          <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;              <a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a> = <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>-&gt;get_parser();</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;              <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a>){</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                  <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Plugin returned a null parser&quot;</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;              }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;          }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;          <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err){</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;              <span class="comment">// Fix plugin lifetime: translate exceptions before unloading plugin-defined exception code.</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error retrieving parser &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: &quot;</span> + err.what());</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;          }</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;          <span class="keywordflow">catch</span> (...){</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;              std::cerr&lt;&lt; <span class="stringliteral">&quot;Error retrieving parser&quot;</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;              <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Error retrieving parser &#39;&quot;</span> + std::string(sofile) + <span class="stringliteral">&quot;&#39;: unknown exception&quot;</span>);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;          }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      }</div>
+<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_aa3df17a7e81c4dc5daa76f0e240c5cc6"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">M3::DynamicPlugin::m_plugin</a></div><div class="ttdeci">std::unique_ptr&lt; IPlugin, destroy_plugin_t &gt; m_plugin</div><div class="ttdoc">Smart pointer to plugin with custom deleter.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00120">DynamicPlugin.hpp:120</a></div></div>
+<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_abcf95fb164d0084f84d32cf03bb35b82"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#abcf95fb164d0084f84d32cf03bb35b82">M3::DynamicPlugin::dlcloser</a></div><div class="ttdeci">static void dlcloser(void *h)</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00114">DynamicPlugin.hpp:114</a></div></div>
+<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_abfb6218ec509f1a0e09a9ba78e7115bf"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">M3::DynamicPlugin::m_parser</a></div><div class="ttdeci">MaCh3ArgumentParser * m_parser</div><div class="ttdoc">Pointer to the plugin's argument parser, owned by the shared library.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00117">DynamicPlugin.hpp:117</a></div></div>
+<div class="ttc" id="aclassM3_1_1DynamicPlugin_html_ad6ca7a77a7fe64787837dea21e18acae"><div class="ttname"><a href="classM3_1_1DynamicPlugin.html#ad6ca7a77a7fe64787837dea21e18acae">M3::DynamicPlugin::m_handle</a></div><div class="ttdeci">std::unique_ptr&lt; void, decltype(&amp;dlcloser)&gt; m_handle</div><div class="ttdoc">Handle to the loaded shared library.</div><div class="ttdef"><b>Definition:</b> <a href="DynamicPlugin_8hpp_source.html#l00119">DynamicPlugin.hpp:119</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a4e3953002879bfcd61eb57de12dae762"><div class="ttname"><a href="namespaceM3.html#a4e3953002879bfcd61eb57de12dae762">M3::PLUGIN_API_VERSION</a></div><div class="ttdeci">constexpr std::uint32_t PLUGIN_API_VERSION</div><div class="ttdoc">Fix API compatibility: increment when the plugin/parser contract changes incompatibly.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00012">plugin.hpp:12</a></div></div>
+<div class="ttc" id="aplugin_8hpp_html_a4782599a8f4dcb7316731ef866bff6d3"><div class="ttname"><a href="plugin_8hpp.html#a4782599a8f4dcb7316731ef866bff6d3">plugin_api_version_t</a></div><div class="ttdeci">std::uint32_t(* plugin_api_version_t)()</div><div class="ttdoc">Function pointer type for the plugin API-version query.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00057">plugin.hpp:57</a></div></div>
+<div class="ttc" id="aplugin_8hpp_html_a4c629ac51de1e70a2dfd26908386f450"><div class="ttname"><a href="plugin_8hpp.html#a4c629ac51de1e70a2dfd26908386f450">create_plugin_t</a></div><div class="ttdeci">M3::IPlugin *(* create_plugin_t)()</div><div class="ttdoc">Function pointer type for the plugin factory.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00060">plugin.hpp:60</a></div></div>
+<div class="ttc" id="aplugin_8hpp_html_af546a73be42388bff0034557021cebb2"><div class="ttname"><a href="plugin_8hpp.html#af546a73be42388bff0034557021cebb2">destroy_plugin_t</a></div><div class="ttdeci">void(* destroy_plugin_t)(M3::IPlugin *)</div><div class="ttdoc">Function pointer type for plugin destructor function.</div><div class="ttdef"><b>Definition:</b> <a href="plugin_8hpp_source.html#l00064">plugin.hpp:64</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -351,10 +350,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00116">116</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                                          {</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                <span class="keywordflow">if</span> (h) dlclose(h);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00114">114</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                                    {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;          <span class="keywordflow">if</span> (h) dlclose(h);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -387,10 +386,10 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classM3_1_1IPlugin.html#ae8ad25f20cf93722239c569bca8ef32e">M3::IPlugin</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00107">107</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                                                       {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a>;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00106">106</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                                                 {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classM3_1_1DynamicPlugin.html#abfb6218ec509f1a0e09a9ba78e7115bf">m_parser</a>;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -422,10 +421,10 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classM3_1_1IPlugin.html#ae7743d20286ed2907623673fe3459dd1">M3::IPlugin</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00099">99</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                               {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>-&gt;Run();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            }</div>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00098">98</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                         {</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classM3_1_1DynamicPlugin.html#aa3df17a7e81c4dc5daa76f0e240c5cc6">m_plugin</a>-&gt;Run();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -452,7 +451,7 @@ Private Attributes</h2></td></tr>
 
 <p>Handle to the loaded shared library. </p>
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00121">121</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00119">119</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
 
 </div>
 </div>
@@ -478,7 +477,7 @@ Private Attributes</h2></td></tr>
 
 <p>Pointer to the plugin's argument parser, owned by the shared library. </p>
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00119">119</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00117">117</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +503,7 @@ Private Attributes</h2></td></tr>
 
 <p>Smart pointer to plugin with custom deleter. </p>
 
-<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00122">122</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DynamicPlugin_8hpp_source.html#l00120">120</a> of file <a class="el" href="DynamicPlugin_8hpp_source.html">DynamicPlugin.hpp</a>.</p>
 
 </div>
 </div>

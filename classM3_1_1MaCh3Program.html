@@ -256,17 +256,17 @@ Static Private Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00155">155</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                                                     {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="comment">// Fix registration safeguards: another get_parser() call could replace a registered parser.</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="keywordflow">if</span> (std::any_of(<a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>.begin(), <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>.end(),</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                        [&amp;module](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; entry) { return entry.second == &amp;module; })) {</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Core module is already registered&quot;</span>);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        MaCh3ArgumentParser* parser = module.get_parser();</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <a class="code" href="classM3_1_1MaCh3Program.html#af6c788e39a683e84d00a3e0654251ac7">validate_parser</a>(parser);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        this-&gt;add_subparser(*parser);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>[parser] = &amp;module;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                                                   {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="comment">// Fix registration safeguards: another get_parser() call could replace a registered parser.</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <span class="keywordflow">if</span> (std::any_of(<a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>.begin(), <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>.end(),</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                      [&amp;module](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; entry) { return entry.second == &amp;module; })) {</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;          <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Core module is already registered&quot;</span>);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      }</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      MaCh3ArgumentParser* parser = module.get_parser();</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <a class="code" href="classM3_1_1MaCh3Program.html#af6c788e39a683e84d00a3e0654251ac7">validate_parser</a>(parser);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      this-&gt;add_subparser(*parser);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>[parser] = &amp;module;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_a6b89d06f9b865408cf99d0c20677f94d"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">M3::MaCh3Program::m_module_map</a></div><div class="ttdeci">std::map&lt; const MaCh3ArgumentParser *, IModule * &gt; m_module_map</div><div class="ttdoc">Map of parsers to core modules (non-owning)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8hpp_source.html#l00076">MaCh3Program.hpp:76</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_af6c788e39a683e84d00a3e0654251ac7"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#af6c788e39a683e84d00a3e0654251ac7">M3::MaCh3Program::validate_parser</a></div><div class="ttdeci">void validate_parser(const MaCh3ArgumentParser *parser) const</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8cpp_source.html#l00146">MaCh3Program.cpp:146</a></div></div>
 </div><!-- fragment -->
@@ -308,10 +308,10 @@ Static Private Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00134">134</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                                                                                                     {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> : <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a4236458e7f4a3ee0053ce2e3e0461d27">get_completions</a>(prefix, context))</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            std::cout &lt;&lt; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                                                                                                   {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> : <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a4236458e7f4a3ee0053ce2e3e0461d27">get_completions</a>(prefix, context))</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;          std::cout &lt;&lt; <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a02b7bee87741f76204d89ed52b1c3168"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">M3::MaCh3ArgumentParser::name</a></div><div class="ttdeci">const std::string name() const</div><div class="ttdoc">Get the name of this parser/subcommand.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00024">m3argparse.hpp:24</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_a4236458e7f4a3ee0053ce2e3e0461d27"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#a4236458e7f4a3ee0053ce2e3e0461d27">M3::MaCh3ArgumentParser::get_completions</a></div><div class="ttdeci">std::vector&lt; std::string &gt; get_completions(const std::string &amp;prefix, const std::vector&lt; std::string &gt; &amp;context) const</div><div class="ttdoc">Complete subcommands or long options at any depth without parsing incomplete arguments.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00075">m3argparse.hpp:75</a></div></div>
 </div><!-- fragment -->
@@ -344,16 +344,16 @@ Static Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Shell name ("bash", "zsh", or empty string if not detected) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00076">76</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                                              {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span>* shell = std::getenv(<span class="stringliteral">&quot;SHELL&quot;</span>);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">if</span> (!shell) <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="fragment"><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                                            {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* shell = std::getenv(<span class="stringliteral">&quot;SHELL&quot;</span>);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">if</span> (!shell) <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="comment">// Fix completion installation: recognise exact shell names, not substrings such as &quot;notbash&quot;.</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> = fs::path(shell).filename().string();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> == <span class="stringliteral">&quot;bash&quot;</span> || <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> == <span class="stringliteral">&quot;zsh&quot;</span>) <span class="keywordflow">return</span> <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="comment">// Fix completion installation: recognise exact shell names, not substrings such as &quot;notbash&quot;.</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> = fs::path(shell).filename().string();</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> == <span class="stringliteral">&quot;bash&quot;</span> || <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a> == <span class="stringliteral">&quot;zsh&quot;</span>) <span class="keywordflow">return</span> <a class="code" href="classM3_1_1MaCh3ArgumentParser.html#a02b7bee87741f76204d89ed52b1c3168">name</a>;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -400,54 +400,54 @@ Static Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Vector of absolute paths to .so files </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00242">242</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                                                                                     {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        std::vector&lt;std::string&gt; result;</div>
+<div class="fragment"><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                                                                                   {</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      std::vector&lt;std::string&gt; result;</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        fs::path p(path);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      fs::path p(path);</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">if</span> (!fs::exists(p)) {</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;Plugin path does not exist: &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;            <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        }</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keywordflow">if</span> (!fs::exists(p)) {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;Plugin path does not exist: &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;          <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      }</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordflow">if</span> (fs::is_regular_file(p)) {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="comment">// Fix registration safeguards: normalise relative paths and symlinks before deduplication.</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            result.push_back(fs::canonical(p).<span class="keywordtype">string</span>());</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        }</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (fs::is_directory(p)) {</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            <span class="comment">// Fix platform coverage: also recognise native macOS shared-library suffixes.</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; entry : fs::directory_iterator(p)) {</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> extension = entry.path().extension();</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                <span class="keywordtype">bool</span> is_good_plugin = extension == <span class="stringliteral">&quot;.so&quot;</span>;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordflow">if</span> (fs::is_regular_file(p)) {</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;          <span class="comment">// Fix registration safeguards: normalise relative paths and symlinks before deduplication.</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;          result.push_back(fs::canonical(p).<span class="keywordtype">string</span>());</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span> (fs::is_directory(p)) {</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;          <span class="comment">// Fix platform coverage: also recognise native macOS shared-library suffixes.</span></div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;          <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; entry : fs::directory_iterator(p)) {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;              <span class="keyword">const</span> <span class="keyword">auto</span> extension = entry.path().extension();</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;              <span class="keywordtype">bool</span> is_good_plugin = extension == <span class="stringliteral">&quot;.so&quot;</span>;</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor">#ifdef __APPLE__</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                is_good_plugin = is_good_plugin || extension == <span class="stringliteral">&quot;.dylib&quot;</span>;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;              is_good_plugin = is_good_plugin || extension == <span class="stringliteral">&quot;.dylib&quot;</span>;</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                    is_good_plugin = is_good_plugin &amp;&amp; entry.is_regular_file();</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                    <span class="comment">// Fix discovery errors: a broken candidate must not hide valid neighbours.</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot inspect plugin &#39;&quot;</span> &lt;&lt; entry.path().string() &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                }</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                <span class="keywordflow">if</span> (is_good_plugin) {</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                        result.push_back(fs::canonical(entry.path()).string());</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                    }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                    <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                        std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot canonicalize plugin &#39;&quot;</span> &lt;&lt; entry.path().string() &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                    }</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                }</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            }</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid plugin path (not file or directory): &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;              <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                  is_good_plugin = is_good_plugin &amp;&amp; entry.is_regular_file();</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;              }</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;              <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                  <span class="comment">// Fix discovery errors: a broken candidate must not hide valid neighbours.</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                  std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot inspect plugin &#39;&quot;</span> &lt;&lt; entry.path().string() &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                  <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;              }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;              <span class="keywordflow">if</span> (is_good_plugin) {</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                  <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                      result.push_back(fs::canonical(entry.path()).string());</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                  }</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                  <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                      std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot canonicalize plugin &#39;&quot;</span> &lt;&lt; entry.path().string() &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                  }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;              }</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;          }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      }</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid plugin path (not file or directory): &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      }</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <span class="comment">// Fix registration safeguards: make candidate precedence independent of directory iteration order.</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        std::sort(result.begin(), result.end());</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      <span class="comment">// Fix registration safeguards: make candidate precedence independent of directory iteration order.</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      std::sort(result.begin(), result.end());</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
@@ -470,51 +470,51 @@ Static Private Attributes</h2></td></tr>
 <p>Install shell completion scripts for bash and zsh. </p>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00088">88</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                                               {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span>* home = std::getenv(<span class="stringliteral">&quot;HOME&quot;</span>);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">if</span> (!home || home[0] == <span class="charliteral">&#39;\0&#39;</span>) {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot determine HOME directory\n&quot;</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
+<div class="fragment"><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                                             {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* home = std::getenv(<span class="stringliteral">&quot;HOME&quot;</span>);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordflow">if</span> (!home || home[0] == <span class="charliteral">&#39;\0&#39;</span>) {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot determine HOME directory\n&quot;</span>;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      }</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        std::string shell = <a class="code" href="classM3_1_1MaCh3Program.html#aae5b6736401b44ecbf86de679e230bd7">detect_shell</a>();</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">if</span> (shell.empty()) {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;Could not detect your shell (check $SHELL is exported). Supported: bash, zsh\n&quot;</span>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      std::string shell = <a class="code" href="classM3_1_1MaCh3Program.html#aae5b6736401b44ecbf86de679e230bd7">detect_shell</a>();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keywordflow">if</span> (shell.empty()) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;Could not detect your shell (check $SHELL is exported). Supported: bash, zsh\n&quot;</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;          <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      }</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="comment">// Resolve the absolute path of this binary so the completion script</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="comment">// works even when mach3 is not on PATH.</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keyword">const</span> std::string binary_path = shell_quote(executable_path());</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="comment">// Resolve the absolute path of this binary so the completion script</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="comment">// works even when mach3 is not on PATH.</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keyword">const</span> std::string binary_path = shell_quote(executable_path());</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="comment">// Replace the generic &quot;mach3&quot; invocation in the template with the</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="comment">// absolute binary path so the script is self-contained.</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keyword">auto</span> embed_path = [&amp;](std::string_view tmpl) -&gt; std::string {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            std::string s(tmpl);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keyword">const</span> std::string placeholder = <span class="stringliteral">&quot;mach3 --complete&quot;</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keyword">const</span> std::string replacement = binary_path + <span class="stringliteral">&quot; --complete&quot;</span>;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keywordflow">for</span> (std::size_t pos = s.find(placeholder); pos != std::string::npos;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                 pos = s.find(placeholder, pos + replacement.size()))</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                s.replace(pos, placeholder.size(), replacement);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <span class="keywordflow">return</span> s;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        };</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="comment">// Replace the generic &quot;mach3&quot; invocation in the template with the</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <span class="comment">// absolute binary path so the script is self-contained.</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keyword">auto</span> embed_path = [&amp;](std::string_view tmpl) -&gt; std::string {</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;          std::string s(tmpl);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;          <span class="keyword">const</span> std::string placeholder = <span class="stringliteral">&quot;mach3 --complete&quot;</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;          <span class="keyword">const</span> std::string replacement = binary_path + <span class="stringliteral">&quot; --complete&quot;</span>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;          <span class="keywordflow">for</span> (std::size_t pos = s.find(placeholder); pos != std::string::npos;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                pos = s.find(placeholder, pos + replacement.size()))</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;              s.replace(pos, placeholder.size(), replacement);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;          <span class="keywordflow">return</span> s;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      };</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        fs::path home_path(home);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      fs::path home_path(home);</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">if</span> (shell == <span class="stringliteral">&quot;bash&quot;</span>) {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            fs::path path = home_path / <span class="stringliteral">&quot;.local/share/bash-completion/completions/mach3&quot;</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e">write_file</a>(path, embed_path(<a class="code" href="classM3_1_1MaCh3Program.html#a626548fb99a2552a7193c3222eff7781">MaCh3Program::BASH_COMPLETION</a>))) <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            std::cout &lt;&lt; <span class="stringliteral">&quot;Installed bash completions → &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="keywordflow">if</span> (shell == <span class="stringliteral">&quot;bash&quot;</span>) {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;          fs::path path = home_path / <span class="stringliteral">&quot;.local/share/bash-completion/completions/mach3&quot;</span>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;          <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e">write_file</a>(path, embed_path(<a class="code" href="classM3_1_1MaCh3Program.html#a626548fb99a2552a7193c3222eff7781">MaCh3Program::BASH_COMPLETION</a>))) <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;Installed bash completions → &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      }</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">if</span> (shell == <span class="stringliteral">&quot;zsh&quot;</span>) {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            fs::path path = home_path / <span class="stringliteral">&quot;.local/share/zsh/site-functions/_mach3&quot;</span>;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e">write_file</a>(path, embed_path(<a class="code" href="classM3_1_1MaCh3Program.html#a4763f8d28884337fe484cd79ae65572c">MaCh3Program::ZSH_COMPLETION</a>))) <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            std::cout &lt;&lt; <span class="stringliteral">&quot;Installed zsh completions → &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        }</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">if</span> (shell == <span class="stringliteral">&quot;zsh&quot;</span>) {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;          fs::path path = home_path / <span class="stringliteral">&quot;.local/share/zsh/site-functions/_mach3&quot;</span>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;          <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e">write_file</a>(path, embed_path(<a class="code" href="classM3_1_1MaCh3Program.html#a4763f8d28884337fe484cd79ae65572c">MaCh3Program::ZSH_COMPLETION</a>))) <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;Installed zsh completions → &quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_a380f9de0053dcf2ebd2ecdb8c709d78e"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#a380f9de0053dcf2ebd2ecdb8c709d78e">M3::MaCh3Program::write_file</a></div><div class="ttdeci">bool write_file(const fs::path &amp;path, std::string_view content) const</div><div class="ttdoc">Write content to a file, creating parent directories if needed.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8cpp_source.html#l00052">MaCh3Program.cpp:52</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_a4763f8d28884337fe484cd79ae65572c"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#a4763f8d28884337fe484cd79ae65572c">M3::MaCh3Program::ZSH_COMPLETION</a></div><div class="ttdeci">static constexpr std::string_view ZSH_COMPLETION</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8hpp_source.html#l00098">MaCh3Program.hpp:98</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_a626548fb99a2552a7193c3222eff7781"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#a626548fb99a2552a7193c3222eff7781">M3::MaCh3Program::BASH_COMPLETION</a></div><div class="ttdeci">static constexpr std::string_view BASH_COMPLETION</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8hpp_source.html#l00080">MaCh3Program.hpp:80</a></div></div>
@@ -542,51 +542,51 @@ Static Private Attributes</h2></td></tr>
 <p>Reads the MACH3_PLUGINS environment variable (colon-separated paths), loads each .so file, and registers the plugins with the program. Each plugin must export create_plugin and destroy_plugin functions. </p>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00172">172</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                                           {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span>* env = std::getenv(<span class="stringliteral">&quot;MACH3_PLUGINS&quot;</span>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">if</span> (!env || env[0] == <span class="charliteral">&#39;\0&#39;</span>) <span class="keywordflow">return</span>;</div>
+<div class="fragment"><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                                         {</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* env = std::getenv(<span class="stringliteral">&quot;MACH3_PLUGINS&quot;</span>);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">if</span> (!env || env[0] == <span class="charliteral">&#39;\0&#39;</span>) <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        std::stringstream ss(env);</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        std::string path;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      std::stringstream ss(env);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      std::string path;</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="keywordflow">while</span> (std::getline(ss, path, <span class="charliteral">&#39;:&#39;</span>)) {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            <span class="keywordflow">if</span> (path.empty()) {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                std::cerr &lt;&lt; <span class="stringliteral">&quot;Ignoring empty plugin path in MACH3_PLUGINS\n&quot;</span>;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;                <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            }</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            std::vector&lt;std::string&gt; files;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            <span class="comment">// Fix discovery errors: one inaccessible path must not block other optional plugins.</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;            <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                files = this-&gt;<a class="code" href="classM3_1_1MaCh3Program.html#af649d2465d4ca3dee82b97e56b0a171c">expand_plugin_path</a>(path);</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            }</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot discover plugins in &#39;&quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;            }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; sofile : files) {</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                <span class="comment">// Fix registration safeguards: canonical paths also deduplicate symlink aliases.</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a8b8a8322c93657e5e3d8a27977762773">m_attempted_plugin_paths</a>.insert(sofile).second) {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Skipping duplicate plugin library: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                <span class="keywordflow">try</span>{</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                    std::unique_ptr&lt;DynamicPlugin&gt; dlplugin = std::make_unique&lt;DynamicPlugin&gt;(sofile);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                    MaCh3ArgumentParser* parser = dlplugin-&gt;get_parser();</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                    <a class="code" href="classM3_1_1MaCh3Program.html#af6c788e39a683e84d00a3e0654251ac7">validate_parser</a>(parser);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                    this-&gt;add_subparser(*parser);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                    <a class="code" href="classM3_1_1MaCh3Program.html#aa58645635a0c38e80eeed1649ada55ab">m_dynamic_plugin_map</a>[parser] = std::move(dlplugin);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                }</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load plugin from &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                }</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                <span class="keywordflow">catch</span> (...) {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                    std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load plugin from &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;: unknown error\n&quot;</span>;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;                }</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">while</span> (std::getline(ss, path, <span class="charliteral">&#39;:&#39;</span>)) {</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;          <span class="keywordflow">if</span> (path.empty()) {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;              std::cerr &lt;&lt; <span class="stringliteral">&quot;Ignoring empty plugin path in MACH3_PLUGINS\n&quot;</span>;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;              <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;          }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;          std::vector&lt;std::string&gt; files;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;          <span class="comment">// Fix discovery errors: one inaccessible path must not block other optional plugins.</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;          <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;              files = this-&gt;<a class="code" href="classM3_1_1MaCh3Program.html#af649d2465d4ca3dee82b97e56b0a171c">expand_plugin_path</a>(path);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;          }</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;          <span class="keywordflow">catch</span> (<span class="keyword">const</span> fs::filesystem_error&amp; err) {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;              std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot discover plugins in &#39;&quot;</span> &lt;&lt; path &lt;&lt; <span class="stringliteral">&quot;&#39;: &quot;</span> &lt;&lt; err.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;              <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          }</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;          <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; sofile : files) {</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;              <span class="comment">// Fix registration safeguards: canonical paths also deduplicate symlink aliases.</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;              <span class="keywordflow">if</span> (!<a class="code" href="classM3_1_1MaCh3Program.html#a8b8a8322c93657e5e3d8a27977762773">m_attempted_plugin_paths</a>.insert(sofile).second) {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                  std::cerr &lt;&lt; <span class="stringliteral">&quot;Skipping duplicate plugin library: &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                  <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;              }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;              <span class="keywordflow">try</span>{</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                  std::unique_ptr&lt;DynamicPlugin&gt; dlplugin = std::make_unique&lt;DynamicPlugin&gt;(sofile);</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                  MaCh3ArgumentParser* parser = dlplugin-&gt;get_parser();</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                  <a class="code" href="classM3_1_1MaCh3Program.html#af6c788e39a683e84d00a3e0654251ac7">validate_parser</a>(parser);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                  this-&gt;add_subparser(*parser);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                  <a class="code" href="classM3_1_1MaCh3Program.html#aa58645635a0c38e80eeed1649ada55ab">m_dynamic_plugin_map</a>[parser] = std::move(dlplugin);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;              }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;              <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                  std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load plugin from &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; e.what() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;                  <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;              }</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;              <span class="keywordflow">catch</span> (...) {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                  std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load plugin from &quot;</span> &lt;&lt; sofile &lt;&lt; <span class="stringliteral">&quot;: unknown error\n&quot;</span>;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                  <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;              }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;          }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_a8b8a8322c93657e5e3d8a27977762773"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#a8b8a8322c93657e5e3d8a27977762773">M3::MaCh3Program::m_attempted_plugin_paths</a></div><div class="ttdeci">std::set&lt; std::string &gt; m_attempted_plugin_paths</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8hpp_source.html#l00077">MaCh3Program.hpp:77</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_aa58645635a0c38e80eeed1649ada55ab"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#aa58645635a0c38e80eeed1649ada55ab">M3::MaCh3Program::m_dynamic_plugin_map</a></div><div class="ttdeci">std::map&lt; const MaCh3ArgumentParser *, std::unique_ptr&lt; DynamicPlugin &gt; &gt; m_dynamic_plugin_map</div><div class="ttdoc">Map of parsers to dynamic plugins (owning)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8hpp_source.html#l00078">MaCh3Program.hpp:78</a></div></div>
 <div class="ttc" id="aclassM3_1_1MaCh3Program_html_af649d2465d4ca3dee82b97e56b0a171c"><div class="ttname"><a href="classM3_1_1MaCh3Program.html#af649d2465d4ca3dee82b97e56b0a171c">M3::MaCh3Program::expand_plugin_path</a></div><div class="ttdeci">std::vector&lt; std::string &gt; expand_plugin_path(const std::string &amp;path) const</div><div class="ttdoc">Expand a plugin path (file or directory) into a list of canonical shared-library paths.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Program_8cpp_source.html#l00242">MaCh3Program.cpp:242</a></div></div>
@@ -622,11 +622,11 @@ Static Private Attributes</h2></td></tr>
 <p>Parse args after inserting any default subcommands. </p>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00139">139</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                                                                    {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        std::vector&lt;std::string&gt; args(argv, argv + argc);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        this-&gt;<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#acaeaada866a52a2cbad8f9b4c5a0b8a9">insert_default_subcommands</a>(args);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        MaCh3ArgumentParser::parse_args(args);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;                                                                  {</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      std::vector&lt;std::string&gt; args(argv, argv + argc);</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      this-&gt;<a class="code" href="classM3_1_1MaCh3ArgumentParser.html#acaeaada866a52a2cbad8f9b4c5a0b8a9">insert_default_subcommands</a>(args);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      MaCh3ArgumentParser::parse_args(args);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  }</div>
 <div class="ttc" id="aclassM3_1_1MaCh3ArgumentParser_html_acaeaada866a52a2cbad8f9b4c5a0b8a9"><div class="ttname"><a href="classM3_1_1MaCh3ArgumentParser.html#acaeaada866a52a2cbad8f9b4c5a0b8a9">M3::MaCh3ArgumentParser::insert_default_subcommands</a></div><div class="ttdeci">void insert_default_subcommands(std::vector&lt; std::string &gt; &amp;args, std::size_t pos=0) const</div><div class="ttdoc">Insert default subcommands into args where no explicit subcommand was given.</div><div class="ttdef"><b>Definition:</b> <a href="m3argparse_8hpp_source.html#l00132">m3argparse.hpp:132</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -653,16 +653,16 @@ Static Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Exit code from the executed module (0 on success) </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00223">223</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                         {</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="comment">// Dispatch to the top-level module; modules handle their own nested subcommands</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [parser, module] : <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>) {</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(*parser)) <span class="keywordflow">return</span> module-&gt;Run();</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        }</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [parser, dplugin] : <a class="code" href="classM3_1_1MaCh3Program.html#aa58645635a0c38e80eeed1649ada55ab">m_dynamic_plugin_map</a>) {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(*parser)) <span class="keywordflow">return</span> dplugin-&gt;Run();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                       {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="comment">// Dispatch to the top-level module; modules handle their own nested subcommands</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [parser, module] : <a class="code" href="classM3_1_1MaCh3Program.html#a6b89d06f9b865408cf99d0c20677f94d">m_module_map</a>) {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(*parser)) <span class="keywordflow">return</span> module-&gt;Run();</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; [parser, dplugin] : <a class="code" href="classM3_1_1MaCh3Program.html#aa58645635a0c38e80eeed1649ada55ab">m_dynamic_plugin_map</a>) {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;          <span class="keywordflow">if</span> (this-&gt;is_subcommand_used(*parser)) <span class="keywordflow">return</span> dplugin-&gt;Run();</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -691,14 +691,14 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00146">146</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                                                                             {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">if</span> (!parser || parser-&gt;name().empty()) {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Module/plugin must provide a non-null parser with a non-empty command name&quot;</span>);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        <span class="keywordflow">if</span> (m_subparser_map.count(parser-&gt;name()) != 0) {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Duplicate command name: &quot;</span> + parser-&gt;name());</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                                                                           {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      <span class="keywordflow">if</span> (!parser || parser-&gt;name().empty()) {</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Module/plugin must provide a non-null parser with a non-empty command name&quot;</span>);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <span class="keywordflow">if</span> (m_subparser_map.count(parser-&gt;name()) != 0) {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;          <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Duplicate command name: &quot;</span> + parser-&gt;name());</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      }</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -747,29 +747,29 @@ Static Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Program_8cpp_source.html#l00052">52</a> of file <a class="el" href="MaCh3Program_8cpp_source.html">MaCh3Program.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        std::string_view operation = <span class="stringliteral">&quot;creating parent directories&quot;</span>;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">try</span> {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            errno = 0;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            fs::create_directories(path.parent_path());</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            std::ofstream out;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            out.exceptions(std::ios::failbit | std::ios::badbit);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            operation = <span class="stringliteral">&quot;opening&quot;</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            out.open(path);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            operation = <span class="stringliteral">&quot;writing&quot;</span>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            out &lt;&lt; content;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            operation = <span class="stringliteral">&quot;closing&quot;</span>;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            out.close();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err) {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> error = errno;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot write completion script &#39;&quot;</span> &lt;&lt; path.string() &lt;&lt; <span class="stringliteral">&quot;&#39; while &quot;</span> &lt;&lt; operation</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                      &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; err.what();</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            <span class="keywordflow">if</span> (error != 0) std::cerr &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; std::strerror(error);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            std::cerr &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
+<div class="fragment"><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                                                                               {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      std::string_view operation = <span class="stringliteral">&quot;creating parent directories&quot;</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="keywordflow">try</span> {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;          errno = 0;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          fs::create_directories(path.parent_path());</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;          std::ofstream out;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;          out.exceptions(std::ios::failbit | std::ios::badbit);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;          operation = <span class="stringliteral">&quot;opening&quot;</span>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;          out.open(path);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          operation = <span class="stringliteral">&quot;writing&quot;</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;          out &lt;&lt; content;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;          operation = <span class="stringliteral">&quot;closing&quot;</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;          out.close();</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; err) {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;          <span class="keyword">const</span> <span class="keywordtype">int</span> error = errno;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;Cannot write completion script &#39;&quot;</span> &lt;&lt; path.string() &lt;&lt; <span class="stringliteral">&quot;&#39; while &quot;</span> &lt;&lt; operation</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                    &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; err.what();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          <span class="keywordflow">if</span> (error != 0) std::cerr &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; std::strerror(error);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;          std::cerr &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
