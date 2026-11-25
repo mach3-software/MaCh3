@@ -21,8 +21,8 @@ void MaCh3Modes::Initialise(const YAML::Node& config) {
   NModes = 0;
   nCCModes = 0;
 
-  Title = config["Title"].as<std::string>();
-  Generator = config["GeneratorName"].as<std::string>();
+  Title = Get<std::string>(config["Title"], __FILE__, __LINE__);
+  Generator = Get<std::string>(config["GeneratorName"], __FILE__, __LINE__);
 
   auto names = Get<std::vector<std::string>>(config["MaCh3Modes"], __FILE__, __LINE__);
 

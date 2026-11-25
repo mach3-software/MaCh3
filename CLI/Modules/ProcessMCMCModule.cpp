@@ -25,22 +25,22 @@ MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){
     Triangle plots\n\
     Study of covariance matrix stability\n""");
   m_parser->add_argument("--corr")
-    .help("plot correlation - Same as PlotCorr option in config.")
+    .help("Enable plotting correlations and 2D posterior")
     .flag();
   m_parser->add_argument("--MakeCredibleIntervals")
-    .help("Same as MakeCredibleIntervals option in config.")
+    .help("Produce Credible intervals (requires --corr)")
     .flag();
   m_parser->add_argument("--CalcBayesFactor")
-    .help("Same as CalcBayesFactor option in config.")
+    .help("Calculate Bayes Factor")
     .flag();
   m_parser->add_argument("--CalcSavageDickey")
-    .help("Same as CalcSavageDickey option in config.")
+    .help("Calculate Bayes Factor using Savage-Dickey")
     .flag();
   m_parser->add_argument("--CalcBipolarPlot")
-    .help("Same as CalcBipolarPlot option in config.")
+    .help("Calculate Bipolar plots")
     .flag();
   m_parser->add_argument("--CalcParameterEvolution")
-    .help("Same as CalcParameterEvolution option in config.")
+    .help("Produce Parameter Evolution .gif")
     .flag();
   m_parser->add_argument("config")
     .help("Config file.")
@@ -56,7 +56,6 @@ MaCh3ArgumentParser* ProcessMCMCModule::get_parser(){
     .required();
   return m_parser.get();
 }
-
 
 int ProcessMCMCModule::Run() {
   SetMaCh3LoggerFormat();

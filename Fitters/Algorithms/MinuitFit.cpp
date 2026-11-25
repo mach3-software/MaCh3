@@ -62,9 +62,8 @@ void MinuitFit::RunMCMC() {
   //KS: add config or something
   minuit->SetPrintLevel(2);
   minuit->SetTolerance(0.01);
-  minuit->SetMaxFunctionCalls(fitMan->raw()["General"]["Minuit2"]["NSteps"].as<unsigned>());
+  minuit->SetMaxFunctionCalls(Get<unsigned>(fitMan->raw()["General"]["Minuit2"]["NSteps"], __FILE__, __LINE__));
   minuit->SetMaxIterations(10000);
-
 
   // Save the adaptive MCMC
   for (const auto &syst : systematics)
