@@ -103,20 +103,20 @@ class MulticanonicalMCMCHandler {
   double GetMulticanonicalWeight() const;
 
   /// @brief Compute the multicanonical penalty using a spline.
-  double GetMulticanonicalWeightSpline(double deltacp, double delm23) const;
+  double GetMulticanonicalWeightSpline(double param_value, double delm23) const;
 
   /// @brief Compute a Gaussian multicanonical penalty.
-  double GetMulticanonicalWeightGaussian(double deltacp) const;
+  double GetMulticanonicalWeightGaussian(double param_value) const;
 
   /// @brief Compute a triple-Gaussian multicanonical penalty.
   /// @details This was mostly for testing the first implementation, probably not used anymore.
-  double GetMulticanonicalWeightTripleGaussian(double deltacp) const;
+  double GetMulticanonicalWeightTripleGaussian(double param_value) const;
 
   /// @brief Compute a von Mises multicanonical penalty.
   /// @details This is the circular analogue of a gaussian, meaning it handles the wrapping of the parameter space at 2pi automatically
   /// this avoids the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary
   /// the normalisation grows extremely quickly, widths of less that 0.05 should not be used until properly tested.
-  double GetMulticanonicalWeightVonMises(double deltacp) const;
+  double GetMulticanonicalWeightVonMises(double param_value) const;
 
   /// @brief Compute a generalised-Gaussian multicanonical penalty.
   /// @details the generalised gaussian is like a gaussian with an extra factor of n on the exponent of the gaussian. This allows for a stronger 
@@ -124,7 +124,7 @@ class MulticanonicalMCMCHandler {
   /// This is the current recommended configuration for umbrella sampling.
   /// @todo implement the wrapping with circular distance function to avoid the need to calculate the weight multiple times for each parameter to ensure it receives a bias even when it jumps the boundary
   /// @todo implement the normalisation for n != 2, and allow n to be set in the yaml configuration file
-  double GetMulticanonicalWeightGenGaussian(double deltacp) const;
+  double GetMulticanonicalWeightGenGaussian(double param_value) const;
 
   /// @brief Compute the circular distance between two angles.
   /// @details This is used to calculate the distance between two angles in a circular space, such as delta_cp. It returns the shortest distance between the two angles, taking into account the wrapping at 2pi.
@@ -169,20 +169,10 @@ class MulticanonicalMCMCHandler {
   double umbrellaMean;
   /// @brief Umbrella width used for the current configuration.
   double umbrellaWidth;
-  /// @brief Number of total umbrellas used for the current configuration. 
-  /// @details Currently only used when auto-overlap mode is enabled. This is not fully tested.
-  int umbrellaNumber;
-  /// @brief Toggle for deriving umbrella widths from a desired # of sigma overlaps between umbrellas.
-  bool umbrellaOverlapMode;
-  /// @brief Requested overlap for evenly spaced umbrellas.
-  double umbrellaSigmaOverlap;
   /// @brief Toggle for rescaling the step size based on the umbrella width.
   bool umbrellaAdjustStepScale;
   /// @brief Additional scale factor applied when rescaling the step size. This is for fine tuning
   double umbrellaStepScaleFactor;
-  /// @brief Optional flip-window control. 
-  /// @details briefly tested feature to mirror windows about their centres. Not tested but may be useful in the future. Currently disabled and not used.
-  bool flipWindow;
 
   /// @brief Von Mises kappa parameter. Analogue of sigma for a gaussian
   double vonMises_kappa;
