@@ -41,7 +41,6 @@ public:
 
 
 void initParametersModule(py::module &m_parameters){
-    
     // Bind the systematic type enum that lets us set different types of systematics
     py::enum_<SystType>(m_parameters, "SystematicType")
             .value("Normalisation", SystType::kNorm)
@@ -241,6 +240,5 @@ void initParametersModule(py::module &m_parameters){
             :param index: The index of the spline parameter",
             py::arg("index")
         )
-
     ; // End of ParameterHandlerGeneric binding
 }

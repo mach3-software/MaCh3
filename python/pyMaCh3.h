@@ -17,7 +17,6 @@
 /// Experiments should derive from this to allow them to insert specialised classes into the
 /// pyMaCh3 module
 class MaCh3PyBinder {
-
   public:
 
     virtual ~MaCh3PyBinder() {};

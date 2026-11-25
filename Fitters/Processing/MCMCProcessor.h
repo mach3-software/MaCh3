@@ -339,6 +339,9 @@ class MCMCProcessor {
     void PlotViolins();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     void DrawCorrelations1D();
+    /// @brief KS: Plot only meaningful correlations
+    void DrawCorrelations1DReduced(const std::vector<std::vector<double>>& CorrOfInterest,
+                                   const std::vector<std::vector<std::string>>& NameCorrOfInterest);
     /// @brief Produces correlation matrix but instead of giving name for each param it only give name for param group
     /// @param CorrMatrix correlation matrix that we are going to plot
     /// @note Inspired by plot in Ewan thesis see https://www.t2k.org/docs/thesis/152/Thesis#page=147

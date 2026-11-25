@@ -1526,20 +1526,17 @@ void MCMCProcessor::DrawCorrelations1D() {
   gStyle->SetOptTitle(1);
 
   constexpr int Nhists = 3;
-  //KS: Highest value is just meant bo be sliglhy higher than 1 to catch >,
+  //KS: Highest value is just meant bo be slightly higher than 1 to catch >,
   constexpr double Thresholds[Nhists+1] = {0, 0.25, 0.5, 1.0001};
   constexpr Color_t CorrColours[Nhists] = {kRed-10, kRed-6,  kRed};
 
   //KS: This store necessary entries for stripped covariance which store only "meaningful correlations
-  std::vector<std::vector<double>> CorrOfInterest;
-  CorrOfInterest.resize(nDraw);
-  std::vector<std::vector<std::string>> NameCorrOfInterest;
-  NameCorrOfInterest.resize(nDraw);
-
+  std::vector<std::vector<double>> CorrOfInterest(nDraw);
+  std::vector<std::vector<std::string>> NameCorrOfInterest(nDraw);
   std::vector<std::vector<std::unique_ptr<TH1D>>> Corr1DHist(nDraw);
   //KS: Initialising ROOT objects is never safe in MP loop
   for(int i = 0; i < nDraw; ++i)
-    {    
+  {
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
@@ -1548,7 +1545,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     for(int j = 0; j < Nhists; ++j)
     {
       Corr1DHist[i][j] = std::make_unique<TH1D>(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
-      Corr1DHist[i][j]->SetTitle(Form("%s",Title.Data()));
+      Corr1DHist[i][j]->SetTitle(Form("%s", Title.Data()));
       Corr1DHist[i][j]->SetDirectory(nullptr);
       Corr1DHist[i][j]->GetYaxis()->SetTitle("Correlation");
       Corr1DHist[i][j]->SetFillColor(CorrColours[j]);
@@ -1565,7 +1562,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     }
   }
 
-  // KS: Do not add collapse(2) otherwise one can intorduce race condition :(
+  // KS: Do not add collapse(2) otherwise one can introduce race condition :(
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
@@ -1581,8 +1578,7 @@ void MCMCProcessor::DrawCorrelations1D() {
           Corr1DHist[i][k]->SetBinContent(j+1, (*Correlation)(i,j));
         }
       }
-      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j)
-  {
+      if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j) {
         CorrOfInterest[i].push_back((*Correlation)(i,j));
         NameCorrOfInterest[i].push_back(Corr1DHist[i][0]->GetXaxis()->GetBinLabel(j+1));
       }
@@ -1591,7 +1587,6 @@ void MCMCProcessor::DrawCorrelations1D() {
 
   TDirectory *CorrDir = OutputFile->mkdir("Corr1D");
   CorrDir->cd();
-
   for(int i = 0; i < nDraw; i++)
   {
     if (ParamVaried[i] == false) continue;
@@ -1614,20 +1609,36 @@ void MCMCProcessor::DrawCorrelations1D() {
     Posterior->Write(Corr1DHist[i][0]->GetTitle());
     if(printToPDF) Posterior->Print(CanvasName);
   }
+  //KS: Plot only meaningful correlations
+  DrawCorrelations1DReduced(CorrOfInterest, NameCorrOfInterest);
+  CorrDir->Close();
+  delete CorrDir;
+  OutputFile->cd();
 
+  SetMargins(Posterior, Margins);
+  gStyle->SetOptTitle(OptTitle);
+}
+
+// *********************
+void MCMCProcessor::DrawCorrelations1DReduced(const std::vector<std::vector<double>>& CorrOfInterest,
+                                              const std::vector<std::vector<std::string>>& NameCorrOfInterest) {
+// *********************
   //KS: Plot only meaningful correlations
   for(int i = 0; i < nDraw; i++)
   {
     const int size = int(CorrOfInterest[i].size());
-
     if(size == 0) continue;
+    TString Title = "";
+    double Prior = 1.0, PriorError = 1.0;
+    GetNthParameter(i, Prior, PriorError, Title);
+
     auto Corr1DHist_Reduced = std::make_unique<TH1D>("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
     Corr1DHist_Reduced->SetDirectory(nullptr);
-    Corr1DHist_Reduced->SetTitle(Corr1DHist[i][0]->GetTitle());
+    Corr1DHist_Reduced->SetTitle(Title);
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
     Corr1DHist_Reduced->SetLineColor(kBlue);
-    
+
     for (int j = 0; j < size; ++j)
     {
       Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
@@ -1642,15 +1653,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     Posterior->Write(Form("%s_Red", Corr1DHist_Reduced->GetTitle()));
     if(printToPDF) Posterior->Print(CanvasName);
   }
-
-  CorrDir->Close();
-  delete CorrDir;
-  OutputFile->cd();
-
-  SetMargins(Posterior, Margins);
-  gStyle->SetOptTitle(OptTitle);
 }
-
 
 // *********************
 // Convert posterior likelihood to Delta Chi2 used for comparison with frequentists fitter
@@ -3217,13 +3220,6 @@ bool AllUnique(unsigned int* StepNumber, size_t size) {
 void MCMCProcessor::PrepareDiagMCMC() {
 // **************************
   doDiagMCMC = true;
-    
-  if(ParStep != nullptr) {
-    MACH3LOG_ERROR("It look like ParStep was already filled ");
-    MACH3LOG_ERROR("Even though it is used for MakeCovariance_MP and for DiagMCMC");
-    MACH3LOG_ERROR("it has different structure in both for cache hits, sorry ");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
   if(nBatches == 0) {
     MACH3LOG_ERROR("nBatches is equal to 0");
     MACH3LOG_ERROR("please use SetnBatches to set other value fore example 20");
@@ -3601,21 +3597,14 @@ void MCMCProcessor::AutoCorrelation() {
   std::vector<std::vector<double>> LagL(nDraw);
   auto ParamSums = GetParameterSums();
   for (int j = 0; j < nDraw; ++j) {
-    DenomSum[j].resize(nLags);
-    NumeratorSum[j].resize(nLags);
-    LagL[j].resize(nLags);
+    DenomSum[j].resize(nLags, 0.0);
+    NumeratorSum[j].resize(nLags, 0.0);
+    LagL[j].resize(nLags, 0.0);
   }
   std::vector<std::unique_ptr<TH1D>> LagKPlots(nDraw);
   // Loop over the parameters of interest
   for (int j = 0; j < nDraw; ++j)
   {
-    // Loop over each lag
-    for (int k = 0; k < nLags; ++k) {
-      NumeratorSum[j][k] = 0.0;
-      DenomSum[j][k] = 0.0;
-      LagL[j][k] = 0.0;
-    }
-
     // Make TH1Ds for each parameter which hold the lag
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
@@ -3786,7 +3775,6 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<doubl
                                    DenomSum_cpu);
 }
 #endif
-
 
 // **************************
 // KS: calc Effective Sample Size Following @cite StanManual

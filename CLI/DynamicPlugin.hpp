@@ -27,7 +27,6 @@ class DynamicPlugin: public IPlugin{
       DynamicPlugin(const char* sofile)
           : m_handle(nullptr, &DynamicPlugin::dlcloser),
             m_plugin(nullptr, nullptr){
-
           m_handle.reset(dlopen(sofile, RTLD_NOW));
           if (!m_handle) {
               std::cerr << "dlopen failed - shared library '"<< sofile << "' not loaded: " << dlerror() << "\n";

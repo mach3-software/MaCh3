@@ -28,8 +28,8 @@ ARG REPOSITORY_URL
 ENV REPOSITORY_URL=${REPOSITORY_URL:-https://github.com/mach3-software/MaCh3}
 
 RUN dnf install -y \
-    python3 \
-    python3-devel \
+    python3.9 \
+    python3.9-devel \
     python3-pip
     
 RUN mkdir -p ${MACH3_WORK_DIR}
