@@ -131,14 +131,14 @@ void MatrixModule::SetupInfo(const std::string& Config, std::vector<std::string>
   YAML::Node settings = config["MatrixPlotter"];
 
   // Retrieve the list of Titles
-  Title = settings["Titles"].as<std::vector<std::string>>();
+  Title = Get<std::vector<std::string>>(settings["Titles"], __FILE__, __LINE__);
   Params.resize(Title.size());
 
   // Retrieve parameters for each title (using the titles as keys)
   for(size_t it = 0; it < Title.size(); it++)
   {
     if (settings[Title[it]]) {
-      Params[it] = settings[Title[it]].as<std::vector<std::string>>();
+      Params[it] = Get<std::vector<std::string>>(settings[Title[it]], __FILE__, __LINE__);
     } else {
       MACH3LOG_ERROR("Missing key in YAML for: {}", Title[it]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -276,4 +276,4 @@ void MatrixModule::CompareMatrices(const std::unique_ptr<Plotting::PlottingManag
     delete file[i];
   }
 }
-}
+} // end M3 namespace

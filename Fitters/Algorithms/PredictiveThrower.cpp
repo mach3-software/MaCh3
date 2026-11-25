@@ -213,11 +213,11 @@ void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGr
   auto paramNode = fitMan->raw()["Predictive"]["ParameterBounds"];
   for (const auto& p : paramNode) {
     // Extract name
-    std::string name = p[0].as<std::string>();
+    auto name = Get<std::string>(p[0], __FILE__, __LINE__);
 
     // Extract bounds: min and max
-    double minVal = p[1][0].as<double>();
-    double maxVal = p[1][1].as<double>();
+    auto minVal = Get<double>(p[1][0], __FILE__, __LINE__);
+    auto maxVal = Get<double>(p[1][1], __FILE__, __LINE__);
     ParamBounds.emplace_back(minVal, maxVal);
 
     for (size_t s = 0; s < systematics.size(); ++s) {
