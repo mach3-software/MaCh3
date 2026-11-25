@@ -32,6 +32,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
+#include "ROOT/RDataFrame.hxx"
 _MaCh3_Safe_Include_End_ //}
 
 
@@ -39,7 +40,6 @@ _MaCh3_Safe_Include_End_ //}
 class TChain;
 class TF1;
 class MCMCProcessorGPU;
-
 /// KS: Enum for different covariance classes
 /// @warning this is bit of legacy functionality and will become deprecated in future
 enum ParameterEnum {
@@ -97,6 +97,8 @@ class MCMCProcessor {
                                );
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
+    /// @brief Write covariances to output file
+    void WriteCovariance(TDirectory *PostHistDir);
     /// @brief Make YAML file from post-fit covariance
     void MakeCovarianceYAML(const std::string& OutputYAMLFile, const std::string& MeansMethod) const;
     /// @brief Make and Draw Credible Regions
@@ -214,7 +216,7 @@ class MCMCProcessor {
 
     /// @brief Get 1D posterior for a given parameter
     /// @param i parameter index
-    TH1D* GetHpost(const int i) const { return hpost[i]; };
+    const std::unique_ptr<TH1D>& GetHpost(const int i) const { return hpost[i]; };
     /// @brief Get 2D posterior for a given parameter combination
     /// @param i parameter index X
     /// @param j parameter index Y
@@ -325,10 +327,16 @@ class MCMCProcessor {
   protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
     std::unique_ptr<TH1D> MakePrefit();
+    /// @brief CW: Save the postfit members
+    void SavePostfit();
     /// @brief Perform plot of 1d marginalised posterior with HPD etc.
     void DrawPosterior(const int i, TDirectory* PostDir, TDirectory* PostHistDir);
+    /// @brief Build RDataFrame for MCMC Processor
+    ROOT::RDF::RNode GetFilteredDataFrame() const;
     /// @brief prepare output root file and canvas to which we will save EVERYTHING
     void MakeOutputFile();
+    /// @brief Simply plot produced violins
+    void PlotViolins();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     void DrawCorrelations1D();
     /// @brief Produces correlation matrix but instead of giving name for each param it only give name for param group
@@ -551,7 +559,7 @@ class MCMCProcessor {
     TMatrixDSym *Correlation;
 
     /// Holds 1D Posterior Distributions
-    std::vector<TH1D*> hpost;
+    std::vector<std::unique_ptr<TH1D>> hpost;
     /// Holds 2D Posterior Distributions
     std::vector<std::vector<std::unique_ptr<TH2D>>> hpost2D;
     /// Holds violin plot for all dials

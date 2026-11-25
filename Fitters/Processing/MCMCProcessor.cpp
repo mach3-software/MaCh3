@@ -4,7 +4,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
 #include "TVirtualFFT.h"
-#include "ROOT/RDataFrame.hxx"
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
@@ -115,7 +114,6 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
 
-  CleanVector(hpost);
   for (int i = 0; i < nDraw; ++i) {
     if(ParStep) delete[] ParStep[i];
   }
@@ -224,20 +222,25 @@ void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* 
   GetNthParameter(i, Prior, PriorError, Title);
   bool isFlat = GetParamFlat(i);
 
+  hpost[i]->SetMinimum(0);
+  hpost[i]->GetYaxis()->SetTitle("Steps");
+  hpost[i]->GetYaxis()->SetNoExponent(false);
+
   if(ApplySmoothing) hpost[i]->Smooth();
 
   (*Central_Value)(i) = Prior;
 
   double Mean, Err, Err_p, Err_m;
-  GetArithmetic(hpost[i], Mean, Err);
+  GetArithmetic(hpost[i].get(), Mean, Err);
   (*Means)(i) = Mean;
   (*Errors)(i) = Err;
-
-  GetGaussian(hpost[i], Gauss.get(), Mean, Err);
+  // KS: needed for compilation reasons
+  auto HistRaw = hpost[i].get();
+  GetGaussian(HistRaw, Gauss.get(), Mean, Err);
   (*Means_Gauss)(i) = Mean;
   (*Errors_Gauss)(i) = Err;
 
-  GetHPD(hpost[i], Mean, Err, Err_p, Err_m);
+  GetHPD(hpost[i].get(), Mean, Err, Err_p, Err_m);
   (*Means_HPD)(i) = Mean;
   (*Errors_HPD)(i) = Err;
   (*Errors_HPD_Positive)(i) = Err_p;
@@ -263,7 +266,7 @@ void MCMCProcessor::DrawPosterior(const int i, TDirectory* PostDir, TDirectory* 
 
   auto leg = std::make_unique<TLegend>(0.15, 0.6, 0.6, 0.95);
   SetLegendStyle(leg.get(), 0.04);
-  leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
+  leg->AddEntry(hpost[i].get(), Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
   leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
   leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
   if(isFlat && !PlotFlatPrior) leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f}", Prior), "l");
@@ -322,6 +325,33 @@ std::pair<double, double> MCMCProcessor::GetHistRange(const int iParam) const {
   };
 }
 
+// *********************
+// Build RDataFrame for MCMC Processor
+ROOT::RDF::RNode MCMCProcessor::GetFilteredDataFrame() const {
+// *********************
+  //KS: Apply additional Cuts, like mass ordering
+  std::string CutPosterior1D = StepCut;
+  if (Posterior1DCut != "") {
+    CutPosterior1D = "(" + StepCut + ") && (" + Posterior1DCut + ")";
+  }
+  MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
+
+  // Define RDataFrame
+  ROOT::RDataFrame df(*Chain);
+  // Apply selection once
+  ROOT::RDF::RNode dfToUse = df.Filter(CutPosterior1D);
+
+  // Apply reweighting once
+  TString WeightExpression = "1.0";
+  if(ReweightPosterior){
+    for (const auto &name : ReweightNames) {
+      WeightExpression = "(" + WeightExpression + ")*(" + name + ")";
+    }
+  }
+  dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
+  return dfToUse;
+}
+
 // ****************************
 //CW: Function to make the post-fit
 void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges) {
@@ -332,7 +362,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
 
   // Check if the output file is ready
   if (OutputFile == nullptr) MakeOutputFile();
-  
+
   MACH3LOG_INFO("Starting {}", __func__);
   TStopwatch clock;
   clock.Start();
@@ -343,32 +373,15 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
-  
-  //KS: Apply additional Cuts, like mass ordering
-  std::string CutPosterior1D = "";
-  if(Posterior1DCut != "") {
-    CutPosterior1D = StepCut +" && " + Posterior1DCut;
-  } else CutPosterior1D = StepCut;
 
-  // Apply reweighting
-  if (ReweightPosterior) {
-    for (const auto& name : ReweightNames) {
-      CutPosterior1D = "(" + CutPosterior1D + ")*(" + name + ")";
-    }
-  }
-  MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
-  
-  // nDraw is number of draws we want to do
-  for (int i = 0; i < nDraw; ++i)
-  {
-    if (i % (nDraw/5) == 0) {
-      M3::Utils::PrintProgressBar(i, nDraw);
-    }
-    OutputFile->cd();
+  M3::EnableROOTMultiThreading();
+  auto dfToUse = GetFilteredDataFrame();
+  OutputFile->cd();
+  std::vector<ROOT::RDF::RResultPtr<TH1D>> Histograms(nDraw);
+  for (int i = 0; i < nDraw; ++i) {
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
-
     // Get bin edges for histograms
     double maxi, mini = M3::_BAD_DOUBLE_;
     if (Edges.find(Title.Data()) != Edges.end()) {
@@ -380,19 +393,53 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     }
     MACH3LOG_DEBUG("Initialising histogram for {} with binning {:.4f}, {:.4f}", Title, mini, maxi);
     // This holds the posterior density
-    // KS: WARNING do NOT SetDirectory(nullptr) this will cause issue with Project()
-    // I know is tempting to avoid ROOT memory management but please do not.
-    hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
-    hpost[i]->SetMinimum(0);
-    hpost[i]->GetYaxis()->SetTitle("Steps");
-    hpost[i]->GetYaxis()->SetNoExponent(false);
+    hpost[i] = std::make_unique<TH1D>(BranchNames[i], BranchNames[i], nBins, mini, maxi);
+    hpost[i]->SetDirectory(nullptr);
+    // Build the model (name, title, binning, range) from the existing histogram
+    const ROOT::RDF::TH1DModel model(*hpost[i].get());
+    Histograms[i] = dfToUse.Histo1D(model, BranchNames[i].Data(), "MCMC_RDF_WEIGHT");
+  }
+  MACH3LOG_INFO("Finished booking {} histograms. Now executing RDF event loop...", Histograms.size());
 
-    // Project BranchNames[i] onto hpost, applying stepcut
-    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+  // The first GetPtr() triggers the RDF event loop.
+  // Because ALL histograms have already been booked, RDF fills all of them in one pass.
+  if (!Histograms.empty()) {
+    TH1D *dummy = Histograms[0].GetPtr();
+    (void)dummy;
+  }
+  MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries", clock.RealTime(), nEntries);
 
+  M3::DisableROOTMultiThreading();
+  // Now we can plot actual histogram
+  for (int i = 0; i < nDraw; ++i) {
+    if (i % std::max(1, nDraw/5) == 0) {
+      M3::Utils::PrintProgressBar(i, nDraw);
+    }
+    OutputFile->cd();
+
+    // Move RDF result into the pre-existing histogram (axis titles, min etc. already set)
+    hpost[i]->Add(Histograms[i].GetPtr());
     DrawPosterior(i, PostDir, PostHistDir);
   } // end the for loop over nDraw
 
+  SavePostfit();
+
+  PostDir->Close();
+  delete PostDir;
+  PostHistDir->Close();
+  delete PostHistDir;
+
+  clock.Stop();
+  MACH3LOG_INFO("{} took {:.2f}s to", __func__, clock.RealTime());
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
+} // Have now written the postfit projections
+
+// *******************
+//CW: Save the postfit
+void MCMCProcessor::SavePostfit() {
+// *******************
   OutputFile->cd();
   TTree *SettingsBranch = new TTree("Settings", "Settings");
   int NDParameters = nParam[kNDPar];
@@ -425,18 +472,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   Errors_HPD->Write("Errors_HPD");
   Errors_HPD_Positive->Write("Errors_HPD_Positive");
   Errors_HPD_Negative->Write("Errors_HPD_Negative");
-
-  PostDir->Close();
-  delete PostDir;
-  PostHistDir->Close();
-  delete PostHistDir;
-
-  clock.Stop();
-  MACH3LOG_INFO("{} took {:.2f}s to", __func__, clock.RealTime());
-
-  // restore original warning setting
-  gErrorIgnoreLevel = originalErrorLevel;
-} // Have now written the postfit projections
+}
 
 // *******************
 //CW: Draw the postfit
@@ -452,8 +488,7 @@ void MCMCProcessor::DrawPostfit() {
   OutputFile->cd();
  
   std::string CutPosterior1D = "";
-  if(Posterior1DCut != "")
-  {
+  if(Posterior1DCut != "") {
     CutPosterior1D = StepCut +" && " + Posterior1DCut;
   }
   else CutPosterior1D = StepCut;
@@ -854,36 +889,16 @@ void MCMCProcessor::MakeViolin() {
   clock.Start();
   //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
   // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
-  #ifdef MULTITHREAD
-  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
-  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
-  #endif
+  M3::EnableROOTMultiThreading();
 
-  ROOT::RDataFrame df(*Chain);
-
-  // Apply selection once
-  ROOT::RDF::RNode dfToUse = df.Filter(StepCut);
-
-  // Apply reweighting once
-  if (ReweightPosterior)
-  {
-    TString WeightExpression = "1.0";
-    for (const auto &name : ReweightNames) {
-      WeightExpression = "(" + WeightExpression + ")*(" + name + ")";
-    }
-    dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
-  }
+  // Get RDataFrame
+  auto dfToUse = GetFilteredDataFrame();
 
   //KS: Binning is identical to Y axis of hviolin so bin number maps 1:1, including under/overflow
-  std::vector<ROOT::RDF::RResultPtr<TH1D>> hPar;
-  hPar.reserve(nDraw);
+  std::vector<ROOT::RDF::RResultPtr<TH1D>> hPar(nDraw);
   for (int x = 0; x < nDraw; ++x) {
     const ROOT::RDF::TH1DModel model(Form("hviolin_tmp_%d", x), "", vBins, mini_y, maxi_y);
-    if (!ReweightPosterior) {
-      hPar.emplace_back(dfToUse.Histo1D<double>(model, BranchNames[x].Data()));
-    } else {
-      hPar.emplace_back(dfToUse.Histo1D<double, double>(model, BranchNames[x].Data(), "MCMC_RDF_WEIGHT"));
-    }
+    hPar[x] = dfToUse.Histo1D<double, double>(model, BranchNames[x].Data(), "MCMC_RDF_WEIGHT");
   }
 
   //KS: First access triggers the event loop, afterwards all histograms are ready
@@ -893,10 +908,7 @@ void MCMCProcessor::MakeViolin() {
     }
   }
 
-  #ifdef MULTITHREAD
-  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
-  #endif
-
+  M3::DisableROOTMultiThreading();
   // nDraw is number of draws we want to do
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -916,7 +928,14 @@ void MCMCProcessor::MakeViolin() {
   } // end the for loop over nDraw
   clock.Stop();
   MACH3LOG_INFO("Making Violin plot took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
+  // It's plotting time
+  PlotViolins();
+}
 
+// *********************
+// Plot fancy violin plots
+void MCMCProcessor::PlotViolins() {
+// *********************
   //KS: Tells how many parameters in one canvas we want
   constexpr int IntervalsSize = 10;
   const int NIntervals = nDraw/IntervalsSize;
@@ -981,20 +1000,9 @@ void MCMCProcessor::MakeViolin() {
 void MCMCProcessor::MakeCovariance(bool Mute) {
 // *********************
   if (OutputFile == nullptr) MakeOutputFile();
-
   if (hpost2D.size() == 0) Prepare2DHistograms();
 
   MACH3LOG_INFO("Making post-fit covariances...");
-  // Check that the diagonal entries have been filled
-  // i.e. MakePostfit() has been called
-  for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
-      MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
-      MakePostfit();
-      break;
-    }
-  }
-
   TStopwatch clock;
   clock.Start();
 
@@ -1007,28 +1015,10 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
 
   //KS: Posterior is filled by RDataFrame, all histograms are filled in ONE event loop over the tree
   // Implicit MT parallelises reading and decompression, which was the serial bottleneck in CacheSteps
-  #ifdef MULTITHREAD
-  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
-  if(!IMTWasEnabled) ROOT::EnableImplicitMT();
-  #endif
-
-
-  // Define RDataFrame
-  ROOT::RDataFrame df(*Chain);
+  M3::EnableROOTMultiThreading();
 
   // Apply selection once
-  ROOT::RDF::RNode dfToUse = df.Filter(StepCut);
-
-  // Apply reweighting once
-  if (ReweightPosterior)
-  {
-    TString WeightExpression = "1.0";
-    for (const auto &name : ReweightNames) {
-      WeightExpression = "(" + WeightExpression + ")*(" + name + ")";
-    }
-    dfToUse = dfToUse.Define("MCMC_RDF_WEIGHT", WeightExpression.Data());
-  }
-
+  auto dfToUse = GetFilteredDataFrame();
   // Only need the indices and the lazy result: titles/ranges live in hpost2D[i][j]
   struct CovarianceHistogram {
     int i, j;
@@ -1042,17 +1032,14 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
   Histograms.reserve(nCov);
 
   MACH3LOG_INFO("Booking {} 2D histograms...", nCov);
-
   for (int i = 0; i < nDraw; ++i)
   {
     for (int j = 0; j < i; ++j) // j < i: diagonal is already done
     {
       // If this parameter isn't varied
       if (ParamVaried[j] == false) {
-        (*Covariance)(i,j) = 0.0;
-        (*Covariance)(j,i) = (*Covariance)(i,j);
-        (*Correlation)(i,j) = 0.0;
-        (*Correlation)(j,i) = (*Correlation)(i,j);
+        (*Covariance)(i,j) = (*Covariance)(j,i) = 0.0;
+        (*Correlation)(i,j) = (*Correlation)(j,i) = 0.0;
         continue;
       }
 
@@ -1060,16 +1047,8 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
       hpost2D[i][j]->Reset();
 
       // Build the model (name, title, binning, range) from the existing histogram
-      const ROOT::RDF::TH2DModel model(*hpost2D[i][j].get());
-
-      ROOT::RDF::RResultPtr<TH2D> result;
-      if (!ReweightPosterior) {
-        result = dfToUse.Histo2D(model, BranchNames[i].Data(), BranchNames[j].Data());
-      } else {
-        result = dfToUse.Histo2D(model, BranchNames[i].Data(), BranchNames[j].Data(),
-                                  "MCMC_RDF_WEIGHT");
-      }
-      Histograms.push_back({i, j, result});
+      const ROOT::RDF::TH2DModel model(*hpost2D[i][j]);
+      Histograms.push_back({i, j, dfToUse.Histo2D(model, BranchNames[i].Data(), BranchNames[j].Data(), "MCMC_RDF_WEIGHT")});
     } // End j loop
   } // End i loop
   MACH3LOG_INFO("Finished booking {} histograms. Now executing RDF event loop...", Histograms.size());
@@ -1082,10 +1061,7 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
   }
   clock.Stop();
   MACH3LOG_INFO("RDataFrame event loop took {:.2f}s for {} entries", clock.RealTime(), nEntries);
-
-  #ifdef MULTITHREAD
-  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
-  #endif
+  M3::DisableROOTMultiThreading();
 
   TStopwatch processingClock;
   processingClock.Start();
@@ -1113,46 +1089,63 @@ void MCMCProcessor::MakeCovariance(bool Mute) {
 
   if (!Mute)
   {
-    if (printToPDF)
-    {
-      Posterior->cd();
-      for (int i = 0; i < nDraw; ++i)
-      {
-        for (int j = 0; j < i; ++j)
-        {
-          if (ParamVaried[j] == false) continue;
-
-          if (ParamType[i] == kModelPar && ParamType[j] == kModelPar)
-          {
-            if (std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
-            {
-              hpost2D[i][j]->Draw("colz");
-              Posterior->SetName(hpost2D[i][j]->GetName());
-              Posterior->SetTitle(hpost2D[i][j]->GetTitle());
-              Posterior->Print(CanvasName);
-              hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
-            }
-          }
-        } // End j loop
-      } // End i loop
-    } // end if pdf
+    WriteCovariance(PostHistDir);
     processingClock.Stop();
     MACH3LOG_INFO("Processing covariance histograms took {:.2f}s", processingClock.RealTime());
-
-    if (PostHistDir) {
-      PostHistDir->Close();
-      delete PostHistDir;
-    }
-    OutputFile->cd();
-    Covariance->Write("Covariance");
-    Correlation->Write("Correlation");
   } // end mute
+}
+
+// *********************
+// Write covariances to output file
+void MCMCProcessor::WriteCovariance(TDirectory *PostHistDir) {
+// *********************
+  if (printToPDF)
+  {
+    Posterior->cd();
+    for (int i = 0; i < nDraw; ++i)
+    {
+      for (int j = 0; j < i; ++j)
+      {
+        if (ParamVaried[j] == false) continue;
+
+        if (ParamType[i] == kModelPar && ParamType[j] == kModelPar)
+        {
+          if (std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+          {
+            hpost2D[i][j]->Draw("colz");
+            Posterior->SetName(hpost2D[i][j]->GetName());
+            Posterior->SetTitle(hpost2D[i][j]->GetTitle());
+            Posterior->Print(CanvasName);
+            hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
+          }
+        }
+      } // End j loop
+    } // End i loop
+  } // end if pdf
+
+  if (PostHistDir) {
+    PostHistDir->Close();
+    delete PostHistDir;
+  }
+  OutputFile->cd();
+  Covariance->Write("Covariance");
+  Correlation->Write("Correlation");
 }
 
 // ***************
 //KS: Cache all steps to allow multithreading, hit RAM quite a bit
 void MCMCProcessor::Prepare2DHistograms() {
 // ***************
+  // Check that the diagonal entries have been filled
+  // i.e. MakePostfit() has been called
+  for (int i = 0; i < nDraw; ++i) {
+    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
+      MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
+      MakePostfit();
+      break;
+    }
+  }
+
   if(hpost2D.size() != 0) return;
 
   // Calculate the total number of TH2D objects
@@ -1680,7 +1673,7 @@ void MCMCProcessor::ProduceChi2(const std::string& GroupName) const {
     if (ParamVaried[iPar] == false) continue;
     if (GroupName != "All" && GroupNameCurr != GroupName) continue;
 
-    auto Chi2 = GetDeltaChi2(hpost[iPar]);
+    auto Chi2 = GetDeltaChi2(hpost[iPar].get());
     RemoveFitter(Chi2.get(), "Gauss");
 
     Chi2->Write();
@@ -2118,11 +2111,6 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
 // Scan the input trees
 void MCMCProcessor::ScanInput() {
 // **************************
-  // KS: This can reduce time necessary for caching even by half
-  #ifdef MULTITHREAD
-  //ROOT::EnableImplicitMT();
-  #endif
-
   // Open the Chain
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());

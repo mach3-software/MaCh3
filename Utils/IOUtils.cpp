@@ -1,5 +1,10 @@
 #include "Utils/IOUtils.h"
 
+_MaCh3_Safe_Include_Start_ //{
+#include <ROOT/RDataFrame.hxx>
+#include <ROOT/RConfig.hxx>
+_MaCh3_Safe_Include_End_ //}
+
 namespace M3 {
 // **************************************************************************
 TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line) {
@@ -19,4 +24,22 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   }
   return OutFile;
 }
+
+// ***************************************************************************
+void EnableROOTMultiThreading() {
+// ***************************************************************************
+  #ifdef MULTITHREAD
+  auto nThreads = GetNThreads();
+  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
+  if(!IMTWasEnabled) ROOT::EnableImplicitMT(nThreads);
+  #endif
+}
+
+// ***************************************************************************
+void DisableROOTMultiThreading() {
+// ***************************************************************************
+  const bool IMTWasEnabled = ROOT::IsImplicitMTEnabled();
+  if(!IMTWasEnabled) ROOT::DisableImplicitMT();
+}
+
 } //end M3 namespace
