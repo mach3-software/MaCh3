@@ -4,7 +4,7 @@
 #include "Manager/MaCh3Modes.h"
 #include "Splines/SplineStructs.h"
 #include "Splines/SplineCommon.h"
-#include "Samples/HistogramUtils.h"
+#include "Utils/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include
