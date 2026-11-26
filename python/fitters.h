@@ -49,8 +49,7 @@ public:
     }
 };
 
-void initFittersModule(py::module &m_fitters){    
-    
+void initFittersModule(py::module &m_fitters){
     py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitters, "FitterBase")
         .def(py::init<Manager* const>())
         
