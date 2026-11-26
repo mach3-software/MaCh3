@@ -157,7 +157,7 @@ If something is unclear please contact us via
             </td>
             <!-- Counter of publication -->
             <td class="mach3-recent-results-text" style="white-space: nowrap; min-width: 300px;">
-                <div>14+ papers using MaCh3</div>
+                <div>15+ papers using MaCh3</div>
                 <div>34+ theses and dissertations</div>
                 <div>2013 → present</div>
             </td>
@@ -171,7 +171,7 @@ If something is unclear please contact us via
                         </span>
                     </div>
                     <div class="mach3-extra-card-text">
-                        The DUNE Collaboration. A Bayesian approach to the long-baseline neutrino oscillation sensitivity of DUNE.
+                         ___XYZ_PUBLICATION___
                     </div>
                 </div>
                 <div class="mach3-extra-card" style="flex: 1; min-width: 0;">
@@ -182,7 +182,7 @@ If something is unclear please contact us via
                         </span>
                     </div>
                     <div class="mach3-extra-card-text">
-                        Naseem Khan — Prototyping of and sensitivity studies for a gaseous argon near detector for the deep underground neutrino experiment
+                        ___XYZ_PHD___
                     </div>
                 </div>
             </td>
