@@ -1,0 +1,11 @@
+#pragma once
+
+namespace M3::CLIConfig {
+    inline constexpr char IncludeDir[] = "@MACH3_CPP_MACH3_INCDIR@";
+    inline constexpr char Cflags[] = "@MACH3_CPP_MACH3_CFLAGS@";
+    inline constexpr char LibraryDir[] = "@MACH3_CPP_MACH3_LIBDIR@";
+    inline constexpr char Libraries[] = "@MACH3_CPP_MACH3_LIBS@";
+    inline constexpr char Features[] = "@MACH3_CPP_MACH3_FEATURES@";
+    inline constexpr char Version[] = "@MACH3_CPP_MaCh3_VERSION@";
+    inline constexpr char Date[] = "@MACH3_CPP_MACH3_CONFIG_DATE@";
+}

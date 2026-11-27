@@ -49,7 +49,7 @@ ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
 WORKDIR ${MACH3_WORK_DIR}
 
 #KS: If GPU is not being compiled this must mean ill configured cmake somewhere in MaCh3
-RUN if ! mach3-config --has-feature GPU; then \
+RUN if ! mach3 config --has-feature GPU; then \
         echo "ERROR: MaCh3 was built without GPU support." >&2; \
         exit 1; \
     fi
