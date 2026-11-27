@@ -43,7 +43,7 @@ RUN make ${INSTALL_OPTIONS} && make install
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
 ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
-    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${MaCh3_ROOT}/lib64:${LD_LIBRARY_PATH}
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
