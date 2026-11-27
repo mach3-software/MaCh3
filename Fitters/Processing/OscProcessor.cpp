@@ -503,6 +503,17 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
     double j_3sig_low = 9999999.;;
     double j_3sig_up  = -9999999.;
 
+    double contlevel1 = 0.68;
+    double contlevel2 = 0.90;
+    double contlevel4 = 0.99;
+    double contlevel5 = 0.9973;
+
+    // Get credible for Jarlskog with delta_CP
+    JarlskogCredible(j_hist_copy.get(), j_hist_1sig.get(), j_hist_2sig.get(), j_hist_3sig.get(),
+                     j_bf, contlevel1, contlevel2, contlevel4, contlevel5,
+                     j_1sig_low, j_1sig_up,
+                     j_2sig_low, j_2sig_up,
+                     j_3sig_low, j_3sig_up);
 
     std::unique_ptr<TH1D> j_hist_sdcp_copy = M3::Clone(j_hist_sdcp.get(), "j_hist_sdcp_copy");
     std::unique_ptr<TH1D> j_hist_sdcp_1sig = M3::Clone(j_hist_sdcp.get(), "j_hist_sdcp_1sig");
@@ -517,17 +528,6 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
     double j_sdcp_3sig_low = 9999999.;;
     double j_sdcp_3sig_up  = -9999999.;
 
-    double contlevel1 = 0.68;
-    double contlevel2 = 0.90;
-    double contlevel4 = 0.99;
-    double contlevel5 = 0.9973;
-
-    // Get credible for Jarlskog with delta_CP
-    JarlskogCredible(j_hist_copy.get(), j_hist_1sig.get(), j_hist_2sig.get(), j_hist_3sig.get(),
-                     j_bf, contlevel1, contlevel2, contlevel4, contlevel5,
-                     j_1sig_low, j_1sig_up,
-                     j_2sig_low, j_2sig_up,
-                     j_3sig_low, j_3sig_up);
     // Get credible for Jarlskog with sin(delta_CP)
     JarlskogCredible(j_hist_sdcp_copy.get(), j_hist_sdcp_1sig.get(), j_hist_sdcp_2sig.get(), j_hist_sdcp_3sig.get(),
                      j_bf, contlevel1, contlevel2, contlevel4, contlevel5,
