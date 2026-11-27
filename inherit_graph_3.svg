@@ -12,9 +12,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="structBinShiftLookup.html" target="_top" xlink:title="KS: Store bin lookups allowing to quickly find bin after migration.">
+<g id="a_node1"><a xlink:href="classBinningHandler.html" target="_top" xlink:title="KS: Class handling binning for multiple samples.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 83,-19.5 83,-0.5 0,-0.5"/>
-<text text-anchor="middle" x="41.5" y="-7.5" font-family="Helvetica" font-size="10.00">BinShiftLookup</text>
+<text text-anchor="middle" x="41.5" y="-7.5" font-family="Helvetica" font-size="10.00">BinningHandler</text>
 </a>
 </g>
 </g>

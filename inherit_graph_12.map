@@ -1,16 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="5,233,93,260"/>
-<area shape="rect" id="node2" href="$classM3_1_1DynamicPlugin.html" title="Manages the lifecycle of a dynamically loaded plugin." alt="" coords="141,208,277,235"/>
-<area shape="rect" id="node3" href="$classM3_1_1PluginBase.html" title="Base class for core modules in MaCh3." alt="" coords="152,259,267,285"/>
-<area shape="rect" id="node4" href="$classM3_1_1CombineModule.html" title="Allows you to combine multiple chains or ROOT files into a single output." alt="" coords="345,5,488,32"/>
-<area shape="rect" id="node5" href="$classM3_1_1DiagMCMCModule.html" title="Module for performing diagnostic analysis on MCMC chains." alt="" coords="337,56,496,83"/>
-<area shape="rect" id="node6" href="$classM3_1_1DiagModule.html" title="Module for MCMC diagnostics." alt="" coords="358,107,475,133"/>
-<area shape="rect" id="node7" href="$classM3_1_1GetPenaltyTermModule.html" title="Module for extracting specific penalty terms from MCMC chains." alt="" coords="325,157,508,184"/>
-<area shape="rect" id="node8" href="$classM3_1_1LLHMapModule.html" title="Module for processing LLHMap outputs." alt="" coords="347,208,486,235"/>
-<area shape="rect" id="node9" href="$classM3_1_1ProcessMCMCModule.html" title="Module for processing MCMC chains and producing various diagnostic plots." alt="" coords="327,259,507,285"/>
-<area shape="rect" id="node10" href="$classM3_1_1RHatModule.html" title="Module for computing the R&#45;hat diagnostic for MCMC chains." alt="" coords="356,309,477,336"/>
-<area shape="rect" id="node11" href="$classM3_1_1ReweightModule.html" title="Module for performing reweighting analysis on MCMC chains." alt="" coords="345,360,488,387"/>
-<area shape="rect" id="node12" href="$classM3_1_1SmearModule.html" title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ..." alt="" coords="353,411,481,437"/>
-<area shape="rect" id="node13" href="$classM3_1_1UmbrellaModule.html" title="Module for performing Umbrella sampling." alt="" coords="345,461,488,488"/>
-<area shape="rect" id="node14" href="$classM3_1_1UmbrellaPlotModule.html" title="Module for Umbrella sampling plot analysis." alt="" coords="334,512,499,539"/>
+<area shape="rect" id="node1" href="$structM3_1_1detail_1_1Functional_1_1Shift.html" title=" " alt="" coords="5,5,152,47"/>
 </map>

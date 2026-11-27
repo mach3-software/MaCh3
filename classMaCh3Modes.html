@@ -836,8 +836,8 @@ Daniel Barrow </dd></dl>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a> = 0;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">nCCModes</a> = 0;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">Title</a> = config[<span class="stringliteral">&quot;Title&quot;</span>].as&lt;std::string&gt;();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a> = config[<span class="stringliteral">&quot;GeneratorName&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">Title</a> = Get&lt;std::string&gt;(config[<span class="stringliteral">&quot;Title&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a> = Get&lt;std::string&gt;(config[<span class="stringliteral">&quot;GeneratorName&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">auto</span> names = Get&lt;std::vector&lt;std::string&gt;&gt;(config[<span class="stringliteral">&quot;MaCh3Modes&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>

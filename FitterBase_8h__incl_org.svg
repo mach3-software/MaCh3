@@ -130,7 +130,7 @@
 <g id="node42" class="node">
 <title>Node88</title>
 <g id="a_node42"><a xlink:href="MCMCProcessor_8h.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="black" points="1293,-403.5 1293,-433.5 1397,-433.5 1397,-403.5 1293,-403.5"/>
+<polygon fill="white" stroke="red" points="1293,-403.5 1293,-433.5 1397,-433.5 1397,-403.5 1293,-403.5"/>
 <text text-anchor="start" x="1301" y="-421.5" font-family="Helvetica" font-size="10.00">Fitters/Processing</text>
 <text text-anchor="middle" x="1345" y="-410.5" font-family="Helvetica" font-size="10.00">/MCMCProcessor.h</text>
 </a>

@@ -81,48 +81,48 @@ var sectionId = 'dynsection-0';
 <path fill="none" stroke="midnightblue" d="M406.63,-738.4C382.28,-728.69 349.74,-715.71 323.61,-705.29"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="324.88,-702.03 314.3,-701.58 322.29,-708.53 324.88,-702.03"/>
 </g>
-<!-- Node100 -->
+<!-- Node101 -->
 <g id="node48" class="node">
-<title>Node100</title>
+<title>Node101</title>
 <g id="a_node48"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="344.5,-677 344.5,-696 435.5,-696 435.5,-677 344.5,-677"/>
 <text text-anchor="middle" x="390" y="-684" font-family="Helvetica" font-size="10.00">Math/Minimizer.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node100 -->
+<!-- Node1&#45;&gt;Node101 -->
 <g id="edge106" class="edge">
-<title>Node1&#45;&gt;Node100</title>
+<title>Node1&#45;&gt;Node101</title>
 <path fill="none" stroke="midnightblue" d="M430.72,-738.4C422.69,-728.36 411.87,-714.84 403.4,-704.25"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="405.94,-701.82 396.96,-696.19 400.47,-706.19 405.94,-701.82"/>
 </g>
-<!-- Node101 -->
+<!-- Node102 -->
 <g id="node49" class="node">
-<title>Node101</title>
+<title>Node102</title>
 <g id="a_node49"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="453.5,-677 453.5,-696 536.5,-696 536.5,-677 453.5,-677"/>
 <text text-anchor="middle" x="495" y="-684" font-family="Helvetica" font-size="10.00">Math/Factory.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node101 -->
+<!-- Node1&#45;&gt;Node102 -->
 <g id="edge107" class="edge">
-<title>Node1&#45;&gt;Node101</title>
+<title>Node1&#45;&gt;Node102</title>
 <path fill="none" stroke="midnightblue" d="M453.5,-738.4C461.68,-728.36 472.71,-714.84 481.34,-704.25"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="484.3,-706.16 487.91,-696.19 478.88,-701.73 484.3,-706.16"/>
 </g>
-<!-- Node102 -->
+<!-- Node103 -->
 <g id="node50" class="node">
-<title>Node102</title>
+<title>Node103</title>
 <g id="a_node50"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="554.5,-677 554.5,-696 637.5,-696 637.5,-677 554.5,-677"/>
 <text text-anchor="middle" x="596" y="-684" font-family="Helvetica" font-size="10.00">Math/Functor.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node102 -->
+<!-- Node1&#45;&gt;Node103 -->
 <g id="edge108" class="edge">
-<title>Node1&#45;&gt;Node102</title>
+<title>Node1&#45;&gt;Node103</title>
 <path fill="none" stroke="midnightblue" d="M475.42,-738.4C502.56,-726.94 540.47,-710.94 566.5,-699.95"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="567.99,-703.12 575.84,-696.01 565.27,-696.67 567.99,-703.12"/>
 </g>

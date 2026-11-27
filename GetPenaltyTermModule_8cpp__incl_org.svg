@@ -306,9 +306,9 @@
 <path fill="none" stroke="midnightblue" d="M850.66,-538.15C1025.35,-531.3 1482.08,-506.21 1853.04,-423 1856.45,-422.23 1859.98,-421.28 1863.47,-420.24"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1864.64,-423.54 1873.07,-417.12 1862.48,-416.88 1864.64,-423.54"/>
 </g>
-<!-- Node81 -->
+<!-- Node82 -->
 <g id="node49" class="node">
-<title>Node81</title>
+<title>Node82</title>
 <g id="a_node49"><a xlink:href="GetPenaltyTermModule_8hpp.html" target="_top" xlink:title="Module for extracting penalty terms from systematic chains.">
 <polygon fill="white" stroke="red" points="2093.54,-459.5 2093.54,-489.5 2238.54,-489.5 2238.54,-459.5 2093.54,-459.5"/>
 <text text-anchor="start" x="2101.54" y="-477.5" font-family="Helvetica" font-size="10.00">CLI/Modules/GetPenaltyTerm</text>
@@ -316,24 +316,24 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node81 -->
+<!-- Node1&#45;&gt;Node82 -->
 <g id="edge98" class="edge">
-<title>Node1&#45;&gt;Node81</title>
+<title>Node1&#45;&gt;Node82</title>
 <path fill="none" stroke="midnightblue" d="M850.55,-540.89C1048.19,-541.26 1612.73,-537.72 2079.04,-490 2080.51,-489.85 2082,-489.69 2083.5,-489.52"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="2084,-492.98 2093.5,-488.29 2083.15,-486.04 2084,-492.98"/>
 </g>
-<!-- Node87 -->
+<!-- Node88 -->
 <g id="node50" class="node">
-<title>Node87</title>
+<title>Node88</title>
 <g id="a_node50"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="2256.54,-465 2256.54,-484 2315.54,-484 2315.54,-465 2256.54,-465"/>
 <text text-anchor="middle" x="2286.04" y="-472" font-family="Helvetica" font-size="10.00">TObject.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node87 -->
+<!-- Node1&#45;&gt;Node88 -->
 <g id="edge109" class="edge">
-<title>Node1&#45;&gt;Node87</title>
+<title>Node1&#45;&gt;Node88</title>
 <path fill="none" stroke="midnightblue" d="M850.79,-539.41C1128.17,-535.04 2110.69,-517.76 2248.04,-490 2251.12,-489.38 2254.29,-488.53 2257.4,-487.56"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="2258.81,-490.77 2267.07,-484.14 2256.48,-484.17 2258.81,-490.77"/>
 </g>

@@ -1,12 +1,11 @@
 <map id="Fitters/Processing/MCMCProcessor.cpp" name="Fitters/Processing/MCMCProcessor.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="3343,5,3495,47"/>
-<area shape="rect" id="node2" href="$MCMCProcessor_8h.html" title=" " alt="" coords="3219,95,3358,136"/>
+<area shape="rect" id="node1" title=" " alt="" coords="3303,5,3455,47"/>
+<area shape="rect" id="node2" href="$MCMCProcessor_8h.html" title=" " alt="" coords="3245,95,3383,136"/>
 <area shape="rect" id="node23" title=" " alt="" coords="1234,348,1290,375"/>
-<area shape="rect" id="node48" title=" " alt="" coords="3382,102,3457,129"/>
-<area shape="rect" id="node49" title=" " alt="" coords="3481,102,3584,129"/>
-<area shape="rect" id="node50" title=" " alt="" coords="3608,102,3769,129"/>
-<area shape="rect" id="node3" title=" " alt="" coords="4259,191,4329,218"/>
-<area shape="rect" id="node4" title=" " alt="" coords="4353,191,4411,218"/>
+<area shape="rect" id="node49" title=" " alt="" coords="3407,102,3482,129"/>
+<area shape="rect" id="node50" title=" " alt="" coords="3507,102,3609,129"/>
+<area shape="rect" id="node3" title=" " alt="" coords="4444,191,4515,218"/>
+<area shape="rect" id="node4" title=" " alt="" coords="4539,191,4596,218"/>
 <area shape="rect" id="node5" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="743,184,872,225"/>
 <area shape="rect" id="node13" title=" " alt="" coords="909,273,1060,300"/>
 <area shape="rect" id="node14" title=" " alt="" coords="1084,273,1189,300"/>
@@ -31,6 +30,7 @@
 <area shape="rect" id="node45" title=" " alt="" coords="3921,191,3997,218"/>
 <area shape="rect" id="node46" title=" " alt="" coords="4022,191,4129,218"/>
 <area shape="rect" id="node47" title=" " alt="" coords="4153,191,4235,218"/>
+<area shape="rect" id="node48" title=" " alt="" coords="4259,191,4420,218"/>
 <area shape="rect" id="node6" title=" " alt="" coords="23,273,95,300"/>
 <area shape="rect" id="node7" title=" " alt="" coords="119,273,189,300"/>
 <area shape="rect" id="node8" title=" " alt="" coords="213,273,279,300"/>

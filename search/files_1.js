@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['10_2e_2dposterior_2dpredictive_2c_2dpâvalue_2detc_2e_2emd_2184',['10.-Posterior-Predictive,-pâvalue-etc..md',['../10_8-Posterior-Predictive_00-p_xC3_xA2_xC2_x80_xC2_x90value-etc_8_8md.html',1,'']]],
-  ['11_2e_2dstep_2dsize_2dtuning_2emd_2185',['11.-Step-size-tuning.md',['../11_8-Step-size-tuning_8md.html',1,'']]],
-  ['12_2e_2dcontainers_2emd_2186',['12.-Containers.md',['../12_8-Containers_8md.html',1,'']]],
-  ['13_2e_2dknown_2dclusters_2emd_2187',['13.-Known-Clusters.md',['../13_8-Known-Clusters_8md.html',1,'']]],
-  ['14_2e_2dmach3_2din_2dthe_2dfield_2emd_2188',['14.-MaCh3-in-the-Field.md',['../14_8-MaCh3-in-the-Field_8md.html',1,'']]],
-  ['16_2e_2dadaptive_2dmcmc_2emd_2189',['16.-Adaptive-MCMC.md',['../16_8-Adaptive-MCMC_8md.html',1,'']]]
+  ['10_2e_2dposterior_2dpredictive_2c_2dpâvalue_2detc_2e_2emd_2224',['10.-Posterior-Predictive,-pâvalue-etc..md',['../10_8-Posterior-Predictive_00-p_xC3_xA2_xC2_x80_xC2_x90value-etc_8_8md.html',1,'']]],
+  ['11_2e_2dstep_2dsize_2dtuning_2emd_2225',['11.-Step-size-tuning.md',['../11_8-Step-size-tuning_8md.html',1,'']]],
+  ['12_2e_2dcontainers_2emd_2226',['12.-Containers.md',['../12_8-Containers_8md.html',1,'']]],
+  ['13_2e_2dknown_2dclusters_2emd_2227',['13.-Known-Clusters.md',['../13_8-Known-Clusters_8md.html',1,'']]],
+  ['14_2e_2dmach3_2din_2dthe_2dfield_2emd_2228',['14.-MaCh3-in-the-Field.md',['../14_8-MaCh3-in-the-Field_8md.html',1,'']]],
+  ['16_2e_2dadaptive_2dmcmc_2emd_2229',['16.-Adaptive-MCMC.md',['../16_8-Adaptive-MCMC_8md.html',1,'']]]
 ];
