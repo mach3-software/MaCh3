@@ -43,13 +43,13 @@ RUN make ${INSTALL_OPTIONS} && make install
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
 ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
-    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${MaCh3_ROOT}/lib64:${LD_LIBRARY_PATH}
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
 
 #KS: If GPU is not being compiled this must mean ill configured cmake somewhere in MaCh3
-RUN if ! mach3-config --has-feature GPU; then \
+RUN if ! mach3 config --has-feature GPU; then \
         echo "ERROR: MaCh3 was built without GPU support." >&2; \
         exit 1; \
     fi

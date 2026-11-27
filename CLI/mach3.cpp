@@ -13,9 +13,11 @@
 #include "CLI/Modules/SmearModule.hpp"
 #include "CLI/Modules/ReweightModule.hpp"
 #include "CLI/Modules/CombineModule.hpp"
+#include "CLI/Modules/ConfigModule.hpp"
 #include "CLI/Modules/Plot/PlotModule.hpp"
 #include "CLI/Modules/UmbrellaModule.hpp"
 #include "CLI/MaCh3Program.hpp"
+#include "CLI/ConfigData.hpp"
 
 /// @brief Main entry point for the MaCh3 application
 ///
@@ -27,7 +29,7 @@
 /// @return Exit code (0 on success, non-zero on error)
 // Fix startup errors: the outer boundary also covers construction, registration and discovery.
 int main(int argc, char *argv[]) try {
-    M3::MaCh3Program program("mach3");
+    M3::MaCh3Program program("mach3", M3::CLIConfig::Version);
 
     // Hidden completion option — accepts prefix + preceding words as context
     program.add_argument("--complete")
@@ -46,6 +48,7 @@ int main(int argc, char *argv[]) try {
     M3::SmearModule smear;
     M3::ReweightModule reweight;
     M3::CombineModule combine;
+    M3::ConfigModule config;
     M3::PlotModule plot;
     M3::UmbrellaModule umbrella;
 
@@ -56,6 +59,7 @@ int main(int argc, char *argv[]) try {
     program.add_core_module(smear);
     program.add_core_module(reweight);
     program.add_core_module(combine);
+    program.add_core_module(config);
     program.add_core_module(plot);
     program.add_core_module(umbrella);
     program.load_dynamic_plugins();

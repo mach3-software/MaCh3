@@ -242,7 +242,7 @@ install(FILES
     ${CMAKE_BINARY_DIR}/MaCh3ConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/MaCh3)
 
-include(mach3-config)
+include(MaCh3CLIConfig)
 
 ############################ Version Info ##########################
 ## Based on Ewan Miller implementation in OAGenWeightsApp (T2K)
