@@ -96,12 +96,11 @@ void OscProcessor::LoadAdditionalInfo() {
 
 // ***************
 // Calculate Jarlskog Invariant using oscillation parameters
-double OscProcessor::CalcJarlskog(const double s2th13, const double s2th23, const double s2th12, const double dcp) const {
+double OscProcessor::CalcJarlskog(const double s2th13, const double s2th23, const double s2th12, const double sdcp) const {
 // ***************
   const double s13  = std::sqrt(s2th13);
   const double s23  = std::sqrt(s2th23);
   const double s12  = std::sqrt(s2th12);
-  const double sdcp = std::sin(dcp);
   const double c13  = std::sqrt(1.-s2th13);
   const double c12  = std::sqrt(1.-s2th12);
   const double c23  = std::sqrt(1.-s2th23);
@@ -283,7 +282,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
 
     if(step < BurnInCut) continue; // burn-in cut
 
-    const double j = CalcJarlskog(s2th13, s2th23, s2th12, dcp);
+    const double j = CalcJarlskog(s2th13, s2th23, s2th12, std::sin(dcp));
     const double prior_weight = prior3->Eval(dcp);
 
     jarl->Fill(j, weight);
@@ -300,31 +299,21 @@ void OscProcessor::PerformJarlskogAnalysis() {
     // KS: This is hardcoded but we always assume flat in delta CP so probably fine
     const double prior_sindcp = M3::rand::Uniform(-1., 1.);
 
-    const double prior_s13          = std::sqrt(prior_s2th13);
-    const double prior_s23          = std::sqrt(prior_s2th23);
-    const double prior_s12          = std::sqrt(prior_s2th12);
-    const double prior_sdcp         = std::sin(prior_dcp);
-    const double prior_c13          = std::sqrt(1.-prior_s2th13);
-    const double prior_c12          = std::sqrt(1.-prior_s2th12);
-    const double prior_c23          = std::sqrt(1.-prior_s2th23);
-    const double prior_j            = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
-    const double prior_flatsindcp_j = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
+    const double prior_j = CalcJarlskog(prior_s2th13, prior_s2th23, prior_s2th12, std::sin(prior_dcp));
+    const double prior_flatsindcp_j = CalcJarlskog(prior_s2th13, prior_s2th23, prior_s2th12, prior_sindcp);
 
     jarl_prior->Fill(prior_j);
     jarl_prior_flatsindcp->Fill(prior_flatsindcp_j);
 
     if(DoReweight) {
-      const double prior_wRC_s2th13       = M3::rand::Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
-      const double prior_wRC_s13          = std::sqrt(prior_wRC_s2th13);
-      const double prior_wRC_c13          = std::sqrt(1.-prior_wRC_s2th13);
-      const double prior_wRC_j            = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
-      const double prior_wRC_flatsindcp_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
-      const double s23                    = std::sqrt(s2th23);
-      const double c23                    = std::sqrt(1.-s2th23);
+      const double prior_wRC_s2th13 = M3::rand::Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
+      const double prior_wRC_j            = CalcJarlskog(prior_wRC_s2th13, prior_s2th23, prior_s2th12, std::sin(prior_dcp));
+      const double prior_wRC_flatsindcp_j = CalcJarlskog(prior_wRC_s2th13, prior_s2th23, prior_s2th12, prior_sindcp);
+      const double prior_wRC_t2kth23_j    = CalcJarlskog(prior_wRC_s2th13, s2th23,       prior_s2th12, std::sin(prior_dcp));
 
       jarl_wRC_prior->Fill(prior_wRC_j);
       jarl_wRC_prior_flatsindcp->Fill(prior_wRC_flatsindcp_j);
-      jarl_wRC_prior_t2kth23->Fill(prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*s23*c23*prior_sdcp);
+      jarl_wRC_prior_t2kth23->Fill(prior_wRC_t2kth23_j);
     }
 
     if(dm2 > 0.) {
@@ -390,6 +379,46 @@ void OscProcessor::PerformJarlskogAnalysis() {
   OutputFile->cd();
 }
 
+// ***************
+void JarlskogCredible(TH1* h_copy, TH1* h_1sig, TH1* h_2sig, TH1* h_3sig,
+                      double bf, double cl1, double cl2, double cl3, double cl_max,
+                      double& low1, double& up1, double& low2, double& up2, double& low3, double& up3) {
+// ***************
+  const double integral = h_copy->Integral();
+  double tsum = 0.;
+
+  while ((tsum / integral) < cl_max) {
+    double tmax   = h_copy->GetMaximum();
+    int    bin    = h_copy->GetMaximumBin();
+    double xval   = h_copy->GetXaxis()->GetBinCenter(bin);
+    double xwidth = h_copy->GetXaxis()->GetBinWidth(bin);
+    double frac   = tsum / integral;
+
+    if (frac < cl1) {
+      h_copy->SetBinContent(bin, -1.0);
+      h_1sig->SetBinContent(bin, 0.);
+      h_2sig->SetBinContent(bin, 0.);
+      h_3sig->SetBinContent(bin, 0.);
+      if (xval < low1 && xval < bf) low1 = xval - xwidth / 2.;
+      if (xval > up1  && xval > bf) up1  = xval + xwidth / 2.;
+    }
+    else if (frac < cl2) {
+      h_copy->SetBinContent(bin, -5.0);
+      h_2sig->SetBinContent(bin, 0.);
+      h_3sig->SetBinContent(bin, 0.);
+      if (xval < low2 && xval < bf) low2 = xval - xwidth / 2.;
+      if (xval > up2  && xval > bf) up2  = xval + xwidth / 2.;
+    }
+    else if (frac < cl3) {
+      h_copy->SetBinContent(bin, -9.0);
+      h_3sig->SetBinContent(bin, 0.);
+      if (xval < low3 && xval < bf) low3 = xval - xwidth / 2.;
+      if (xval > up3  && xval > bf) up3  = xval + xwidth / 2.;
+    }
+
+    tsum += tmax;
+  }
+}
 
 // ***************
 void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
@@ -492,70 +521,19 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
     double contlevel2 = 0.90;
     double contlevel4 = 0.99;
     double contlevel5 = 0.9973;
-    double integral, tsum = 0.;
 
-    integral = j_hist_copy->Integral();
-
-    while((tsum/integral)<contlevel5) {
-      double tmax = j_hist_copy->GetMaximum();
-      int bin = j_hist_copy->GetMaximumBin();
-      double xval = j_hist_copy->GetXaxis()->GetBinCenter(bin);
-      double xwidth = j_hist_copy->GetXaxis()->GetBinWidth(bin);
-      if((tsum/integral)<contlevel1) {
-        j_hist_copy->SetBinContent(bin,-1.0);
-        j_hist_1sig->SetBinContent(bin,0.);
-        j_hist_2sig->SetBinContent(bin,0.);
-        j_hist_3sig->SetBinContent(bin,0.);
-        if(xval<j_1sig_low && xval<j_bf) j_1sig_low = xval - xwidth/2.;
-        if(xval>j_1sig_up && xval>j_bf) j_1sig_up = xval + xwidth/2.;
-      }
-      if((tsum/integral)<contlevel2  && (tsum / integral > contlevel1) ) {
-        j_hist_copy->SetBinContent(bin,-5.0);
-        j_hist_2sig->SetBinContent(bin,0.);
-        j_hist_3sig->SetBinContent(bin,0.);
-        if(xval<j_2sig_low && xval<j_bf) j_2sig_low = xval - xwidth/2.;
-        if(xval>j_2sig_up && xval>j_bf) j_2sig_up = xval + xwidth/2.;
-      }
-      if((tsum/integral)<contlevel4  && (tsum / integral > contlevel1) ) {
-        j_hist_copy->SetBinContent(bin,-9.0);
-        j_hist_3sig->SetBinContent(bin,0.);
-        if(xval < j_3sig_low && xval <j_bf) j_3sig_low = xval - xwidth/2.;
-        if(xval > j_3sig_up && xval > j_bf) j_3sig_up = xval + xwidth/2.;
-      }
-      tsum+=tmax;
-    }
-
-    integral = j_hist_sdcp_copy->Integral();
-    tsum = 0.;
-
-    while((tsum/integral)<contlevel5) {
-      double tmax = j_hist_sdcp_copy->GetMaximum();
-      int bin = j_hist_sdcp_copy->GetMaximumBin();
-      double xval = j_hist_sdcp_copy->GetXaxis()->GetBinCenter(bin);
-      double xwidth = j_hist_sdcp_copy->GetXaxis()->GetBinWidth(bin);
-      if((tsum/integral)<contlevel1) {
-        j_hist_sdcp_copy->SetBinContent(bin,-1.0);
-        j_hist_sdcp_1sig->SetBinContent(bin,0.);
-        j_hist_sdcp_2sig->SetBinContent(bin,0.);
-        j_hist_sdcp_3sig->SetBinContent(bin,0.);
-        if(xval<j_sdcp_1sig_low && xval<j_bf) j_sdcp_1sig_low = xval - xwidth/2.;
-        if(xval>j_sdcp_1sig_up && xval>j_bf) j_sdcp_1sig_up = xval + xwidth/2.;
-      }
-      if((tsum/integral)<contlevel2  && (tsum / integral > contlevel1) ) {
-        j_hist_sdcp_copy->SetBinContent(bin,-5.0);
-        j_hist_sdcp_2sig->SetBinContent(bin,0.);
-        j_hist_sdcp_3sig->SetBinContent(bin,0.);
-        if(xval<j_sdcp_2sig_low && xval<j_bf) j_sdcp_2sig_low = xval - xwidth/2.;
-        if(xval>j_sdcp_2sig_up && xval>j_bf) j_sdcp_2sig_up = xval + xwidth/2.;
-      }
-      if((tsum/integral)<contlevel4  && (tsum / integral > contlevel1) ) {
-        j_hist_sdcp_copy->SetBinContent(bin,-9.0);
-        j_hist_sdcp_3sig->SetBinContent(bin,0.);
-        if(xval<j_sdcp_3sig_low && xval<j_bf) j_sdcp_3sig_low = xval - xwidth/2.;
-        if(xval>j_sdcp_3sig_up && xval>j_bf) j_sdcp_3sig_up = xval + xwidth/2.;
-      }
-      tsum+=tmax;
-    }
+    // Get credible for Jarlskog with delta_CP
+    JarlskogCredible(j_hist_copy.get(), j_hist_1sig.get(), j_hist_2sig.get(), j_hist_3sig.get(),
+                     j_bf, contlevel1, contlevel2, contlevel4, contlevel5,
+                     j_1sig_low, j_1sig_up,
+                     j_2sig_low, j_2sig_up,
+                     j_3sig_low, j_3sig_up);
+    // Get credible for Jarlskog with sin(delta_CP)
+    JarlskogCredible(j_hist_sdcp_copy.get(), j_hist_sdcp_1sig.get(), j_hist_sdcp_2sig.get(), j_hist_sdcp_3sig.get(),
+                     j_bf, contlevel1, contlevel2, contlevel4, contlevel5,
+                     j_sdcp_1sig_low, j_sdcp_1sig_up,
+                     j_sdcp_2sig_low, j_sdcp_2sig_up,
+                     j_sdcp_3sig_low, j_sdcp_3sig_up);
 
     j_hist_1sig->SetLineStyle(9);
     j_hist_sdcp_1sig->SetLineStyle(9);
