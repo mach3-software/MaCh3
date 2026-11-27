@@ -36,6 +36,7 @@ struct UmbrellaConfig {
   bool dynamic_files;
   std::string dynamic_pattern;
   int dynamic_n_windows;
+  int burn_in = 0;
   int max_iterations;
   double tolerance;
   int print_frequency;
@@ -71,6 +72,11 @@ UmbrellaConfig parseYAMLConfig(const std::string &filename) {
     config.dynamic_files = GetFromManager<bool>(yaml_config["dynamic_files"], false, __FILE__ , __LINE__);
     config.dynamic_pattern = Get<std::string>(yaml_config["dynamic_pattern"], __FILE__ , __LINE__);
     config.dynamic_n_windows = Get<int>(yaml_config["dynamic_n_windows"], __FILE__ , __LINE__);
+    config.burn_in = GetFromManager<int>(yaml_config["burn_in"], 0, __FILE__, __LINE__);
+    if (config.burn_in < 0) {
+      MACH3LOG_ERROR("UmbrellaSolver burn_in must be non-negative, got {}.", config.burn_in);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     config.use_openmp = GetFromManager<bool>(yaml_config["use_openmp"], true, __FILE__ , __LINE__);
 
     if (!config.dynamic_files) {
@@ -785,15 +791,42 @@ void UmbrellaSolver(const std::string &config_file) {
       MACH3LOG_ERROR("Required branch '{}' missing from {}", config.variable_of_interest, file->GetName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    // The weight calculation only needs this branch. Keep the other posterior
+    // branches disabled during the sample-reading pass to reduce ROOT I/O.
+    tree->SetBranchStatus("*", 0);
+    tree->SetBranchStatus(config.variable_of_interest.c_str(), 1);
     tree->SetBranchAddress(config.variable_of_interest.c_str(), &var_value);
+    int step_value = 0;
+    if (config.burn_in > 0) {
+      tree->SetBranchStatus("step", 1);
+      tree->SetBranchAddress("step", &step_value);
+    }
 
     Long64_t nentries = tree->GetEntries();
-    //Long64_t filtered_entries = 0;
-    MACH3LOG_INFO("Window {}: {} entries", i, nentries);
+    MACH3LOG_INFO("Window {}: {} entries; excluding rows with step < {} from weight calculation", i, nentries, config.burn_in);
 
+    Long64_t invalid_logl_entries = 0;
+    Long64_t burn_in_entries = 0;
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
+      if (config.burn_in > 0 && step_value < config.burn_in) {
+        ++burn_in_entries;
+        continue;
+      }
+      if (config.bias_mode == "temperature" &&
+          (!std::isfinite(var_value) || var_value >= M3::_LARGE_LOGL_)) {
+        ++invalid_logl_entries;
+        continue;
+      }
       samples[i].push_back(var_value);
+    }
+    MACH3LOG_INFO("Window {}: excluded {} entries from weight calculation by step burn-in", i, burn_in_entries);
+    if (config.bias_mode == "temperature") {
+      MACH3LOG_INFO("Window {}: discarded {} entries with non-finite or artificial-maximum LogL", i, invalid_logl_entries);
+    }
+    if (samples[i].empty()) {
+      MACH3LOG_ERROR("Window {} has no valid entries remaining after burn-in and LogL filtering.", i);
+      throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
 
@@ -1081,8 +1114,10 @@ void UmbrellaSolver(const std::string &config_file) {
   oss << "]";
   MACH3LOG_INFO("{}", oss.str());
 
-  // z is normalized to unit magnitude, so event weights are only defined up to
-  // one common factor. Scale by the largest log weight to keep them finite.
+  // z is normalized to unit magnitiude, so we can scale weights arbitrarily by constant factor
+  // Here we scale event weights by largest weight i.e. largest weight is 1.0
+  // This is done to avoid double overflow issues which cause sums to be invalid
+  // Trade for underflow which effectively discards events with weight = 0.0
   double log_weight_scale = 0.0;
   if (config.bias_mode == "temperature") {
     log_weight_scale = -std::numeric_limits<double>::infinity();
@@ -1133,11 +1168,20 @@ void UmbrellaSolver(const std::string &config_file) {
 
     Long64_t nentries = tree->GetEntries();
 
+    // The combined tree retains every input branch, so restore them for output.
+    tree->SetBranchStatus("*", 1);
+
     // KS: This is to avoid warnings about missing umbrella branches...
     int oldLevel = gErrorIgnoreLevel;
     gErrorIgnoreLevel = kError;
     combined_tree->CopyAddresses(tree);
     gErrorIgnoreLevel = oldLevel;
+
+    int step_value = 0;
+    if (config.burn_in > 0) {
+      tree->SetBranchAddress("step", &step_value);
+      combined_tree->GetBranch("step")->SetAddress(&step_value);
+    }
 
     tree->SetBranchAddress("delta_cp", &delta_cp);
     combined_tree->GetBranch("delta_cp")->SetAddress(&delta_cp);
@@ -1157,8 +1201,17 @@ void UmbrellaSolver(const std::string &config_file) {
 
     for (Long64_t entry = 0; entry < nentries; entry++) {
       tree->GetEntry(entry);
+      if (config.bias_mode == "temperature" &&
+          (!std::isfinite(logl_value) || logl_value >= M3::_LARGE_LOGL_)) {
+        continue;
+      }
 
-      if (z_current[i] == 0) {
+      const bool is_burn_in = config.burn_in > 0 && step_value < config.burn_in;
+      if (is_burn_in) {
+        // Preserve burn-in rows for inspection, but exclude them from the
+        // weighted posterior because they were not used to estimate z.
+        umbrella_weight = 0.0;
+      } else if (z_current[i] == 0) {
         umbrella_weight = 0.0; // If z is zero, we cannot apply the umbrella weight, so we set it to 0 (completely downweigh this window's contribution)
       } else {
         // Calculate umbrella weight for this event
@@ -1167,6 +1220,7 @@ void UmbrellaSolver(const std::string &config_file) {
         if (config.bias_mode == "temperature") {
           const double log_denominator = temperatureLogDenominator(
               bias_value, config.windows, z_current, config.log_bias_offset);
+          // Scale the weight by value calculayed above to avoid overflow issues
           umbrella_weight = std::exp(-log_denominator - log_weight_scale);
           if (!std::isfinite(umbrella_weight)) {
             MACH3LOG_ERROR("Non-finite scaled umbrella weight for LogL {}", bias_value);
