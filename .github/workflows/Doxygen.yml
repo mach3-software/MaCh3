@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/mach3-software/mach3:alma9latest
+      image: ghcr.io/mach3-software/mach3:alma9v2.7.1
 
     permissions:
       contents: write
