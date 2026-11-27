@@ -6,10 +6,10 @@ BinnedSplineMakerBase::BinnedSplineMakerBase(const std::string& Config) {
 // ************************************************
   Setting = std::make_unique<Manager>(Config.c_str());
 
-  const auto options = Get<YAML::Node>(Setting->raw()["systematics"], __FILE__, __LINE__);
-  auto ModeName = Get<std::string>(options["modes"], __FILE__ , __LINE__);
+  auto ModeName = Get<std::string>(Setting->raw()["settings"]["modes"], __FILE__ , __LINE__);
   M3::AddPath(ModeName);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
+  const auto options = Get<YAML::Node>(Setting->raw()["systematics"], __FILE__, __LINE__);
   UseKnotForWeight = GetFromManager<bool>(options["UseKnot"], true, __FILE__, __LINE__);
   int nSplineModes = 0;
   KinematicParameters = nullptr;
