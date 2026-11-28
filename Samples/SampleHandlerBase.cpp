@@ -47,8 +47,6 @@ SampleHandlerBase::SampleHandlerBase(std::string ConfigFileName, ParameterHandle
 }
 
 SampleHandlerBase::~SampleHandlerBase() {
-  MACH3LOG_DEBUG("I'm deleting SampleHandlerBase");
-  if(THStackLeg != nullptr) delete THStackLeg;
 }
 
 // ************************************************
@@ -1702,71 +1700,48 @@ bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) const {
 }
 
 // ************************************************
-std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const {
+KinematicCut SampleHandlerBase::MakeExactValueCut(const std::string& VarName, const int value) const {
 // ************************************************
-  bool fChannel;
-  bool fMode;
-
-  if (kChannelToFill != -1) {
-    if (kChannelToFill > GetNOscChannels(iSample)) {
-      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", GetNOscChannels(iSample));
-      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
-      MACH3LOG_ERROR("Exiting.");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    fChannel = true;
-  } else {
-    fChannel = false;
-  }
-
-  if (kModeToFill != -1) {
-    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
-      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
-      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
-      MACH3LOG_ERROR("Exiting..");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    fMode = true;
-  } else {
-    fMode = false;
-  }
-
-  std::vector< KinematicCut > SelectionVec;
-
-  if (fMode) {
-    KinematicCut SelecMode;
-    SelecMode.ParamToCutOnIt = ReturnKinematicParameterFromString("Mode");
-    SelecMode.LowerBound = kModeToFill;
-    SelecMode.UpperBound = kModeToFill+1;
-    SelectionVec.push_back(SelecMode);
-  }
-
-  if (fChannel) {
-    KinematicCut SelecChannel;
-    SelecChannel.ParamToCutOnIt = ReturnKinematicParameterFromString("OscillationChannel");
-    SelecChannel.LowerBound = kChannelToFill;
-    SelecChannel.UpperBound = kChannelToFill+1;
-    SelectionVec.push_back(SelecChannel);
-  }
-
-  return SelectionVec;
+  KinematicCut Cut;
+  Cut.ParamToCutOnIt = ReturnKinematicParameterFromString(VarName);
+  Cut.LowerBound = value - 0.5;
+  Cut.UpperBound = value + 0.5;
+  return Cut;
 }
 
 // ************************************************
-std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                                                     const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
+std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByValues(const int iSample, const std::string& ProjectionVar_Str,
+                                                            const std::vector<std::string>& VarNames, const std::vector<int>& Values,
+                                                            const int WeightStyle) {
 // ************************************************
-  auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
-  return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle);
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("{}: VarNames (size={}) and Values (size={}) must have the same size.",
+                   __func__, VarNames.size(), Values.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<KinematicCut> cuts(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    cuts[i] = MakeExactValueCut(VarNames[i], Values[i]);
+  }
+  return Get1DVarHist(iSample, ProjectionVar_Str, cuts, WeightStyle);
 }
 
 // ************************************************
-std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                                                     const std::string& ProjectionVar_StrY, const int kModeToFill,
-                                                                     const int kChannelToFill, const int WeightStyle) {
+std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHistByValues(const int iSample, const std::string& ProjectionVar_StrX,
+                                                             const std::string& ProjectionVar_StrY, const std::vector<std::string>& VarNames,
+                                                             const std::vector<int>& Values, const int WeightStyle) {
 // ************************************************
-  auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
-  return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, SelectionVec, WeightStyle);
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("{}: VarNames (size={}) and Values (size={}) must have the same size.",
+                   __func__, VarNames.size(), Values.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  std::vector<KinematicCut> cuts(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    cuts[i] = MakeExactValueCut(VarNames[i], Values[i]);
+  }
+  return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, cuts, WeightStyle);
 }
 
 // ************************************************
@@ -1793,13 +1768,15 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
   }
 
   double PDFIntegral = 0.;
-
-  /// [mode][]
+  /// [mode][channel]
   std::vector< std::vector< double > > IntegralList(Modes->GetNModes());
   std::vector<double> ChannelIntegral(GetNOscChannels(iSample), 0.);
 
-  for (int i=0;i<Modes->GetNModes();i++) {
-    IntegralList[i] = ReturnSampleIntegralBySelection(iSample, SamplePlotType::kOscChannelPlot, i, WeightStyle);
+  for (int iMode = 0; iMode < Modes->GetNModes(); iMode++) {
+    IntegralList[iMode].resize(GetNOscChannels(iSample));
+    for (int iChannel = 0; iChannel < GetNOscChannels(iSample); iChannel++) {
+      IntegralList[iMode][iChannel] = ReturnSampleIntegralByValue(iSample, {"Mode", "OscillationChannel"}, {iMode, iChannel}, WeightStyle);
+    }
   }
 
   MACH3LOG_INFO("-------------------------------------------------");
@@ -1905,80 +1882,91 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 }
 
 // ************************************************
-int SampleHandlerBase::GetRangeForPlotType(const SamplePlotType TypeEnum, const int iSample) const {
+std::map<int, SplitCategory> SampleHandlerBase::BuildSplitCategories(const int iSample, const std::string& VarName,
+                                                                     const std::map<int, SplitCategory>& Categories) const {
 // ************************************************
-  switch (TypeEnum) {
-    case SamplePlotType::kModePlot:
-      return Modes->GetNModes();
-      break;
-    case SamplePlotType::kOscChannelPlot:
-      return GetNOscChannels(iSample);
-      break;
-    default:
-      MACH3LOG_ERROR("You've passed me a SamplePlotType with value {} which was not implemented.", static_cast<int>(TypeEnum));
-      throw MaCh3Exception(__FILE__, __LINE__);
+  if (!Categories.empty()) return Categories;
+
+  std::map<int, SplitCategory> split;
+  if (VarName == "Mode") {
+    for (int i = 0; i < Modes->GetNModes(); ++i) {
+      split[i] = {Modes->GetMaCh3ModeName(i),
+        static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i))};
+    }
+  } else if (VarName == "OscillationChannel") {
+    for (int i = 0; i < GetNOscChannels(iSample); ++i) {
+      split[i] = {GetFlavourName(iSample, i), static_cast<Color_t>(kAzure + 2 * i)};
+    }
+  } else {
+    MACH3LOG_ERROR("No categories given for split variable '{}', and it is not 'Mode' or 'OscillationChannel'", VarName);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
+  return split;
 }
 
 // ************************************************
 std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                              const SamplePlotType Selection1, const int Selection2, const int WeightStyle) {
+                                                                              const std::string& VarName, const std::map<int, SplitCategory>& Categories,
+                                                                              const int WeightStyle) {
 // ************************************************
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
+
+  // New approach: user-defined categories
   std::vector<std::unique_ptr<TH1>> hHistList;
-  std::string legendEntry;
-
-  if (THStackLeg != nullptr) {delete THStackLeg;}
-  THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
-
-  const int iMax = GetRangeForPlotType(Selection1, iSample);
-  for (int i=0;i<iMax;i++) {
-    if (Selection1 == SamplePlotType::kModePlot) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle));
-      THStackLeg->AddEntry(hHistList[i].get(), (Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
-
-      hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
-      hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
-    }
-    if (Selection1 == SamplePlotType::kOscChannelPlot) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,Selection2,i,WeightStyle));
-      THStackLeg->AddEntry(hHistList[i].get(),(GetFlavourName(iSample, i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
-    }
+  hHistList.reserve(SplitCategories.size());
+  for (const auto& [value, category] : SplitCategories) {
+    const std::vector<KinematicCut> cuts = {MakeExactValueCut(VarName, value)};
+    auto hist = Get1DVarHist(iSample, KinematicProjection, cuts, WeightStyle);
+    hHistList.push_back(std::move(hist));
   }
-
   return hHistList;
 }
 
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                                                              const std::string& KinematicProjectionY, const SamplePlotType Selection1,
-                                                                              const int Selection2, const int WeightStyle) {
+                                                                              const std::string& KinematicProjectionY,
+                                                                              const std::string& VarName, const std::map<int, SplitCategory>& Categories,
+                                                                              const int WeightStyle) {
 // ************************************************
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
+
   std::vector<std::unique_ptr<TH2>> hHistList;
-
-  const int iMax = GetRangeForPlotType(Selection1, iSample);
-  for (int i=0;i<iMax;i++) {
-    if (Selection1 == SamplePlotType::kModePlot) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle));
-    }
-    if (Selection1 == SamplePlotType::kOscChannelPlot) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle));
-    }
+  hHistList.reserve(SplitCategories.size());
+  for (const auto& [value, category] : SplitCategories) {
+    const std::vector<KinematicCut> cuts = {MakeExactValueCut(VarName, value)};
+    hHistList.push_back(Get2DVarHist(iSample, KinematicProjectionX, KinematicProjectionY, cuts, WeightStyle));
   }
-
   return hHistList;
 }
 
 // ************************************************
-std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                                           const SamplePlotType Selection1, int Selection2, int WeightStyle) {
+std::pair<std::unique_ptr<THStack>, std::unique_ptr<TLegend>> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample,
+                                                                                      const std::string& KinematicProjection, const std::string& VarName,
+                                                                                      const std::map<int, SplitCategory>& Categories, int WeightStyle) {
 // ************************************************
-  auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
+  const auto SplitCategories = BuildSplitCategories(iSample, VarName, Categories);
+  auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, VarName, SplitCategories, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
+
+  auto THStackLeg = std::make_unique<TLegend>(0.1, 0.1, 0.9, 0.9);
+  int iPlot = 0;
+  for (const auto& [value, category] : SplitCategories) {
+    auto plot_colour = category.colour;
+    if(plot_colour == M3::_BAD_INT_) {
+      plot_colour = static_cast<Color_t>(kAzure + 2 * iPlot);
+    }
+    HistList[iPlot]->SetFillColor(plot_colour);
+    HistList[iPlot]->SetLineColor(plot_colour);
+
+    THStackLeg->AddEntry(HistList[iPlot].get(), (category.label + Form(" : (%4.2f)", HistList[iPlot]->Integral())).c_str(), "f");
+    ++iPlot;
+  }
+
   // Note: we use .release() to transfer ownership of each TH1 to THStack.
-  for (unsigned int i=0;i<HistList.size();i++) {
+  for (size_t i = 0; i < HistList.size(); i++) {
     StackHist->Add(HistList[i].release());
   }
-  return StackHist;
+  return {std::move(StackHist), std::move(THStackLeg)};
 }
 
 // ************************************************
@@ -2119,22 +2107,21 @@ double SampleHandlerBase::GetSampleIntegral(const int iSample, const std::vector
 }
 
 // ************************************************
-std::vector<double> SampleHandlerBase::ReturnSampleIntegralBySelection(const int iSample, const SamplePlotType Selection1,
-                                                                       const int Selection2, const int WeightStyle) {
+double SampleHandlerBase::ReturnSampleIntegralByValue(const int iSample, const std::vector<std::string>& VarNames,
+                                                      const std::vector<int>& Values, const int WeightStyle) {
 // ************************************************
   std::vector<double> hHistList;
 
-  const int iMax = GetRangeForPlotType(Selection1, iSample);
-  for (int i = 0; i < iMax; i++) {
-    if (Selection1 == SamplePlotType::kModePlot) {
-      auto SelectionVec = BuildModeChannelSelection(iSample, i, Selection2);
-      hHistList.push_back(GetSampleIntegral(iSample, SelectionVec, WeightStyle));
-    }
-    if (Selection1 == SamplePlotType::kOscChannelPlot) {
-      auto SelectionVec = BuildModeChannelSelection(iSample, Selection2, i);
-      hHistList.push_back(GetSampleIntegral(iSample, SelectionVec, WeightStyle));
-    }
+  if (VarNames.size() != Values.size()) {
+    MACH3LOG_ERROR("VarNames and values must have the same size.");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  return hHistList;
+  std::vector<KinematicCut> SelectionVec(VarNames.size());
+  for (std::size_t i = 0; i < VarNames.size(); ++i) {
+    SelectionVec[i] = MakeExactValueCut(VarNames[i], Values[i]);
+  }
+
+
+  return GetSampleIntegral(iSample, SelectionVec, WeightStyle);
 }

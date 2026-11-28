@@ -104,22 +104,22 @@ class SampleHandlerInterface
   /// @brief Build a 1D histogram for a given variable, optionally filtered by mode and channel.
   /// @param iSample Index of the sample.
   /// @param ProjectionVar_Str Name of the variable to project onto.
-  /// @param kModeToFill Interaction mode to select (-1 means all modes).
-  /// @param kChannelToFill Oscillation channel to select (-1 means all channels).
+  /// @param var_name Names of the variables used for selection.
+  /// @param value Cut values use for selection
   /// @param WeightStyle Weighting scheme (e.g. 0 = nominal weights, 1 = unit weights).
-  virtual std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                                            const int kModeToFill = -1, const int kChannelToFill = -1,
-                                                            const int WeightStyle = 0) = 0;
+  virtual std::unique_ptr<TH1> Get1DVarHistByValues(const int iSample, const std::string& ProjectionVar_Str,
+                                                    const std::vector<std::string>& var_name, const std::vector<int>& value,
+                                                    const int WeightStyle = 0) = 0;
   /// @brief Build a 2D histogram for given variables, optionally filtered by mode and channel.
   /// @param iSample Index of the sample.
   /// @param ProjectionVar_StrX Name of the variable for the X axis.
   /// @param ProjectionVar_StrY Name of the variable for the Y axis.
-  /// @param kModeToFill Interaction mode to select (-1 means all modes).
-  /// @param kChannelToFill Oscillation channel to select (-1 means all channels).
+  /// @param var_name Names of the variables used for selection.
+  /// @param value Cut values use for selection
   /// @param WeightStyle Weighting scheme (e.g. 0 = nominal weights, 1 = unit weights).
-  virtual std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
-                                                            const int kChannelToFill = -1, const int WeightStyle = 0) = 0;
+  virtual std::unique_ptr<TH2> Get2DVarHistByValues(const int iSample, const std::string& ProjectionVar_StrX,
+                                                    const std::string& ProjectionVar_StrY, const std::vector<std::string>& var_name,
+                                                    const std::vector<int>& value, const int WeightStyle = 0) = 0;
   /// @brief Return 1D projection of MC into given 1D variable (doesn't have to be variable used in the fit)
   /// @param iSample Index of the sample.
   /// @param ProjectionVar name of variable

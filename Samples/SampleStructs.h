@@ -726,6 +726,15 @@ inline int GetLocalBinFromGlobalBin(const std::vector<SampleBinningInfo>& Binnin
   return M3::_BAD_INT_;
 }
 
+/// @brief Label and plotting style for one category when splitting a
+/// histogram by selection, e.g. by interaction mode or oscillation channel
+struct SplitCategory {
+  /// Human-readable label shown in the legend. Empty until set.
+  std::string label;
+  /// Fill/line colour used when drawing this category.
+  Color_t colour = M3::_BAD_INT_;
+};
+
 // ***************************
 // A handy namespace for variables extraction
 namespace M3 {
